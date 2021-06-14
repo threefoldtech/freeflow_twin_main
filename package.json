@@ -1,0 +1,48 @@
+{
+    "name": "Chatty",
+    "version": "0.0.1",
+    "scripts": {
+        "serve": "vue-cli-service serve --port 8080 --host localhost --https",
+        "dev": "vue-cli-service serve --port 8080",
+        "build": "vue-cli-service build"
+    },
+    "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.15.2",
+        "@giphy/js-fetch-api": "^2.1.0",
+        "@tailwindcss/typography": "^0.4.0",
+        "@threefoldjimber/threefold_login": "^1.4.0",
+        "autoprefixer": "^9.8.6",
+        "axios": "^0.21.1",
+        "core-js": "^3.6.5",
+        "crypto-js": "^4.0.0",
+        "js-file-download": "^0.4.12",
+        "lodash": "^4.17.20",
+        "markdown-it": "^12.0.4",
+        "moment": "^2.29.1",
+        "moment-js": "^1.1.15",
+        "postcss": "^7.0.35",
+        "scriptjs": "^2.5.9",
+        "socket.io-client": "^4.0.0",
+        "socketio-file-upload": "^0.7.3",
+        "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.4",
+        "unicode-emoji-picker": "^1.1.1",
+        "universal-cookie": "^4.0.4",
+        "vue": "^3.0.4",
+        "vue-cropperjs": "^5.0.0",
+        "vue-router": "^4.0.1",
+        "vue-socket.io": "^3.0.10"
+    },
+    "devDependencies": {
+        "@types/crypto-js": "^4.0.1",
+        "@types/dom-mediacapture-record": "^1.0.7",
+        "@types/lodash": "^4.14.168",
+        "@types/markdown-it": "^12.0.1",
+        "@types/scriptjs": "^0.0.2",
+        "@vue/cli-plugin-babel": "^4.5.10",
+        "@vue/cli-plugin-router": "~4.5.0",
+        "@vue/cli-plugin-typescript": "~4.5.0",
+        "@vue/cli-service": "~4.5.0",
+        "@vue/compiler-sfc": "^3.0.4",
+        "typescript": "^4.1.3"
+    }
+}
