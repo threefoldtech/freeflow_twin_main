@@ -5,6 +5,7 @@ import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
+import {createErrorNotification} from '@/store/notificiationStore';
 
 const state = reactive<State>({
     socket: '',
@@ -68,6 +69,10 @@ const initializeSocket = (username: string) => {
         const { addChat } = usechatsActions();
         addChat(chat);
     });
+    state.socket.on('disconnect', () => {
+        createErrorNotification("Connection Lost", "You appear to be having connection issues")
+    });
+
 };
 
 const sendSocketMessage = async (

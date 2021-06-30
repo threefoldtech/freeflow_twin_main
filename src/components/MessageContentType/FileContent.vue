@@ -1,5 +1,5 @@
 <template>
-    <a class="p-4 pb-2 pr-8 bg-gray-200 my-message:bg-my" :href="calcExternalResourceLink(message.body.url)" download>
+    <a class="px-4 my-2 bg-gray-200 my-message:bg-my" :href="calcExternalResourceLink(message.body.url)" download>
         <div
             class="icon bg-gray-600 rounded-full h-12 w-12 flex items-center justify-center text-white my-message:bg-icon"
         >

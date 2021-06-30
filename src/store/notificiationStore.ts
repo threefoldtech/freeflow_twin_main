@@ -10,7 +10,11 @@ import {
 import { uuidv4 } from '@/common';
 
 export const notifications = ref<Notification[]>([]);
-export const addNotification = (n: Notification) => notifications.value.push(n);
+export const addNotification = (n: Notification) => {
+    notifications.value.push(n);
+    if(!canDestroy(n)) return;
+    setTimeout(() => destroyNotification(n), n.options?.interval ?? 5000);
+};
 export const destroyNotification = (n: Notification) => {
     notifications.value = notifications.value.filter(x => x.id !== n.id);
 };
@@ -68,7 +72,7 @@ const defaultOptions = {
     update: updateNotification
 } as NotificationOptions;
 
-export const createNotification = (title: string, text: string, options = defaultOptions) => {
+export const createNotification = (title: string, text: string, status = Status.Info, options = defaultOptions) => {
     const newOptions = {
         ...defaultOptions,
         ...options,
@@ -79,7 +83,7 @@ export const createNotification = (title: string, text: string, options = defaul
         title: title,
         text: text,
         options: newOptions,
-        status: Status.Info
+        status: status
     } as Notification
     addNotification(n);
     return n;

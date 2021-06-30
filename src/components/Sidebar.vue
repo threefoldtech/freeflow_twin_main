@@ -32,12 +32,8 @@
                 :class="{
                     'text-gray-300': !app?.enabled,
                     'cursor-pointer': app.enabled,
-                    'text-white': router.currentRoute?.value.path.includes(
-                        app.name
-                    ),
-                    selected: !router.currentRoute?.value.path.includes(
-                        app.name
-                    ),
+                    'text-white': router.currentRoute?.value.path.replaceAll('/', '')===app.name,
+                    selected: router.currentRoute?.value.path.replaceAll('/', '')!==app.name,
                 }"
             >
                 <div
@@ -89,7 +85,12 @@
                 {
                     name: 'forum',
                     icon: 'fas fa-stream',
-                    enabled: false,
+                    enabled: true,
+                },
+                {
+                    name: 'browser',
+                    icon: 'fas fa-search',
+                    enabled: true,
                 },
                 {
                     name: 'meetings',

@@ -34,10 +34,10 @@
     import { computed, onMounted, onUnmounted, ref } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, messageBox, showDivider } from '@/services/messageHelperService';
-    import { Chat } from '@/types';
     import { usechatsActions } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
+    import { Chat } from '@/types';
 
     export default {
         name: 'MessageBox',
@@ -60,7 +60,6 @@
             const lastReadByMe = computed(() => {
                 return findLastIndex(props.chat.messages, message => props.chat.read[<string>user.id] === message.id);
             });
-
             const handleScroll = async e => {
                 let element = messageBox.value;
                 const oldScrollHeight = element.scrollHeight;

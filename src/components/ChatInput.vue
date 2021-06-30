@@ -407,7 +407,6 @@
     .action-btn:hover {
         color: rgb(68, 166, 135);
     }
-
     .action-btn {
     }
 

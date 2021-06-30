@@ -8,6 +8,7 @@ const endpoint = `${config.baseUrl}api/browse`;
 export interface PathInfo {
     isFile: boolean,
     isDirectory: boolean,
+    directory: string,
     path: string,
     fullName: string,
     name: string,
@@ -18,7 +19,7 @@ export interface PathInfo {
     lastAccessed: Date;
 }
 
-export interface FullPathInfo extends PathInfo {
+export interface EditPathInfo extends PathInfo {
     key: string,
     readToken: string,
     writeToken: string;
@@ -44,7 +45,7 @@ export const createDirectory = async (path: string, name: string): Promise<Axios
     return await axios.post<PathInfo>(`${endpoint}/directories`, body);
 };
 
-export const getFileInfo = async (path: string): Promise<AxiosResponse<FullPathInfo>> => {
+export const getFileInfo = async (path: string): Promise<AxiosResponse<EditPathInfo>> => {
     const params = new URLSearchParams();
     params.append('path', path);
     return await axios.get(`${endpoint}/files/info`, { params: params });
@@ -116,9 +117,14 @@ export const searchDir = async (searchTerm: string, currentDir: string) => {
     params.append('currentDir', currentDir);
     return await axios.get<PathInfo[]>(`${endpoint}/files/search`, {params: params});
 };
-export const pasteFile = async (paths: PathInfo[], pathToPaste: string) => {
-    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, pathToPaste: pathToPaste});
+export const copyFiles = async (paths: string[], pathToPaste: string) => {
+    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste});
 };
+
+export const moveFiles = async (paths: string[], pathToPaste: string) => {
+    return await axios.post<PathInfo[]>(`${endpoint}/files/move`, { paths: paths, destinationPath: pathToPaste});
+};
+
 export const renameFile = async (oldPath: string, newPath: string) => {
     return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
 };

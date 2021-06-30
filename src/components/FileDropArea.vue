@@ -43,6 +43,11 @@
                 showOverlay.value = false;
             };
 
+            const dragContainsFiles = (e) => {
+                const dt = e?.dataTransfer;
+                return dt?.types && (dt.types.indexOf ? dt.types.indexOf('Files') !== -1 : dt.types.contains('Files'));
+            }
+
             function preventDefaults(e) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -50,11 +55,13 @@
 
             const handleDragEnter = (e) => {
                 preventDefaults(e);
+                if(!dragContainsFiles(e)) return;
                 highLight();
             };
 
             const handleDragOver = (e) => {
                 preventDefaults(e);
+                if(!dragContainsFiles(e)) return;
                 highLight();
             };
 
