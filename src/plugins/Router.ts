@@ -35,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '',
                 name: 'chat',
                 component: Chat,
-                meta: { requiresAuth: true },
+                meta: { requiresAuth: false },
             },
             {
                 path: ':id',
