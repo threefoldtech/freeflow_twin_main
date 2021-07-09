@@ -3,7 +3,7 @@ module.exports = {
     devServer: {
         disableHostCheck: true,
     },
-
+    publicPath: "/digitaltwin",
     configureWebpack: {
         plugins: [new IgnorePlugin(/^\.\/locale$/, /moment$/)],
         optimization: {
