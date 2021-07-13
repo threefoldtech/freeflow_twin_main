@@ -9,5 +9,5 @@ export const calculateBaseUrl = userId => {
 };
 
 export const calcExternalResourceLink = location => {
-    return `${window.location.origin}/getExternalResource?resource=${location}`;
+    return `${window.location.origin}/api/getExternalResource?resource=${location}`;
 };
