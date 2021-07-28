@@ -7,7 +7,6 @@ import socketIo from '@/plugins/SocketIo';
 import config from '../public/config/config';
 import MessageContent from '@/components/MessageContent.vue';
 import { clickOutside } from '@/plugins/ClickOutside';
-import {get} from "scriptjs"
 import axios from 'axios';
 
 // console.log(Socketio)
@@ -47,7 +46,4 @@ axios.interceptors.response.use(function (response) {
 });
 
 app.mount('#app');
-get(`${config.documentServerUrl}/web-apps/apps/api/documents/api.js`, () => {
-    console.log("DocumentServer API Loaded")
-});
 export default app;

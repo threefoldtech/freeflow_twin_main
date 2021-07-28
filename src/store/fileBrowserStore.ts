@@ -1,12 +1,20 @@
 import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { Router } from 'vue-router';
+import { Router, useRouter } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
+import { useAuthState } from '@/store/authStore';
+import { getShareWithId } from '@/services/fileBrowserService';
+import { DtId } from '@/types';
+import axios, { ResponseType } from 'axios';
+import { calcExternalResourceLink } from '@/services/urlService';
+import { watchingUsers } from '@/store/statusStore';
 
+
+declare const Buffer;
 export enum FileType {
     Unknown,
     Word,
@@ -44,9 +52,12 @@ export const searchDirValue = ref<string>('');
 export const searchResults = ref<PathInfoModel[] | string>([]);
 export const isDraggingFiles = ref<boolean>(false);
 export const selectedAction = ref<Action>(Action.COPY);
+export const sharedDir = ref(false);
+export const sharedContent = ref<Api.ShareInfo[]>([]);
 
 watch([currentDirectory], () => {
     updateContent();
+    sharedDir.value = false;
     selectedPaths.value = [];
     searchResults.value = [];
     searchDirValue.value = '';
@@ -138,6 +149,10 @@ export const goToFolderInCurrentDirectory = (item: PathInfoModel) => {
 };
 
 export const goToHome = () => {
+    if (sharedDir.value === true) {
+        sharedDir.value = false;
+        return;
+    }
     currentDirectory.value = rootDirectory;
 };
 
@@ -211,6 +226,10 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
 };
 
 export const goToAPreviousDirectory = (index: number) => {
+    if (sharedDir.value === true) {
+        sharedDir.value = false;
+        return;
+    }
     if (currentDirectory.value === rootDirectory) return;
     const parts = currentDirectory.value.split('/');
     if (index < 1 || index === parts.length - 1) return;
@@ -233,6 +252,10 @@ export const goToFileDirectory = (item: PathInfoModel) => {
 };
 
 export const goBack = () => {
+    if (sharedDir.value === true) {
+        sharedDir.value = false;
+        return;
+    }
     if (currentDirectory.value === rootDirectory) return;
     const parts = currentDirectory.value.split('/');
     parts.pop();
@@ -340,6 +363,31 @@ export const getIcon = (item: PathInfoModel) => {
             return 'far fa-file';
     }
 };
+export const getIconDirty = (fileType: FileType) => {
+    switch (fileType) {
+        case FileType.Video:
+            return 'far fa-file-video';
+        case FileType.Word:
+            return 'far fa-file-word';
+        case FileType.Image:
+            return 'far fa-file-image';
+        case FileType.Pdf:
+            return 'far fa-file-pdf';
+        case FileType.Csv:
+            return 'far fa-file-csv';
+        case FileType.Audio:
+            return 'far fa-file-audio';
+        case FileType.Archive:
+            return 'far fa-file-archive';
+        case FileType.Excel:
+            return 'far fa-file-excel';
+        case FileType.Powerpoint:
+            return 'far fa-file-powerpoint';
+        default:
+            return 'far fa-file';
+    }
+};
+
 
 export const createModel = <T extends Api.PathInfo>(pathInfo: T): PathInfoModel => {
     return {
@@ -429,7 +477,7 @@ export const getFileSize = (val: any) => {
     }
     return '-';
 };
-const formatBytes = function(bytes, decimals) {
+export const formatBytes = function(bytes, decimals) {
     if (bytes == 0) return '0 Bytes';
     let k = 1024,
         dm = decimals || 2,
@@ -468,5 +516,93 @@ export const getIconColor = (item: PathInfoModel) => {
             return 'text-gray-600';
     }
 };
+export const getIconColorDirty = (filetype: FileType) => {
+    switch (filetype) {
+        case FileType.Excel:
+            return 'text-green-400';
+        case FileType.Word:
+            return 'text-blue-400';
+        case FileType.Powerpoint:
+            return 'text-red-400';
+        default:
+            return 'text-gray-600';
+    }
+};
 
+export const getSharedContent = async () => {
+    const result = await Api.getShared('SharedWithMe');
+    sharedContent.value = result.data;
+};
+export const getToken = async (userId: string, path: string, filename: string, size: number, writable) => {
+    const result = await Api.getShareFileToken(userId, path, filename ,size, writable);
+    return result;
+
+};
+
+export const parseJwt = (token) => {
+    let base64Url = token.split('.')[1];
+    return JSON.parse(Buffer.from(base64Url, 'base64').toString());
+};
+
+export const requestSharedFile = async (object, shareId, filetype, router: Router) => {
+    let token;
+
+    token = object.shares[0].token;
+    let tokenData = parseJwt(token);
+    let issuer = tokenData.iss;
+    let result = await getShareWithId(shareId);
+    if (!result)
+        throw new Error('Share no longer exists');
+
+    if ([FileType.Excel, FileType.Word, FileType.Powerpoint].some(x => x === filetype)) {
+        let info = await getExternalPathInfo(issuer, token, shareId);
+        let editRights
+        tokenData.data.permissions.includes("FileBrowserWrite") ? editRights='write':  editRights ='read' ;
+        const result = router.resolve({
+            name: 'editfile',
+            params: { id: btoa(JSON.stringify(info)), share: 'shared', issuer: issuer, perms: btoa(editRights) },
+        });
+        window.open(result.href, '_blank');
+    } else {
+        let share = await fetchShare(issuer, token, shareId);
+        fileDownload(share, object.filename);
+    }
+
+};
+const fetchShare = async (digitalTwinId: DtId, token: string, shareId: string, responseType: ResponseType = 'blob') => {
+    const { user } = useAuthState();
+    let params= {shareId: shareId, token: token}
+    const locationApiEndpoint = `/api/browse/files/getSharedFileDownload?params=${btoa(JSON.stringify(params))}`;
+    let location = '';
+    if (digitalTwinId == user.id) {
+        location = `${window.location.origin}${locationApiEndpoint}`;
+    } else {
+        location = calcExternalResourceLink(
+            `http://[${
+                watchingUsers[<string>digitalTwinId].location
+            }]${locationApiEndpoint}`,
+        );
+    }
+    // TODO: url encoding
+    const response = await axios.get(location, { responseType: responseType });
+    return response.data;
+};
+export const getExternalPathInfo = async (digitalTwinId: DtId,token:string,  shareId: string) => {
+    const { user } = useAuthState();
+    let params= {shareId: shareId, token: token}
+    const locationApiEndpoint = `/api/browse/files/info?params=${btoa(JSON.stringify(params))}`;
+    let location = '';
+    if (digitalTwinId == user.id) {
+        location = `${window.location.origin}${locationApiEndpoint}`;
+    } else {
+        location = calcExternalResourceLink(
+            `http://[${
+                watchingUsers[<string>digitalTwinId].location
+            }]${locationApiEndpoint}`,
+        );
+    }
+    // TODO: url encoding
+    const response = await axios.get(location);
+    return response.data;
+};
 

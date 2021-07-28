@@ -6,7 +6,8 @@ import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import {createErrorNotification} from '@/store/notificiationStore';
-
+import { saveToken } from '@/services/fileBrowserService';
+import { login } from '@/services/authService';
 const state = reactive<State>({
     socket: '',
     notification: {
@@ -39,6 +40,10 @@ const initializeSocket = (username: string) => {
         addUserToBlockList(chatId);
     });
     state.socket.on('message', message => {
+        const { user } = useAuthState();
+        if (message.type === 'FILE_SHARE' && user.id === message.to) {
+            saveToken(message.body.token, message.body.fileName, message.body.size).then(r => console.log("SUCCES"))
+        }
         if (message.type === 'READ') {
             handleRead(message);
             return;
@@ -52,7 +57,6 @@ const initializeSocket = (username: string) => {
         }
         const { addMessage } = usechatsActions();
 
-        const { user } = useAuthState();
         addMessage(message.to === user.id ? message.from : message.to, message);
     });
     state.socket.on('connectionRequest', newContactRequest => {
