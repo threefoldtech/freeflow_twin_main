@@ -20,7 +20,7 @@
 <script lang="ts">
     import { defineComponent } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { parseJwt, requestSharedFile, sharedDir } from '@/store/fileBrowserStore';
+    import {getSharedContent, parseJwt, requestSharedFile, sharedDir} from '@/store/fileBrowserStore';
     import { getFileType } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
 
@@ -40,9 +40,11 @@
                     i = Math.floor(Math.log(bytes) / Math.log(k));
                 return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
             };
-            const goToShared = function() {
-                router.push({ name: 'filebrowser' });
+            const goToShared = async function() {
+                await getSharedContent();
+                await router.push({name: 'filebrowser'});
                 sharedDir.value = true;
+
             };
 
 
