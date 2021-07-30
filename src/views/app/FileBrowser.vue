@@ -36,6 +36,7 @@
         setup() {
             onBeforeMount(async() => {
                await updateContent();
+               await getSharedContent();
             })
 
             return {

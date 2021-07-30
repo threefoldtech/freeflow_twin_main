@@ -54,7 +54,7 @@
             class='hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300'
         >
           <td></td>
-          <td @click="sharedDir = true">
+          <td @click="goToShared()">
             <div class='flex flex-row items-center text-md'>
               <div class='mr-3 w-7 text-center'>
                 <i class='fas fa-share-alt-square fa-2x text-blue-400'
@@ -127,7 +127,7 @@ import {
   PathInfoModel, selectItem, deselectAll, selectAll,
   selectedPaths, deselectItem, sortContent, sortAction, currentSort, currentSortDir,
   getFileLastModified, getFileExtension, getFileSize, getIconColor, getIcon
-  , uploadFiles, equals, moveFiles, isDraggingFiles, sharedDir, sharedContent
+  , uploadFiles, equals, moveFiles, isDraggingFiles, sharedDir, sharedContent, getSharedContent
 } from '@/store/fileBrowserStore';
 import {useRouter} from 'vue-router';
 import FileDropArea from '@/components/FileDropArea.vue';
@@ -212,6 +212,10 @@ export default defineComponent({
     const onDragEnd = () => {
       isDraggingFiles.value = false;
     };
+    const goToShared = async () => {
+      sharedDir.value = true
+      await getSharedContent();
+    };
 
     return {
       handleSelect,
@@ -242,7 +246,8 @@ export default defineComponent({
       onDragLeaveParent,
       onDragEnd,
       sharedDir,
-      sharedContent
+      sharedContent,
+      goToShared
     };
   },
 });
