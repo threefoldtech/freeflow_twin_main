@@ -33,3 +33,4 @@ dev/
 build.sh
 install.sh
 .installed
+run.sh
