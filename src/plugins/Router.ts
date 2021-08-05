@@ -12,6 +12,7 @@ import Unauthorised from '@/views/Unauthorised.vue';
 import EditFile from '@/views/app/EditFile.vue';
 import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
+import { AppType } from '@/types/apps';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -38,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '',
                 name: 'chat',
                 component: Chat,
-                meta: { requiresAuth: true },
+                meta: { requiresAuth: true, app:AppType.Chat },
             },
             {
                 path: ':id',
@@ -47,6 +48,7 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     back: 'chat',
                     requiresAuth: true,
+                    app:AppType.Chat
                 },
             },
         ],
@@ -56,7 +58,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'filebrowser',
         path: '/filebrowser',
         component: FileBrowser,
-        meta: { requiresAuth: true },
+        meta: { requiresAuth: true, app:AppType.Filebrowser },
     },
     {
         path: '/filebrowser/edit/:id/:share?/:issuer?/:perms?',
@@ -65,22 +67,32 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
             back: 'filebrowser',
             requiresAuth: true,
+            app:AppType.Filebrowser
         }
     },
     {
         name: 'forum',
         path: '/forum',
         component: Forum,
+        meta: {
+            app:AppType.Forum
+        }
     },
     {
         name: 'browser',
         path: '/browser',
         component: Browser,
+        meta: {
+            app:AppType.Browser
+        }
     },
     {
         name: 'videoroom',
         path: '/videoroom/:id',
         component: VideoRoom,
+        meta: {
+            app:AppType.Meetings
+        }
     },
     {
         name: '404',
