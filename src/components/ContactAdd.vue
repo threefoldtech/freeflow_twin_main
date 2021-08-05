@@ -29,20 +29,6 @@
                     @clicked="handleClicked"
                 ></user-table>
             </div>
-
-            <!--
-            <div class="flex place-items-center">
-                <label class="mr-2" for="location">Location:</label>
-                <input id="location" v-model="userAddLocation" class="mb-2" maxlength="50" />
-            </div> 
-            -->
-
-            <!--<div class="flex mt-4 justify-end w-full">
-                <button type="button" @click="$emit('closeDialog')">
-                    Cancel
-                </button>
-                <button>Add contact</button>
-            </div> -->
         </form>
         <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
             <div class="flex place-items-center">
@@ -55,36 +41,7 @@
                     </span>
                 </div>
             </div>
-            <div><!--
-                    <div v-if="!contacts.length">
-                        <p class="text-gray-300 text-center py-4">
-                            No users in group yet
-                        </p>
-                    </div>
-                    <div v-for="(contact, i) in contacts" :key="i" class="grid grid-cols-12 rounded-lg mb-2 py-2">
-                        <div class="col-span-2 place-items-center grid">
-                            <AvatarImg :id="contact.id" alt="contact image" />
-                        </div>
-                        <div class="col-span-8 pl-4 flex flex-col justify-center">
-                            {{ contact.id }}
-                        </div>
-                        <div class="col-span-2 place-items-center grid">
-                            <button
-                                class="h-12 rounded-full"
-                                @click="removeUserFromGroup(contact)"
-                                v-if="userIsInGroup(contact)"
-                            >
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <button
-                                class="h-12 rounded-full"
-                                @click="usersInGroup.push(contact)"
-                                v-if="!userIsInGroup(contact)"
-                            >
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div> -->
+            <div>
                 <user-table-group
                     :data="contacts"
                     :usersInGroup="usersInGroup"
@@ -211,7 +168,6 @@
                 emit('closeDialog');
             };
 
-
             // @todo: config
             axios.get(`${config.spawnerUrl}api/v1/list`, {}).then(r => {
                 const { user } = useAuthState();
@@ -233,8 +189,6 @@
                 setActive,
                 groupAdd,
                 contacts,
-                userIsInGroup,
-                removeUserFromGroup,
                 possibleUsers,
                 handleClicked,
             };
