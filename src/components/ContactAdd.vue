@@ -211,18 +211,6 @@
                 emit('closeDialog');
             };
 
-            const userIsInGroup = (contact: Contact) => {
-                const user = usersInGroup.value.find(c => c.id == contact.id);
-                if (user) {
-                    return true;
-                }
-                return false;
-            };
-
-            const removeUserFromGroup = (contact: Contact) => {
-                const index = usersInGroup.value.findIndex(u => u.id == contact.id);
-                usersInGroup.value.splice(index, 1);
-            };
 
             // @todo: config
             axios.get(`${config.spawnerUrl}api/v1/list`, {}).then(r => {
