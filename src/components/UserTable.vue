@@ -82,12 +82,6 @@
                 type: Array,
                 required: true,
             },
-            dropdownClass: {
-                type: String,
-                required: false,
-                default:
-                    'absolute w-full z-50 bg-white border border-gray-300 mt-1 mh-48 overflow-hidden overflow-y-scroll rounded-md shadow-md',
-            },
             error: {
                 type: String,
                 default: '',
@@ -96,7 +90,6 @@
         emits: ['update:modelValue', 'clicked'],
 
         setup(props, { emit }) {
-            const showOptions = ref(false);
             const chosenOption = ref('');
             const searchTerm = ref('');
 
@@ -108,7 +101,6 @@
 
             const handleInput = evt => {
                 emit('update:modelValue', evt.target.value);
-                showOptions.value = true;
             };
 
             const handleClick = item => {
@@ -116,17 +108,9 @@
                 chosenOption.value = item.id;
                 searchTerm.value = item.id;
                 emit('update:modelValue', item.id);
-                showOptions.value = false;
                 emit('clicked');
             };
 
-            const clickedOutside = () => {
-                showOptions.value = false;
-
-                if (!chosenOption.value) {
-                    emit('update:modelValue', '');
-                }
-            };
             const searchResults = () => {
                 return props.data.filter((item: Contact) => {
                     return item.id
@@ -139,8 +123,6 @@
                 reset,
                 handleInput,
                 handleClick,
-                clickedOutside,
-                showOptions,
                 chosenOption,
                 searchTerm,
                 searchResults,
