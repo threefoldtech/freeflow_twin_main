@@ -48,7 +48,10 @@
                       </div>
                     </div>
                     </div>
-                    <button @click="handleClick(item)" style="backgroundColor: #16A085;" class="text-white rounded-md justify-self-end">Invite to chat</button>
+                    <div>
+                        <button v-if="userIsInGroup(item)" @click="removeUserFromGroup(item)" style="backgroundColor: #EF4444;" class="text-white rounded-md justify-self-end">Delete invite</button>
+                        <button v-if="!userIsInGroup(item)" @click="usersInGroup.push(item)" style="backgroundColor: #16A085;" class="text-white rounded-md justify-self-end">Invite to group</button>
+                    </div>
                   </div>
                 </td>
               </tr>
@@ -82,11 +85,9 @@
                 type: Array,
                 required: true,
             },
-            dropdownClass: {
-                type: String,
-                required: false,
-                default:
-                    'absolute w-full z-50 bg-white border border-gray-300 mt-1 mh-48 overflow-hidden overflow-y-scroll rounded-md shadow-md',
+            usersInGroup: {
+                type: Array,
+                required: true,
             },
             error: {
                 type: String,
@@ -135,6 +136,19 @@
                 });
             };
 
+            const userIsInGroup = (contact: props.data) => {
+                const user = props.usersInGroup.find(c => c.id == contact.id);
+                if (user) {
+                    return true;
+                }
+                return false;
+            };
+
+            const removeUserFromGroup = (contact: props.data) => {
+                const index = props.usersInGroup.findIndex(u => u.id == contact.id);
+                props.usersInGroup.splice(index, 1);
+            };
+
             return {
                 reset,
                 handleInput,
@@ -144,6 +158,8 @@
                 chosenOption,
                 searchTerm,
                 searchResults,
+                userIsInGroup,
+                removeUserFromGroup,
             };
         },
     });
