@@ -120,8 +120,7 @@
         components: { AvatarImg, userTable, userTableGroup },
         emits: ['closeDialog'],
         setup(props, { emit }) {
-            const contacts = [{'id':'Arnob', 'location':'155:45:898'},{'id':'Jens', 'location':'165:145:98'},{'id':'Simon', 'location':'521:455:89'}]
-            // const { contacts } = useContactsState();
+            const { contacts } = useContactsState();
             let addGroup = ref(false);
             let usernameAdd = ref('');
             let userAddLocation = ref('');
