@@ -22,7 +22,7 @@
         <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
             <div class="flex flex-col">
                 <user-table
-                    :data="possibleUsers"
+                    :data="contacts"
                     v-model="usernameAdd"
                     placeholder="Search for user..."
                     :error="usernameAddError"
@@ -55,8 +55,7 @@
                     </span>
                 </div>
             </div>
-            <div class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl">
-                <div class="h-full">
+            <div><!--
                     <div v-if="!contacts.length">
                         <p class="text-gray-300 text-center py-4">
                             No users in group yet
@@ -85,8 +84,14 @@
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </div> -->
+                <user-table-group
+                    :data="contacts"
+                    :usersInGroup="usersInGroup"
+                    v-model="usernameInGroupAdd"
+                    placeholder="Search for user..."
+                    :error="usernameAddError"
+                ></user-table-group>
             </div>
             <div class="flex mt-4 justify-end w-full">
                 <button @click="$emit('closeDialog')">Cancel</button>
@@ -108,13 +113,15 @@
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
     import userTable from '@/components/UserTable.vue';
+    import userTableGroup from '@/components/UserTableGroup.vue'
 
     export default defineComponent({
         name: 'ContactAdd',
-        components: { AvatarImg, userTable },
+        components: { AvatarImg, userTable, userTableGroup },
         emits: ['closeDialog'],
         setup(props, { emit }) {
-            const { contacts } = useContactsState();
+            const contacts = [{'id':'Arnob', 'location':'155:45:898'},{'id':'Jens', 'location':'165:145:98'},{'id':'Simon', 'location':'521:455:89'}]
+            // const { contacts } = useContactsState();
             let addGroup = ref(false);
             let usernameAdd = ref('');
             let userAddLocation = ref('');
