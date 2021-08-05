@@ -20,28 +20,29 @@
         </div>
 
         <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
-            <div class="flex place-items-center">
-                <label class="mr-2" for="username">Username:</label>
-                <auto-complete
+            <div class="flex flex-col">
+                <user-table
                     :data="possibleUsers"
                     v-model="usernameAdd"
                     placeholder="Search for user..."
                     :error="usernameAddError"
                     @clicked="handleClicked"
-
-                ></auto-complete>
+                ></user-table>
             </div>
+
+            <!--
             <div class="flex place-items-center">
                 <label class="mr-2" for="location">Location:</label>
                 <input id="location" v-model="userAddLocation" class="mb-2" maxlength="50" />
-            </div>
+            </div> 
+            -->
 
-            <div class="flex mt-4 justify-end w-full">
+            <!--<div class="flex mt-4 justify-end w-full">
                 <button type="button" @click="$emit('closeDialog')">
                     Cancel
                 </button>
                 <button>Add contact</button>
-            </div>
+            </div> -->
         </form>
         <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
             <div class="flex place-items-center">
@@ -106,10 +107,11 @@
     import autoComplete from './AutoComplete.vue';
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import userTable from '@/components/UserTable.vue';
 
     export default defineComponent({
         name: 'ContactAdd',
-        components: { AvatarImg, autoComplete },
+        components: { AvatarImg, userTable },
         emits: ['closeDialog'],
         setup(props, { emit }) {
             const { contacts } = useContactsState();
