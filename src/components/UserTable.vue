@@ -10,15 +10,15 @@
             tabindex="0"
             maxlength="50"
         />
+        <span
+          v-if="modelValue"
+          @click.prevent="reset()"
+          class="cursor-pointer"
+        >
+          <i class="fas fa-times"></i>
+        </span>
     </div>
     <span class="text-red-600" v-if="error != ''"> {{ error }} </span>
-    <span
-        v-if="modelValue"
-        @click.prevent="reset()"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-    >
-        x
-    </span>
     <div class="flex flex-col mt-4">
     <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -44,7 +44,7 @@
                         {{ item.id }}
                       </div>
                       <div class="text-sm text-gray-500">
-                        {{ item.location }} 205546654
+                        {{ item.location }}
                       </div>
                     </div>
                     </div>

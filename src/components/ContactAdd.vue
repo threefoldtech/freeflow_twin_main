@@ -66,7 +66,6 @@
     import { Chat, Contact, Message } from '../types/index';
     import axios from 'axios';
     import config from '../../public/config/config';
-    import autoComplete from './AutoComplete.vue';
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
     import userTable from '@/components/UserTable.vue';
