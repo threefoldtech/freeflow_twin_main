@@ -23,7 +23,7 @@
                 </span>
             </p>
             <p class='col-end-13 col-span-2 font-thin truncate'>
-                {{ lastMessageBody }}
+              {{ lastMessageBody.token === undefined ? lastMessageBody : "File has been shared" }}
             </p>
         </div>
     </div>
@@ -78,7 +78,6 @@
 
             const lastMessageBody = computed(() => {
                 const lstmsg = lastMessage.value;
-                console.log(';', lstmsg);
                 switch (lstmsg.type) {
                     case 'GIF':
                         return 'Gif was sent';

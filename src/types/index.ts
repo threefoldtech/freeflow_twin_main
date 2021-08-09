@@ -119,6 +119,7 @@ export enum MessageTypes {
     MESSAGE = 'MESSAGE',
     FILE = 'FILE',
     FILE_UPLOAD = 'FILE_UPLOAD',
+    FILE_SHARE = 'FILE_SHARE',
     EDIT = 'EDIT',
     READ = 'READ',
     CONTACT_REQUEST = 'CONTACT_REQUEST',

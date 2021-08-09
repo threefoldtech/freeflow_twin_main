@@ -28,12 +28,11 @@
             <div
                 v-for="app in apps"
                 :key="app.name"
-                class="mb-4 grid text-center"
+                class="mb-4 grid text-center text-white"
                 :class="{
-                    'text-gray-300': !app?.enabled,
                     'cursor-pointer': app.enabled,
-                    'text-white': router.currentRoute?.value.path.replaceAll('/', '')===app.name,
-                    selected: router.currentRoute?.value.path.replaceAll('/', '')!==app.name,
+                    selected: app?.enabled && router.currentRoute?.value.meta.app!==app.name,
+                    'text-gray-500': !app?.enabled,
                 }"
             >
                 <div
@@ -66,6 +65,7 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
+    import { AppType } from "@/types/apps"
 
     export default defineComponent({
         name: 'Sidebar',
@@ -73,27 +73,27 @@
         setup() {
             const apps = [
                 {
-                    name: 'chat',
+                    name: AppType.Chat,
                     icon: 'fas fa-comments',
                     enabled: true,
                 },
                 {
-                    name: 'filebrowser',
+                    name: AppType.Filebrowser,
                     icon: 'fas fa-file-alt',
                     enabled: true,
                 },
                 {
-                    name: 'forum',
+                    name: AppType.Forum,
                     icon: 'fas fa-stream',
                     enabled: true,
                 },
                 {
-                    name: 'browser',
+                    name: AppType.Browser,
                     icon: 'fas fa-search',
                     enabled: true,
                 },
                 {
-                    name: 'meetings',
+                    name: AppType.Meetings,
                     icon: 'fas fa-video',
                 },
             ];

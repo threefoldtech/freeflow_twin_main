@@ -18,6 +18,19 @@ export interface PathInfo {
     lastModified: Date;
     lastAccessed: Date;
 }
+export interface ShareInfo {
+    [id: string]: {
+        path: string;
+        shares: {
+            expiration: number,
+            token: string,
+        };
+    }
+}
+
+export interface GetShareToken {
+    token: string,
+}
 
 export interface EditPathInfo extends PathInfo {
     key: string,
@@ -127,5 +140,22 @@ export const moveFiles = async (paths: string[], pathToPaste: string) => {
 
 export const renameFile = async (oldPath: string, newPath: string) => {
     return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
+};
+export const getShareFileToken = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
+
+    return await axios.post<GetShareToken>(`${endpoint}/files/share`, { userId: userId, writable: writable, path: path, filename: filename, size: size});
+};
+export const saveToken = async (token: string, filename: string, size: number) => {
+    return await axios.post<string>(`${endpoint}/files/insertToken`, { token: token, filename: filename, size: size});
+};
+export const getShared = async (shareStatus: string) => {
+    const params = new URLSearchParams();
+    params.append('shareStatus', shareStatus);
+    return await axios.get<ShareInfo[]>(`${endpoint}/files/getShares`, { params: params });
+};
+export const getShareWithId = async (id: string) => {
+    const params = new URLSearchParams();
+    params.append('id', id);
+    return await axios.get<ShareInfo[]>(`${endpoint}/files/getShareWithId`, { params: params });
 };
 

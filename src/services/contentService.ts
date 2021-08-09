@@ -23,6 +23,8 @@ export const getComponentForType = message => {
             return 'QuoteContent';
         case MessageTypes.SYSTEM:
             return 'SystemContent';
+        case MessageTypes.FILE_SHARE:
+            return 'FileShareContent';
         case MessageTypes.FILE:
             if (isImage(message.body.filename)) {
                 return 'ImageContent';

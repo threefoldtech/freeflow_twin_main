@@ -17,6 +17,7 @@
     import ImageContent from '@/components/MessageContentType/ImageContent.vue';
     import GifContent from '@/components/MessageContentType/GifContent.vue';
     import QuoteContent from '@/components/MessageContentType/QuoteContent.vue';
+    import FileShareContent from '@/components/MessageContentType/FileShareContent.vue';
     import { getComponentForType } from '@/services/contentService';
 
     export default defineComponent({
@@ -28,6 +29,7 @@
             AudioContent,
             ImageContent,
             GifContent,
+            FileShareContent,
             QuoteContent,
         },
         props: {
