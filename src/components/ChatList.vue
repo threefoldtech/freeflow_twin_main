@@ -82,7 +82,7 @@
 
         <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
             <template v-slot:title>
-                <h1>Create a new chat</h1>
+                <h1>Invite someone to chat</h1>
             </template>
             <add-contact @closeDialog="sendUpdate(false)"> </add-contact>
         </jdialog>
