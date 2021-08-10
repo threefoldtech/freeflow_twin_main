@@ -49,8 +49,8 @@
                     </div>
                     </div>
                     <div>
-                        <button v-if="userIsInGroup(item)" @click="removeUserFromGroup(item)" style="backgroundColor: #EF4444;" class="text-white rounded-md justify-self-end">Delete invite</button>
-                        <button v-if="!userIsInGroup(item)" @click="usersInGroup.push(item)" style="backgroundColor: #16A085;" class="text-white rounded-md justify-self-end">Invite to group</button>
+                        <button v-if="userIsInGroup(item)" @click="removeUserFromGroup(item)" style="backgroundColor: #EF4444;" class="text-white py-2 px-4 rounded-md justify-self-end">Delete invite</button>
+                        <button v-if="!userIsInGroup(item)" @click="usersInGroup.push(item)" style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md justify-self-end">Invite to group</button>
                     </div>
                   </div>
                 </td>
