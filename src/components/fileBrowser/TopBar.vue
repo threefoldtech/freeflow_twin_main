@@ -1,5 +1,5 @@
 <template>
-  <div class='flex flex-row my-4 items-center'>
+  <div class='flex flex-row my-4 items-center justify-between'>
     <div class='collapsed-bar:hidden px-2 relative' v-if="sharedDir === false">
       <input
           type='text'
@@ -16,42 +16,7 @@
             x
         </span>
     </div>
-    <div
-        class='mx-2 hover:text-green-500 cursor-pointer'
-        @click='goToHome'
-    >
-      <i class='fas fa-home fa-2x text-accent'></i>
-    </div>
-    <div
-        class='rounded-full w-6 h-6 flex justify-center items-center'
-        @click='goBack'
-        :class='{
-                "bg-accent hover:text-green-500 cursor-pointer": currentDirectory !== "/",
-                "bg-gray-500": currentDirectory === "/"
-            }'
-    >
-      <i class='fas fa-arrow-up text-white'></i>
-    </div>
-    <div class='flex-1 mx-2'>
-      <template v-for='(item,i) in parts'>
-                <span
-                    v-if='i !== 0 && item'
-                >
-                    &#62;
-                </span>
-        <span
-            class='underline cursor-pointer p-2 rounded-md'
-            v-if='item || i === 0'
-            @click='i === 0 ? goToHome() : goToAPreviousDirectory(i)'
-            @dragenter='(event) => onDragEnter(event, i)'
-            @dragleave='(event) => onDragLeave(event, i)'
-            @dragover='(event) => event.preventDefault()'
-            @drop='(event) => onDrop(event,i)'
-        >
-                    {{ i === 0 ? 'Home' : item }}
-                </span>
-      </template>
-    </div>
+    <breadcrumbs></breadcrumbs>
     <options></options>
     <buttons></buttons>
   </div>
@@ -61,6 +26,7 @@
 <script lang='ts'>
 import {computed, defineComponent, onBeforeMount, ref} from 'vue';
 import {
+  selectedPaths,
   currentDirectory,
   goToHome,
   goToAPreviousDirectory,
@@ -71,6 +37,7 @@ import {
 } from '@/store/fileBrowserStore';
 import Dialog from '@/components/Dialog.vue';
 import MainActionButtons from '@/components/fileBrowser/MainActionButtons.vue';
+import Breadcrumbs from '@/components/fileBrowser/Breadcrumbs.vue';
 import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
 import Button from '@/components/Button.vue';
 import {sendMessageObject, usechatsActions, usechatsState} from '@/store/chatStore';
@@ -83,11 +50,11 @@ const {retrievechats, sendMessage} = usechatsActions();
 
 export default defineComponent({
   name: 'TopBar',
-  components: { Button, jdialog: Dialog, options: SelectedOptions, buttons: MainActionButtons },
+  components: { Button, jdialog: Dialog, breadcrumbs: Breadcrumbs, options: SelectedOptions, buttons: MainActionButtons },
   setup() {
     let debounce;
-
     const parts = computed(() => currentDirectory.value.split('/'));
+
     onBeforeMount(() => {
       retrievechats();
     });
@@ -142,7 +109,6 @@ export default defineComponent({
       onDragEnter,
       onDragLeave,
       onDrop,
-      parts,
       createNotification,
     };
   },
