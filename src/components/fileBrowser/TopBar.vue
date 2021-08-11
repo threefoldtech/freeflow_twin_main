@@ -1,4 +1,5 @@
 <template>
+<div>
   <div class='flex flex-row my-4 items-center justify-between'>
     <div class='collapsed-bar:hidden px-2 relative' v-if="sharedDir === false">
       <input
@@ -16,11 +17,14 @@
             x
         </span>
     </div>
-    <breadcrumbs></breadcrumbs>
-    <options></options>
-    <buttons></buttons>
+    <div class="flex flex-row items-center">
+      <options></options>
+      <buttons></buttons>
+    </div>
+    
   </div>
-
+  <breadcrumbs></breadcrumbs>
+</div>
 </template>
 
 <script lang='ts'>
@@ -110,6 +114,7 @@ export default defineComponent({
       onDragLeave,
       onDrop,
       createNotification,
+      sharedDir
     };
   },
 });

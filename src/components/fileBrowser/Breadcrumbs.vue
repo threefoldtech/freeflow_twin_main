@@ -1,12 +1,12 @@
 <template>
-  <div class='flex flex-row'>
+  <div class='flex flex-row items-center mb-4'>
     <div
-        class='mx-2 hover:text-green-500 cursor-pointer'
+        class='ml-2 hover:text-green-500 cursor-pointer'
         @click='goToHome'
     >
-      <i class='fas fa-home fa-2x text-accent'></i>
+      <i class='fas fa-home text-accent'></i>
     </div>
-    <div
+    <!--<div
         class='rounded-full w-6 h-6 flex justify-center items-center'
         @click='goBack'
         :class='{
@@ -15,16 +15,16 @@
             }'
     >
       <i class='fas fa-arrow-up text-white'></i>
-    </div>
-    <div class='flex-1 mx-2'>
+    </div>-->
+    <div class='flex-1 mr-4'>
       <template v-for='(item,i) in parts'>
                 <span
                     v-if='i !== 0 && item'
                 >
-                    &#62;
+                    <i class="fas fa-chevron-right"></i>
                 </span>
         <span
-            class='underline cursor-pointer p-2 rounded-md'
+            class='cursor-pointer text-base p-2 rounded-md'
             v-if='item || i === 0'
             @click='i === 0 ? goToHome() : goToAPreviousDirectory(i)'
             @dragenter='(event) => onDragEnter(event, i)'
@@ -33,7 +33,7 @@
             @drop='(event) => onDrop(event,i)'
         >
                     {{ i === 0 ? 'Home' : item }}
-                </span>
+        </span>
       </template>
     </div>
   </div>
@@ -43,7 +43,7 @@
 <script lang='ts'>
 import {computed, defineComponent, onBeforeMount, ref} from 'vue';
 import {
-  selectedPaths
+  selectedPaths,
   currentDirectory,
   goToHome,
   goToAPreviousDirectory,
