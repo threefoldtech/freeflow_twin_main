@@ -2,9 +2,9 @@
     <appLayout>
         <template v-slot:default>
             <div class='flex flex-row w-full h-full'>
-                <div>
+                <!--<div>
                     <SideBar/>
-                </div>
+                </div>-->
                 <div class='flex flex-col flex-1'>
                     <TopBar/>
                   <DirectoryContent v-if="searchResults.length === 0 && sharedDir === false"/>
@@ -22,7 +22,7 @@
     import { defineComponent, onBeforeMount } from 'vue';
     import DirectoryContent from '@/components/fileBrowser/DirectoryContent.vue';
     import SearchContent from '@/components/fileBrowser/SearchContent.vue';
-    import SideBar from '@/components/fileBrowser/SideBar.vue'
+    // import SideBar from '@/components/fileBrowser/SideBar.vue'
     import { updateContent, getSharedContent, searchResults, sharedDir, } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
@@ -31,7 +31,7 @@
         name: 'Apps',
         components: {
             TopBar,
-          appLayout, DirectoryContent, SideBar, SearchContent, SharedContent
+          appLayout, DirectoryContent, SearchContent, SharedContent
         },
         setup() {
             onBeforeMount(async() => {

@@ -48,7 +48,7 @@
                       </div>
                     </div>
                     </div>
-                    <button @click="handleClick(item)" style="backgroundColor: #16A085;" class="text-white rounded-md justify-self-end">Invite to chat</button>
+                    <button @click="handleClick(item)" style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md justify-self-end">Invite to chat</button>
                   </div>
                 </td>
               </tr>
