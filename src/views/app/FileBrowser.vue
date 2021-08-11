@@ -22,7 +22,6 @@
     import { defineComponent, onBeforeMount } from 'vue';
     import DirectoryContent from '@/components/fileBrowser/DirectoryContent.vue';
     import SearchContent from '@/components/fileBrowser/SearchContent.vue';
-    // import SideBar from '@/components/fileBrowser/SideBar.vue'
     import { updateContent, getSharedContent, searchResults, sharedDir, } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
