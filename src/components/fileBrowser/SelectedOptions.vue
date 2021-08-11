@@ -193,7 +193,6 @@ export default defineComponent({
     let showShareDialog = ref(false);
     let writeRights = ref(false);
 
-    const parts = computed(() => currentDirectory.value.split('/'));
     onBeforeMount(() => {
       retrievechats();
     });
@@ -242,7 +241,6 @@ export default defineComponent({
       searchResults,
       debounceSearch,
       isDraggingFiles,
-      parts,
       cutFiles,
       copyFiles,
       showShareDialog,
