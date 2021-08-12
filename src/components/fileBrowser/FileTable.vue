@@ -141,7 +141,7 @@ import {useSocketActions} from '@/store/socketStore';
 import {useAuthState} from '@/store/authStore';
 
 export default defineComponent({
-  name: 'DirectoryContent',
+  name: 'FileTable',
   computed: {
     orderClass() {
       return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
