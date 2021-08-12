@@ -169,8 +169,6 @@ export const getFileAccessDetails = async ( owner: ContactInterface , shareId :s
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall)
 
     externalUrl = externalUrl+apiEndPointToCall
-
-    console.log(externalUrl)
     const res = await axios.get(externalUrl);
      return <EditPathInfo>res.data
 }

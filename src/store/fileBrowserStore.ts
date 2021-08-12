@@ -289,28 +289,11 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, router: Router, path = currentDirectory.value) => {
     if (item.isDirectory) {
-        goToFolderInCurrentDirectory(item);
-    } else if ([FileType.Excel, FileType.Word, FileType.Powerpoint].some(x => x === item.fileType)) {
-        const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName]))} });
-        window.open(result.href, '_blank');
-    } else if (item.fileType === FileType.Image) {
-        const response = await Api.downloadFile(item.path);
-        const result = window.URL.createObjectURL(response.data);
-        setImageSrc(result);
-    } else if (item.fileType === FileType.Pdf) {
-        const response = await Api.downloadFile(item.path, 'arraybuffer');
-        const file = new Blob([response.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(file);
-        window.open(url, '_blank');
-    } else if (item.fileType === FileType.Video) {
-        const response = await Api.downloadFile(item.path, 'arraybuffer');
-        const file = new Blob([response.data], { type: `video/${item.extension}` });
-        const url = URL.createObjectURL(file);
-        window.open(url, '_blank');
-    } else {
-        const result = await Api.downloadFile(item.path);
-        fileDownload(result.data, item.fullName);
-    }
+       return goToFolderInCurrentDirectory(item);
+    } 
+    const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName]))} });
+    window.open(result.href, '_blank');
+
 };
 
 export const sortContent = () => {
