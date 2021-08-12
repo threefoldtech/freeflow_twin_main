@@ -1,8 +1,14 @@
 <template>
-  <div class="flex flex-col">
-    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+  <div class="flex flex-col mx-2">
+    <div class=" overflow-x-auto sm:-mx-6 lg:-mx-8">
       <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+        <FileDropArea @send-file='uploadFiles' class='h-full'>
+          <div class='absolute hiddenItems' ref='hiddenItems'>
+            <div class='bg-white p-2' ref='ghostImage'>
+              Moving {{ selectedPaths.length }} selected File(s)
+            </div>
+          </div>
           <table class="min-w-full divide-y divide-gray-200"
             :key='currentDirectory'
             @dragleave='onDragLeaveParent'
@@ -10,10 +16,10 @@
           >
             <thead class="bg-gray-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <input
                   type='checkbox'
-                  class='h-auto w-auto'
+                  class='h-auto w-auto '
                   @change='handleAllSelect'
                   :checked='currentDirectoryContent.length === selectedPaths.length && currentDirectoryContent.length !== 0'
                   >
@@ -47,7 +53,7 @@
               </tr>
               <!-- File Share Folder -->
               <tr v-if="currentDirectory === '/'">
-                <td></td>
+                <td class='px-6 py-4 whitespace-nowrap hidden'> </td>
                 <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
                   <div class='flex flex-row items-center text-md'>
                     <div class='mr-3 w-7 text-center'>
@@ -55,20 +61,21 @@
                       ></i>
                     </div>
                     <span
-                      class='hover:underline'
+                      class='hover:underline cursor-pointer'
                     >
                       Files shared with me
                     </span>
                   </div>
                 </td>
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
+                <td class='px-6 py-4 whitespace-nowrap'>-</td>
+                <td class='px-6 py-4 whitespace-nowrap'>-</td>
+                <td class='px-6 py-4 whitespace-nowrap'>-</td>
               </tr>
               <tr v-for="item in sortContent()"
                 class='hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300'
                 :class='{
-                  "bg-accent": highlight(item)
+                  "bg-accent": highlight(item),
+                  "bg-gray-100": isSelected(item)
                 }'
                 :key='item.fullName'
                 @click='handleSelect(item)'
@@ -77,7 +84,7 @@
                 @dragover='(event) => onDragOver(event, item)'
                 @drop='() => onDrop(item)'
               >
-                <td class="px-6 py-4 whitespace-nowrap">
+                <td class="px-6 py-4 whitespace-nowrap hidden">
                   <input
                     type='checkbox'
                     class='h-auto w-auto'
@@ -110,6 +117,7 @@
               </tr>
             </tbody>
           </table>
+          </FileDropArea>
         </div>
       </div>
     </div>
@@ -157,6 +165,13 @@ export default defineComponent({
         selectItem(item);
       else
         deselectItem(item);
+    };
+
+    const isSelected = (item: PathInfoModel) =>{
+      if (!selectedPaths.value.includes(item))
+        return false;
+      else
+        return true;
     };
 
     const handleAllSelect = (val: any) => {
@@ -217,6 +232,7 @@ export default defineComponent({
 
     return {
       handleSelect,
+      isSelected,
       handleAllSelect,
       handleItemClick,
       currentDirectoryContent,

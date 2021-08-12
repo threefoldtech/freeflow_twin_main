@@ -4,7 +4,8 @@
             <div class='flex flex-row w-full h-full bg-white'>
                 <div class='flex flex-col flex-1'>
                     <TopBar/>
-                  <DirectoryContent v-if="searchResults.length === 0 && sharedDir === false"/>
+                  <FileTable v-if="searchResults.length === 0 && sharedDir === false"/>
+                  <!--<DirectoryContent v-if="searchResults.length === 0 && sharedDir === false"/>-->
                   <SearchContent v-if="searchResults.length > 0 && sharedDir === false"/>
                   <SharedContent v-if="sharedDir === true"/>
                 </div>
@@ -17,7 +18,8 @@
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
     import { defineComponent, onBeforeMount } from 'vue';
-    import DirectoryContent from '@/components/fileBrowser/DirectoryContent.vue';
+    //import DirectoryContent from '@/components/fileBrowser/DirectoryContent.vue';
+    import FileTable from '@/components/fileBrowser/FileTable.vue';
     import SearchContent from '@/components/fileBrowser/SearchContent.vue';
     import { updateContent, getSharedContent, searchResults, sharedDir, } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
@@ -27,7 +29,7 @@
         name: 'Apps',
         components: {
             TopBar,
-          appLayout, DirectoryContent, SearchContent, SharedContent
+          appLayout, FileTable, SearchContent, SharedContent
         },
         setup() {
             onBeforeMount(async() => {
