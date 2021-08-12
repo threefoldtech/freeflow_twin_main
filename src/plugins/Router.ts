@@ -61,7 +61,7 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true, app:AppType.Filebrowser },
     },
     {
-        path: '/filebrowser/edit/:id/:share?/:issuer?/:perms?',
+        path: '/filebrowser/edit/:path/:shareId?',
         name: 'editfile',
         component: EditFile,
         meta: {

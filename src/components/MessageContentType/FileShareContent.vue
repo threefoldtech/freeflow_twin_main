@@ -20,7 +20,7 @@
 <script lang="ts">
     import { defineComponent } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import {getSharedContent, parseJwt, requestSharedFile, sharedDir} from '@/store/fileBrowserStore';
+    import {getSharedContent, parseJwt, sharedDir} from '@/store/fileBrowserStore';
     import { getFileType } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
 
@@ -51,7 +51,6 @@
             return {
                 formatBytes,
                 calcExternalResourceLink,
-                requestSharedFile,
                 goToShared
             };
         },
