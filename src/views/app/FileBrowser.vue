@@ -1,10 +1,7 @@
 <template>
     <appLayout>
         <template v-slot:default>
-            <div class='flex flex-row w-full h-full'>
-                <!--<div>
-                    <SideBar/>
-                </div>-->
+            <div class='flex flex-row w-full h-full bg-white'>
                 <div class='flex flex-col flex-1'>
                     <TopBar/>
                   <DirectoryContent v-if="searchResults.length === 0 && sharedDir === false"/>
