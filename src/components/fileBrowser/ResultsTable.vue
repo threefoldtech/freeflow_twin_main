@@ -17,25 +17,17 @@
                   :checked='currentDirectoryContent.length === selectedPaths.length && currentDirectoryContent.length !== 0'
                   >
                 </th>
-                <th :class="{active: 'name' === currentSort}" @click="sortAction('name')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Name
-                  <span :class='orderClass'>
-                    </span>
                 </th>
-                <th :class="{active: 'extension' === currentSort}" @click="sortAction('extension')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Extension
-                  <span :class='orderClass'>
-                    </span>
                 </th>
-                <th :class="{active: 'size' === currentSort}" @click="sortAction('size')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Size
-                  <span :class='orderClass'>
-                    </span>
                 </th>
-                <th :class="{active: 'lastModified' === currentSort}" @click="sortAction('lastModified')" scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Last Modified
-                  <span :class='orderClass'>
-                    </span>
                 </th>
               </tr>
             </thead>
@@ -108,18 +100,13 @@
         getFileLastModified,
         getFileExtension,
         getFileSize, selectAll, deselectAll, selectItem, deselectItem,
-        getIconColor, sortAction, currentSort, currentSortDir,
-        getIcon, PathInfoModel, itemAction, goToFileDirectory, sortContent,
+        getIconColor,
+        getIcon, PathInfoModel, itemAction, goToFileDirectory,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
 
     export default defineComponent({
         name: 'ResultsTable',
-        computed: {
-            orderClass() {
-                return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
-            },
-        },
         setup() {
             const router = useRouter();
             const handleItemClick = (item: PathInfoModel) => {
@@ -156,10 +143,6 @@
                 isSelected,
                 searchDirValue,
                 currentDirectory,
-                currentSortDir,
-                sortContent,
-                sortAction, 
-                currentSort,
                 selectedPaths,
                 getFileLastModified,
                 getFileExtension,
