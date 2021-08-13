@@ -1,23 +1,7 @@
 <template>
-    <div class='bg-white h-full w-52'>
-        <div
-            @click='showCreateFolderDialog = true'
-            class='flex flex-row p-4 items-center w-full hover:bg-gray-200 cursor-pointer'
-        >
-            <div class='mr-3 w-7'>
-                <i class="fas fa-folder-plus fa-2x text-accent"></i>
-            </div>
-            <span class='text-md text-gray-600'>New Folder</span>
-        </div>
-        <div
-            @click='showCreateFileDialog = true'
-            class='flex flex-row p-4 items-center w-full hover:bg-gray-200 cursor-pointer'
-        >
-            <div class='mr-3 w-7'>
-                <i class="fas fa-file-upload fa-2x text-accent"></i>
-            </div>
-            <span class='text-md text-gray-600'>Upload Files</span>
-        </div>
+    <div>
+        <button @click='showCreateFolderDialog = true' style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md"><i class="fas fa-plus"></i> New Folder</button>
+        <button @click='showCreateFileDialog = true' style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md"><i class="fas fa-plus"></i> Upload Files</button>
     </div>
     <Dialog :model-value='showCreateFolderDialog' @update-model-value='(val) => updateCreateFolderDialog(val)'>
         <template v-slot:title>
@@ -69,7 +53,7 @@
     import Button from '@/components/Button.vue';
 
     export default defineComponent({
-        name: 'SideBar',
+        name: 'MainActionButtons',
         components: {
             Button, Dialog, FileDropArea,
         },

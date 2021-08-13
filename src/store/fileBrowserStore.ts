@@ -322,7 +322,7 @@ export const sortAction = function(s) {
 };
 
 export const getIcon = (item: PathInfoModel) => {
-    if (item.isDirectory) return 'far fa-folder';
+    if (item.isDirectory) return 'fas fa-folder';
     switch (item.fileType) {
         case FileType.Video:
             return 'far fa-file-video';

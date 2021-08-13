@@ -20,27 +20,14 @@
         </div>
 
         <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
-            <div class="flex place-items-center">
-                <label class="mr-2" for="username">Username:</label>
-                <auto-complete
-                    :data="possibleUsers"
+            <div class="flex flex-col">
+                <user-table
+                    :data="contacts"
                     v-model="usernameAdd"
                     placeholder="Search for user..."
                     :error="usernameAddError"
                     @clicked="handleClicked"
-
-                ></auto-complete>
-            </div>
-            <div class="flex place-items-center">
-                <label class="mr-2" for="location">Location:</label>
-                <input id="location" v-model="userAddLocation" class="mb-2" maxlength="50" />
-            </div>
-
-            <div class="flex mt-4 justify-end w-full">
-                <button type="button" @click="$emit('closeDialog')">
-                    Cancel
-                </button>
-                <button>Add contact</button>
+                ></user-table>
             </div>
         </form>
         <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
@@ -54,42 +41,18 @@
                     </span>
                 </div>
             </div>
-            <div class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl">
-                <div class="h-full">
-                    <div v-if="!contacts.length">
-                        <p class="text-gray-300 text-center py-4">
-                            No users in group yet
-                        </p>
-                    </div>
-                    <div v-for="(contact, i) in contacts" :key="i" class="grid grid-cols-12 rounded-lg mb-2 py-2">
-                        <div class="col-span-2 place-items-center grid">
-                            <AvatarImg :id="contact.id" alt="contact image" />
-                        </div>
-                        <div class="col-span-8 pl-4 flex flex-col justify-center">
-                            {{ contact.id }}
-                        </div>
-                        <div class="col-span-2 place-items-center grid">
-                            <button
-                                class="h-12 rounded-full"
-                                @click="removeUserFromGroup(contact)"
-                                v-if="userIsInGroup(contact)"
-                            >
-                                <i class="fas fa-times"></i>
-                            </button>
-                            <button
-                                class="h-12 rounded-full"
-                                @click="usersInGroup.push(contact)"
-                                v-if="!userIsInGroup(contact)"
-                            >
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div>
+                <user-table-group
+                    :data="contacts"
+                    :usersInGroup="usersInGroup"
+                    v-model="usernameInGroupAdd"
+                    placeholder="Search for user..."
+                    :error="usernameAddError"
+                ></user-table-group>
             </div>
             <div class="flex mt-4 justify-end w-full">
-                <button @click="$emit('closeDialog')">Cancel</button>
-                <button>Add Group</button>
+                <button @click="$emit('closeDialog')" class="rounded-md border border-gray-400 px-4 py-2 justify-self-end">Cancel</button>
+                <button style="backgroundColor: #16A085" class="py-2 px-4 text-white rounded-md justify-self-end">Add Group</button>
             </div>
         </form>
     </div>
@@ -103,13 +66,14 @@
     import { Chat, Contact, Message } from '../types/index';
     import axios from 'axios';
     import config from '../../public/config/config';
-    import autoComplete from './AutoComplete.vue';
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import userTable from '@/components/UserTable.vue';
+    import userTableGroup from '@/components/UserTableGroup.vue'
 
     export default defineComponent({
         name: 'ContactAdd',
-        components: { AvatarImg, autoComplete },
+        components: { AvatarImg, userTable, userTableGroup },
         emits: ['closeDialog'],
         setup(props, { emit }) {
             const { contacts } = useContactsState();
@@ -203,19 +167,6 @@
                 emit('closeDialog');
             };
 
-            const userIsInGroup = (contact: Contact) => {
-                const user = usersInGroup.value.find(c => c.id == contact.id);
-                if (user) {
-                    return true;
-                }
-                return false;
-            };
-
-            const removeUserFromGroup = (contact: Contact) => {
-                const index = usersInGroup.value.findIndex(u => u.id == contact.id);
-                usersInGroup.value.splice(index, 1);
-            };
-
             // @todo: config
             axios.get(`${config.spawnerUrl}api/v1/list`, {}).then(r => {
                 const { user } = useAuthState();
@@ -237,8 +188,6 @@
                 setActive,
                 groupAdd,
                 contacts,
-                userIsInGroup,
-                removeUserFromGroup,
                 possibleUsers,
                 handleClicked,
             };

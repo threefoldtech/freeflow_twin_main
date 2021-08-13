@@ -1,5 +1,6 @@
 <template>
-    <div class="relative w-full" @keydown.esc="showOptions = false">
+    <div class="flex flex-row items-center">
+        <label class="mr-2" for="username">Username:</label>
         <input
             v-model="searchTerm"
             @focus="handleInput"
@@ -9,45 +10,58 @@
             tabindex="0"
             maxlength="50"
         />
-        <span class="text-red-600" v-if="error != ''"> {{ error }} </span>
         <span
-            v-if="modelValue"
-            @click.prevent="reset()"
-            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          v-if="modelValue"
+          @click.prevent="reset()"
+          class="cursor-pointer"
         >
-            x
+          <i class="fas fa-times"></i>
         </span>
-        <div
-            v-show="showOptions"
-            @click.self="handleSelf()"
-            @focusout="showOptions = false"
-            tabindex="0"
-            :class="dropdownClass"
-        >
-            <ul class="py-1">
-                <li
-                    v-for="(item, index) in searchResults()"
-                    :key="index"
-                    @click="handleClick(item)"
-                    class="px-3 flex flex-row py-2 cursor-pointer hover:bg-gray-200 capitalize"
-                >
-                    <AvatarImg :id="item.id" alt="contact image" />
-                    <div class="flex-col mr-2">
-                    <b>{{ item.id }}</b> <br />
-                    <span class="truncate">{{ item.location }}</span>
-                    </div>
-                </li>
-                <li
-                    v-if="!searchResults().length"
-                    class="px-3 py-2 text-center"
-                >
-                    No Matching Results
-                </li>
-            </ul>
-        </div>
     </div>
+    <span class="text-red-600" v-if="error != ''"> {{ error }} </span>
+    <div class="flex flex-col mt-4">
+    <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-100">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Users
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="(item, index) in searchResults()" :key="index">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center justify-between">
+                    <div class='flex'>
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <AvatarImg :id="item.id" alt="contact image" />
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ item.id }}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        {{ item.location }}
+                      </div>
+                    </div>
+                    </div>
+                    <button @click="handleClick(item)" style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md justify-self-end">Invite to chat</button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="!searchResults().length">
+                <td><p class="text-sm p-3 text-center">No Matching Results</p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
-
 <script lang="ts">
     import { Contact } from '@/types';
     import { defineComponent, ref, computed, onMounted } from 'vue';
@@ -68,12 +82,6 @@
                 type: Array,
                 required: true,
             },
-            dropdownClass: {
-                type: String,
-                required: false,
-                default:
-                    'absolute w-full z-50 bg-white border border-gray-300 mt-1 mh-48 overflow-hidden overflow-y-scroll rounded-md shadow-md',
-            },
             error: {
                 type: String,
                 default: '',
@@ -82,7 +90,6 @@
         emits: ['update:modelValue', 'clicked'],
 
         setup(props, { emit }) {
-            const showOptions = ref(false);
             const chosenOption = ref('');
             const searchTerm = ref('');
 
@@ -94,7 +101,6 @@
 
             const handleInput = evt => {
                 emit('update:modelValue', evt.target.value);
-                showOptions.value = true;
             };
 
             const handleClick = item => {
@@ -102,17 +108,9 @@
                 chosenOption.value = item.id;
                 searchTerm.value = item.id;
                 emit('update:modelValue', item.id);
-                showOptions.value = false;
                 emit('clicked');
             };
 
-            const clickedOutside = () => {
-                showOptions.value = false;
-
-                if (!chosenOption.value) {
-                    emit('update:modelValue', '');
-                }
-            };
             const searchResults = () => {
                 return props.data.filter((item: Contact) => {
                     return item.id
@@ -125,8 +123,6 @@
                 reset,
                 handleInput,
                 handleClick,
-                clickedOutside,
-                showOptions,
                 chosenOption,
                 searchTerm,
                 searchResults,
