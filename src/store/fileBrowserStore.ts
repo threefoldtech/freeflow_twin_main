@@ -537,7 +537,8 @@ export const fetchShareDetails = async (shareId: string) => {
 };
 
 export const fetchFileAccessDetails = async ( owner: ContactInterface , shareId :string) => {
-    const fileAccessDetails = await Api.getFileAccessDetails( owner , shareId)
+    const {user} = useAuthState()
+    const fileAccessDetails = await Api.getFileAccessDetails( owner , shareId, <string>user.id)
     return fileAccessDetails
 }
 

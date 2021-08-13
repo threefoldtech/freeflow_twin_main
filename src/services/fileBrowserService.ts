@@ -161,11 +161,11 @@ export const getShareWithId = async (id: string) => {
      return <SharedFileInterface>res.data
 };
 
-export const getFileAccessDetails = async ( owner: ContactInterface , shareId :string ) => {
+export const getFileAccessDetails = async ( owner: ContactInterface , shareId :string, userId:string ) => {
     let externalUrl = `http://[${owner.location}]`
     externalUrl = calcExternalResourceLink(externalUrl)
     
-    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}`
+    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}`
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall)
 
     externalUrl = externalUrl+apiEndPointToCall
