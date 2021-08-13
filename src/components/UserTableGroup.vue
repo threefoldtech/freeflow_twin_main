@@ -67,7 +67,7 @@
 </template>
 <script lang="ts">
     import { Contact } from '@/types';
-    import { defineComponent, ref, computed, onMounted } from 'vue';
+    import { defineComponent, ref, computed, onMounted, PropType } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     export default defineComponent({
         components: { AvatarImg },
@@ -86,7 +86,7 @@
                 required: true,
             },
             usersInGroup: {
-                type: Array,
+                type: Array as PropType<Contact[]>,
                 required: true,
             },
             error: {
@@ -126,7 +126,7 @@
                 });
             };
 
-            const userIsInGroup = (contact: props.data) => {
+            const userIsInGroup = (contact: Contact) => {
                 const user = props.usersInGroup.find(c => c.id == contact.id);
                 if (user) {
                     return true;
@@ -134,7 +134,7 @@
                 return false;
             };
 
-            const removeUserFromGroup = (contact: props.data) => {
+            const removeUserFromGroup = (contact: Contact) => {
                 const index = props.usersInGroup.findIndex(u => u.id == contact.id);
                 props.usersInGroup.splice(index, 1);
             };
