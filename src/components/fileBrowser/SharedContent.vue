@@ -36,8 +36,7 @@
                         </span>
                             <span class="text-xs opacity-50"
                             >
-                        From: 
-                        <!-- {{ parseJwt(sharedContent[key].shares[0].token).iss }} -->
+                        From: {{item.owner.id}}
                         </span>
 
                         </div>

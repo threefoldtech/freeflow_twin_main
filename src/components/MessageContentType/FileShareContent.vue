@@ -57,7 +57,7 @@ export default defineComponent({
     return {
       formatBytes,
       // calcExternalResourceLink,
-      // goToShared
+      goToShared
     };
   },
 });
