@@ -1,12 +1,12 @@
 <template>
     <div class='h-full overflow-y-auto'>
         <h1 class="p-2">Files shared with me:</h1>
-        <div class="flex flex-row" v-if="Object.keys(sharedContent).length === 0">
+        <div class="flex flex-row" v-if="sharedContent.length === 0">
             <h2
                 class="align-middle ml-2"
             >No files shared with you yet</h2>
         </div>
-        <table class='w-full box-border' v-if="Object.keys(sharedContent).length > 0">
+        <table class='w-full box-border' v-if="sharedContent.length > 0">
             <thead>
             <tr v-if="searchResults !== 'None'">
                 <th class='text-left select-none pl-4'>
@@ -19,30 +19,30 @@
             </thead>
             <tbody>
             <tr
-                v-for='key in Object.keys(sharedContent)'
+                v-for='item in sharedContent'
                 class='hover:bg-gray-200 h-10 border-b border-t border-gray-300 cursor-pointer'
-                @click='goTo(sharedContent[key], key)'
+                @click='goTo(item)'
             >
                 <td>
                     <div class='flex flex-row items-center pl-4 py-1'>
                         <div class='mr-3 w-7'>
                             <i class='fa-2x'
-                               :class='getIconDirty(getFileType(getExtension(sharedContent[key])))+ " " + getIconColorDirty(getFileType(getExtension(sharedContent[key])))'
+                               :class='getIconDirty(getFileType(getExtension(item.name)))+ " " + getIconColorDirty(getFileType(getExtension(item.name)))'
                             ></i>
                         </div>
                         <div class='flex flex-col items-start py-1'>
                         <span class="text-md">
-                         {{ sharedContent[key].filename }}
+                         {{ item.name }}
                         </span>
                             <span class="text-xs opacity-50"
                             >
-                        From: {{ parseJwt(sharedContent[key].shares[0].token).iss }}
+                        From: {{item.owner.id}}
                         </span>
 
                         </div>
                     </div>
                 </td>
-                <td>{{ formatBytes(sharedContent[key].size, 2) }}</td>
+                <td>{{ formatBytes(item.size) }}</td>
 
             </tr>
             </tbody>
@@ -50,14 +50,15 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
     import {
-        FileType, formatBytes, getFileType,
+        FileType, formatBytes, getExtension, getFileType,
         getIcon,
         getIconColor, getIconColorDirty, getIconDirty,
-        parseJwt, requestSharedFile,
+        parseJwt,
         sharedContent,
     } from '@/store/fileBrowserStore';
+import { SharedFileInterface } from '@/types';
     import { defineComponent } from '@vue/runtime-core';
     import { useRouter } from 'vue-router';
 
@@ -71,13 +72,12 @@
 
                 return d === '1/20/1980' ? 'Never' : d;
             };
-            const goTo = (object, key) => {
-                requestSharedFile(object, key, getFileType(getExtension(object)), router)
+            const goTo = (item:SharedFileInterface) => {
+                return router.push({name: 'editfile', params:{
+                    path:btoa(item.path),
+                    shareId:item.id
+                }})
             };
-            const getExtension = (file) => {
-                return file.filename.substring(file.filename.lastIndexOf('.') + 1);
-            };
-
 
             return {
                 getIconColorDirty,

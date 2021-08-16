@@ -126,3 +126,28 @@ export enum MessageTypes {
     DELETE = 'DELETE',
     QUOTE = 'QUOTE',
 }
+
+export interface SharedFileInterface {
+    id: string
+    path: string;
+    owner: ContactInterface;
+    name:string | undefined
+    isFolder: Boolean;
+    size: number | undefined;
+    lastModified: number | undefined;
+    permissions: SharePermissionInterface[];
+}
+
+export enum SharePermission {
+    Read = 'r',
+    Write = 'w'
+}
+export interface SharePermissionInterface {
+    userId: string | undefined;
+    types: SharePermission[]
+}
+
+export interface ContactInterface {
+    id: string;
+    location: string;
+}

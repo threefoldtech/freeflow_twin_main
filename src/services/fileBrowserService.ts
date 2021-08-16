@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '../../public/config/config';
 import { createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
 import { ProgressNotification } from '@/types/notifications';
+import { ContactInterface, SharedFileInterface } from '@/types';
+import { calcExternalResourceLink } from './urlService';
 
 const endpoint = `${config.baseUrl}api/browse`;
 
@@ -141,9 +143,8 @@ export const moveFiles = async (paths: string[], pathToPaste: string) => {
 export const renameFile = async (oldPath: string, newPath: string) => {
     return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
 };
-export const getShareFileToken = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
-
-    return await axios.post<GetShareToken>(`${endpoint}/files/share`, { userId: userId, writable: writable, path: path, filename: filename, size: size});
+export const addShare = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
+    return await axios.post<GetShareToken>(`${endpoint}/files/share`, { chatId: userId, writable: writable, path: path, filename: filename, size: size});
 };
 export const saveToken = async (token: string, filename: string, size: number) => {
     return await axios.post<string>(`${endpoint}/files/insertToken`, { token: token, filename: filename, size: size});
@@ -156,6 +157,18 @@ export const getShared = async (shareStatus: string) => {
 export const getShareWithId = async (id: string) => {
     const params = new URLSearchParams();
     params.append('id', id);
-    return await axios.get<ShareInfo[]>(`${endpoint}/files/getShareWithId`, { params: params });
+     const res = await axios.get(`${endpoint}/files/getShareWithId`, { params: params });
+     return <SharedFileInterface>res.data
 };
 
+export const getFileAccessDetails = async ( owner: ContactInterface , shareId :string, userId:string ) => {
+    let externalUrl = `http://[${owner.location}]`
+    externalUrl = calcExternalResourceLink(externalUrl)
+    
+    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}`
+    apiEndPointToCall = encodeURIComponent(apiEndPointToCall)
+
+    externalUrl = externalUrl+apiEndPointToCall
+    const res = await axios.get(externalUrl);
+     return <EditPathInfo>res.data
+}

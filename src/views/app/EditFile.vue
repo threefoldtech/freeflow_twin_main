@@ -5,102 +5,131 @@
 </template>
 
 <script lang='ts'>
-import {defineComponent, onMounted, ref} from 'vue';
-import {useRoute, useRouter} from 'vue-router';
-import {createModel, FullPathInfoModel, getFile} from '@/store/fileBrowserStore';
-import {get} from 'scriptjs';
-import config from '../../../public/config/config';
-import {DtId} from '@/types';
-import axios, {ResponseType} from 'axios';
-import {useAuthState} from '@/store/authStore';
-import {watchingUsers} from '@/store/statusStore';
+import { defineComponent, onMounted, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import {
+  createModel,
+  FullPathInfoModel,
+  getFile,
+  fetchShareDetails,
+  fetchFileAccessDetails,
+  getExtension,
+  FileType,
+  getFileType,
+} from "@/store/fileBrowserStore";
+import { get } from "scriptjs";
+import config from "../../../public/config/config";
+import { DtId } from "@/types";
+import axios, { ResponseType } from "axios";
+import { useAuthState } from "@/store/authStore";
+import { watchingUsers } from "@/store/statusStore";
+import { calcExternalResourceLink } from "@/services/urlService";
+import {
+  EditPathInfo,
+  getFileInfo,
+  PathInfo,
+} from "@/services/fileBrowserService";
 
 export default defineComponent({
-  name: 'EditFile',
+  name: "EditFile",
   setup() {
     const route = useRoute();
     const router = useRouter();
-    const fileInfo = ref<FullPathInfoModel>();
 
-    onMounted(() => {
-      renderDocument();
-      get(`${config.documentServerUrl}/web-apps/apps/api/documents/api.js`, () => {
-        if (route.params.share === 'shared') {
-          renderExternalDocument();
-          return;
+    onMounted(async () => {
+      const path = atob(<string>route.params.path);
+      const shareId = <string>route.params.shareId;
+      //@todo find better way to get name
+      const name = window.location.host.split(".")[0];
+      let documentServerconfig;
+      let fileAccesDetails: EditPathInfo;
+
+      if (shareId) {
+        const shareDetails = await fetchShareDetails(shareId);
+        fileAccesDetails = await fetchFileAccessDetails(
+          shareDetails.owner,
+          shareId
+        );
+      } else {
+        fileAccesDetails = (await getFileInfo(path)).data;
+      }
+
+      const fileType = getFileType(getExtension(fileAccesDetails.fullName));
+
+      if (
+        [FileType.Excel, FileType.Word, FileType.Powerpoint].some(
+          (x) => x === fileType
+        )
+      ) {
+        documentServerconfig = generateDocumentserverConfig(
+          name,
+          fileAccesDetails.path,
+          fileAccesDetails.key,
+          fileAccesDetails.readToken,
+          fileAccesDetails.writeToken,
+          getExtension(fileAccesDetails.fullName),
+          fileAccesDetails.extension
+        );
+        get(
+          `${config.documentServerUrl}/web-apps/apps/api/documents/api.js`,
+          () => {
+            console.log(documentServerconfig);
+            //@ts-ignore
+            new window.DocsAPI.DocEditor("placeholder", documentServerconfig);
+          }
+        );
+
+      //   } else if (fileType === FileType.Image) {
+      //       const response = await Api.downloadFile(fileAccesDetails.readToken);
+      //       const result = window.URL.createObjectURL(response.data);
+      //       setImageSrc(result);
+      //   } else if (item.fileType === FileType.Pdf) {
+      //       const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
+      //       const file = new Blob([response.data], { type: 'application/pdf' });
+      //       const url = URL.createObjectURL(file);
+      //       window.open(url, '_blank');
+      //   } else if (item.fileType === FileType.Video) {
+      //       const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
+      //       const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
+      //       const url = URL.createObjectURL(file);
+      //       window.open(url, '_blank');
+      //   } else {
+      //       const result = await Api.downloadFile(item.path);
+      //       fileDownload(result.data, item.fullName);
+      }
+
+      get(
+        `${config.documentServerUrl}/web-apps/apps/api/documents/api.js`,
+        () => {
+          console.log(documentServerconfig);
+          //@ts-ignore
+          new window.DocsAPI.DocEditor("placeholder", documentServerconfig);
         }
-        renderDocument();
-      });
+      );
     });
 
-    const renderDocument = async () => {
-      const path = atob(<string>route.params.id);
-      if (!path) router.push({name: "filebrowser"});
-      fileInfo.value = await getFile(path);
-      if (!fileInfo.value || !fileInfo.value.isFile)
-        return;
-
-      const name = window.location.host.split(".")[0]
-
-      const config = {
+    const generateDocumentserverConfig = (
+      ownerId: string,
+      path: string,
+      key: string,
+      readToken: string,
+      writeToken: string | undefined,
+      extension: string,
+      fileName: string
+    ) => {
+      const readUrl = `http://${ownerId}-chat/api/browse/internal/files?path=${path}&token=${readToken}`;
+      const writeUrl = `http://${ownerId}-chat/api/browse/internal/files?path=${path}&token=${writeToken}`;
+      //@todo find better way to get name
+      const name = window.location.host.split(".")[0];
+      return {
         document: {
-          fileType: fileInfo.value.extension,
-          key: fileInfo.value.key,
-          title: fileInfo.value.name,
-          url: `http://${name}-chat/api/browse/internal/files?path=${path}&token=${fileInfo.value.readToken}`,
-          info: {
-            owner: name,
-            sharingSettings: [
-              {
-                permissions: "Full Access",
-                user: name
-              },
-            ],
-          },
-        },
-        height: '100%',
-        width: '100%',
-        editorConfig: {
-          callbackUrl: `http://${name}-chat/api/browse/internal/files?path=${path}&token=${fileInfo.value.writeToken}`,
-          customization: {
-            chat: false,
-            forcesave: true
-          },
-          user: {
-            id: name,
-            name: name
-          }
-
-        },
-      };
-      //@ts-ignore
-      new window.DocsAPI.DocEditor('placeholder', config);
-    }
-    const renderExternalDocument = async () => {
-      const res = atob(<string>route.params.id);
-      const issuer = <string>route.params.issuer;
-      const permissions = atob(<string>route.params.perms);
-      let edit = permissions === 'write'
-      const object = JSON.parse(res);
-      if (!object) router.push({ name: 'filebrowser' });
-      fileInfo.value = createModel(object) as FullPathInfoModel;
-      if (!fileInfo.value || !fileInfo.value.isFile)
-        return;
-      const name = window.location.host.split('.')[0];
-      const readUrl = `http://${issuer}-chat/api/browse/internal/files?path=${fileInfo.value.path}&token=${fileInfo.value.readToken}`;
-      const writeUrl = `http://${issuer}-chat/api/browse/internal/files?path=${fileInfo.value.path}&token=${fileInfo.value.writeToken}`;
-      const config = {
-        document: {
-          fileType: fileInfo.value.extension,
-          key: fileInfo.value.key,
-          title: fileInfo.value.name,
+          fileType: extension,
+          key: key,
+          title: fileName,
           url: readUrl,
-          permissions: {
-            edit: edit,
-          },
         },
-        height: '100%',
-        width: '100%',
+        height: "100%",
+        width: "100%",
         editorConfig: {
           callbackUrl: writeUrl,
           customization: {
@@ -111,15 +140,13 @@ export default defineComponent({
             id: name,
             name: name,
           },
+          mode: writeToken ? "edit" : "view",
         },
       };
-      //@ts-ignore
-      new window.DocsAPI.DocEditor('placeholder', config);
-    }
-  }
+    };
+  },
 });
 </script>
 
 <style scoped>
-
 </style>

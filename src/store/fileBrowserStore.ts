@@ -8,7 +8,7 @@ import { createErrorNotification, createNotification } from '@/store/notificiati
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
 import { getShareWithId } from '@/services/fileBrowserService';
-import { DtId } from '@/types';
+import { ContactInterface, DtId, SharedFileInterface } from '@/types';
 import axios, { ResponseType } from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -289,28 +289,11 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, router: Router, path = currentDirectory.value) => {
     if (item.isDirectory) {
-        goToFolderInCurrentDirectory(item);
-    } else if ([FileType.Excel, FileType.Word, FileType.Powerpoint].some(x => x === item.fileType)) {
-        const result = router.resolve({ name: 'editfile', params: { id: btoa(pathJoin([path, item.fullName])) } });
-        window.open(result.href, '_blank');
-    } else if (item.fileType === FileType.Image) {
-        const response = await Api.downloadFile(item.path);
-        const result = window.URL.createObjectURL(response.data);
-        setImageSrc(result);
-    } else if (item.fileType === FileType.Pdf) {
-        const response = await Api.downloadFile(item.path, 'arraybuffer');
-        const file = new Blob([response.data], { type: 'application/pdf' });
-        const url = URL.createObjectURL(file);
-        window.open(url, '_blank');
-    } else if (item.fileType === FileType.Video) {
-        const response = await Api.downloadFile(item.path, 'arraybuffer');
-        const file = new Blob([response.data], { type: `video/${item.extension}` });
-        const url = URL.createObjectURL(file);
-        window.open(url, '_blank');
-    } else {
-        const result = await Api.downloadFile(item.path);
-        fileDownload(result.data, item.fullName);
-    }
+       return goToFolderInCurrentDirectory(item);
+    } 
+    const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName]))} });
+    window.open(result.href, '_blank');
+
 };
 
 export const sortContent = () => {
@@ -534,7 +517,7 @@ export const getSharedContent = async () => {
     sharedContent.value = result.data;
 };
 export const getToken = async (userId: string, path: string, filename: string, size: number, writable) => {
-    const result = await Api.getShareFileToken(userId, path, filename ,size, writable);
+    const result = await Api.addShare(userId, path, filename ,size, writable);
     return result;
 
 };
@@ -544,49 +527,21 @@ export const parseJwt = (token) => {
     return JSON.parse(Buffer.from(base64Url, 'base64').toString());
 };
 
-export const requestSharedFile = async (object, shareId, filetype, router: Router) => {
-    let token;
-
-    token = object.shares[0].token;
-    let tokenData = parseJwt(token);
-    let issuer = tokenData.iss;
-    let result = await getShareWithId(shareId);
-    if (!result)
-        throw new Error('Share no longer exists');
-
-    if ([FileType.Excel, FileType.Word, FileType.Powerpoint].some(x => x === filetype)) {
-        let info = await getExternalPathInfo(issuer, token, shareId);
-        let editRights
-        tokenData.data.permissions.includes("FileBrowserWrite") ? editRights='write':  editRights ='read' ;
-        const result = router.resolve({
-            name: 'editfile',
-            params: { id: btoa(JSON.stringify(info)), share: 'shared', issuer: issuer, perms: btoa(editRights) },
-        });
-        window.open(result.href, '_blank');
-    } else {
-        let share = await fetchShare(issuer, token, shareId);
-        fileDownload(share, object.filename);
-    }
-
+export const getExtension = (filename) => {
+    return filename.substring(filename.lastIndexOf('.') + 1);
 };
-const fetchShare = async (digitalTwinId: DtId, token: string, shareId: string, responseType: ResponseType = 'blob') => {
-    const { user } = useAuthState();
-    let params= {shareId: shareId, token: token}
-    const locationApiEndpoint = `/api/browse/files/getSharedFileDownload?params=${btoa(JSON.stringify(params))}`;
-    let location = '';
-    if (digitalTwinId == user.id) {
-        location = `${window.location.origin}${locationApiEndpoint}`;
-    } else {
-        location = calcExternalResourceLink(
-            `http://[${
-                watchingUsers[<string>digitalTwinId].location
-            }]${locationApiEndpoint}`,
-        );
-    }
-    // TODO: url encoding
-    const response = await axios.get(location, { responseType: responseType });
-    return response.data;
+
+export const fetchShareDetails = async (shareId: string) => {
+    const shareDetails = await getShareWithId(shareId)
+    return shareDetails
 };
+
+export const fetchFileAccessDetails = async ( owner: ContactInterface , shareId :string) => {
+    const {user} = useAuthState()
+    const fileAccessDetails = await Api.getFileAccessDetails( owner , shareId, <string>user.id)
+    return fileAccessDetails
+}
+
 export const getExternalPathInfo = async (digitalTwinId: DtId,token:string,  shareId: string) => {
     const { user } = useAuthState();
     let params= {shareId: shareId, token: token}

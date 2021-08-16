@@ -42,19 +42,19 @@ export const startFetchStatusLoop = async (contact: Contact) => {
 
     await fetchStatus(contact.id);
     fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    setInterval(async () => {
-        try {
-            if (fetching.indexOf(<string>contact.id) !== -1) {
-                return;
-            }
-            fetching.push(<string>contact.id);
-            await fetchStatus(contact.id);
+    // setInterval(async () => {
+    //     try {
+    //         if (fetching.indexOf(<string>contact.id) !== -1) {
+    //             return;
+    //         }
+    //         fetching.push(<string>contact.id);
+    //         await fetchStatus(contact.id);
 
-            fetching.splice(fetching.indexOf(<string>contact.id), 1);
-        } catch (e) {
-            setTimeout(() => {
-                fetching.splice(fetching.indexOf(<string>contact.id), 1);
-            }, 10000);
-        }
-    }, 5000);
+    //         fetching.splice(fetching.indexOf(<string>contact.id), 1);
+    //     } catch (e) {
+    //         setTimeout(() => {
+    //             fetching.splice(fetching.indexOf(<string>contact.id), 1);
+    //         }, 10000);
+    //     }
+    // }, 5000);
 };
