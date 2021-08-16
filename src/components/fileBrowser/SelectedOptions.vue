@@ -112,35 +112,38 @@
         </button>
       </div>
     </jdialog>
-    <jdialog v-model='showShareDialog' @update-model-value='showShareDialog = false' noActions class='max-w-10 w-auto'>
+    <jdialog v-model='showShareDialog' @update-model-value='showShareDialog = false' noActions>
       <template v-slot:title>
 
         <h1 class='text-center'>Share file</h1>
-        <div class="flex items-end justify-end mr-2">
+        <!--<div class="flex items-end justify-end mr-2">
           <label class="flex items-center cursor-pointer">
-            <!-- toggle -->
+            
             <div class="mr-3 text-gray-700 font-medium">
               Read
             </div>
             <div class="relative">
-              <!-- input -->
+              
               <input type="checkbox" v-model="writeRights" class="sr-only">
-              <!-- line -->
+              
               <div class="block bg-gray-600 w-14 h-8 rounded-full"></div>
-              <!-- dot -->
+              
               <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
             </div>
-            <!-- label -->
+            
             <div class="ml-3 text-gray-700 font-medium">
               Write
             </div>
           </label>
 
-        </div>
-
-
+        </div> -->
       </template>
-      <div
+      <chatTable
+        :data="chats"
+        :options="options"
+        v-model="writeRights"
+        ></chatTable>
+      <!--<div
           v-for='chat in chats'
           class='h-auto border-b border-t border-gray-300 flex flex-row items-center'
           :key='chat.chatId'
@@ -150,7 +153,7 @@
         <div @click="shareFile(chat.chatId)" class="mr-2 hover:bg-gray-200 cursor-pointer">
           <i class='fas fill-current text-green-400 fa-paper-plane fa-2x'></i>
         </div>
-      </div>
+      </div>-->
     </jdialog>
   </div>
 
@@ -172,6 +175,7 @@ import {
 } from '@/store/fileBrowserStore';
 import Dialog from '@/components/Dialog.vue';
 import Button from '@/components/Button.vue';
+import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
 import {sendMessageObject, usechatsActions, usechatsState} from '@/store/chatStore';
 import {useSocketActions} from '@/store/socketStore';
 import Avatar from '@/components/Avatar.vue';
@@ -184,14 +188,18 @@ const {retrievechats, sendMessage} = usechatsActions();
 
 export default defineComponent({
   name: 'SelectedOptions',
-  components: { AvatarImg, Button, jdialog: Dialog },
+  components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable },
   setup() {
     let debounce;
     let showDeleteDialog = ref(false);
     let showRenameDialog = ref(false);
     let newName = ref<string>('');
     let showShareDialog = ref(false);
-    let writeRights = ref(false);
+    const options = [
+      { name: 'Read' },
+      { name: 'Write' },
+    ];
+    let writeRights = ref(options[0].name);
 
     onBeforeMount(() => {
       retrievechats();
@@ -248,7 +256,8 @@ export default defineComponent({
       shareFile,
       createNotification,
       sharedDir,
-      writeRights
+      writeRights,
+      options,
     };
   },
 });
