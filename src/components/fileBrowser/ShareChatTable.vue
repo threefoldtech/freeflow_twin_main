@@ -33,7 +33,7 @@
             <tbody class="bg-white divide-y divide-gray-200">
               <tr v-for="(item, index) in searchResults()" :key="index">
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center justify-between">
+                  
                     <div class='flex'>
                         <div class="flex-shrink-0 h-10 w-10">
                             <AvatarImg :id="item.chatId" alt="chat image" />
@@ -44,11 +44,13 @@
                             </div>
                         </div>
                     </div>
-                    <Listbox as="div" v-model="modelValue">
+                </td>
+                <td>
+                    <Listbox as="div" v-model="writeRights">
                         <div class="mt-1 relative">
                             <ListboxButton class="relative w-full bg-white border border-gray-300 rounded-md shadow-sm pl-3 pr-10 py-2 text-left cursor-default focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                                 <span class="flex items-center">
-                                    <span class="ml-3 block truncate">{{ modelValue }}</span>
+                                    <span class="ml-3 block truncate">{{ writeRights.name }}</span>
                                 </span>
                                 <span class="ml-3 absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                                     <SelectorIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -74,8 +76,9 @@
                             </transition>
                         </div>
                     </Listbox>
+                </td>
+                <td>
                     <button @click="shareFile(item.chatId)" style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md justify-self-end">Share</button>
-                  </div>
                 </td>
               </tr>
             </tbody>
@@ -108,17 +111,10 @@
     export default defineComponent({
         components: { Listbox, ListboxButton, ListboxOptions, ListboxOption, AvatarImg },
         props: {
-            modelValue: {
-                type: String,
-                required: false,
-            },
             data: {
                 type: Array,
                 required: true,
             },
-            options:{
-                type: Array,
-            }
         },
         emits: ['update:modelValue', 'clicked'],
 
@@ -163,6 +159,9 @@
                 searchTerm,
                 searchResults,
                 selectedPaths,
+                options,
+                writeRights, 
+                shareFile,
             };
         },
     });

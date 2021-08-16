@@ -140,8 +140,6 @@
       </template>
       <chatTable
         :data="chats"
-        :options="options"
-        v-model="writeRights"
         ></chatTable>
       <!--<div
           v-for='chat in chats'
@@ -195,11 +193,6 @@ export default defineComponent({
     let showRenameDialog = ref(false);
     let newName = ref<string>('');
     let showShareDialog = ref(false);
-    const options = [
-      { name: 'Read' },
-      { name: 'Write' },
-    ];
-    let writeRights = ref(options[0].name);
 
     onBeforeMount(() => {
       retrievechats();
@@ -225,14 +218,7 @@ export default defineComponent({
       selectedAction.value = Action.COPY
       await copyPasteSelected()
     }
-    async function shareFile(chatId) {
-      const size= selectedPaths.value[0].size
-      const filename = selectedPaths.value[0].fullName
-      const response = await getToken(chatId, selectedPaths.value[0].path, filename, size, writeRights.value)
-      sendMessage(chatId, {token: response.data.token, fileName: filename, size: size}, MessageTypes.FILE_SHARE)
-      showShareDialog.value = false
-      createNotification("Shared File", "File has been shared with "+ chatId)
-    }
+    
     return {
       selectedPaths,
       deleteFiles,
@@ -253,11 +239,8 @@ export default defineComponent({
       copyFiles,
       showShareDialog,
       chats,
-      shareFile,
       createNotification,
       sharedDir,
-      writeRights,
-      options,
     };
   },
 });
