@@ -97,8 +97,8 @@
             'content'
             'content';
             grid-template-rows: auto 1fr;
-        }
 
+        }
         .customgrid {
             grid-template-columns: 400px 1fr;
         }
