@@ -116,7 +116,7 @@
             v-model="showShareDialog"
             @update-model-value="showShareDialog = false"
             noActions
-            class="max-w-10 w-auto"
+            class="md:max-w-10"
         >
             <template v-slot:title>
                 <h1 class="text-center">Share file</h1>
