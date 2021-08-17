@@ -2,6 +2,7 @@ const plugin = require('tailwindcss/plugin');
 
 module.exports = {
     purge: ['./public/**/*.html', './src/**/*.vue'],
+    mode: 'jit',
     darkMode: false, // or 'media' or 'class'
     theme: {
         extend: {
@@ -13,7 +14,7 @@ module.exports = {
         },
     },
     plugins: [
-        plugin(function({ addVariant, e }) {
+        plugin(function ({ addVariant, e }) {
             addVariant('my-message', ({ modifySelectors, separator }) => {
                 modifySelectors(({ className }) => {
                     return `.my-message .${e(`my-message${separator}${className}`)}`;
@@ -26,6 +27,7 @@ module.exports = {
                 });
             });
         }),
+        require('@tailwindcss/forms'),
     ],
     variants: {
         extend: {

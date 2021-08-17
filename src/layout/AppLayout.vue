@@ -69,32 +69,6 @@
 </script>
 
 <style scoped>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer utilities {
-        @variants responsive {
-            .bigmaingrid {
-                display: grid;
-                grid-template-areas:
-                    'top top'
-                    'side content'
-                    'side content';
-                grid-template-columns: 100px 1fr;
-                grid-template-rows: auto 1fr;
-            }
-        }
-    }
-
-    .maingrid {
-        display: grid;
-        grid-template-areas:
-            'top'
-            'content'
-            'content';
-        grid-template-rows: auto 1fr;
-    }
     .top {
         grid-area: top;
     }

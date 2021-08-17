@@ -28,6 +28,37 @@
                     :error="usernameAddError"
                     @clicked="handleClicked"
                 ></user-table>
+                <Disclosure v-slot="{ open }">
+                    <DisclosureButton
+                        class="
+                        flex
+                        justify-between
+                        w-full
+                        mt-4
+                        ml-0
+                        py-2
+                        text-sm
+                        font-medium
+                        text-left text-gray-500
+                        bg-gray-100
+                        rounded-lg
+                        hover:bg-gray-200
+                        focus:outline-none
+                        focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
+                    "
+                    >
+                        <span>Advanced</span>
+                        <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-gray-500" />
+                    </DisclosureButton>
+                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                        <div>
+                            <label for="manualContactAdd" class="block text-sm font-medium text-gray-700">Location</label>
+                            <div class="mt-1">
+                                <input type="text" v-model="manualContactAdd" name="manualContactAdd" id="manualContactAdd" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
+                            </div>
+                        </div>
+                    </DisclosurePanel>
+                </Disclosure>
             </div>
         </form>
         <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
@@ -50,32 +81,6 @@
                     :error="usernameAddError"
                 ></user-table-group>
             </div>
-            <Disclosure v-slot="{ open }">
-                <DisclosureButton
-                    class="
-                        flex
-                        justify-between
-                        w-full
-                        px-4
-                        py-2
-                        text-sm
-                        font-medium
-                        text-left text-purple-900
-                        bg-purple-100
-                        rounded-lg
-                        hover:bg-purple-200
-                        focus:outline-none
-                        focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75
-                    "
-                >
-                    <span>What is your refund policy?</span>
-                    <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-purple-500" />
-                </DisclosureButton>
-                <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
-                    If you're unhappy with your purchase for any reason, email us within 90 days and we'll refund you in
-                    full, no questions asked.
-                </DisclosurePanel>
-            </Disclosure>
 
             <div class="flex mt-4 justify-end w-full">
                 <button
@@ -104,6 +109,8 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import userTable from '@/components/UserTable.vue';
     import userTableGroup from '@/components/UserTableGroup.vue';
+    import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
+    import { ChevronUpIcon } from '@heroicons/vue/solid'
 
     export default defineComponent({
         name: 'ContactAdd',
@@ -129,6 +136,7 @@
             let usersInGroup = ref<Contact[]>([]);
             let possibleUsers = ref<Contact[]>([]);
             let contactAddError = ref('');
+            let manualContactAdd = ref('');
 
             const contactAdd = () => {
                 try {
@@ -137,7 +145,9 @@
                         usernameAddError.value = 'Cannot add empty user!';
                         return;
                     }
-                    if (!possibleUsers.value.find(pu => pu.id === userId)) {
+
+
+                    if (!manualContactAdd && !possibleUsers.value.find(pu => pu.id === userId)) {
                         usernameAddError.value = 'Not able to find DigitalTwin of this user';
                         return;
                     }
@@ -147,7 +157,7 @@
                         return;
                     }
                     const { addContact } = useContactsActions();
-                    addContact(userId, userAddLocation.value);
+                    addContact(userId, manualContactAdd.value ? manualContactAdd.value : userAddLocation.value);
                     usernameAdd.value = '';
                     contactAddError.value = '';
                     emit('closeDialog');
@@ -232,6 +242,7 @@
                 contacts,
                 possibleUsers,
                 handleClicked,
+                manualContactAdd
             };
         },
     });
