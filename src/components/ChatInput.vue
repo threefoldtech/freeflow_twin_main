@@ -22,7 +22,7 @@
                 <h2>GIF</h2>
             </button>
             <button class="action-btn mx-2 my-0 p-0 self-center flex-1" @click.stop="selectFile">
-                <i class="fas fa-paperclip  transform" style="--tw-rotate: -225deg"></i>
+                <i class="fas fa-paperclip transform" style="--tw-rotate: -225deg"></i>
             </button>
             <input class="hidden" type="file" id="fileinput" ref="fileinput" @change="changeFile" />
             <button
@@ -30,7 +30,7 @@
                 @click.stop="startRecording"
                 v-if="!stopRecording"
             >
-                <i class="fas fa-microphone "></i>
+                <i class="fas fa-microphone"></i>
             </button>
             <button class="action-btn mx-2 my-0 p-0 self-center flex-1" @click.stop="stopRecording" v-else>
                 <i class="fas fa-circle text-red-600"></i>
@@ -54,8 +54,8 @@
                 @click="collapsed = !collapsed"
                 :key="collapsed.toString()"
             >
-                <i v-if="collapsed" class="fas fa-chevron-down "></i>
-                <i v-else class="fas fa-chevron-up "></i>
+                <i v-if="collapsed" class="fas fa-chevron-down"></i>
+                <i v-else class="fas fa-chevron-up"></i>
             </button>
             <div class="bg-indigo-100 inline-flex text-sm rounded flex-row h-8 pl-3 self-center mr-2" v-if="attachment">
                 <div class="self-center">
@@ -65,7 +65,7 @@
                     {{ attachment.name }}
                 </span>
                 <button class="action-btn p-2 mx-0 self-center" @click.stop="removeFile">
-                    <i class="fas  fa-times"></i>
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <form class="w-full" @submit.prevent="chatsend">
@@ -80,29 +80,13 @@
         class="overlay-emoji"
         :class="{ hidden: !showEmoji }"
         @click="hideEmoji"
-        style="
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
-            top: 0;
-            left: 0;
-            z-index: 9999;
-        "
+        style="position: fixed; width: 100vw; height: 100vh; background: transparent; top: 0; left: 0; z-index: 9999"
     ></div>
     <div
         class="overlay-gif"
         :class="{ hidden: !showGif }"
         @click="hideGif"
-        style="
-            position: fixed;
-            width: 100vw;
-            height: 100vh;
-            background: transparent;
-            top: 0;
-            left: 0;
-            z-index: 9999;
-        "
+        style="position: fixed; width: 100vw; height: 100vh; background: transparent; top: 0; left: 0; z-index: 9999"
     ></div>
 </template>
 <script lang="ts">
@@ -397,7 +381,7 @@
                 getActionMessage,
                 MessageAction,
                 MessageTypes,
-                attachment
+                attachment,
             };
         },
     };

@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: '',
                 name: 'chat',
                 component: Chat,
-                meta: { requiresAuth: true, app:AppType.Chat },
+                meta: { requiresAuth: true, app: AppType.Chat },
             },
             {
                 path: ':id',
@@ -48,7 +48,7 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     back: 'chat',
                     requiresAuth: true,
-                    app:AppType.Chat
+                    app: AppType.Chat,
                 },
             },
         ],
@@ -58,7 +58,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'filebrowser',
         path: '/filebrowser',
         component: FileBrowser,
-        meta: { requiresAuth: true, app:AppType.Filebrowser },
+        meta: { requiresAuth: true, app: AppType.Filebrowser },
     },
     {
         path: '/filebrowser/edit/:path/:shareId?',
@@ -67,37 +67,37 @@ const routes: Array<RouteRecordRaw> = [
         meta: {
             back: 'filebrowser',
             requiresAuth: true,
-            app:AppType.Filebrowser
-        }
+            app: AppType.Filebrowser,
+        },
     },
     {
         name: 'forum',
         path: '/forum',
         component: Forum,
         meta: {
-            app:AppType.Forum
-        }
+            app: AppType.Forum,
+        },
     },
     {
         name: 'browser',
         path: '/browser',
         component: Browser,
         meta: {
-            app:AppType.Browser
-        }
+            app: AppType.Browser,
+        },
     },
     {
         name: 'videoroom',
         path: '/videoroom/:id',
         component: VideoRoom,
         meta: {
-            app:AppType.Meetings
-        }
+            app: AppType.Meetings,
+        },
     },
     {
         name: '404',
         path: '/:pathMatch(.*)*',
-        component: PageNotFound
+        component: PageNotFound,
     },
 ];
 
@@ -107,10 +107,7 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    if (
-        to.matched.some(record => record.meta.requiresAuth) &&
-        !(await isUserAuthenticated())
-    ) {
+    if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
     next();

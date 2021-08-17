@@ -1,14 +1,19 @@
 <template>
     <app-layout>
-        <iframe class="relative h-full w-full" title="forum" id="forum-iframe" :src="iframeUrl"
-                allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;" />
+        <iframe
+            class="relative h-full w-full"
+            title="forum"
+            id="forum-iframe"
+            :src="iframeUrl"
+            allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;"
+        />
     </app-layout>
 </template>
 
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref } from 'vue';
-    import { onMounted, onBeforeMount } from 'vue'
+    import { onMounted, onBeforeMount } from 'vue';
 
     export default defineComponent({
         name: 'Apps',
@@ -21,7 +26,7 @@
 
             onMounted(() => {
                 browse();
-            })
+            });
 
             function browse() {
                 iframeUrl.value = `https://browser.staging.jimber.io/?browsercontrols=true#https://duckduckgo.com/`;
@@ -29,13 +34,10 @@
             }
 
             return {
-                iframeUrl
+                iframeUrl,
             };
         },
     });
 </script>
 
-<style scoped type="text/css">
-
-
-</style>
+<style scoped type="text/css"></style>

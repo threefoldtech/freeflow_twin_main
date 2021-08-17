@@ -18,34 +18,59 @@
                         >
                             <i class="fas fa-pen text-white"></i>
                         </div>
-                        <AvatarImg :id="user.id" large/>
+                        <AvatarImg :id="user.id" large />
                     </div>
                     <h1 class="text-center my-4">{{ user.id }}</h1>
                 </div>
             </div>
 
             <div class="relative w-full h-full">
-                    <button
-                        v-if="!isEditingStatus"
-                        class="absolute top-0 mt-2 right-0 flex flex-row text-white font-bold bg-green-400 border-2 border-green-400 hover:text-green-400 hover:bg-white rounded-md cursor-pointer items-center"
-                        @click="setEditStatus(true)"
-                    >
-                        <i class="fas fa-pen fa-xs mr-1 align-middle"></i>
-                        <p class="text-xs">Edit</p>
-                    </button>
+                <button
+                    v-if="!isEditingStatus"
+                    class="
+                        absolute
+                        top-0
+                        mt-2
+                        right-0
+                        flex flex-row
+                        text-white
+                        font-bold
+                        bg-green-400
+                        border-2 border-green-400
+                        hover:text-green-400 hover:bg-white
+                        rounded-md
+                        cursor-pointer
+                        items-center
+                    "
+                    @click="setEditStatus(true)"
+                >
+                    <i class="fas fa-pen fa-xs mr-1 align-middle"></i>
+                    <p class="text-xs">Edit</p>
+                </button>
 
-
-
-                    <button
-                        v-if="isEditingStatus"
-                        class="absolute top-1 mt-2 right-0 flex flex-row ml-1 text-white font-bold bg-green-400 border-2 border-green-400 hover:text-green-400 hover:bg-white rounded-md cursor-pointer items-center"
-                        @click="sendNewStatus"
-                    >
-                        <i class="fas fa-check fa-xs mr-1 align-middle"></i>
-                        <p class="text-xs">Save</p>
-
-                    </button>
-
+                <button
+                    v-if="isEditingStatus"
+                    class="
+                        absolute
+                        top-1
+                        mt-2
+                        right-0
+                        flex flex-row
+                        ml-1
+                        text-white
+                        font-bold
+                        bg-green-400
+                        border-2 border-green-400
+                        hover:text-green-400 hover:bg-white
+                        rounded-md
+                        cursor-pointer
+                        items-center
+                    "
+                    @click="sendNewStatus"
+                >
+                    <i class="fas fa-check fa-xs mr-1 align-middle"></i>
+                    <p class="text-xs">Save</p>
+                </button>
 
                 <suspense>
                     <textarea
@@ -57,35 +82,38 @@
                         :placeholder="myStatus"
                         maxlength="150"
                     >
-
                     </textarea>
                 </suspense>
-              <div v-if="isEditingStatus" class="flex justify-end">
-                <span id="current">{{ userStatus.length }}</span>
-                <span id="maximum">&nbsp;/&nbsp;150</span>
-
-              </div>
+                <div v-if="isEditingStatus" class="flex justify-end">
+                    <span id="current">{{ userStatus.length }}</span>
+                    <span id="maximum">&nbsp;/&nbsp;150</span>
+                </div>
             </div>
-            <input
-                class="hidden"
-                type="file"
-                id="fileInput"
-                ref="fileInput"
-                accept="image/*"
-                @change="changeFile"
-            />
+            <input class="hidden" type="file" id="fileInput" ref="fileInput" accept="image/*" @change="changeFile" />
 
             <div>
-                <h2>{{ blockedUsers.length > 0 ? "Blocked": "No blocked users" }}</h2>
+                <h2>{{ blockedUsers.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
                 <ul v-if="blockedUsers.length > 0" class="max-h-28 overflow-y-auto">
-                    <template
-                        v-for="blockedUser in blockedUsers"
-                        :key="blockedUser"
-                    >
+                    <template v-for="blockedUser in blockedUsers" :key="blockedUser">
                         <li>
                             {{ blockedUser }}
                             <button
-                                class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase"
+                                class="
+                                    px-4
+                                    py-2
+                                    text-base
+                                    font-medium
+                                    rounded-md
+                                    text-white
+                                    bg-blue-600
+                                    hover:bg-blue-500
+                                    focus:border-blue-700
+                                    active:bg-blue-700
+                                    ease-in-out
+                                    duration-150
+                                    cursor-pointer
+                                    uppercase
+                                "
                                 @click="unblockUser(blockedUser)"
                             >
                                 unblock
@@ -104,14 +132,13 @@
                 </ul>
             </div>
         </div>
-        <jdialog v-model="showEditAvatar"   noActions>
+        <jdialog v-model="showEditAvatar" noActions>
             <template v-slot:title>
                 <h1>Avatar</h1>
             </template>
-            <div class="flex w-full flex-col" >
-                <div class="w-full" >
+            <div class="flex w-full flex-col">
+                <div class="w-full">
                     <vue-cropper
-
                         ref="cropper"
                         :aspect-ratio="1"
                         :src="src"
@@ -120,17 +147,13 @@
                         :guides="false"
                         :minCanvasWidth="64"
                         :minCropBoxWidth="64"
-                        :containerStyle='{"max-height": "400px"}'
-                        :background='false'
+                        :containerStyle="{ 'max-height': '400px' }"
+                        :background="false"
                     />
                 </div>
                 <div class="flex flex-row justify-end">
-                    <Button @click="saveNewAvatar">
-                        SAVE
-                    </Button>
-                    <Button @click="cancelNewAvatar">
-                        CANCEL
-                    </Button>
+                    <Button @click="saveNewAvatar"> SAVE </Button>
+                    <Button @click="cancelNewAvatar"> CANCEL </Button>
                 </div>
             </div>
         </jdialog>
@@ -138,23 +161,12 @@
 </template>
 
 <script lang="ts">
-    import {
-        computed,
-        defineComponent,
-        onBeforeMount,
-        onMounted,
-        ref, watch,
-        watchEffect,
-    } from 'vue';
+    import { computed, defineComponent, onBeforeMount, onMounted, ref, watch, watchEffect } from 'vue';
     import { useAuthState, getMyStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import {
-        blocklist,
-        deleteBlockedEntry,
-        initBlocklist,
-    } from '@/store/blockStore';
+    import { blocklist, deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
@@ -171,8 +183,6 @@
         emits: ['addUser'],
         created: () => {
             initBlocklist();
-
-
         },
         async setup({}, ctx) {
             const { user } = useAuthState();
@@ -188,19 +198,18 @@
             const isHoveringAvatar = ref(false);
             const showEditAvatar = ref(false);
 
-
             watch(showEditAvatar, () => {
-                if (showEditAvatar.value){
-                    window.addEventListener("keypress", enterPressed)
-                    return
-                }
-                window.removeEventListener("keypress", enterPressed)
-            });
-            watchEffect(() => {
-                if(!cropper.value) {
+                if (showEditAvatar.value) {
+                    window.addEventListener('keypress', enterPressed);
                     return;
                 }
-                if(!file.value) {
+                window.removeEventListener('keypress', enterPressed);
+            });
+            watchEffect(() => {
+                if (!cropper.value) {
+                    return;
+                }
+                if (!file.value) {
                     cropper.value.destroy();
                     return;
                 }
@@ -210,11 +219,11 @@
                 };
                 reader.readAsDataURL(file.value);
             });
-            const enterPressed = (e) => {
-                if (e.key === "Enter"){
-                    saveNewAvatar()
+            const enterPressed = e => {
+                if (e.key === 'Enter') {
+                    saveNewAvatar();
                 }
-            }
+            };
             const backOrMenu = () => {
                 if (route.meta && route.meta.back) {
                     router.push({ name: <any>route.meta.back });
@@ -239,13 +248,7 @@
             };
 
             const saveNewAvatar = async () => {
-                const blob = await (
-                    await fetch(
-                        cropper.value
-                            .getCroppedCanvas()
-                            .toDataURL(file.value.type)
-                    )
-                ).blob();
+                const blob = await (await fetch(cropper.value.getCroppedCanvas().toDataURL(file.value.type))).blob();
                 const tempFile = new File([blob], 'avatar', {
                     type: file.value.type,
                 });
@@ -263,7 +266,7 @@
 
             const closeDialog = newVal => {
                 showUserConfigDialog.value = newVal;
-            }
+            };
 
             const sendNewAvatar = async (data: any) => {
                 await setNewAvatar(data);
@@ -330,7 +333,6 @@
                 showEditAvatar,
                 cancelNewAvatar,
                 closeDialog,
-
             };
         },
     });

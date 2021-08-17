@@ -14,7 +14,6 @@ setInterval(() => {
     clock.value = new Date().getTime();
 }, 1000);
 
-
 setInterval(() => {
     minuteClock.value = new Date().getTime();
 }, 1000 * 40);

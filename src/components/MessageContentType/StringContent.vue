@@ -1,5 +1,5 @@
 <template>
-    <span class=" pt-2 pl-4 pb-2 pr-8 " v-html="computedMessage"></span>
+    <span class="pt-2 pl-4 pb-2 pr-8" v-html="computedMessage"></span>
 </template>
 
 <script lang="ts">

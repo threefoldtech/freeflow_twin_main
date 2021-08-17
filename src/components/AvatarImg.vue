@@ -29,7 +29,19 @@
 
         <div
             v-if="unreadMessagesAmount > 0"
-            class="absolute -top-1 -right-1 bg-accent h-4 w-4 rounded-full text-xs z-10 align-middle text-center text-white"
+            class="
+                absolute
+                -top-1
+                -right-1
+                bg-accent
+                h-4
+                w-4
+                rounded-full
+                text-xs
+                z-10
+                align-middle
+                text-center text-white
+            "
         >
             {{ unreadMessagesAmount }}
         </div>

@@ -5,10 +5,7 @@
             <div class="hidden w-full h-full md:grid place-items-center">
                 <div class="flex flex-col mb-12 text-center">
                     <p>Select a chat</p>
-                    <button
-                        @click="showAddUserDialog = true"
-                        class="mt-2 border rounded-full py-1 px-3"
-                    >
+                    <button @click="showAddUserDialog = true" class="mt-2 border rounded-full py-1 px-3">
                         Or start a new conversation
                     </button>
                 </div>

@@ -3,12 +3,12 @@ import { uuidv4 } from '@/common';
 export enum Status {
     Info = 'Info',
     Success = 'Success',
-    Error = 'Error'
+    Error = 'Error',
 }
 
 export enum NotificationType {
     Info = 'Info',
-    Progress = 'Progress'
+    Progress = 'Progress',
 }
 
 type Callback = (n: Notification) => void;

@@ -69,12 +69,7 @@
                     MessageTypes.SYSTEM
                 );
 
-                const videoRoomPopup = popupCenter(
-                    `/videoroom/${videoRoomId}`,
-                    'video room',
-                    800,
-                    550
-                );
+                const videoRoomPopup = popupCenter(`/videoroom/${videoRoomId}`, 'video room', 800, 550);
             };
 
             return { joinVideo };

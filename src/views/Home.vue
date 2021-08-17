@@ -5,9 +5,7 @@
             >, to your digitalTwin.
         </h1>
         <p>Automaticly redirecting you in 3 seconds ...</p>
-        <button class="fancyButton" @click="loginAndPush">
-            Verify my identity
-        </button>
+        <button class="fancyButton" @click="loginAndPush">Verify my identity</button>
     </div>
 </template>
 

@@ -13,7 +13,6 @@ import axios, { ResponseType } from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 
-
 declare const Buffer;
 export enum FileType {
     Unknown,
@@ -25,7 +24,7 @@ export enum FileType {
     Archive,
     Excel,
     Powerpoint,
-    Image
+    Image,
 }
 
 export enum Action {
@@ -70,39 +69,37 @@ function pathJoin(parts, separator = '/'): string {
 
 export const getFile = async (fullPath: string): Promise<FullPathInfoModel> => {
     const result = await Api.getFileInfo(fullPath);
-    if (result.status !== 200 || !result.data)
-        throw new Error('Could not get file');
+    if (result.status !== 200 || !result.data) throw new Error('Could not get file');
 
     return createModel(result.data) as FullPathInfoModel;
 };
 
 export const updateContent = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path);
-    if (result.status !== 200 || !result.data)
-        throw new Error('Could not get content');
+    if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     currentDirectoryContent.value = result.data.map(createModel);
-
 };
 
 export const createDirectory = async (name: string, path = currentDirectory.value) => {
     const result = await Api.createDirectory(path, name);
-    if (result.status !== 201 || !result.data)
-        throw new Error('Could not create new folder');
+    if (result.status !== 201 || !result.data) throw new Error('Could not create new folder');
 
     currentDirectoryContent.value.push(createModel(result.data));
     await updateContent();
 };
 
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {
-    await Promise.all(files.map(async f => {
-        const result = await Api.uploadFile(path, f);
-        if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
-            throw new Error('Could not create new folder');
+    await Promise.all(
+        files.map(async f => {
+            const result = await Api.uploadFile(path, f);
+            if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
+                throw new Error('Could not create new folder');
 
-        currentDirectoryContent.value.push(createModel(result.data));
-        await updateContent();
-    }));
+            currentDirectoryContent.value.push(createModel(result.data));
+            await updateContent();
+        })
+    );
 };
 
 export const uploadFile = async (file: File, path = currentDirectory.value) => {
@@ -115,24 +112,25 @@ export const uploadFile = async (file: File, path = currentDirectory.value) => {
 };
 
 export const deleteFiles = async (list: PathInfoModel[]) => {
-    await Promise.all(list.map(async f => {
-        const result = await Api.deleteFile(f.path);
-        if (result.status !== 200 && result.status !== 201)
-            throw new Error('Could not delete file');
-        selectedPaths.value = [];
-        await updateContent();
-
-    }));
+    await Promise.all(
+        list.map(async f => {
+            const result = await Api.deleteFile(f.path);
+            if (result.status !== 200 && result.status !== 201) throw new Error('Could not delete file');
+            selectedPaths.value = [];
+            await updateContent();
+        })
+    );
 };
 export const downloadFiles = async () => {
-    await Promise.all(selectedPaths.value.map(async f => {
-        const result = await Api.downloadFile(f.path);
-        if (result.status !== 200 && result.status !== 201)
-            throw new Error('Could not download file');
+    await Promise.all(
+        selectedPaths.value.map(async f => {
+            const result = await Api.downloadFile(f.path);
+            if (result.status !== 200 && result.status !== 201) throw new Error('Could not download file');
 
-        fileDownload(result.data, f.fullName);
-        selectedPaths.value = [];
-    }));
+            fileDownload(result.data, f.fullName);
+            selectedPaths.value = [];
+        })
+    );
 };
 
 export const downloadFileForPreview = async (path: string) => {
@@ -182,13 +180,18 @@ export const copyPasteSelected = async () => {
 
     //paste
     if (selectedAction.value === Action.COPY) {
-        const result = await Api.copyFiles(copiedFiles.value.map(x => x.path), currentDirectory.value);
-        if (result.status !== 200 && result.status !== 201)
-            throw new Error('Could not copy files');
+        const result = await Api.copyFiles(
+            copiedFiles.value.map(x => x.path),
+            currentDirectory.value
+        );
+        if (result.status !== 200 && result.status !== 201) throw new Error('Could not copy files');
     }
     //paste/cut
     if (selectedAction.value === Action.CUT) {
-        await moveFiles(currentDirectory.value, copiedFiles.value.map(x => x.path));
+        await moveFiles(
+            currentDirectory.value,
+            copiedFiles.value.map(x => x.path)
+        );
     }
     await clearClipboard();
     await updateContent();
@@ -201,8 +204,7 @@ export const clearClipboard = () => {
 
 export const searchDir = async () => {
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
-    if (result.status !== 200 || !result.data)
-        throw new Error('Could not get search results');
+    if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
     if (result.data.toString() === 'None') {
         searchResults.value = 'None';
         return;
@@ -214,12 +216,10 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
     if (!name) return;
     const oldPath = item.path;
     let newPath = pathJoin([currentDirectory.value, name]);
-    if (item.extension)
-        newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
+    if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
 
     const result = await Api.renameFile(oldPath, newPath);
-    if (result.status !== 201)
-        throw new Error('Could not rename file');
+    if (result.status !== 201) throw new Error('Could not rename file');
 
     selectedPaths.value = [];
     await updateContent();
@@ -238,7 +238,7 @@ export const goToAPreviousDirectory = (index: number) => {
 };
 
 export const goToFileDirectory = (item: PathInfoModel) => {
-    const itemDir = item.path.substr(0, item.path.lastIndexOf('\/'));
+    const itemDir = item.path.substr(0, item.path.lastIndexOf('/'));
     if (item.isDirectory) {
         currentDirectory.value = item.path;
         return;
@@ -260,7 +260,7 @@ export const goBack = () => {
     const parts = currentDirectory.value.split('/');
     parts.pop();
     console.log(parts);
-    parts.length === 1 ? currentDirectory.value = rootDirectory : currentDirectory.value = pathJoin(parts);
+    parts.length === 1 ? (currentDirectory.value = rootDirectory) : (currentDirectory.value = pathJoin(parts));
 };
 
 export const selectItem = (item: PathInfoModel) => {
@@ -273,10 +273,12 @@ export const deselectItem = (item: PathInfoModel) => {
 
 export const equals = (item1: PathInfoModel, item2: PathInfoModel): boolean => {
     if (!item1 || !item2) return false;
-    return item1.fullName === item2.fullName &&
+    return (
+        item1.fullName === item2.fullName &&
         item1.isDirectory === item2.isDirectory &&
         item1.extension === item2.extension &&
-        item1.path === item2.path;
+        item1.path === item2.path
+    );
 };
 
 export const selectAll = () => {
@@ -289,11 +291,10 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, router: Router, path = currentDirectory.value) => {
     if (item.isDirectory) {
-       return goToFolderInCurrentDirectory(item);
-    } 
-    const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName]))} });
+        return goToFolderInCurrentDirectory(item);
+    }
+    const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName])) } });
     window.open(result.href, '_blank');
-
 };
 
 export const sortContent = () => {
@@ -302,10 +303,8 @@ export const sortContent = () => {
 
         if (currentSortDir.value === 'desc') modifier = -1;
         if (currentSort.value === 'name') {
-            if (!a.isDirectory && b.isDirectory)
-                return 1;
-            if (a.isDirectory && !b.isDirectory)
-                return -1;
+            if (!a.isDirectory && b.isDirectory) return 1;
+            if (a.isDirectory && !b.isDirectory) return -1;
         }
 
         if (a[currentSort.value] < b[currentSort.value]) return -1 * modifier;
@@ -314,7 +313,7 @@ export const sortContent = () => {
     });
 };
 
-export const sortAction = function(s) {
+export const sortAction = function (s) {
     if (s === currentSort.value) {
         currentSortDir.value = currentSortDir.value === 'asc' ? 'desc' : 'asc';
     }
@@ -370,7 +369,6 @@ export const getIconDirty = (fileType: FileType) => {
             return 'far fa-file';
     }
 };
-
 
 export const createModel = <T extends Api.PathInfo>(pathInfo: T): PathInfoModel => {
     return {
@@ -460,7 +458,7 @@ export const getFileSize = (val: any) => {
     }
     return '-';
 };
-export const formatBytes = function(bytes, decimals) {
+export const formatBytes = function (bytes, decimals) {
     if (bytes == 0) return '0 Bytes';
     let k = 1024,
         dm = decimals || 2,
@@ -483,7 +481,6 @@ export const getFileLastModified = (val: any) => {
         return dd + '-' + mm + '-' + yyyy;
     }
     return moment(dateObj).fromNow();
-
 };
 
 export const getIconColor = (item: PathInfoModel) => {
@@ -517,47 +514,43 @@ export const getSharedContent = async () => {
     sharedContent.value = result.data;
 };
 export const getToken = async (userId: string, path: string, filename: string, size: number, writable) => {
-    const result = await Api.addShare(userId, path, filename ,size, writable);
+    const result = await Api.addShare(userId, path, filename, size, writable);
     return result;
-
 };
 
-export const parseJwt = (token) => {
+export const parseJwt = token => {
     let base64Url = token.split('.')[1];
     return JSON.parse(Buffer.from(base64Url, 'base64').toString());
 };
 
-export const getExtension = (filename) => {
+export const getExtension = filename => {
     return filename.substring(filename.lastIndexOf('.') + 1);
 };
 
 export const fetchShareDetails = async (shareId: string) => {
-    const shareDetails = await getShareWithId(shareId)
-    return shareDetails
+    const shareDetails = await getShareWithId(shareId);
+    return shareDetails;
 };
 
-export const fetchFileAccessDetails = async ( owner: ContactInterface , shareId :string) => {
-    const {user} = useAuthState()
-    const fileAccessDetails = await Api.getFileAccessDetails( owner , shareId, <string>user.id)
-    return fileAccessDetails
-}
-
-export const getExternalPathInfo = async (digitalTwinId: DtId,token:string,  shareId: string) => {
+export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: string) => {
     const { user } = useAuthState();
-    let params= {shareId: shareId, token: token}
+    const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id);
+    return fileAccessDetails;
+};
+
+export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
+    const { user } = useAuthState();
+    let params = { shareId: shareId, token: token };
     const locationApiEndpoint = `/api/browse/files/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';
     if (digitalTwinId == user.id) {
         location = `${window.location.origin}${locationApiEndpoint}`;
     } else {
         location = calcExternalResourceLink(
-            `http://[${
-                watchingUsers[<string>digitalTwinId].location
-            }]${locationApiEndpoint}`,
+            `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
     // TODO: url encoding
     const response = await axios.get(location);
     return response.data;
 };
-

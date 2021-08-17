@@ -1,5 +1,5 @@
 <template>
-    <img width="450" :src="src" @load="imageLoaded" class="cursor-pointer" @click='show' />
+    <img width="450" :src="src" @load="imageLoaded" class="cursor-pointer" @click="show" />
 </template>
 
 <script lang="ts">
@@ -15,7 +15,7 @@
         },
         setup(props) {
             const { addScrollEvent } = useScrollActions();
-            const src = calcExternalResourceLink(props.message.body.url)
+            const src = calcExternalResourceLink(props.message.body.url);
             const imageLoaded = () => {
                 addScrollEvent();
             };
@@ -24,7 +24,7 @@
                 setImageSrc(src);
             };
 
-            return { imageLoaded, show, src};
+            return { imageLoaded, show, src };
         },
     });
 </script>

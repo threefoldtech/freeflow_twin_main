@@ -24,8 +24,6 @@
             const router = useRouter();
             router.push('/chat');
         },
-        setup() {
-
-        },
+        setup() {},
     });
 </script>

@@ -4,7 +4,9 @@ import axios from 'axios';
 import moment from 'moment';
 import {
     Chat,
-    Contact, FileTypes, GetMessagesResponse,
+    Contact,
+    FileTypes,
+    GetMessagesResponse,
     GroupChat,
     GroupManagementBody,
     Message,
@@ -83,7 +85,6 @@ const retrievechats = async () => {
         sortChats();
         isLoading.value = false;
     });
-
 };
 
 const getChat = chatId => state.chats.find(x => x.chatId === chatId);
@@ -209,7 +210,7 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined,
+    lastMessageId: string | undefined
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
     if (lastMessageId) params.append('fromId', lastMessageId);
@@ -290,7 +291,7 @@ const addMessage = (chatId, message) => {
         }
 
         setLastMessage(chatId, message);
-        addScrollEvent()
+        addScrollEvent();
         return;
     }
 
@@ -359,10 +360,8 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
         formData.append('file', selectedFile, `recording-${Date.now()}.WebM`);
     }
 
-    if (isRecording)
-        formData.append('type', FileTypes.RECORDING);
-    else
-        formData.append('type', FileTypes.OTHER);
+    if (isRecording) formData.append('type', FileTypes.RECORDING);
+    else formData.append('type', FileTypes.OTHER);
 
     const msgToSend: Message<Object> = {
         id,
@@ -378,7 +377,6 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     addMessage(chatId, msgToSend);
 
     try {
-
         await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -415,11 +413,9 @@ const sortChats = () => {
     state.chats.sort((a, b) => {
         const aIsBlocked = blockList.includes(a.chatId);
         const bIsBlocked = blockList.includes(b.chatId);
-        if (aIsBlocked && !bIsBlocked)
-            return 1;
+        if (aIsBlocked && !bIsBlocked) return 1;
 
-        if (!aIsBlocked && bIsBlocked)
-            return -1;
+        if (!aIsBlocked && bIsBlocked) return -1;
 
         var adate = a.messages[a.messages.length - 1]
             ? a.messages[a.messages.length - 1].timeStamp

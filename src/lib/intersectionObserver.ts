@@ -9,10 +9,10 @@ export const useIntersectionObserver = (
     const isFullyInView = ref(false);
     const isObserved = ref(false);
 
-    watch(target, () =>{
-        if(isObserved.value || !target.value) return;
+    watch(target, () => {
+        if (isObserved.value || !target.value) return;
         observer.observe(target.value);
-    })
+    });
 
     let observer: IntersectionObserver;
     onMounted(() => {
@@ -26,7 +26,6 @@ export const useIntersectionObserver = (
 
             isIntersecting.value = false;
         }, options);
-
     });
 
     const unobserve = () => {

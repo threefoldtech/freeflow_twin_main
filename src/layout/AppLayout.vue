@@ -3,7 +3,7 @@
         <UserConfigDialog></UserConfigDialog>
     </suspense>
     <div class="bg-gray-100 h-full overflow-hidden relative text-sm">
-        <NotificationSection/>
+        <NotificationSection />
         <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
             <div class="top h-20 md:hidden">
                 <Topbar>
@@ -20,12 +20,10 @@
                     <Sidebar class="bg-icon md:block h-full"></Sidebar>
                 </slot>
             </div>
-            <div
-                class="content w-full h-full overflow-y-auto relative flex flex-col"
-            >
+            <div class="content w-full h-full overflow-y-auto relative flex flex-col">
                 <div class="relative w-full h-full overflow-y-auto">
                     <div class="absolute w-full h-full">
-                        <ImagePreview/>
+                        <ImagePreview />
                         <slot></slot>
                     </div>
                 </div>

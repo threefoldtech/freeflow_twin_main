@@ -7,17 +7,9 @@
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <img
-                        src="../../public/TF-small.svg"
-                        width="50"
-                        alt="Threefold logo"
-                    />
+                    <img src="../../public/TF-small.svg" width="50" alt="Threefold logo" />
 
-                    <img
-                        src="../../public/digitaltwin.png"
-                        width="100"
-                        alt="Threefold logo"
-                    />
+                    <img src="../../public/digitaltwin.png" width="100" alt="Threefold logo" />
                     <!-- <div class="text-sm">
                         <strong>digital </strong>
                         <span>twin</span>
@@ -31,7 +23,7 @@
                 class="mb-4 grid text-center text-white"
                 :class="{
                     'cursor-pointer': app.enabled,
-                    selected: app?.enabled && router.currentRoute?.value.meta.app!==app.name,
+                    selected: app?.enabled && router.currentRoute?.value.meta.app !== app.name,
                     'text-gray-500': !app?.enabled,
                 }"
             >
@@ -65,7 +57,7 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
-    import { AppType } from "@/types/apps"
+    import { AppType } from '@/types/apps';
 
     export default defineComponent({
         name: 'Sidebar',
@@ -108,16 +100,10 @@
             const { user } = useAuthState();
 
             const toggleShowUserConfigDialog = () => {
-                console.log(
-                    'Showing user config dialog: ',
-                    showUserConfigDialog.value
-                );
+                console.log('Showing user config dialog: ', showUserConfigDialog.value);
                 showUserConfigDialog.value = !showUserConfigDialog.value;
 
-                console.log(
-                    'Showing user config dialog: ',
-                    showUserConfigDialog.value
-                );
+                console.log('Showing user config dialog: ', showUserConfigDialog.value);
             };
 
             return {

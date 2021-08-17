@@ -17,7 +17,7 @@
             });
 
             return {
-                timeString
+                timeString,
             };
         },
     });

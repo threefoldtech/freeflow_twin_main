@@ -10,7 +10,7 @@
     >
         <AvatarImg
             small
-            class="mr-2 "
+            class="mr-2"
             :class="{
                 'opacity-0': !isLastMessage,
             }"
@@ -20,13 +20,25 @@
         <div class="flex-1">
             <div class="flex flex-row flex-wrap">
                 <div
-                    class="flex flex-col rounded-md rounded-r-xl mb-1 bg-white shadow relative overflow-hidden my-message:bg-my"
+                    class="
+                        flex flex-col
+                        rounded-md rounded-r-xl
+                        mb-1
+                        bg-white
+                        shadow
+                        relative
+                        overflow-hidden
+                        my-message:bg-my
+                    "
                     :class="{
                         'rounded-tl-xl': isFirstMessage,
                         'rounded-bl-xl': isLastMessage,
                     }"
                 >
-                    <header class="p-4 pt-2 pb-0 -mb-1.5 font-bold my-message:text-icon " v-if="isFirstMessage && isGroup">
+                    <header
+                        class="p-4 pt-2 pb-0 -mb-1.5 font-bold my-message:text-icon"
+                        v-if="isFirstMessage && isGroup"
+                    >
                         {{ message.from }}
                     </header>
                     <main class="msgcard flex justify-between">
@@ -39,7 +51,7 @@
                 </div>
 
                 <div
-                    style="margin-top: auto;"
+                    style="margin-top: auto"
                     class="actions pb-4 pl-4 md:hidden"
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
                 >
@@ -72,9 +84,7 @@
             </div>
 
             <div class="flex flex-col mb-4 ml-4 border-l-2 pl-2" v-if="message.replies?.length > 0">
-                <div class="text-gray-400 self-start">
-                    Replies:
-                </div>
+                <div class="text-gray-400 self-start">Replies:</div>
                 <div v-for="reply in message.replies" :key="reply.id" class="card flex mb-1">
                     <AvatarImg class="mr-2" small :id="reply.from" :showOnlineStatus="false" />
 
@@ -90,7 +100,7 @@
                         </main>
                     </div>
 
-                    <div style="margin-top: auto;" class="actions pb-4 pl-4 flex">
+                    <div style="margin-top: auto" class="actions pb-4 pl-4 flex">
                         <span
                             class="reply text-xs pr-4 cursor-pointer hover:underline"
                             @click="deleteReply(message, reply)"

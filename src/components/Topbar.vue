@@ -1,7 +1,5 @@
 <template>
-    <div
-        class="items-center bg-gradient flex justify-between md:topgrid relative h-full px-4 md:px-0"
-    >
+    <div class="items-center bg-gradient flex justify-between md:topgrid relative h-full px-4 md:px-0">
         <div class="flex">
             <div class="h-5 ml-4 items-center">
                 <button
@@ -9,48 +7,22 @@
                     @click="backOrMenu"
                     :class="{ 'md:hidden': !(route.meta && route.meta.back) }"
                 >
-                    <i
-                        :class="
-                            `fas ${
-                                route.meta && route.meta.back
-                                    ? 'fa-chevron-left'
-                                    : 'fa-bars'
-                            }`
-                        "
-                    ></i>
+                    <i :class="`fas ${route.meta && route.meta.back ? 'fa-chevron-left' : 'fa-bars'}`"></i>
                 </button>
-                <img
-                    src="/TFN.svg"
-                    alt="TF-Logo"
-                    class="md:ml-4 h-full hidden md:flex"
-                />
+                <img src="/TFN.svg" alt="TF-Logo" class="md:ml-4 h-full hidden md:flex" />
             </div>
 
-            <div
-                class="h-5 flex items-center col-span-3 md:col-span-1 md:hidden"
-            >
+            <div class="h-5 flex items-center col-span-3 md:col-span-1 md:hidden">
                 <slot>
-                    <img
-                        src="/digitaltwin.svg"
-                        alt="TF-Logo"
-                        class="md:hidden md:ml-4 h-full"
-                    />
+                    <img src="/digitaltwin.svg" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />
                 </slot>
             </div>
         </div>
 
-        <div
-            class="pr-4 text-right text-gray-500 flex items-center justify-begin"
-        >
-            <div
-                class="h-5 md:flex text-black items-center col-span-3 md:col-span-1 hidden"
-            >
+        <div class="pr-4 text-right text-gray-500 flex items-center justify-begin">
+            <div class="h-5 md:flex text-black items-center col-span-3 md:col-span-1 hidden">
                 <slot>
-                    <img
-                        src="/TFN.svg"
-                        alt="TF-Logo"
-                        class="md:hidden md:ml-4 h-full"
-                    />
+                    <img src="/TFN.svg" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />
                 </slot>
             </div>
 
@@ -65,10 +37,7 @@
     import { useSocketActions } from '../store/socketStore';
     import Dialog from './Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import {
-        deleteBlockedEntry,
-        initBlocklist,
-    } from '@/store/blockStore';
+    import { deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';

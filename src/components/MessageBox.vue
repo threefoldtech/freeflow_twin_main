@@ -1,5 +1,5 @@
 <template>
-    <div class=" overflow-y-auto" ref="messageBox" @scroll="handleScroll">
+    <div class="overflow-y-auto" ref="messageBox" @scroll="handleScroll">
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />

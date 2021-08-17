@@ -34,7 +34,7 @@
             <div class="flex place-items-center">
                 <label class="mr-2" for="username">Group name: </label>
                 <div class="w-full">
-                    <input v-model="groupnameAdd" id="username" class="mb-2" placeholder="Group name" maxlength="50"/>
+                    <input v-model="groupnameAdd" id="username" class="mb-2" placeholder="Group name" maxlength="50" />
                     <br />
                     <span class="text-red-600" v-if="groupnameAddError != ''">
                         {{ groupnameAddError }}
@@ -50,9 +50,43 @@
                     :error="usernameAddError"
                 ></user-table-group>
             </div>
+            <Disclosure v-slot="{ open }">
+                <DisclosureButton
+                    class="
+                        flex
+                        justify-between
+                        w-full
+                        px-4
+                        py-2
+                        text-sm
+                        font-medium
+                        text-left text-purple-900
+                        bg-purple-100
+                        rounded-lg
+                        hover:bg-purple-200
+                        focus:outline-none
+                        focus-visible:ring focus-visible:ring-purple-500 focus-visible:ring-opacity-75
+                    "
+                >
+                    <span>What is your refund policy?</span>
+                    <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-purple-500" />
+                </DisclosureButton>
+                <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                    If you're unhappy with your purchase for any reason, email us within 90 days and we'll refund you in
+                    full, no questions asked.
+                </DisclosurePanel>
+            </Disclosure>
+
             <div class="flex mt-4 justify-end w-full">
-                <button @click="$emit('closeDialog')" class="rounded-md border border-gray-400 px-4 py-2 justify-self-end">Cancel</button>
-                <button style="backgroundColor: #16A085" class="py-2 px-4 text-white rounded-md justify-self-end">Add Group</button>
+                <button
+                    @click="$emit('closeDialog')"
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                >
+                    Cancel
+                </button>
+                <button style="backgroundcolor: #16a085" class="py-2 px-4 text-white rounded-md justify-self-end">
+                    Add Group
+                </button>
             </div>
         </form>
     </div>
@@ -69,11 +103,19 @@
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
     import userTable from '@/components/UserTable.vue';
-    import userTableGroup from '@/components/UserTableGroup.vue'
+    import userTableGroup from '@/components/UserTableGroup.vue';
 
     export default defineComponent({
         name: 'ContactAdd',
-        components: { AvatarImg, userTable, userTableGroup },
+        components: {
+            AvatarImg,
+            userTable,
+            userTableGroup,
+            Disclosure,
+            DisclosureButton,
+            DisclosurePanel,
+            ChevronUpIcon,
+        },
         emits: ['closeDialog'],
         setup(props, { emit }) {
             const { contacts } = useContactsState();
@@ -91,7 +133,7 @@
             const contactAdd = () => {
                 try {
                     let userId = usernameAdd.value;
-                    if(!userId) {
+                    if (!userId) {
                         usernameAddError.value = 'Cannot add empty user!';
                         return;
                     }

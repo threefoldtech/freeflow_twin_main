@@ -12,7 +12,7 @@ import { uuidv4 } from '@/common';
 export const notifications = ref<Notification[]>([]);
 export const addNotification = (n: Notification) => {
     notifications.value.push(n);
-    if(!canDestroy(n)) return;
+    if (!canDestroy(n)) return;
     setTimeout(() => destroyNotification(n), n.options?.interval ?? 5000);
 };
 export const destroyNotification = (n: Notification) => {
@@ -21,55 +21,59 @@ export const destroyNotification = (n: Notification) => {
 
 const canDestroy = (n: Notification) => {
     switch (n.type) {
-        case NotificationType.Progress: return n.status === Status.Success;
-        default: return true;
+        case NotificationType.Progress:
+            return n.status === Status.Success;
+        default:
+            return true;
     }
-}
+};
 
 export const getKey = (n: Notification) => {
-    const key = `${n.id}-${n.status}`
+    const key = `${n.id}-${n.status}`;
     switch (n.type) {
-        case NotificationType.Progress: return `${key}-${(n as ProgressNotification).progress}`
-        default: return true;
+        case NotificationType.Progress:
+            return `${key}-${(n as ProgressNotification).progress}`;
+        default:
+            return true;
     }
-}
+};
 
 export const updateNotification = (n: Notification) => {
     const index = notifications.value.findIndex(x => x.id === n.id);
-    if(index === -1) return;
-    const copy = {...n};
+    if (index === -1) return;
+    const copy = { ...n };
 
-    if(checkCompletion(n)) return;
+    if (checkCompletion(n)) return;
     notifications.value.splice(index, 1, copy);
 
-    if(!canDestroy(n)) return;
+    if (!canDestroy(n)) return;
     setTimeout(() => destroyNotification(n), n.options?.interval ?? 5000);
-}
+};
 
 export const checkCompletion = (notification: Notification) => {
-    if(notification.type === NotificationType.Info || notification.status === Status.Success) return;
+    if (notification.type === NotificationType.Info || notification.status === Status.Success) return;
     const progressNotification = notification as ProgressNotification;
-    if(progressNotification.progress !== progressNotification.max) return;
+    if (progressNotification.progress !== progressNotification.max) return;
     success(progressNotification);
     return true;
-}
+};
 
 export const fail = (notification: ProgressNotification) => {
-    if(notification.status === Status.Error) return;
+    if (notification.status === Status.Error) return;
     notification.status = Status.Error;
     updateNotification(notification);
-}
+};
 
 export const success = (notification: ProgressNotification) => {
-    if(notification.status === Status.Success) return;
+    if (notification.status === Status.Success) return;
     notification.status = Status.Success;
     updateNotification(notification);
-}
+};
 
 const defaultOptions = {
     interval: 5000,
     destroy: destroyNotification,
-    update: updateNotification
+    update: updateNotification,
 } as NotificationOptions;
 
 export const createNotification = (title: string, text: string, status = Status.Info, options = defaultOptions) => {
@@ -83,8 +87,8 @@ export const createNotification = (title: string, text: string, status = Status.
         title: title,
         text: text,
         options: newOptions,
-        status: status
-    } as Notification
+        status: status,
+    } as Notification;
     addNotification(n);
     return n;
 };
@@ -100,13 +104,18 @@ export const createErrorNotification = (title: string, text: string, options = d
         title: title,
         text: text,
         options: newOptions,
-        status: Status.Error
-    } as Notification
+        status: Status.Error,
+    } as Notification;
     addNotification(n);
     return n;
 };
 
-export const createPercentProgressNotification = (title: string, text: string, start = 0, options = defaultOptions as ProgressNotificationOptions) => {
+export const createPercentProgressNotification = (
+    title: string,
+    text: string,
+    start = 0,
+    options = defaultOptions as ProgressNotificationOptions
+) => {
     const newOptions = {
         ...defaultOptions,
         ...options,
@@ -119,13 +128,20 @@ export const createPercentProgressNotification = (title: string, text: string, s
         options: newOptions,
         status: Status.Info,
         progress: start,
-        max: 1
-    } as ProgressNotification
+        max: 1,
+    } as ProgressNotification;
     notifications.value.push(n);
     return n;
 };
 
-export const createProgressNotification = (title: string, text, max: number, interval = 5000, start = 0, options = defaultOptions as ProgressNotificationOptions) => {
+export const createProgressNotification = (
+    title: string,
+    text,
+    max: number,
+    interval = 5000,
+    start = 0,
+    options = defaultOptions as ProgressNotificationOptions
+) => {
     const newOptions = {
         ...defaultOptions,
         ...options,
@@ -138,10 +154,8 @@ export const createProgressNotification = (title: string, text, max: number, int
         options: newOptions,
         status: Status.Info,
         progress: start,
-        max: max
-    } as ProgressNotification
+        max: max,
+    } as ProgressNotification;
     addNotification(n);
     return n;
 };
-
-

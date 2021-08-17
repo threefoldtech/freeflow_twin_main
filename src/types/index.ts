@@ -86,7 +86,7 @@ export enum SystemMessageTypes {
     REMOVE_USER = 'REMOVEUSER',
     ADD_USER = 'ADDUSER',
     JOINED_VIDEOROOM = 'JOINED_VIDEOROOM',
-    CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND'
+    CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND',
 }
 
 export enum FileTypes {
@@ -109,7 +109,7 @@ export interface SystemBody {
 
 export interface GetMessagesResponse {
     hasMore: boolean;
-    messages: Array<Message<MessageBodyType>>
+    messages: Array<Message<MessageBodyType>>;
 }
 
 export enum MessageTypes {
@@ -128,10 +128,10 @@ export enum MessageTypes {
 }
 
 export interface SharedFileInterface {
-    id: string
+    id: string;
     path: string;
     owner: ContactInterface;
-    name:string | undefined
+    name: string | undefined;
     isFolder: Boolean;
     size: number | undefined;
     lastModified: number | undefined;
@@ -140,11 +140,11 @@ export interface SharedFileInterface {
 
 export enum SharePermission {
     Read = 'r',
-    Write = 'w'
+    Write = 'w',
 }
 export interface SharePermissionInterface {
     userId: string | undefined;
-    types: SharePermission[]
+    types: SharePermission[];
 }
 
 export interface ContactInterface {

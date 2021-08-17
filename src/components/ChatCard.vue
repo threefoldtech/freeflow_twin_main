@@ -1,35 +1,38 @@
 <template>
     <div
-        class='chatcard relative text-sm flex flex-row'
+        class="chatcard relative text-sm flex flex-row"
         :class="{
             'bg-gray-50': !router.currentRoute?.value.path.includes(chat.chatId),
             'bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
-            'opacity-50': blocked
+            'opacity-50': blocked,
         }"
     >
-        <div class=' place-items-center relative'>
-            <AvatarImg :id='chat.chatId' :showOnlineStatus='!chat.isGroup'
-                       :unreadMessagesAmount='unreadMessagesAmount' />
+        <div class="place-items-center relative">
+            <AvatarImg
+                :id="chat.chatId"
+                :showOnlineStatus="!chat.isGroup"
+                :unreadMessagesAmount="unreadMessagesAmount"
+            />
         </div>
-        <div class='px-2 ml-2 content' v-if='!collapsed'>
-            <p class='flex'>
-                <span class='font-bold break-normal overflow-ellipsis overflow-hidden name'>
+        <div class="px-2 ml-2 content" v-if="!collapsed">
+            <p class="flex">
+                <span class="font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
                 </span>
-                <span class='font-thin ml-2' v-if='chat.isGroup'> (group)</span>
-                <span class='ml-2 text-red-500' v-if='blocked'> BLOCKED</span>
-                <span class='font-thin ml-auto' v-if='lastMessage'>
+                <span class="font-thin ml-2" v-if="chat.isGroup"> (group)</span>
+                <span class="ml-2 text-red-500" v-if="blocked"> BLOCKED</span>
+                <span class="font-thin ml-auto" v-if="lastMessage">
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <p class='col-end-13 col-span-2 font-thin overflow-ellipsis'>
-              {{lastMessageBody}}
+            <p class="col-end-13 col-span-2 font-thin overflow-ellipsis">
+                {{ lastMessageBody }}
             </p>
         </div>
     </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
     import { computed, defineComponent, ref } from 'vue';
     import { findLastIndex } from 'lodash';
     import { useAuthState } from '@/store/authStore';
@@ -54,7 +57,7 @@
                 let lastReadMessage = props.chat.read[<string>user.id];
                 return findLastIndex(
                     props.chat.messages,
-                    (message: Message<MessageBodyType>) => lastReadMessage === message.id,
+                    (message: Message<MessageBodyType>) => lastReadMessage === message.id
                 );
             });
             const lastMessage = computed(() => {
@@ -86,15 +89,14 @@
                     case MessageTypes.SYSTEM:
                         return (lstmsg.body as SystemBody).message;
                     case 'FILE': {
-                        if (lstmsg.body.type === FileTypes.RECORDING)
-                            return 'Voice recording was sent';
+                        if (lstmsg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
                         return 'File has been uploaded';
                     }
                     case 'FILE_SHARE': {
-                        if (lstmsg?.body?.isFolder){
-                            return "Folder has been shared"
+                        if (lstmsg?.body?.isFolder) {
+                            return 'Folder has been shared';
                         }
-                        return "File has been shared" 
+                        return 'File has been shared';
                     }
                     case 'DELETE':
                     default:

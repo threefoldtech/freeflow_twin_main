@@ -10,15 +10,15 @@ const addScrollEvent = (force = false) => {
 
 const popScrollEvent = () => {
     state.scrollEvents.pop();
-}
+};
 
 const shiftScrollEvent = () => {
     state.scrollEvents.shift();
-}
+};
 
 const clearScrollEvents = () => {
     state.scrollEvents = [];
-}
+};
 
 export const useScrollState = () => {
     return {
@@ -31,7 +31,7 @@ export const useScrollActions = () => {
         addScrollEvent,
         popScrollEvent,
         clearScrollEvents,
-        shiftScrollEvent
+        shiftScrollEvent,
     };
 };
 

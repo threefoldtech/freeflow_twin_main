@@ -9,18 +9,42 @@
     >
         <div class="relative w-full pt-4 justify-center">
             <div
-                class="chatcard cursor-pointer flex flex-row items-center flex-row collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 mb-2"
+                class="
+                    chatcard
+                    cursor-pointer
+                    flex flex-row
+                    items-center
+                    flex-row
+                    collapsed-bar:flex-col-reverse
+                    justify-center
+                    collapsed-bar:mb-0
+                    mb-2
+                "
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
-                    <button @click="showAddUserDialog = true" class="bg-icon rounded-full text-white w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10">
+                    <button
+                        @click="showAddUserDialog = true"
+                        class="bg-icon rounded-full text-white w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10"
+                    >
                         <i class="fas fa-plus"></i>
                     </button>
                     <h1 class="collapsed-bar:hidden pt-1">Messages</h1>
                 </div>
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
                     <button
-                        class="rounded-full w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10 bg-gray-100 flex justify-center"
-                        @click="collapsed = !collapsed; searchValue = ''"
+                        class="
+                            rounded-full
+                            w-8
+                            h-8
+                            collapsed-bar:w-10 collapsed-bar:h-10
+                            bg-gray-100
+                            flex
+                            justify-center
+                        "
+                        @click="
+                            collapsed = !collapsed;
+                            searchValue = '';
+                        "
                     >
                         <div v-if="collapsed" class="h-full flex items-center justify-center">
                             <i class="fas fa-chevron-right"></i>
@@ -31,21 +55,35 @@
                     </button>
                     <div
                         v-if="filteredChatRequests.length > 0"
-                        class="hidden collapsed-bar:block absolute -top-1 right-1 bg-accent h-4 w-4 rounded-full text-xs z-10 align-middle text-center text-white"
+                        class="
+                            hidden
+                            collapsed-bar:block
+                            absolute
+                            -top-1
+                            right-1
+                            bg-accent
+                            h-4
+                            w-4
+                            rounded-full
+                            text-xs
+                            z-10
+                            align-middle
+                            text-center text-white
+                        "
                     >
                         {{ filteredChatRequests.length }}
                     </div>
                 </div>
             </div>
-            <div class='collapsed-bar:hidden px-2'>
+            <div class="collapsed-bar:hidden px-2">
                 <input
-                    type='text'
-                    placeholder='Search'
-                    class='px2-2 border-gray-200 border-2 focus:border-accent border-r rounded-lg'
-                    v-model='searchValue'
+                    type="text"
+                    placeholder="Search"
+                    class="px2-2 border-gray-200 border-2 focus:border-accent border-r rounded-lg"
+                    v-model="searchValue"
                 />
             </div>
-            <div v-if="filteredChatRequests.length > 0" class='collapsed-bar:hidden px-2'>
+            <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2">
                 <h2 style="font-size: 1.5em">
                     You have
                     <span style="">
@@ -56,7 +94,18 @@
                 <ChatRequestList :chat-requests="filteredChatRequests" />
             </div>
             <div
-                class="relative overflow-y-auto w-full max-h-full h-full flex flex-col justify-center items-center px-2 collapsed-bar:px-0"
+                class="
+                    relative
+                    overflow-y-auto
+                    w-full
+                    max-h-full
+                    h-full
+                    flex flex-col
+                    justify-center
+                    items-center
+                    px-2
+                    collapsed-bar:px-0
+                "
                 v-if="filteredChats && filteredChats.length"
             >
                 <ChatCard
@@ -75,9 +124,7 @@
             class="text-center collapsed-bar:hidden"
         >
             <p>It feels lonely over here :(</p>
-            <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">
-                Add a contact
-            </button>
+            <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
         </div>
 
         <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
@@ -170,7 +217,7 @@
             const sendUpdate = newVal => {
                 console.log('update it');
                 showAddUserDialog.value = newVal;
-            }
+            };
 
             return {
                 status,

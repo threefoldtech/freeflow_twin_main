@@ -6,12 +6,11 @@
                 'pt-2 px-4 ': !preventRecursion,
             }"
         >
-            <div class="pl-4 border-l-2 border-gray-400 my-message:border-icon " v-if="!preventRecursion">
+            <div class="pl-4 border-l-2 border-gray-400 my-message:border-icon" v-if="!preventRecursion">
                 <div class="font-bold my-message:text-icon" v-if="message.body.quotedMessage !== 'SYSTEM'">
                     {{ message.body.quotedMessage.from }}
                 </div>
                 <MessageContent :message="message.body.quotedMessage" preventRecursion></MessageContent>
-
             </div>
         </div>
 

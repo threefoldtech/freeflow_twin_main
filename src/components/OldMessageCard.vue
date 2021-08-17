@@ -8,12 +8,7 @@
             'my-1': !disabled,
         }"
     >
-        <AvatarImg
-            small
-            class="mr-2 self-center"
-            v-if="!isMine && isGroup && !disabled"
-            :id="message.from"
-        ></AvatarImg>
+        <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup && !disabled" :id="message.from"></AvatarImg>
         <div
             class="relative rounded-lg"
             :class="{
@@ -39,38 +34,20 @@
                 >
                     <button
                         class="mx-0"
-                        v-if="
-                            isMine &&
-                            (message.type === 'EDIT' ||
-                                message.type === 'STRING') &&
-                            !disabled
-                        "
+                        v-if="isMine && (message.type === 'EDIT' || message.type === 'STRING') && !disabled"
                         @click="setEditMessage"
                     >
                         <i class="fas fa-pen"></i>
                     </button>
-                    <button
-                        class="mx-0"
-                        @click="setQuoteMessage"
-                        v-if="!disabled"
-                    >
+                    <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
                         <i class="fas fa-quote-left"></i>
                     </button>
-                    <button
-                        class="mx-0"
-                        @click="setReplyMessage"
-                        v-if="!disabled"
-                    >
+                    <button class="mx-0" @click="setReplyMessage" v-if="!disabled">
                         <i class="fas fa-reply-all"></i>
                     </button>
                     <button
                         class="mx-0"
-                        v-if="
-                            isMine &&
-                            message.type !== 'DELETE' &&
-                            !disabled &&
-                            !message.type === 'SYSTEM'
-                        "
+                        v-if="isMine && message.type !== 'DELETE' && !disabled && !message.type === 'SYSTEM'"
                         @click="sendUpdateMessage(true)"
                     >
                         <i class="fas fa-trash"></i>
@@ -85,18 +62,9 @@
                         @load="$emit('scroll')"
                     ></audio>
 
-                    <img
-                        v-if="isImage(message.body.filename)"
-                        :src="fileUrl"
-                        @load="$emit('scroll')"
-                    />
+                    <img v-if="isImage(message.body.filename)" :src="fileUrl" @load="$emit('scroll')" />
                     <br />
-                    <a
-                        class="py-2 px-2 bg-gray-200 border-r-2"
-                        :href="fileUrl"
-                        download
-                        >{{ message.body.filename }}</a
-                    >
+                    <a class="py-2 px-2 bg-gray-200 border-r-2" :href="fileUrl" download>{{ message.body.filename }}</a>
                 </span>
                 <div v-else-if="message.type === 'GIF'">
                     <img :src="message.body" @load="$emit('scroll')" />
@@ -106,8 +74,7 @@
                 </div>
                 <div v-else-if="message.type === 'GROUP_UPDATE'">
                     <span v-if="message.body.type === 'REMOVEUSER'">
-                        <b>{{ message.body.contact.id }}</b> removed from the
-                        group.
+                        <b>{{ message.body.contact.id }}</b> removed from the group.
                     </span>
                     <span v-else-if="message.body.type === 'ADDUSER'">
                         <b>{{ message.body.contact.id }}</b> added to the group.
@@ -145,13 +112,10 @@
                 </p>
             </div>
             <div
-                v-if="
-                    !disabled && message.replies && message.replies.length >= 1
-                "
+                v-if="!disabled && message.replies && message.replies.length >= 1"
                 class="bg-white p-2"
                 :class="{
-                    'rounded-b-lg':
-                        !replyMessage && !editMessage && !quoteMessage,
+                    'rounded-b-lg': !replyMessage && !editMessage && !quoteMessage,
                 }"
             >
                 <MessageCard
@@ -164,58 +128,29 @@
                 />
             </div>
 
-            <div
-                class="text-actions bg-gray-200 p-2 rounded-b-lg"
-                v-if="quoteMessage || editMessage || replyMessage"
-            >
-                <button
-                    @click="quoteMessage, editMessage, (replyMessage = false)"
-                >
+            <div class="text-actions bg-gray-200 p-2 rounded-b-lg" v-if="quoteMessage || editMessage || replyMessage">
+                <button @click="quoteMessage, editMessage, (replyMessage = false)">
                     <i class="fas fa-times"></i>
                 </button>
                 <template v-if="quoteMessage">
-                    <form
-                        @submit.prevent="sendQuoteMessage(false)"
-                        class="flex"
-                    >
-                        <input
-                            class="col-span-6"
-                            type="text"
-                            v-model="quoteMessageValue"
-                        />
-                        <button
-                            class="px-2 py-4"
-                            @click="sendQuoteMessage(false)"
-                        >
+                    <form @submit.prevent="sendQuoteMessage(false)" class="flex">
+                        <input class="col-span-6" type="text" v-model="quoteMessageValue" />
+                        <button class="px-2 py-4" @click="sendQuoteMessage(false)">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </form>
                 </template>
                 <template v-if="editMessage">
-                    <form
-                        @submit.prevent="sendUpdateMessage(false)"
-                        class="flex"
-                    >
-                        <input
-                            class="col-span-6"
-                            type="text"
-                            v-model="editMessageValue"
-                        />
-                        <button
-                            class="px-2 py-4"
-                            @click="sendUpdateMessage(false)"
-                        >
+                    <form @submit.prevent="sendUpdateMessage(false)" class="flex">
+                        <input class="col-span-6" type="text" v-model="editMessageValue" />
+                        <button class="px-2 py-4" @click="sendUpdateMessage(false)">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </form>
                 </template>
                 <template v-if="replyMessage">
                     <form @submit.prevent="sendReplyMessage" class="flex">
-                        <input
-                            class="col-span-6"
-                            type="text"
-                            v-model="replyMessageValue"
-                        />
+                        <input class="col-span-6" type="text" v-model="replyMessageValue" />
                         <button class="px-2 py-4" @click="sendReplyMessage">
                             <i class="fas fa-paper-plane"></i>
                         </button>
@@ -231,12 +166,7 @@
     import { useAuthState } from '../store/authStore';
     import moment from 'moment';
     import { usechatsActions } from '../store/chatStore';
-    import {
-        Message,
-        MessageBodyType,
-        QuoteBodyType,
-        StringMessageType,
-    } from '../types/index';
+    import { Message, MessageBodyType, QuoteBodyType, StringMessageType } from '../types/index';
     import { uuidv4 } from '@/common';
     import config from '../../public/config/config';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -302,9 +232,7 @@
                         id: oldmessage.id,
                         from: oldmessage.from,
                         to: oldmessage.to,
-                        body: isDelete
-                            ? 'Message has been deleted'
-                            : editMessageValue.value,
+                        body: isDelete ? 'Message has been deleted' : editMessageValue.value,
                         timeStamp: oldmessage.timeStamp,
                         type: isDelete ? 'DELETE' : 'EDIT',
                         replies: [],
@@ -365,9 +293,7 @@
                         to: props.chatId,
                         body: <QuoteBodyType>{
                             message: quoteMessageValue.value,
-                            quotedMessage: <Message<MessageBodyType>>(
-                                messageToQuote
-                            ),
+                            quotedMessage: <Message<MessageBodyType>>messageToQuote,
                         },
                         timeStamp: new Date(),
                         type: 'QUOTE',
@@ -388,10 +314,7 @@
                 read();
             }
 
-            const fromId = props.message.from.replace(
-                'localhost:8080',
-                'localhost:3000'
-            );
+            const fromId = props.message.from.replace('localhost:8080', 'localhost:3000');
             const baseurl = calculateBaseUrl(fromId);
             const fileUrl = props.message.body?.filename
                 ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}`

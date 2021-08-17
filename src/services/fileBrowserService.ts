@@ -8,12 +8,12 @@ import { calcExternalResourceLink } from './urlService';
 const endpoint = `${config.baseUrl}api/browse`;
 
 export interface PathInfo {
-    isFile: boolean,
-    isDirectory: boolean,
-    directory: string,
-    path: string,
-    fullName: string,
-    name: string,
+    isFile: boolean;
+    isDirectory: boolean;
+    directory: string;
+    path: string;
+    fullName: string;
+    name: string;
     size: number;
     extension: string;
     createdOn: Date;
@@ -24,32 +24,32 @@ export interface ShareInfo {
     [id: string]: {
         path: string;
         shares: {
-            expiration: number,
-            token: string,
+            expiration: number;
+            token: string;
         };
-    }
+    };
 }
 
 export interface GetShareToken {
-    token: string,
+    token: string;
 }
 
 export interface EditPathInfo extends PathInfo {
-    key: string,
-    readToken: string,
+    key: string;
+    readToken: string;
     writeToken: string;
 }
 
 export const getDirectoryContent = async (path: string): Promise<AxiosResponse<PathInfo[]>> => {
     const params = new URLSearchParams();
     params.append('path', path);
-    return await axios.get<PathInfo[]>(`${endpoint}/directories/content`, {params: params});
+    return await axios.get<PathInfo[]>(`${endpoint}/directories/content`, { params: params });
 };
 
 export const getDirectoryInfo = async (path: string) => {
     const params = new URLSearchParams();
     params.append('path', path);
-    return await axios.get(`${endpoint}/directories/info`, {params: params});
+    return await axios.get(`${endpoint}/directories/info`, { params: params });
 };
 
 export const createDirectory = async (path: string, name: string): Promise<AxiosResponse<PathInfo>> => {
@@ -66,88 +66,96 @@ export const getFileInfo = async (path: string): Promise<AxiosResponse<EditPathI
     return await axios.get(`${endpoint}/files/info`, { params: params });
 };
 
-export const uploadFile = async (path: string, file: File, withNotification = true): Promise<AxiosResponse<PathInfo>> => {
+export const uploadFile = async (
+    path: string,
+    file: File,
+    withNotification = true
+): Promise<AxiosResponse<PathInfo>> => {
     const formData = new FormData();
     formData.append('newFiles', file);
-    formData.append('path', path)
-    let config  = {
+    formData.append('path', path);
+    let config = {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
     } as AxiosRequestConfig;
 
-    let notification: ProgressNotification | undefined = undefined
-    if(withNotification) {
-        notification = createPercentProgressNotification("Uploading file", file.name, 0)
+    let notification: ProgressNotification | undefined = undefined;
+    if (withNotification) {
+        notification = createPercentProgressNotification('Uploading file', file.name, 0);
         config = {
             ...config,
-            onUploadProgress: function(progressEvent) {
-                console.log("test", Math.round((progressEvent.loaded * 100) / progressEvent.total))
-                notification.progress = Math.round(progressEvent.loaded / progressEvent.total)
+            onUploadProgress: function (progressEvent) {
+                console.log('test', Math.round((progressEvent.loaded * 100) / progressEvent.total));
+                notification.progress = Math.round(progressEvent.loaded / progressEvent.total);
             },
-        }
+        };
     }
     try {
         const response = await axios.post<PathInfo>(`${endpoint}/files`, formData, config);
-        if(withNotification && response.status >= 300) {
-            notification.title = "Upload failed"
+        if (withNotification && response.status >= 300) {
+            notification.title = 'Upload failed';
             fail(notification);
-        }
-        else {
-            notification.title = "Upload Success"
+        } else {
+            notification.title = 'Upload Success';
             success(notification);
         }
 
         return response;
     } catch (ex) {
-        if(!withNotification) return;
-        if(ex.message=== "Request failed with status code 413"){
-            notification.title = "File is too big!"
-            fail(notification)
-            return
+        if (!withNotification) return;
+        if (ex.message === 'Request failed with status code 413') {
+            notification.title = 'File is too big!';
+            fail(notification);
+            return;
         }
-        notification.title = "Upload failed"
-        fail(notification)
+        notification.title = 'Upload failed';
+        fail(notification);
     }
-
 };
 
 export const deleteFile = async (path: string) => {
-    return await axios.delete<PathInfo>(`${endpoint}/files`, { data: { filepath: path}});
+    return await axios.delete<PathInfo>(`${endpoint}/files`, { data: { filepath: path } });
 };
 
 export const downloadFileEndpoint = `${endpoint}/files`;
 export const getDownloadFileEndpoint = (path: string) => {
     return `${downloadFileEndpoint}?path=${path}`;
-}
+};
 
-export const downloadFile = async (path: string, responseType: ResponseType = "blob") => {
+export const downloadFile = async (path: string, responseType: ResponseType = 'blob') => {
     return await axios.get(getDownloadFileEndpoint(path), {
-        responseType: responseType
+        responseType: responseType,
     });
 };
 export const searchDir = async (searchTerm: string, currentDir: string) => {
     const params = new URLSearchParams();
     params.append('searchTerm', searchTerm);
     params.append('currentDir', currentDir);
-    return await axios.get<PathInfo[]>(`${endpoint}/files/search`, {params: params});
+    return await axios.get<PathInfo[]>(`${endpoint}/files/search`, { params: params });
 };
 export const copyFiles = async (paths: string[], pathToPaste: string) => {
-    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste});
+    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste });
 };
 
 export const moveFiles = async (paths: string[], pathToPaste: string) => {
-    return await axios.post<PathInfo[]>(`${endpoint}/files/move`, { paths: paths, destinationPath: pathToPaste});
+    return await axios.post<PathInfo[]>(`${endpoint}/files/move`, { paths: paths, destinationPath: pathToPaste });
 };
 
 export const renameFile = async (oldPath: string, newPath: string) => {
     return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
 };
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
-    return await axios.post<GetShareToken>(`${endpoint}/files/share`, { chatId: userId, writable: writable, path: path, filename: filename, size: size});
+    return await axios.post<GetShareToken>(`${endpoint}/files/share`, {
+        chatId: userId,
+        writable: writable,
+        path: path,
+        filename: filename,
+        size: size,
+    });
 };
 export const saveToken = async (token: string, filename: string, size: number) => {
-    return await axios.post<string>(`${endpoint}/files/insertToken`, { token: token, filename: filename, size: size});
+    return await axios.post<string>(`${endpoint}/files/insertToken`, { token: token, filename: filename, size: size });
 };
 export const getShared = async (shareStatus: string) => {
     const params = new URLSearchParams();
@@ -157,18 +165,18 @@ export const getShared = async (shareStatus: string) => {
 export const getShareWithId = async (id: string) => {
     const params = new URLSearchParams();
     params.append('id', id);
-     const res = await axios.get(`${endpoint}/files/getShareWithId`, { params: params });
-     return <SharedFileInterface>res.data
+    const res = await axios.get(`${endpoint}/files/getShareWithId`, { params: params });
+    return <SharedFileInterface>res.data;
 };
 
-export const getFileAccessDetails = async ( owner: ContactInterface , shareId :string, userId:string ) => {
-    let externalUrl = `http://[${owner.location}]`
-    externalUrl = calcExternalResourceLink(externalUrl)
-    
-    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}`
-    apiEndPointToCall = encodeURIComponent(apiEndPointToCall)
+export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string) => {
+    let externalUrl = `http://[${owner.location}]`;
+    externalUrl = calcExternalResourceLink(externalUrl);
 
-    externalUrl = externalUrl+apiEndPointToCall
+    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}`;
+    apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
+
+    externalUrl = externalUrl + apiEndPointToCall;
     const res = await axios.get(externalUrl);
-     return <EditPathInfo>res.data
-}
+    return <EditPathInfo>res.data;
+};

@@ -4,24 +4,14 @@
         v-if="chat.isGroup"
     >
         <h2>Members</h2>
-        <div
-            v-for="contact in chat.contacts"
-            :key="contact.id + chat.contacts.length"
-            class="w-full"
-        >
-            <div
-                class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2"
-            >
-                <div
-                    class="md:col-span-2 col-span-2 place-items-center grid relative"
-                >
+        <div v-for="contact in chat.contacts" :key="contact.id + chat.contacts.length" class="w-full">
+            <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2">
+                <div class="md:col-span-2 col-span-2 place-items-center grid relative">
                     <AvatarImg small :id="contact.id" />
                 </div>
                 <div class="md:col-span-8 col-span-8 pl-2">
                     <p class="flex place-content-between">
-                        <span
-                            class="font-bold overflow-hidden overflow-ellipsis"
-                        >
+                        <span class="font-bold overflow-hidden overflow-ellipsis">
                             {{ contact.id }}
                         </span>
                     </p>
@@ -41,28 +31,17 @@
             <h2 class="text-center">Add new members</h2>
             <div class="h-full">
                 <div v-if="!contacts.length">
-                    <p class="text-gray-300 text-center py-4">
-                        Not able to add any contacts to this group
-                    </p>
+                    <p class="text-gray-300 text-center py-4">Not able to add any contacts to this group</p>
                 </div>
-                <div
-                    v-for="(contact, i) in contacts"
-                    :key="i"
-                    class="grid grid-cols-12 rounded-lg mb-2 py-2"
-                >
+                <div v-for="(contact, i) in contacts" :key="i" class="grid grid-cols-12 rounded-lg mb-2 py-2">
                     <div class="col-span-2 place-items-center grid">
                         <AvatarImg small :id="contact.id" />
                     </div>
-                    <div
-                        class="col-span-8 pl-4 flex-col justify-center overflow-hidden overflow-ellipsis w-full"
-                    >
+                    <div class="col-span-8 pl-4 flex-col justify-center overflow-hidden overflow-ellipsis w-full">
                         {{ contact.id }}
                     </div>
                     <div class="col-span-2 place-items-center grid">
-                        <button
-                            class="h-12 rounded-full"
-                            @click="addToGroup(contact)"
-                        >
+                        <button class="h-12 rounded-full" @click="addToGroup(contact)">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -70,16 +49,11 @@
             </div>
         </div>
     </div>
-    <div
-        class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
-    >
+    <div class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1">
         <h2>Actions</h2>
 
         <div class="flex items-center flex-col w-full">
-            <div
-                class="call bg-gray-100 flex items-center rounded-xl w-full m-2"
-                @click="$emit('app-call')"
-            >
+            <div class="call bg-gray-100 flex items-center rounded-xl w-full m-2" @click="$emit('app-call')">
                 <i class="fas fa-video m-3"></i>
                 <p class="m-3">Join video room</p>
             </div>
@@ -102,10 +76,7 @@
                 <p class="m-3">Unblock user</p>
             </div>
 
-            <div
-                class="delete bg-gray-100 flex items-center rounded-xl w-full m-2"
-                @click="$emit('app-delete')"
-            >
+            <div class="delete bg-gray-100 flex items-center rounded-xl w-full m-2" @click="$emit('app-delete')">
                 <i class="fas fa-trash m-3"></i>
                 <p class="m-3">Delete conversation</p>
             </div>
@@ -153,8 +124,8 @@
             });
 
             const blocked = computed(() => {
-                if(!props.chat || props.chat.isGroup) return false;
-                return isBlocked(props.chat.chatId)
+                if (!props.chat || props.chat.isGroup) return false;
+                return isBlocked(props.chat.chatId);
             });
 
             return {
@@ -163,7 +134,7 @@
                 contacts: filteredContacts,
                 addToGroup,
                 iAmAdmin,
-                blocked
+                blocked,
             };
         },
     };

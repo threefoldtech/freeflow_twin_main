@@ -5,7 +5,7 @@ import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
-import {createErrorNotification} from '@/store/notificiationStore';
+import { createErrorNotification } from '@/store/notificiationStore';
 import { saveToken } from '@/services/fileBrowserService';
 import { login } from '@/services/authService';
 const state = reactive<State>({
@@ -42,17 +42,13 @@ const initializeSocket = (username: string) => {
     state.socket.on('message', message => {
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE' && user.id === message.to) {
-            saveToken(message.body.token, message.body.fileName, message.body.size).then(r => console.log("SUCCES"))
+            saveToken(message.body.token, message.body.fileName, message.body.size).then(r => console.log('SUCCES'));
         }
         if (message.type === 'READ') {
             handleRead(message);
             return;
         }
-        if (
-            message.type !== 'SYSTEM' ||
-            message.type !== 'EDIT' ||
-            message.type !== 'DELETE'
-        ) {
+        if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
             notify({ id: message.id });
         }
         const { addMessage } = usechatsActions();
@@ -74,16 +70,11 @@ const initializeSocket = (username: string) => {
         addChat(chat);
     });
     state.socket.on('disconnect', () => {
-        createErrorNotification("Connection Lost", "You appear to be having connection issues")
+        createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
-
 };
 
-const sendSocketMessage = async (
-    chatId: string,
-    message: Message<any>,
-    isUpdate = false
-) => {
+const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
     const data = {
         chatId,
         message,

@@ -9,9 +9,7 @@ export const getMyStatus = async () => {
 
 const authState = reactive<AuthState>({
     user: {
-        id: window.location.host
-            .split('.')[0]
-            .replace('localhost:8080', 'localhost:3000'),
+        id: window.location.host.split('.')[0].replace('localhost:8080', 'localhost:3000'),
         image: `${window.location.origin}/api/user/avatar/default`,
         email: 'testemail',
         status: '',
@@ -21,9 +19,7 @@ const authState = reactive<AuthState>({
 });
 
 export const myYggdrasilAddress = async () => {
-    const res = await axios.get(
-        `${window.location.origin}/api/yggdrasil_address`
-    );
+    const res = await axios.get(`${window.location.origin}/api/yggdrasil_address`);
     return res.data;
 };
 

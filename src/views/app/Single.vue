@@ -1,200 +1,212 @@
 <template>
     <appLayout>
         <template v-slot:top>
-            <div class='w-full flex md:px-4' v-if='chat'>
-                <div class='place-items-center grid mr-4'>
-                    <AvatarImg :id='chat.chatId' :showOnlineStatus='false'></AvatarImg>
+            <div class="w-full flex md:px-4" v-if="chat">
+                <div class="place-items-center grid mr-4">
+                    <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
                 </div>
-                <div class='py-4 pl-2'>
-                    <p class='font-bold font overflow-hidden overflow-ellipsis'>
+                <div class="py-4 pl-2">
+                    <p class="font-bold font overflow-hidden overflow-ellipsis">
                         {{ chat.name }}
                     </p>
-                    <p class='font-thin' v-if='!chat.isGroup && !blocked'>
+                    <p class="font-thin" v-if="!chat.isGroup && !blocked">
                         {{ status?.isOnline ? 'Is online' : 'Is offline' }}
                     </p>
-                    <p class='text-red-500' v-if='!chat.isGroup && blocked'>
-                        BLOCKED
-                    </p>
-                    <p class='font-thin' v-if='chat.isGroup'>Group chat</p>
+                    <p class="text-red-500" v-if="!chat.isGroup && blocked">BLOCKED</p>
+                    <p class="font-thin" v-if="chat.isGroup">Group chat</p>
                 </div>
             </div>
             <div v-else>Loading</div>
         </template>
 
         <template v-slot:actions>
-            <div class=''>
-                <div class='relative'>
-                    <button class='text-lg text-white md:hidden' @click='showMenu = true'>
-                        <i class='fas fa-ellipsis-v'></i>
+            <div class="">
+                <div class="relative">
+                    <button class="text-lg text-white md:hidden" @click="showMenu = true">
+                        <i class="fas fa-ellipsis-v"></i>
                     </button>
-                    <div class='backdrop' v-if='showMenu' @click='showMenu = false'></div>
+                    <div class="backdrop" v-if="showMenu" @click="showMenu = false"></div>
                     <div
-                        class='right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2 pl-2'
-                        v-if='showMenu'
+                        class="right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2 pl-2"
+                        v-if="showMenu"
                     >
-                        <button @click='popupMeeting' class='flex align-center'>
-                            <div class='w-8 justify-center align-center'>
-                                <i class='fas fa-video'></i>
+                        <button @click="popupMeeting" class="flex align-center">
+                            <div class="w-8 justify-center align-center">
+                                <i class="fas fa-video"></i>
                             </div>
-                            <span class='ml-1 text-left'>Call</span>
+                            <span class="ml-1 text-left">Call</span>
                         </button>
 
-                        <button @click='null' class='flex'>
-                            <div class='w-8'>
-                                <i class='fas fa-info-circle'></i>
+                        <button @click="null" class="flex">
+                            <div class="w-8">
+                                <i class="fas fa-info-circle"></i>
                             </div>
-                            <span class='ml-1 text-left'>Info</span>
+                            <span class="ml-1 text-left">Info</span>
                         </button>
 
-                        <button @click='blockChat' class='flex'>
-                            <div class='w-8'>
-                                <i class='fas fa-minus-circle'></i>
+                        <button @click="blockChat" class="flex">
+                            <div class="w-8">
+                                <i class="fas fa-minus-circle"></i>
                             </div>
-                            <span class='ml-1 text-left'>Block chat</span>
+                            <span class="ml-1 text-left">Block chat</span>
                         </button>
-                        <button @click='deleteChat' class='flex'>
-                            <div class='w-8'>
-                                <i class='fas fa-trash'></i>
+                        <button @click="deleteChat" class="flex">
+                            <div class="w-8">
+                                <i class="fas fa-trash"></i>
                             </div>
-                            <span class='ml-1 text-left'>Delete chat</span>
+                            <span class="ml-1 text-left">Delete chat</span>
                         </button>
                     </div>
                 </div>
             </div>
         </template>
         <template v-slot:default>
-            <div class='flex flex-row relative h-full w-full'>
-                <ChatList class='hidden md:inline-block' />
-                <div class='relative h-full flex flex-col flex-1' v-if='chat' :key='chat.id + selectedId'>
+            <div class="flex flex-row relative h-full w-full">
+                <ChatList class="hidden md:inline-block" />
+                <div class="relative h-full flex flex-col flex-1" v-if="chat" :key="chat.id + selectedId">
                     <FileDropArea
-                        class='h-full flex flex-col'
-                        @send-file='(files) => files.forEach(f => sendFile(chat.chatId, f))'
+                        class="h-full flex flex-col"
+                        @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"
                     >
-                        <div class='topbar h-14 bg-white flex-row border border-t-0 border-gray-100 hidden md:flex'>
-                            <div class='py-2 pl-4 flex-1'>
-                                <p class='font-bold font overflow-hidden overflow-ellipsis w-80'>
+                        <div class="topbar h-14 bg-white flex-row border border-t-0 border-gray-100 hidden md:flex">
+                            <div class="py-2 pl-4 flex-1">
+                                <p class="font-bold font overflow-hidden overflow-ellipsis w-80">
                                     {{ chat.name }}
                                 </p>
-                                <p class='font-thin' v-if='!blocked'>
-                                    {{getChatStatus.message}}
-                                    <span v-if='!chat.isGroup && getChatStatus?.lastSeen'>
-                                        , active <TimeContent :time='getChatStatus.lastSeen.toDate()'/>
+                                <p class="font-thin" v-if="!blocked">
+                                    {{ getChatStatus.message }}
+                                    <span v-if="!chat.isGroup && getChatStatus?.lastSeen">
+                                        , active <TimeContent :time="getChatStatus.lastSeen.toDate()" />
                                     </span>
                                 </p>
-                                <p class='text-red-500' v-if='blocked'>
-                                    BLOCKED
-                                </p>
+                                <p class="text-red-500" v-if="blocked">BLOCKED</p>
                             </div>
-                            <div class='h-full flex items-center self-end px-8  space-x-4'>
-                                <button @click='popupMeeting'
-                                        class='focus:outline-none hover:text-accent text-gray-500'>
-                                    <i class='fas fa-video fa-w-12'> </i>
+                            <div class="h-full flex items-center self-end px-8 space-x-4">
+                                <button
+                                    @click="popupMeeting"
+                                    class="focus:outline-none hover:text-accent text-gray-500"
+                                >
+                                    <i class="fas fa-video fa-w-12"> </i>
                                 </button>
 
                                 <button
-                                    @click='toggleSideBar'
-                                    class='focus:outline-none hover:text-accent'
+                                    @click="toggleSideBar"
+                                    class="focus:outline-none hover:text-accent"
                                     :class="{
-                                    'text-accent': showSideBar,
-                                    'text-gray-500': !showSideBar,
-                                }"
+                                        'text-accent': showSideBar,
+                                        'text-gray-500': !showSideBar,
+                                    }"
                                 >
-                                    <i class='far fa-window-maximize transform fa-w-12 '
-                                       style='--tw-rotate: 90deg'> </i>
+                                    <i class="far fa-window-maximize transform fa-w-12" style="--tw-rotate: 90deg"> </i>
                                 </button>
                             </div>
                         </div>
-                        <MessageBox :chat='chat' style='flex:2'>
+                        <MessageBox :chat="chat" style="flex: 2">
                             <template v-slot:viewAnchor>
                                 <div
-                                    id='viewAnchor'
-                                    ref='viewAnchor'
-                                    style='
-                                height: 40vh;
-                                position: absolute;
-                                bottom: 0;
-                                width: 50%;
-                                pointer-events: none;
-                            '
+                                    id="viewAnchor"
+                                    ref="viewAnchor"
+                                    style="
+                                        height: 40vh;
+                                        position: absolute;
+                                        bottom: 0;
+                                        width: 50%;
+                                        pointer-events: none;
+                                    "
                                 ></div>
                             </template>
                         </MessageBox>
-                        <ChatInput v-if='!blocked' :selectedid='chat.chatId' @messageSend='scrollToBottom(true)'/>
-                        <jdialog v-model='showDialog' @update-model-value="showDialog = false" noActions class='max-w-10'>
-                            <template v-slot:title class='center'>
-                                <h1 class='text-center'>Blocking</h1>
+                        <ChatInput v-if="!blocked" :selectedid="chat.chatId" @messageSend="scrollToBottom(true)" />
+                        <jdialog
+                            v-model="showDialog"
+                            @update-model-value="showDialog = false"
+                            noActions
+                            class="max-w-10"
+                        >
+                            <template v-slot:title class="center">
+                                <h1 class="text-center">Blocking</h1>
                             </template>
                             <div>
                                 Do you really want to block
                                 <b> {{ chat.name }} </b>?
                             </div>
-                            <div class='grid grid-cols-2 mt-2'>
-                                <button @click='doBlockChat' class='bg-red-500 p-2 text-white font-bold'>
-                                    YES
-                                </button>
-                                <button @click='showDialog = false' class='p-2'>
-                                    NO
-                                </button>
+                            <div class="grid grid-cols-2 mt-2">
+                                <button @click="doBlockChat" class="bg-red-500 p-2 text-white font-bold">YES</button>
+                                <button @click="showDialog = false" class="p-2">NO</button>
                             </div>
                         </jdialog>
-                        <jdialog v-model='showDeleteDialog' @update-model-value="showDeleteDialog = false" noActions class='max-w-10'>
-                            <template v-slot:title class='center'>
-                                <h1 class='text-center'>Deleting Conversation</h1>
+                        <jdialog
+                            v-model="showDeleteDialog"
+                            @update-model-value="showDeleteDialog = false"
+                            noActions
+                            class="max-w-10"
+                        >
+                            <template v-slot:title class="center">
+                                <h1 class="text-center">Deleting Conversation</h1>
                             </template>
                             <div>
                                 Do you really want to delete the conversation with
                                 <b> {{ chat.name }} </b>?
                             </div>
-                            <div class='grid grid-cols-2 mt-2'>
-                                <button @click='doDeleteChat' class='bg-red-500 p-2 text-white font-bold'>
-                                    YES
-                                </button>
-                                <button @click='showDeleteDialog = false' class='p-2'>
-                                    NO
-                                </button>
+                            <div class="grid grid-cols-2 mt-2">
+                                <button @click="doDeleteChat" class="bg-red-500 p-2 text-white font-bold">YES</button>
+                                <button @click="showDeleteDialog = false" class="p-2">NO</button>
                             </div>
                         </jdialog>
                     </FileDropArea>
                 </div>
-                <div class='grid h-full w-full place-items-center' v-else>
-                    <h2 v-if='isLoading'>Loading</h2>
-                    <div class='flex flex-col justify-center items-center' v-else>
-                        <h1 class='text-3xl'>404</h1>
-                        <h2>Chat '{{selectedId}}' does not exist</h2>
+                <div class="grid h-full w-full place-items-center" v-else>
+                    <h2 v-if="isLoading">Loading</h2>
+                    <div class="flex flex-col justify-center items-center" v-else>
+                        <h1 class="text-3xl">404</h1>
+                        <h2>Chat '{{ selectedId }}' does not exist</h2>
                     </div>
                 </div>
                 <aside
-                    class='hidden relative h-full flex-col overflow-y-auto md:w-400p'
+                    class="hidden relative h-full flex-col overflow-y-auto md:w-400p"
                     :class="{
                         'md:flex': showSideBar,
                         'md:hidden': !showSideBar,
                     }"
-                    v-if='chat'
+                    v-if="chat"
                     :key="'aside' + chat.id + selectedId"
                 >
-                    <div class='absolute max-w-full w-full p-4 pt-8'>
+                    <div class="absolute max-w-full w-full p-4 pt-8">
                         <div
-                            class='bg-white p-2 pb-6 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1 md:px-4'
+                            class="
+                                bg-white
+                                p-2
+                                pb-6
+                                w-full
+                                relative
+                                rounded-lg
+                                mb-4
+                                mt-0
+                                md:grid
+                                place-items-center
+                                grid-cols-1
+                                md:px-4
+                            "
                         >
-                            <div class='place-items-center grid relative'>
-                                <AvatarImg class='-mt-7' :id='chat.chatId' :showOnlineStatus='!chat.isGroup' />
+                            <div class="place-items-center grid relative">
+                                <AvatarImg class="-mt-7" :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
                             </div>
-                            <h2 class='my-3 break-words text-center w-full overflow-y-auto max-h-28 text-xl'>
+                            <h2 class="my-3 break-words text-center w-full overflow-y-auto max-h-28 text-xl">
                                 {{ chat.name }}
                             </h2>
                             <p
-                                class='break-words w-full overflow-y-auto font-bold text-center text-gray-300'
-                                v-if='!chat.isGroup'
+                                class="break-words w-full overflow-y-auto font-bold text-center text-gray-300"
+                                v-if="!chat.isGroup"
                             >
                                 {{ status?.status || 'No status found' }}
                             </p>
                         </div>
                         <group-management
-                            :chat='chat'
-                            @app-call='popupMeeting'
-                            @app-block='blockChat'
-                            @app-unblock='unBlockChat'
-                            @app-delete='deleteChat'
+                            :chat="chat"
+                            @app-call="popupMeeting"
+                            @app-block="blockChat"
+                            @app-unblock="unBlockChat"
+                            @app-delete="deleteChat"
                         ></group-management>
                     </div>
                 </aside>
@@ -203,7 +215,7 @@
     </appLayout>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
     import { useScrollActions, useScrollState } from '@/store/scrollStore';
 
     import appLayout from '../../layout/AppLayout.vue';
@@ -258,7 +270,7 @@
                 id => {
                     selectedId.value = <string>id;
                     scrollToBottom(true);
-                },
+                }
             );
 
             const { retrievechats, sendFile } = usechatsActions();
@@ -328,7 +340,7 @@
 
                     return {
                         message: message,
-                        lastSeen: undefined
+                        lastSeen: undefined,
                     };
                 }
 
@@ -338,7 +350,7 @@
                 lastSeen = lastSeen?.slice(0, -3);
                 return {
                     message: status?.isOnline ? 'Online' : 'Offline',
-                    lastSeen: lastSeen ? moment.unix( Number(lastSeen)) : undefined
+                    lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
                 };
             });
 
@@ -348,9 +360,9 @@
                 const str: string = chat.value.isGroup
                     ? chat.value.chatId
                     : chat.value.contacts
-                        .map(c => c.id)
-                        .sort()
-                        .join();
+                          .map(c => c.id)
+                          .sort()
+                          .join();
 
                 const id = crypto.SHA1(str);
                 sendMessage(
@@ -360,7 +372,7 @@
                         message: `${user.id} joined the video chat`,
                         id: id.toString(),
                     } as JoinedVideoRoomBody,
-                    MessageTypes.SYSTEM,
+                    MessageTypes.SYSTEM
                 );
 
                 popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
@@ -403,8 +415,7 @@
             const { isIntersecting } = useIntersectionObserver(viewAnchor);
 
             const scrollToBottom = (force = false) => {
-                if (!force && !isIntersecting.value)
-                    return;
+                if (!force && !isIntersecting.value) return;
 
                 nextTick(() => {
                     scrollMessageBoxToBottom();
@@ -473,7 +484,7 @@
     });
 </script>
 
-<style scoped type='text/css'>
+<style scoped type="text/css">
     @tailwind base;
     @tailwind components;
     @tailwind utilities;

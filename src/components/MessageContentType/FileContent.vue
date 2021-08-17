@@ -1,9 +1,20 @@
 <template>
-  <a class="px-4 my-2 my-message:bg-my" :href="calcExternalResourceLink(message.body.url)" download>
+    <a class="px-4 my-2 my-message:bg-my" :href="calcExternalResourceLink(message.body.url)" download>
         <div
-            class="icon bg-gray-600 rounded-full h-12 w-12 flex items-center justify-center text-white my-message:bg-icon"
+            class="
+                icon
+                bg-gray-600
+                rounded-full
+                h-12
+                w-12
+                flex
+                items-center
+                justify-center
+                text-white
+                my-message:bg-icon
+            "
         >
-            <i class="fas fa-file "></i>
+            <i class="fas fa-file"></i>
         </div>
         <div class="pt-2 my-message:text-icon">
             {{ message.body.filename }}
