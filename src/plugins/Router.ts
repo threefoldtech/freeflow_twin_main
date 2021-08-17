@@ -13,6 +13,7 @@ import EditFile from '@/views/app/EditFile.vue';
 import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
+import config from '../../public/config/config';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -102,7 +103,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(process.env.BASE_URL),
+    history: createWebHistory(config.baseUrl),
     routes,
 });
 
