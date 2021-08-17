@@ -22,8 +22,8 @@
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <p class='col-end-13 col-span-2 font-thin truncate'>
-              {{ lastMessageBody.token === undefined ? lastMessageBody : "File has been shared" }}
+            <p class='col-end-13 col-span-2 font-thin overflow-ellipsis'>
+              {{lastMessageBody}}
             </p>
         </div>
     </div>
@@ -89,6 +89,12 @@
                         if (lstmsg.body.type === FileTypes.RECORDING)
                             return 'Voice recording was sent';
                         return 'File has been uploaded';
+                    }
+                    case 'FILE_SHARE': {
+                        if (lstmsg?.body?.isFolder){
+                            return "Folder has been shared"
+                        }
+                        return "File has been shared" 
                     }
                     case 'DELETE':
                     default:
