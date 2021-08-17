@@ -59,16 +59,14 @@
                                             <button
                                                 v-if="userIsInGroup(item)"
                                                 @click="removeUserFromGroup(item)"
-                                                style="backgroundcolor: #ef4444"
-                                                class="text-white py-2 px-4 rounded-md justify-self-end"
+                                                class="text-white py-2 px-4 rounded-md justify-self-end bg-btnred"
                                             >
                                                 Delete invite
                                             </button>
                                             <button
                                                 v-if="!userIsInGroup(item)"
                                                 @click="usersInGroup.push(item)"
-                                                style="backgroundcolor: #16a085"
-                                                class="text-white py-2 px-4 rounded-md justify-self-end"
+                                                class="text-white py-2 px-4 rounded-md justify-self-end bg-btngreen"
                                             >
                                                 Invite to group
                                             </button>

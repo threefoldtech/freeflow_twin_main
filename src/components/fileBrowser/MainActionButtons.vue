@@ -2,15 +2,13 @@
     <div>
         <button
             @click="showCreateFolderDialog = true"
-            style="backgroundcolor: #16a085"
-            class="text-white py-2 px-4 rounded-md"
+            class="text-white py-2 px-4 rounded-md bg-btngreen"
         >
             <i class="fas fa-plus"></i> New Folder
         </button>
         <button
             @click="showCreateFileDialog = true"
-            style="backgroundcolor: #16a085"
-            class="text-white py-2 px-4 rounded-md"
+            class="text-white py-2 px-4 rounded-md bg-btngreen"
         >
             <i class="fas fa-plus"></i> Upload Files
         </button>

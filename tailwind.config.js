@@ -1,7 +1,7 @@
 const plugin = require('tailwindcss/plugin');
 
 module.exports = {
-    purge: ['./public/**/*.html', './src/**/*.vue'],
+    purge: ['./public/**/*.html', './src/**/*.vue', './src/**/*.ts'],
     mode: 'jit',
     darkMode: false, // or 'media' or 'class'
     theme: {
@@ -10,6 +10,8 @@ module.exports = {
                 accent: '#4EC48F',
                 icon: '#44A687',
                 my: '#d0f0c0',
+                btngreen: '#16a085',
+                btnred: '#ef4444',
             },
         },
     },
@@ -27,7 +29,6 @@ module.exports = {
                 });
             });
         }),
-        require('@tailwindcss/forms'),
     ],
     variants: {
         extend: {

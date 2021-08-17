@@ -57,8 +57,7 @@
                                         </div>
                                         <button
                                             @click="handleClick(item)"
-                                            style="backgroundcolor: #16a085"
-                                            class="text-white py-2 px-4 rounded-md justify-self-end"
+                                            class="text-white py-2 px-4 rounded-md justify-self-end bg-btngreen"
                                         >
                                             Invite to chat
                                         </button>

@@ -1,36 +1,36 @@
 <template>
-    <div class="place-items-start">
-        <div class="grid grid-cols-2">
+    <div class='place-items-start'>
+        <div class='grid grid-cols-2'>
             <a
-                class="nav-link grid-cols-6 text-center py-2"
-                @click.prevent="setActive('user')"
                 :class="{ active: isActive('user') }"
-                href="#"
+                class='nav-link grid-cols-6 text-center py-2'
+                href='#'
+                @click.prevent="setActive('user')"
             >
                 Add a user
             </a>
             <a
-                class="nav-link grid-cols-6 text-center py-2"
-                @click.prevent="setActive('group')"
                 :class="{ active: isActive('group') }"
-                href="#"
+                class='nav-link grid-cols-6 text-center py-2'
+                href='#'
+                @click.prevent="setActive('group')"
             >
                 Create a group
             </a>
         </div>
 
-        <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
-            <div class="flex flex-col">
+        <form v-if="isActive('user')" class='w-full' @submit.prevent='contactAdd'>
+            <div class='flex flex-col'>
                 <user-table
-                    :data="contacts"
-                    v-model="usernameAdd"
-                    placeholder="Search for user..."
-                    :error="usernameAddError"
-                    @clicked="handleClicked"
+                    v-model='usernameAdd'
+                    :data='contacts'
+                    :error='usernameAddError'
+                    placeholder='Search for user...'
+                    @clicked='handleClicked'
                 ></user-table>
-                <Disclosure v-slot="{ open }">
+                <Disclosure v-slot='{ open }'>
                     <DisclosureButton
-                        class="
+                        class='
                         flex
                         justify-between
                         w-full
@@ -40,56 +40,60 @@
                         text-sm
                         font-medium
                         text-left text-gray-500
-                        bg-gray-100
+                        bg-gray-50
                         rounded-lg
-                        hover:bg-gray-200
+                        hover:bg-gray-100
                         focus:outline-none
                         focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
-                    "
+                    '
                     >
                         <span>Advanced</span>
-                        <ChevronUpIcon :class="open ? 'transform rotate-180' : ''" class="w-5 h-5 text-gray-500" />
+                        <ChevronUpIcon :class="{'rotate-180': !open}" class='w-5 h-5 text-gray-500 transform' />
                     </DisclosureButton>
-                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                    <DisclosurePanel class='px-4 pt-4 pb-2 text-sm text-gray-500'>
                         <div>
-                            <label for="manualContactAdd" class="block text-sm font-medium text-gray-700">Location</label>
-                            <div class="mt-1">
-                                <input type="text" v-model="manualContactAdd" name="manualContactAdd" id="manualContactAdd" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" />
+                            <label class='block text-sm font-medium text-gray-700'
+                                   for='manualContactAdd'>Location</label>
+                            <div class='mt-1'>
+                                <input id='manualContactAdd' v-model='manualContactAdd' class='shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md'
+                                       name='manualContactAdd'
+                                       type='text' />
                             </div>
+                            <input type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"  />
                         </div>
                     </DisclosurePanel>
                 </Disclosure>
             </div>
         </form>
-        <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
-            <div class="flex place-items-center">
-                <label class="mr-2" for="username">Group name: </label>
-                <div class="w-full">
-                    <input v-model="groupnameAdd" id="username" class="mb-2" placeholder="Group name" maxlength="50" />
+        <form v-if="isActive('group')" class='w-full' @submit.prevent='groupAdd'>
+            <div class='flex place-items-center'>
+                <label class='mr-2' for='username'>Group name: </label>
+                <div class='w-full'>
+                    <input id='username' v-model='groupnameAdd' class='mb-2' maxlength='50' placeholder='Group name' />
                     <br />
-                    <span class="text-red-600" v-if="groupnameAddError != ''">
+                    <span v-if="groupnameAddError != ''" class='text-red-600'>
                         {{ groupnameAddError }}
                     </span>
                 </div>
             </div>
             <div>
                 <user-table-group
-                    :data="contacts"
-                    :usersInGroup="usersInGroup"
-                    v-model="usernameInGroupAdd"
-                    placeholder="Search for user..."
-                    :error="usernameAddError"
+                    v-model='usernameInGroupAdd'
+                    :data='contacts'
+                    :error='usernameAddError'
+                    :usersInGroup='usersInGroup'
+                    placeholder='Search for user...'
                 ></user-table-group>
             </div>
 
-            <div class="flex mt-4 justify-end w-full">
+            <div class='flex mt-4 justify-end w-full'>
                 <button
+                    class='rounded-md border border-gray-400 px-4 py-2 justify-self-end'
                     @click="$emit('closeDialog')"
-                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                 >
                     Cancel
                 </button>
-                <button style="backgroundcolor: #16a085" class="py-2 px-4 text-white rounded-md justify-self-end">
+                <button class='py-2 px-4 text-white rounded-md justify-self-end bg-btngreen'>
                     Add Group
                 </button>
             </div>
@@ -97,7 +101,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
     import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
     import { defineComponent, ref, computed, nextTick, watch } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
@@ -109,8 +113,8 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import userTable from '@/components/UserTable.vue';
     import userTableGroup from '@/components/UserTableGroup.vue';
-    import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
-    import { ChevronUpIcon } from '@heroicons/vue/solid'
+    import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
+    import { ChevronUpIcon } from '@heroicons/vue/solid';
 
     export default defineComponent({
         name: 'ContactAdd',
@@ -200,7 +204,7 @@
                     return;
                 }
                 if (groupnameAdd.value.length > 20) {
-                    groupnameAddError.value = "The name can't contain more than 20 characters";
+                    groupnameAddError.value = 'The name can\'t contain more than 20 characters';
                     return;
                 }
                 const mylocation = await myYggdrasilAddress();
@@ -242,7 +246,7 @@
                 contacts,
                 possibleUsers,
                 handleClicked,
-                manualContactAdd
+                manualContactAdd,
             };
         },
     });
