@@ -103,7 +103,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(config.baseUrl),
+    history: createWebHistory(),
     routes,
 });
 
