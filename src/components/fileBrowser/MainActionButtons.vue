@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <button @click='showCreateFolderDialog = true' style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md"><i class="fas fa-plus"></i> New Folder</button>
-        <button @click='showCreateFileDialog = true' style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md"><i class="fas fa-plus"></i> Upload Files</button>
+    <div class="flex justify-between">
+        <button @click='showCreateFolderDialog = true' style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md mx-2"><i class="fas fa-plus"></i> New Folder</button>
+        <button @click='showCreateFileDialog = true' style="backgroundColor: #16A085;" class="text-white py-2 px-4 rounded-md mr-2"><i class="fas fa-plus"></i> Upload Files</button>
     </div>
     <Dialog :model-value='showCreateFolderDialog' @update-model-value='(val) => updateCreateFolderDialog(val)'>
         <template v-slot:title>

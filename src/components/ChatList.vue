@@ -12,7 +12,7 @@
                 class="chatcard cursor-pointer flex flex-row items-center flex-row collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 mb-2"
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
-                    <button @click="showAddUserDialog = true" class="bg-icon rounded-full text-white w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10">
+                    <button @click="showAddUserDialog = true" class="bg-icon rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10">
                         <i class="fas fa-plus"></i>
                     </button>
                     <h1 class="collapsed-bar:hidden pt-1">Messages</h1>
@@ -20,6 +20,9 @@
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
                     <button
                         class="rounded-full w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10 bg-gray-100 flex justify-center"
+                        :class="{
+                            'mr-2': !collapsed,
+                        }"
                         @click="collapsed = !collapsed; searchValue = ''"
                     >
                         <div v-if="collapsed" class="h-full flex items-center justify-center">
