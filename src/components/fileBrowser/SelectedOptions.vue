@@ -140,7 +140,7 @@
       </template>
       <chatTable
         :data="chats"
-        ></chatTable>
+      ></chatTable>
       <!--<div
           v-for='chat in chats'
           class='h-auto border-b border-t border-gray-300 flex flex-row items-center'
