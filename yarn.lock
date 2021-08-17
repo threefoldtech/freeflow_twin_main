@@ -1205,6 +1205,11 @@
   resolved "https://registry.yarnpkg.com/@soda/get-current-script/-/get-current-script-1.0.2.tgz#a53515db25d8038374381b73af20bb4f2e508d87"
   integrity sha512-T7VNNlYVM1SgQ+VsMYhnDkcGmWhQdL0bDyGm5TlQ3GBXnJscEClUUOKduWTmm2zCnvNLC1hc3JpuXjs/nFOc5w==
 
+"@tailwindcss/aspect-ratio@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/aspect-ratio/-/aspect-ratio-0.2.1.tgz#a7ce776688b8218d9559a6918f0bccc58f0f16dd"
+  integrity sha512-aDFi80aHQ3JM3symJ5iKU70lm151ugIGFCI0yRZGpyjgQSDS+Fbe93QwypC1tCEllQE8p0S7TUu20ih1b9IKLA==
+
 "@tailwindcss/forms@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@tailwindcss/forms/-/forms-0.3.3.tgz#a29d22668804f3dae293dcadbef1aa6315c45b64"
@@ -10201,6 +10206,11 @@ symbol-observable@^1.0.4:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.2.0.tgz#c22688aed4eab3cdc2dfeacbb561660560a00804"
   integrity sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==
+
+tailwindcss-debug-screens@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/tailwindcss-debug-screens/-/tailwindcss-debug-screens-2.1.0.tgz#fff6b6d84029a8dc7b507fb02f4264582c1123b2"
+  integrity sha512-58mnybJxnGQG8DyLnbovjNL9dpHpffrHSPm6PsELOX3KSvsZF3xwZO3GYtQhLvSryFGLjS7Ntfdjw34Efck/MQ==
 
 "tailwindcss@npm:@tailwindcss/postcss7-compat@^2.2.7":
   version "2.2.7"
