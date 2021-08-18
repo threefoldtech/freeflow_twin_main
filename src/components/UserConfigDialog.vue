@@ -5,7 +5,7 @@
         </template>
         <div>
             <div class="avatar-container mb-2">
-                <div class="flex">
+                <div class="flex gap-2">
                     <div
                         class="avatar-container mr-2 flex justify-center items-center cursor-pointer"
                         @mouseover="isHoveringAvatar = true"
@@ -32,6 +32,8 @@
                         top-0
                         mt-2
                         right-0
+                        px-2
+                        py-1
                         flex flex-row
                         text-white
                         font-bold
@@ -55,6 +57,8 @@
                         top-1
                         mt-2
                         right-0
+                        px-2
+                        py-1
                         flex flex-row
                         ml-1
                         text-white
@@ -77,7 +81,7 @@
                         ref="statusInput"
                         v-model="userStatus"
                         style="resize: none"
-                        class="w-full"
+                        class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
                         :disabled="!isEditingStatus"
                         :placeholder="myStatus"
                         maxlength="150"
