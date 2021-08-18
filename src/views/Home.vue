@@ -12,8 +12,7 @@
     </div>
 </template>
 
-<script lang='ts'>
-    import { defineComponent } from 'vue';
+<script lang='ts' setup>
     import { login } from '@/services/authService';
 
     const loginAndPush = async () => {
@@ -21,20 +20,11 @@
         await login();
     };
 
-    export default defineComponent({
-        name: 'Home',
-        mounted() {
-            setTimeout(() => {
-                loginAndPush();
-            }, 3200);
-        },
-        setup() {
-            return {
-                name: window.location.host.split('.')[0],
-                loginAndPush,
-            };
-        },
-    });
+    const name = window.location.host.split('.')[0];
+
+    setTimeout(() => {
+        loginAndPush();
+    }, 3200);
 </script>
 
 <style scoped type='text/css'>
