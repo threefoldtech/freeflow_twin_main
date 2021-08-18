@@ -20,18 +20,32 @@
                 "
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
-                    <button @click="showAddUserDialog = true" class="bg-icon rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10">
+                    <button
+                        @click="showAddUserDialog = true"
+                        class="bg-icon rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                    >
                         <i class="fas fa-plus"></i>
                     </button>
                     <h1 class="collapsed-bar:hidden pt-1">Messages</h1>
                 </div>
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
                     <button
-                        class="rounded-full w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10 bg-gray-100 flex justify-center"
+                        class="
+                            rounded-full
+                            w-8
+                            h-8
+                            collapsed-bar:w-10 collapsed-bar:h-10
+                            bg-gray-100
+                            flex
+                            justify-center
+                        "
                         :class="{
                             'mr-2': !collapsed,
                         }"
-                        @click="collapsed = !collapsed; searchValue = ''"
+                        @click="
+                            collapsed = !collapsed;
+                            searchValue = '';
+                        "
                     >
                         <div v-if="collapsed" class="h-full flex items-center justify-center">
                             <i class="fas fa-chevron-right"></i>
@@ -70,7 +84,7 @@
                     v-model="searchValue"
                 />
             </div>
-            <div v-if="filteredChatRequests.length > 0" class=" bg-indigo-500 collapsed-bar:hidden px-2">
+            <div v-if="filteredChatRequests.length > 0" class="bg-indigo-500 collapsed-bar:hidden px-2">
                 <h2 style="font-size: 1.5em">
                     You have
                     <span style="">
@@ -80,8 +94,7 @@
                 </h2>
                 <ChatRequestList :chat-requests="filteredChatRequests" />
             </div>
-            <div class='flex-grow overflow-auto '>
-
+            <div class="flex-grow overflow-auto">
                 <div
                     v-if="filteredChatRequests.length === 0 && filteredChats.length == 0"
                     class="text-center collapsed-bar:hidden"
@@ -90,29 +103,20 @@
                     <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
                 </div>
                 <div
-                    class='
-                    flex
-                    flex-col
-                    justify-center
-                    items-center
-                    px-2
-                    collapsed-bar:px-0
-                '
-                    v-if='filteredChats && filteredChats.length'
+                    class="flex flex-col justify-center items-center px-2 collapsed-bar:px-0"
+                    v-if="filteredChats && filteredChats.length"
                 >
                     <ChatCard
-                        v-for='chat in filteredChats'
-                        :key='`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`'
-                        class='w-full rounded-lg collapsed-bar:rounded-none p-2 collapsed-bar:my-0 my-2 cursor-pointer'
-                        @click='setSelected(chat.chatId)'
-                        :collapsed='collapsed'
-                        :chat='chat'
+                        v-for="chat in filteredChats"
+                        :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
+                        class="w-full rounded-lg collapsed-bar:rounded-none p-2 collapsed-bar:my-0 my-2 cursor-pointer"
+                        @click="setSelected(chat.chatId)"
+                        :collapsed="collapsed"
+                        :chat="chat"
                     />
                 </div>
             </div>
         </div>
-
-
 
         <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
             <template v-slot:title>
@@ -226,5 +230,4 @@
     });
 </script>
 
-<style scoped type="text/css">
-</style>
+<style scoped type="text/css"></style>

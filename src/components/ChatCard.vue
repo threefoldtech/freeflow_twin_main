@@ -5,35 +5,36 @@
             'bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
             'opacity-50': blocked,
         }"
-        class='chatcard relative text-sm flex flex-row'
+        class="chatcard relative text-sm flex flex-row"
     >
-        <div class='place-items-center relative'>
+        <div class="place-items-center relative">
             <AvatarImg
-                :id='chat.chatId'
-                :showOnlineStatus='!chat.isGroup'
-                :unreadMessagesAmount='unreadMessagesAmount'
+                :id="chat.chatId"
+                :showOnlineStatus="!chat.isGroup"
+                :unreadMessagesAmount="unreadMessagesAmount"
             />
         </div>
-        <div v-if='!collapsed' class='px-2 ml-2 content'>
-            <p class='flex'>
-                <span class='font-bold break-normal overflow-ellipsis overflow-hidden name'>
+        <div v-if="!collapsed" class="px-2 ml-2 content">
+            <p class="flex">
+                <span class="font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
                 </span>
-                <span v-if='chat.isGroup' class='font-thin ml-2'> (group)</span>
-                <span v-if='blocked' class='ml-2 text-red-500'> BLOCKED</span>
-                <span v-if='lastMessage' class='font-thin ml-auto'>
+                <span v-if="chat.isGroup" class="font-thin ml-2"> (group)</span>
+                <span v-if="blocked" class="ml-2 text-red-500"> BLOCKED</span>
+                <span v-if="lastMessage" class="font-thin ml-auto">
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <div class='flex overflow-hidden'><div class='flex-0 col-end-13 col-span-2 font-thin overflow-ellipsis overflow-hidden '>
-                {{ lastMessageBody }}
-            </div>
+            <div class="flex overflow-hidden">
+                <div class="flex-0 col-end-13 col-span-2 font-thin overflow-ellipsis overflow-hidden">
+                    {{ lastMessageBody }}
+                </div>
             </div>
         </div>
     </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
     import { computed, defineComponent, ref } from 'vue';
     import { findLastIndex } from 'lodash';
     import { useAuthState } from '@/store/authStore';
@@ -58,7 +59,7 @@
                 let lastReadMessage = props.chat.read[<string>user.id];
                 return findLastIndex(
                     props.chat.messages,
-                    (message: Message<MessageBodyType>) => lastReadMessage === message.id,
+                    (message: Message<MessageBodyType>) => lastReadMessage === message.id
                 );
             });
             const lastMessage = computed(() => {

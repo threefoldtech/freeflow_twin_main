@@ -21,7 +21,8 @@
                     <td>
                         <div class="flex flex-row items-center pl-4 py-1">
                             <div class="mr-3 w-7">
-                                <i :key="item.name"
+                                <i
+                                    :key="item.name"
                                     class="fa-2x"
                                     :class="
                                         getIconDirty(getFileType(getExtension(item.name))) +
@@ -72,7 +73,7 @@
         setup() {
             onBeforeMount(async () => {
                 await getSharedContent();
-            })
+            });
 
             const router = useRouter();
             const epochToDate = epoch => {
@@ -81,9 +82,9 @@
                 return d === '1/20/1980' ? 'Never' : d;
             };
             const goTo = async (item: SharedFileInterface) => {
-                if(item.isFolder){
-                    goIntoSharedFolder(item)
-                    return
+                if (item.isFolder) {
+                    goIntoSharedFolder(item);
+                    return;
                 }
                 return router.push({
                     name: 'editfile',

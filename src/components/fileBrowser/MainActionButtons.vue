@@ -1,15 +1,9 @@
 <template>
     <div>
-        <button
-            @click="showCreateFolderDialog = true"
-            class="text-white py-2 px-4 rounded-md bg-btngreen"
-        >
+        <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 rounded-md bg-btngreen">
             <i class="fas fa-plus"></i> New Folder
         </button>
-        <button
-            @click="showCreateFileDialog = true"
-            class="text-white py-2 px-4 rounded-md bg-btngreen"
-        >
+        <button @click="showCreateFileDialog = true" class="text-white py-2 px-4 rounded-md bg-btngreen">
             <i class="fas fa-plus"></i> Upload Files
         </button>
     </div>

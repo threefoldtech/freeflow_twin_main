@@ -484,6 +484,4 @@
     });
 </script>
 
-<style scoped type="text/css">
-
-</style>
+<style scoped type="text/css"></style>

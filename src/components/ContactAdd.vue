@@ -1,111 +1,133 @@
 <template>
-    <div class='place-items-start'>
-        <div class='grid grid-cols-2'>
+    <div class="place-items-start">
+        <div class="grid grid-cols-2">
             <a
                 :class="{ active: isActive('user') }"
-                class='nav-link grid-cols-6 text-center py-2'
-                href='#'
+                class="nav-link grid-cols-6 text-center py-2"
+                href="#"
                 @click.prevent="setActive('user')"
             >
                 Add a user
             </a>
             <a
                 :class="{ active: isActive('group') }"
-                class='nav-link grid-cols-6 text-center py-2'
-                href='#'
+                class="nav-link grid-cols-6 text-center py-2"
+                href="#"
                 @click.prevent="setActive('group')"
             >
                 Create a group
             </a>
         </div>
 
-        <form v-if="isActive('user')" class='w-full' @submit.prevent='contactAdd'>
-            <div class='flex flex-col'>
+        <form v-if="isActive('user')" class="w-full" @submit.prevent="contactAdd">
+            <div class="flex flex-col">
                 <user-table
-                    v-model='usernameAdd'
-                    :data='contacts'
-                    :error='usernameAddError'
-                    placeholder='Search for user...'
-                    @clicked='handleClicked'
+                    v-model="usernameAdd"
+                    :data="contacts"
+                    :error="usernameAddError"
+                    placeholder="Search for user..."
+                    @clicked="handleClicked"
                 ></user-table>
-                <Disclosure v-slot='{ open }'>
+                <Disclosure v-slot="{ open }">
                     <DisclosureButton
-                        class='
-                        flex
-                        justify-between
-                        w-full
-                        mt-4
-                        ml-0
-                        py-2
-                        text-sm
-                        font-medium
-                        text-left text-gray-500
-                        bg-gray-50
-                        rounded-lg
-                        hover:bg-gray-100
-                        focus:outline-none
-                        focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
-                    '
+                        class="
+                            flex
+                            justify-between
+                            w-full
+                            mt-4
+                            ml-0
+                            py-2
+                            text-sm
+                            font-medium
+                            text-left text-gray-500
+                            bg-gray-50
+                            rounded-lg
+                            hover:bg-gray-100
+                            focus:outline-none
+                            focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
+                        "
                     >
                         <span>Advanced</span>
-                        <ChevronUpIcon :class="{'rotate-180': !open}" class='w-5 h-5 text-gray-500 transform' />
+                        <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform" />
                     </DisclosureButton>
-                    <DisclosurePanel class='px-4 pt-4 pb-2 text-sm text-gray-500'>
+                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
                         <div>
-                            <label class='block text-sm font-medium text-gray-700'
-                                   for='manualContactAdd'>Location</label>
-                            <div class='mt-1'>
-                                <input id='manualContactAdd' v-model='manualContactAdd'
-                                       class='focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm'
-                                       name='manualContactAdd'
-                                       type='text' />
+                            <label class="block text-sm font-medium text-gray-700" for="manualContactAdd"
+                                >Location</label
+                            >
+                            <div class="mt-1">
+                                <input
+                                    id="manualContactAdd"
+                                    v-model="manualContactAdd"
+                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm"
+                                    name="manualContactAdd"
+                                    type="text"
+                                />
                             </div>
                             <div>
-                                <input class='-ml-2 inline-flex w-auto items-center px-3 py-2 border cursor-pointer border-transparent text-sm leading-4 font-medium rounded-md text-white bg-btngreen focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' type='submit'
-                                        value='Manually add' />
+                                <input
+                                    class="
+                                        -ml-2
+                                        inline-flex
+                                        w-auto
+                                        items-center
+                                        px-3
+                                        py-2
+                                        border
+                                        cursor-pointer
+                                        border-transparent
+                                        text-sm
+                                        leading-4
+                                        font-medium
+                                        rounded-md
+                                        text-white
+                                        bg-btngreen
+                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                                    "
+                                    type="submit"
+                                    value="Manually add"
+                                />
                             </div>
                         </div>
                     </DisclosurePanel>
                 </Disclosure>
             </div>
         </form>
-        <form v-if="isActive('group')" class='w-full' @submit.prevent='groupAdd'>
-            <div class='flex place-items-center'>
-                <label class='mr-2' for='username'>Group name: </label>
-                <div class='w-full'>
-                    <input id='username' v-model='groupnameAdd' class='mb-2' maxlength='50' placeholder='Group name' />
+        <form v-if="isActive('group')" class="w-full" @submit.prevent="groupAdd">
+            <div class="flex place-items-center">
+                <label class="mr-2" for="username">Group name: </label>
+                <div class="w-full">
+                    <input id="username" v-model="groupnameAdd" class="mb-2" maxlength="50" placeholder="Group name" />
                     <br />
-                    <span v-if="groupnameAddError != ''" class='text-red-600'>
+                    <span v-if="groupnameAddError != ''" class="text-red-600">
                         {{ groupnameAddError }}
                     </span>
                 </div>
             </div>
             <div>
                 <user-table-group
-                    v-model='usernameInGroupAdd'
-                    :data='contacts'
-                    :error='usernameAddError'
-                    :usersInGroup='usersInGroup'
-                    placeholder='Search for user...'
+                    v-model="usernameInGroupAdd"
+                    :data="contacts"
+                    :error="usernameAddError"
+                    :usersInGroup="usersInGroup"
+                    placeholder="Search for user..."
                 ></user-table-group>
             </div>
 
-            <div class='flex mt-4 justify-end w-full'>
+            <div class="flex mt-4 justify-end w-full">
                 <button
-                    class='rounded-md border border-gray-400 px-4 py-2 justify-self-end'
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                     @click="$emit('closeDialog')"
                 >
                     Cancel
                 </button>
-                <button class='py-2 px-4 text-white rounded-md justify-self-end bg-btngreen'>
-                    Add Group
-                </button>
+                <button class="py-2 px-4 text-white rounded-md justify-self-end bg-btngreen">Add Group</button>
             </div>
         </form>
     </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
     import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
     import { defineComponent, ref, computed, nextTick, watch } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
@@ -134,7 +156,12 @@
         emits: ['closeDialog'],
         setup(props, { emit }) {
             //const { contacts } = useContactsState();
-            const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
+            const contacts = [
+                { id: 'jens', location: '145.546.487' },
+                { id: 'Simon', location: '145.586.487' },
+                { id: 'jonas', location: '145.546.48765654654' },
+                { id: 'Ine', location: '145.546sdfsdf.487' },
+            ];
             let addGroup = ref(false);
             let usernameAdd = ref('');
             let userAddLocation = ref('');
@@ -154,7 +181,6 @@
                         usernameAddError.value = 'Cannot add empty user!';
                         return;
                     }
-
 
                     if (!manualContactAdd && !possibleUsers.value.find(pu => pu.id === userId)) {
                         usernameAddError.value = 'Not able to find DigitalTwin of this user';
@@ -209,7 +235,7 @@
                     return;
                 }
                 if (groupnameAdd.value.length > 20) {
-                    groupnameAddError.value = 'The name can\'t contain more than 20 characters';
+                    groupnameAddError.value = "The name can't contain more than 20 characters";
                     return;
                 }
                 const mylocation = await myYggdrasilAddress();

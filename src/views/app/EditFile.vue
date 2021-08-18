@@ -35,18 +35,18 @@
             onMounted(async () => {
                 const path = atob(<string>route.params.path);
                 const shareId = <string>route.params.shareId;
-                let name 
+                let name;
                 let documentServerconfig;
                 let fileAccesDetails: EditPathInfo;
 
                 if (shareId) {
                     const shareDetails = await fetchShareDetails(shareId);
                     fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
-                    name = shareDetails.owner.id
+                    name = shareDetails.owner.id;
                 } else {
                     fileAccesDetails = (await getFileInfo(path)).data;
-                                            //@todo find better way to get name
-                        name = window.location.host.split('.')[0];
+                    //@todo find better way to get name
+                    name = window.location.host.split('.')[0];
                 }
 
                 const fileType = getFileType(getExtension(fileAccesDetails.fullName));

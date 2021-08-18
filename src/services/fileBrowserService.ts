@@ -168,7 +168,7 @@ export const getShareWithId = async (id: string) => {
     return <SharedFileInterface>res.data;
 };
 
-export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string, path:string) => {
+export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string, path: string) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
@@ -180,7 +180,12 @@ export const getFileAccessDetails = async (owner: ContactInterface, shareId: str
     return <EditPathInfo>res.data;
 };
 
-export const getSharedFolderContent = async (owner: ContactInterface, shareId: string, userId: string, path:string) => {
+export const getSharedFolderContent = async (
+    owner: ContactInterface,
+    shareId: string,
+    userId: string,
+    path: string
+) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 

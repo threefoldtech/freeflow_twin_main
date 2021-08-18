@@ -44,7 +44,11 @@
                 <unicode-emoji-picker v-pre></unicode-emoji-picker>
             </span>
 
-            <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1" @click.stop="toggleEmoji" v-if="!attachment">
+            <button
+                class="hover:text-icon mx-2 my-0 p-0 self-center flex-1"
+                @click.stop="toggleEmoji"
+                v-if="!attachment"
+            >
                 😃
             </button>
         </div>
@@ -387,5 +391,4 @@
     };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

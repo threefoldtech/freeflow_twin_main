@@ -1,24 +1,24 @@
 <template>
-    <div class='flex flex-col mx-2'>
-        <div class='overflow-x-auto sm:-mx-6 lg:-mx-8'>
-            <div class='py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8'>
-                <div class='shadow overflow-hidden border-b border-gray-200 sm:rounded-lg'>
-                    <FileDropArea class='h-full' @send-file='uploadFiles'>
-                        <div ref='hiddenItems' class='absolute hiddenItems'>
-                            <div ref='ghostImage' class='bg-white p-2'>
+    <div class="flex flex-col mx-2">
+        <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <FileDropArea class="h-full" @send-file="uploadFiles">
+                        <div ref="hiddenItems" class="absolute hiddenItems">
+                            <div ref="ghostImage" class="bg-white p-2">
                                 Moving {{ selectedPaths.length }} selected File(s)
                             </div>
                         </div>
                         <table
-                            :key='currentDirectory'
-                            class='min-w-full divide-y divide-gray-200'
-                            @dragenter='onDragEnterParent'
-                            @dragleave='onDragLeaveParent'
+                            :key="currentDirectory"
+                            class="min-w-full divide-y divide-gray-200"
+                            @dragenter="onDragEnterParent"
+                            @dragleave="onDragLeaveParent"
                         >
-                            <thead class='bg-gray-50'>
-                            <tr>
-                                <th
-                                    class='
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th
+                                        class="
                                             hidden
                                             px-6
                                             py-3
@@ -27,22 +27,22 @@
                                             text-gray-500
                                             uppercase
                                             tracking-wider
-                                        '
-                                    scope='col'
-                                >
-                                    <input
-                                        :checked='
+                                        "
+                                        scope="col"
+                                    >
+                                        <input
+                                            :checked="
                                                 currentDirectoryContent.length === selectedPaths.length &&
                                                 currentDirectoryContent.length !== 0
-                                            '
-                                        class='h-auto w-auto'
-                                        type='checkbox'
-                                        @change='handleAllSelect'
-                                    />
-                                </th>
-                                <th
-                                    :class="{ active: 'name' === currentSort }"
-                                    class='
+                                            "
+                                            class="h-auto w-auto"
+                                            type="checkbox"
+                                            @change="handleAllSelect"
+                                        />
+                                    </th>
+                                    <th
+                                        :class="{ active: 'name' === currentSort }"
+                                        class="
                                             px-6
                                             py-3
                                             text-left text-xs
@@ -50,16 +50,16 @@
                                             text-gray-500
                                             uppercase
                                             tracking-wider
-                                        '
-                                    scope='col'
-                                    @click="sortAction('name')"
-                                >
-                                    Name
-                                    <span :class='orderClass'> </span>
-                                </th>
-                                <th
-                                    :class="{ active: 'extension' === currentSort }"
-                                    class='
+                                        "
+                                        scope="col"
+                                        @click="sortAction('name')"
+                                    >
+                                        Name
+                                        <span :class="orderClass"> </span>
+                                    </th>
+                                    <th
+                                        :class="{ active: 'extension' === currentSort }"
+                                        class="
                                             px-6
                                             py-3
                                             text-left text-xs
@@ -67,16 +67,16 @@
                                             text-gray-500
                                             uppercase
                                             tracking-wider
-                                        '
-                                    scope='col'
-                                    @click="sortAction('extension')"
-                                >
-                                    Extension
-                                    <span :class='orderClass'> </span>
-                                </th>
-                                <th
-                                    :class="{ active: 'size' === currentSort }"
-                                    class='
+                                        "
+                                        scope="col"
+                                        @click="sortAction('extension')"
+                                    >
+                                        Extension
+                                        <span :class="orderClass"> </span>
+                                    </th>
+                                    <th
+                                        :class="{ active: 'size' === currentSort }"
+                                        class="
                                             px-6
                                             py-3
                                             text-left text-xs
@@ -84,16 +84,16 @@
                                             text-gray-500
                                             uppercase
                                             tracking-wider
-                                        '
-                                    scope='col'
-                                    @click="sortAction('size')"
-                                >
-                                    Size
-                                    <span :class='orderClass'> </span>
-                                </th>
-                                <th
-                                    :class="{ active: 'lastModified' === currentSort }"
-                                    class='
+                                        "
+                                        scope="col"
+                                        @click="sortAction('size')"
+                                    >
+                                        Size
+                                        <span :class="orderClass"> </span>
+                                    </th>
+                                    <th
+                                        :class="{ active: 'lastModified' === currentSort }"
+                                        class="
                                             px-6
                                             py-3
                                             text-left text-xs
@@ -101,85 +101,85 @@
                                             text-gray-500
                                             uppercase
                                             tracking-wider
-                                        '
-                                    scope='col'
-                                    @click="sortAction('lastModified')"
-                                >
-                                    Last Modified
-                                    <span :class='orderClass'> </span>
-                                </th>
-                            </tr>
+                                        "
+                                        scope="col"
+                                        @click="sortAction('lastModified')"
+                                    >
+                                        Last Modified
+                                        <span :class="orderClass"> </span>
+                                    </th>
+                                </tr>
                             </thead>
-                            <tbody class='bg-white divide-y divide-gray-200'>
-                            <tr v-if='currentDirectoryContent.length === 0'>
-                                <td class='px-6 py-4 whitespace-nowrap'>Empty directory</td>
-                                <td class='px-6 py-4 whitespace-nowrap'>-</td>
-                                <td class='px-6 py-4 whitespace-nowrap'>-</td>
-                                <td class='px-6 py-4 whitespace-nowrap'>-</td>
-                            </tr>
-                            <!-- File Share Folder -->
-                            <tr v-if="currentDirectory === '/'">
-                                <td class='px-6 py-4 whitespace-nowrap hidden'></td>
-                                <td class='px-6 py-4 whitespace-nowrap' @click='goToShared()'>
-                                    <div class='flex flex-row items-center text-md'>
-                                        <div class='mr-3 w-7 text-center'>
-                                            <i class='fas fa-share-alt-square fa-2x text-blue-400'></i>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr v-if="currentDirectoryContent.length === 0">
+                                    <td class="px-6 py-4 whitespace-nowrap">Empty directory</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                </tr>
+                                <!-- File Share Folder -->
+                                <tr v-if="currentDirectory === '/'">
+                                    <td class="px-6 py-4 whitespace-nowrap hidden"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
+                                        <div class="flex flex-row items-center text-md">
+                                            <div class="mr-3 w-7 text-center">
+                                                <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
+                                            </div>
+                                            <span class="hover:underline cursor-pointer"> Files shared with me </span>
                                         </div>
-                                        <span class='hover:underline cursor-pointer'> Files shared with me </span>
-                                    </div>
-                                </td>
-                                <td class='px-6 py-4 whitespace-nowrap'>-</td>
-                                <td class='px-6 py-4 whitespace-nowrap'>-</td>
-                                <td class='px-6 py-4 whitespace-nowrap'>-</td>
-                            </tr>
-                            <tr
-                                v-for='item in sortContent()'
-                                :key='item.fullName'
-                                :class="{
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                </tr>
+                                <tr
+                                    v-for="item in sortContent()"
+                                    :key="item.fullName"
+                                    :class="{
                                         'bg-accent': highlight(item),
                                         'bg-gray-100': isSelected(item),
                                     }"
-                                class='hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300'
-                                draggable='true'
-                                @click='handleSelect(item)'
-                                @dragover='event => onDragOver(event, item)'
-                                @dragstart='event => onDragStart(event, item)'
-                                @drop='() => onDrop(item)'
-                            >
-                                <td class='px-6 py-4 whitespace-nowrap hidden'>
-                                    <input
-                                        :checked='
+                                    class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
+                                    draggable="true"
+                                    @click="handleSelect(item)"
+                                    @dragover="event => onDragOver(event, item)"
+                                    @dragstart="event => onDragStart(event, item)"
+                                    @drop="() => onDrop(item)"
+                                >
+                                    <td class="px-6 py-4 whitespace-nowrap hidden">
+                                        <input
+                                            :checked="
                                                 selectedPaths.some(
                                                     x =>
                                                         x.fullName === item.fullName &&
                                                         x.extension === item.extension &&
                                                         x.path === item.path
                                                 )
-                                            '
-                                        class='h-auto w-auto'
-                                        type='checkbox'
-                                    />
-                                </td>
-                                <td class='px-6 py-4 whitespace-nowrap'>
-                                    <div class='flex flex-row items-center text-md'>
-                                        <div class='mr-3 w-7 text-center'>
-                                            <i :class="getIcon(item) + ' ' + getIconColor(item)" class='fa-2x'></i>
-                                        </div>
-                                        <span class='hover:underline' @click.stop='handleItemClick(item)'>
+                                            "
+                                            class="h-auto w-auto"
+                                            type="checkbox"
+                                        />
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex flex-row items-center text-md">
+                                            <div class="mr-3 w-7 text-center">
+                                                <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
+                                            </div>
+                                            <span class="hover:underline" @click.stop="handleItemClick(item)">
                                                 {{ item.name }}
                                             </span>
-                                    </div>
-                                </td>
-                                <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {{ getFileExtension(item) }}
-                                </td>
-                                <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {{ getFileSize(item) }}
-                                </td>
-                                <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-500'>
-                                    {{ getFileLastModified(item) }}
-                                </td>
-                            </tr>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ getFileExtension(item) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ getFileSize(item) }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ getFileLastModified(item) }}
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </FileDropArea>
@@ -189,7 +189,7 @@
     </div>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
     import {
         currentDirectory,
@@ -295,7 +295,7 @@
                 dragOverItem.value = undefined;
                 moveFiles(
                     item.path,
-                    selectedPaths.value.map(x => x.path),
+                    selectedPaths.value.map(x => x.path)
                 );
                 selectedPaths.value = [];
             };

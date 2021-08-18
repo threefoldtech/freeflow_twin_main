@@ -17,14 +17,14 @@
 </template>
 
 <script lang="ts" setup>
-    import { Status,Notification } from '@/types/notifications';
+    import { Status, Notification } from '@/types/notifications';
 
     defineProps({
         notification: {
             type: Object,
             required: true,
         },
-    })
+    });
 </script>
 
 <style scoped></style>

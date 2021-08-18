@@ -64,33 +64,39 @@
             </div>
         </div>
 
-    <jdialog v-model='showRenameDialog' @update-model-value='showRenameDialog = false' noActions class='max-w-10'>
-      <template v-slot:title class='center'>
-        <h1 class='text-center'>Renaming {{ selectedPaths[0].name }}</h1>
-      </template>
-      <div>
-        <input
-            v-model='newName'
-            :placeholder='selectedPaths[0].name'
-            tabindex='0'
-            maxlength='260'
-        />
-      </div>
-      <div class='grid grid-cols-2 mt-2'>
-        <button @click='renameFile(selectedPaths[0], newName);newName = "";showRenameDialog = false;'
-                class='bg-red-500 p-2 text-white font-bold'>
-          RENAME
-        </button>
-        <button @click='showRenameDialog = false;newName = ""' class='p-2'>
-          CANCEL
-        </button>
-      </div>
-    </jdialog>
-    <jdialog v-model='showShareDialog' @update-model-value='showShareDialog = false' noActions>
-      <template v-slot:title>
-
-        <h1 class='text-center'>Share file</h1>
-        <!--<div class="flex items-end justify-end mr-2">
+        <jdialog v-model="showRenameDialog" @update-model-value="showRenameDialog = false" noActions class="max-w-10">
+            <template v-slot:title class="center">
+                <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
+            </template>
+            <div>
+                <input v-model="newName" :placeholder="selectedPaths[0].name" tabindex="0" maxlength="260" />
+            </div>
+            <div class="grid grid-cols-2 mt-2">
+                <button
+                    @click="
+                        renameFile(selectedPaths[0], newName);
+                        newName = '';
+                        showRenameDialog = false;
+                    "
+                    class="bg-red-500 p-2 text-white font-bold"
+                >
+                    RENAME
+                </button>
+                <button
+                    @click="
+                        showRenameDialog = false;
+                        newName = '';
+                    "
+                    class="p-2"
+                >
+                    CANCEL
+                </button>
+            </div>
+        </jdialog>
+        <jdialog v-model="showShareDialog" @update-model-value="showShareDialog = false" noActions>
+            <template v-slot:title>
+                <h1 class="text-center">Share file</h1>
+                <!--<div class="flex items-end justify-end mr-2">
           <label class="flex items-center cursor-pointer">
             
             <div class="mr-3 text-gray-700 font-medium">
@@ -111,11 +117,9 @@
           </label>
 
         </div> -->
-      </template>
-      <chatTable
-        :data="chats"
-      ></chatTable>
-      <!--<div
+            </template>
+            <chatTable :data="chats"></chatTable>
+            <!--<div
           v-for='chat in chats'
           class='h-auto border-b border-t border-gray-300 flex flex-row items-center'
           :key='chat.chatId'
@@ -126,41 +130,46 @@
           <i class='fas fill-current text-green-400 fa-paper-plane fa-2x'></i>
         </div>
       </div>-->
-    </jdialog>
-  </div>
-
+        </jdialog>
+    </div>
 </template>
 
-<script lang='ts'>
-import {computed, defineComponent, onBeforeMount, ref} from 'vue';
-import {
-  selectedPaths,
-  deleteFiles,
-  downloadFiles,
-  copyPasteSelected,
-  copiedFiles,
-  clearClipboard,
-  renameFile,
-  searchDir,
-  searchDirValue,
-  searchResults, isDraggingFiles, moveFiles, selectedAction, Action, getToken, sharedDir
-} from '@/store/fileBrowserStore';
-import Dialog from '@/components/Dialog.vue';
-import Button from '@/components/Button.vue';
-import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
-import {sendMessageObject, usechatsActions, usechatsState} from '@/store/chatStore';
-import {useSocketActions} from '@/store/socketStore';
-import Avatar from '@/components/Avatar.vue';
-import AvatarImg from '@/components/AvatarImg.vue';
-import {SystemMessageTypes, MessageTypes} from '@/types';
-import {createNotification} from '@/store/notificiationStore';
+<script lang="ts">
+    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import {
+        selectedPaths,
+        deleteFiles,
+        downloadFiles,
+        copyPasteSelected,
+        copiedFiles,
+        clearClipboard,
+        renameFile,
+        searchDir,
+        searchDirValue,
+        searchResults,
+        isDraggingFiles,
+        moveFiles,
+        selectedAction,
+        Action,
+        getToken,
+        sharedDir,
+    } from '@/store/fileBrowserStore';
+    import Dialog from '@/components/Dialog.vue';
+    import Button from '@/components/Button.vue';
+    import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
+    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { useSocketActions } from '@/store/socketStore';
+    import Avatar from '@/components/Avatar.vue';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { SystemMessageTypes, MessageTypes } from '@/types';
+    import { createNotification } from '@/store/notificiationStore';
 
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
 
     export default defineComponent({
         name: 'SelectedOptions',
-        components: { AvatarImg, Button, jdialog: Dialog,  chatTable: ShareChatTable  },
+        components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable },
         setup() {
             let debounce;
             let showDeleteDialog = ref(false);
