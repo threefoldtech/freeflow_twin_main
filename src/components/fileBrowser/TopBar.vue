@@ -5,7 +5,7 @@
                 <input
                     type="text"
                     placeholder="Search"
-                    class="px2-2 border-gray-200 border-2 focus:border-accent border-r rounded-lg"
+                    class="px2-2 border-gray-200 border-2 focus:border-accent-300 border-r rounded-lg"
                     v-model="searchDirValue"
                     @input="debounceSearch"
                 />
@@ -89,13 +89,13 @@
 
             const onDragEnter = (e: Event, i: number) => {
                 if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                (e.target as HTMLElement).classList.add('bg-accent');
+                (e.target as HTMLElement).classList.add('bg-accent-300');
                 (e.target as HTMLElement).classList.add('text-white');
             };
 
             const onDragLeave = (e: Event, i: number) => {
                 if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                (e.target as HTMLElement).classList.remove('bg-accent');
+                (e.target as HTMLElement).classList.remove('bg-accent-300');
                 (e.target as HTMLElement).classList.remove('text-white');
             };
 
@@ -107,7 +107,7 @@
                     parts.splice(i + 1);
                     path = parts.join('/');
                 }
-                (e.target as HTMLElement).classList.remove('bg-accent');
+                (e.target as HTMLElement).classList.remove('bg-accent-300');
                 (e.target as HTMLElement).classList.remove('text-white');
                 moveFiles(path);
                 selectedPaths.value = [];

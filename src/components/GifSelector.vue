@@ -43,7 +43,7 @@
                             focus-within:ring-2
                             focus-within:ring-offset-2
                             focus-within:ring-offset-gray-100
-                            focus-within:ring-indigo-500
+                            focus-within:ring-accent-500
                             overflow-hidden
                         "
                     >

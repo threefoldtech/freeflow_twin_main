@@ -1,13 +1,13 @@
 <template>
     <div class="flex flex-row items-center mb-4">
         <div class="ml-2 hover:text-green-500 cursor-pointer" @click="goToHome">
-            <i class="fas fa-home text-accent"></i>
+            <i class="fas fa-home text-accent-300"></i>
         </div>
         <!--<div
         class='rounded-full w-6 h-6 flex justify-center items-center'
         @click='goBack'
         :class='{
-                "bg-accent hover:text-green-500 cursor-pointer": currentDirectory !== "/",
+                "bg-accent-300 hover:text-green-500 cursor-pointer": currentDirectory !== "/",
                 "bg-gray-500": currentDirectory === "/"
             }'
     >
@@ -55,13 +55,13 @@
 
             const onDragEnter = (e: Event, i: number) => {
                 if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                (e.target as HTMLElement).classList.add('bg-accent');
+                (e.target as HTMLElement).classList.add('bg-accent-300');
                 (e.target as HTMLElement).classList.add('text-white');
             };
 
             const onDragLeave = (e: Event, i: number) => {
                 if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                (e.target as HTMLElement).classList.remove('bg-accent');
+                (e.target as HTMLElement).classList.remove('bg-accent-300');
                 (e.target as HTMLElement).classList.remove('text-white');
             };
 
@@ -73,7 +73,7 @@
                     parts.splice(i + 1);
                     path = parts.join('/');
                 }
-                (e.target as HTMLElement).classList.remove('bg-accent');
+                (e.target as HTMLElement).classList.remove('bg-accent-300');
                 (e.target as HTMLElement).classList.remove('text-white');
                 moveFiles(path);
                 selectedPaths.value = [];

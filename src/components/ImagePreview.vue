@@ -10,7 +10,7 @@
     >
         <div class="absolute w-full top-4 left-0 flex justify-end md:pr-8">
             <a
-                class="cursor-pointer text-gray-100 size hover:text-accent mr-4"
+                class="cursor-pointer text-gray-100 size hover:text-accent-300 mr-4"
                 :href="src"
                 :download="src.split('/').reverse()[0]"
             >

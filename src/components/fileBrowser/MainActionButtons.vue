@@ -19,7 +19,7 @@
             <h1>Add files</h1>
         </template>
         <div class="flex flex-col justify-center items-center">
-            <button class="bg-accent text-white hover:bg-green-600" @click="newFileInput.click()">Select files</button>
+            <button class="bg-accent-300 text-white hover:bg-green-600" @click="newFileInput.click()">Select files</button>
             <span>OR</span>
         </div>
         <input type="file" ref="newFileInput" hidden multiple @change="handleFileSelectChange" />

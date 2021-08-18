@@ -84,16 +84,16 @@
                             <div class="h-full flex items-center self-end px-8 space-x-4">
                                 <button
                                     @click="popupMeeting"
-                                    class="focus:outline-none hover:text-accent text-gray-500"
+                                    class="focus:outline-none hover:text-accent-300 text-gray-500"
                                 >
                                     <i class="fas fa-video fa-w-12"> </i>
                                 </button>
 
                                 <button
                                     @click="toggleSideBar"
-                                    class="focus:outline-none hover:text-accent"
+                                    class="focus:outline-none hover:text-accent-300"
                                     :class="{
-                                        'text-accent': showSideBar,
+                                        'text-accent-300': showSideBar,
                                         'text-gray-500': !showSideBar,
                                     }"
                                 >
