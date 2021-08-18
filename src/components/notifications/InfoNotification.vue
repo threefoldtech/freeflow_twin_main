@@ -16,24 +16,15 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { Notification, Status } from '@/types/notifications';
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
+    import { Status,Notification } from '@/types/notifications';
 
-    export default defineComponent({
-        name: 'InfoNotification',
-        props: {
-            notification: {
-                type: Notification,
-                required: true,
-            },
+    defineProps({
+        notification: {
+            type: Object,
+            required: true,
         },
-        setup() {
-            return {
-                Status,
-            };
-        },
-    });
+    })
 </script>
 
 <style scoped></style>
