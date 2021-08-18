@@ -133,16 +133,4 @@
 </script>
 
 <style scoped>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer utilities {
-        @variants responsive {
-            .topgrid {
-                display: grid !important;
-                grid-template-columns: 500px 2fr 1fr !important;
-            }
-        }
-    }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <button class="flex items-center rounded-xl m-2 bg-accent text-white btn">
+    <button class="flex items-center rounded-xl m-2 bg-accent text-white btn disabled:bg-gray-300 bg-cursor-[unset]">
         <slot />
     </button>
 </template>
@@ -11,8 +11,4 @@
 </script>
 
 <style scoped>
-    .btn:disabled {
-        background-color: lightgray;
-        cursor: unset;
-    }
 </style>

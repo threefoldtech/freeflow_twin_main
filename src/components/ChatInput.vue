@@ -6,7 +6,7 @@
                 <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
                 <i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>
             </div>
-            <div class="replymsg">
+            <div class="max-w-[750px] break-words">
                 <b>{{ action.message.from }}</b>
                 <p>{{ getActionMessage }}</p>
             </div>
@@ -16,23 +16,23 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <div class="md:p-2 md:m-2 md:rounded-3xl bg-white flex flex-col actions md:flex-row" @paste="onPaste">
+    <div class="md:p-2 md:m-2 md:rounded-3xl bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
         <div class="md:col-span-4 flex flex-nowrap md:bg-transparent bg-gray-200" :class="{ hidden: !collapsed }">
-            <button class="action-btn mx-2 my-0 p-0 self-center flex-1 pt-0.5" @click="toggleGif">
+            <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1 pt-0.5" @click="toggleGif">
                 <h2>GIF</h2>
             </button>
-            <button class="action-btn mx-2 my-0 p-0 self-center flex-1" @click.stop="selectFile">
+            <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1" @click.stop="selectFile">
                 <i class="fas fa-paperclip transform" style="--tw-rotate: -225deg"></i>
             </button>
             <input class="hidden" type="file" id="fileinput" ref="fileinput" @change="changeFile" />
             <button
-                class="action-btn mx-2 my-0 p-0 self-center flex-1"
+                class="hover:text-icon mx-2 my-0 p-0 self-center flex-1"
                 @click.stop="startRecording"
                 v-if="!stopRecording"
             >
                 <i class="fas fa-microphone"></i>
             </button>
-            <button class="action-btn mx-2 my-0 p-0 self-center flex-1" @click.stop="stopRecording" v-else>
+            <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1" @click.stop="stopRecording" v-else>
                 <i class="fas fa-circle text-red-600"></i>
             </button>
 
@@ -44,13 +44,13 @@
                 <unicode-emoji-picker v-pre></unicode-emoji-picker>
             </span>
 
-            <button class="action-btn mx-2 my-0 p-0 self-center flex-1" @click.stop="toggleEmoji" v-if="!attachment">
+            <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1" @click.stop="toggleEmoji" v-if="!attachment">
                 😃
             </button>
         </div>
         <div class="flex flex-row flex-1">
             <button
-                class="action-btn mx-2 my-0 p-0 self-center md:hidden"
+                class="hover:text-icon mx-2 my-0 p-0 self-center md:hidden"
                 @click="collapsed = !collapsed"
                 :key="collapsed.toString()"
             >
@@ -64,14 +64,14 @@
                 <span class="ml-2 mr-1 leading-relaxed truncate max-w- self-center hidden md:inline-block">
                     {{ attachment.name }}
                 </span>
-                <button class="action-btn p-2 mx-0 self-center" @click.stop="removeFile">
+                <button class="hover:text-icon p-2 mx-0 self-center" @click.stop="removeFile">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form class="w-full" @submit.prevent="chatsend">
                 <input type="text" ref="message" v-focus />
             </form>
-            <button class="action-btn mx-2 my-0 p-0 self-center" @click="chatsend">
+            <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatsend">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
@@ -388,13 +388,4 @@
 </script>
 
 <style scoped>
-    .action-btn:hover {
-        color: rgb(68, 166, 135);
-    }
-    .action-btn {
-    }
-
-    .actions {
-        min-height: 3em;
-    }
 </style>

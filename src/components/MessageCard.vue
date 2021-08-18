@@ -1,6 +1,6 @@
 <template>
     <div
-        class="messageCard flex flex-row"
+        class="group flex flex-row"
         :class="{
             'mb-2': isLastMessage,
             'my-message': isMine,
@@ -41,7 +41,7 @@
                     >
                         {{ message.from }}
                     </header>
-                    <main class="msgcard flex justify-between">
+                    <main class="max-w-[500px] break-words flex justify-between">
                         <MessageContent :message="message" :key="message.type"></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
@@ -52,7 +52,7 @@
 
                 <div
                     style="margin-top: auto"
-                    class="actions pb-4 pl-4 md:hidden"
+                    class="group-hover:flex pb-4 pl-4 md:hidden"
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
                 >
                     <span
@@ -95,7 +95,7 @@
                             'bg-my': reply.from === user.id,
                         }"
                     >
-                        <main class="replymsg flex justify-between">
+                        <main class="max-w-[750px] break-words flex justify-between">
                             <MessageContent :message="reply"></MessageContent>
                         </main>
                     </div>
@@ -239,19 +239,4 @@
     });
 </script>
 <style lang="css" scoped>
-    .text-message * {
-        word-wrap: break-word;
-        max-width: 100%;
-        white-space: pre-wrap;
-    }
-
-    .messageCard:hover .actions {
-        display: flex;
-    }
-
-    .msgcard,
-    .replymsg {
-        max-width: 500px;
-        word-break: break-word;
-    }
 </style>

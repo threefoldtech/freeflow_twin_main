@@ -98,6 +98,4 @@
 </script>
 
 <style scoped>
-    addpointerevents * {
-    }
 </style>

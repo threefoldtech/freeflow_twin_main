@@ -4,7 +4,7 @@
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,
-            'md:w-400p': !collapsed,
+            'md:w-[400px]': !collapsed,
         }"
     >
         <div class="relative w-full pt-4 justify-center">
@@ -240,9 +240,4 @@
 </script>
 
 <style scoped type="text/css">
-    @media (min-width: 768px) {
-        .md\:w-400p {
-            width: 400px;
-        }
-    }
 </style>

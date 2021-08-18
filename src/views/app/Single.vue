@@ -163,7 +163,7 @@
                     </div>
                 </div>
                 <aside
-                    class="hidden relative h-full flex-col overflow-y-auto md:w-400p"
+                    class="hidden relative h-full flex-col overflow-y-auto md:w-[400px]"
                     :class="{
                         'md:flex': showSideBar,
                         'md:hidden': !showSideBar,
@@ -485,30 +485,5 @@
 </script>
 
 <style scoped type="text/css">
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
 
-    @layer utilities {
-        @variants responsive {
-            .singleGrid {
-                grid-template-columns: 400px 1fr 400px;
-            }
-
-            .twoGrid {
-                grid-template-columns: 400px 1fr;
-            }
-        }
-    }
-
-    .replymsg {
-        max-width: 750px;
-        word-break: break-word;
-    }
-
-    @media (min-width: 768px) {
-        .md\:w-400p {
-            width: 400px;
-        }
-    }
 </style>

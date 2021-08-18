@@ -96,12 +96,4 @@
     };
 </script>
 <style scoped type="text/css">
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
-
-    @layer utilities {
-        @variants responsive {
-        }
-    }
 </style>

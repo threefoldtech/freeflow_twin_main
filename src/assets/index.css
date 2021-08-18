@@ -6,7 +6,7 @@
     h1,
     h2,
     h3 {
-        font-family: 'Bebas Neue', cursive;
+        font-family: 'Bebas Neue', sans-serif;
     }
     h1 {
         @apply text-2xl;
@@ -101,6 +101,10 @@
         }
         .customgrid {
             grid-template-columns: 400px 1fr;
+        }
+        .topgrid {
+            display: grid !important;
+            grid-template-columns: 500px 2fr 1fr !important;
         }
     }
 }

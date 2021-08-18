@@ -19,13 +19,4 @@
 </script>
 
 <style>
-    a {
-        text-decoration: none !important;
-    }
-    #app .prose h1,
-    #app .prose h2,
-    #app .prose h3 {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
 </style>

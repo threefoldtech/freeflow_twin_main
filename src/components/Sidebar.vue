@@ -84,10 +84,10 @@
                     icon: 'fas fa-search',
                     enabled: true,
                 },
-                {
-                    name: AppType.Meetings,
-                    icon: 'fas fa-video',
-                },
+                // {
+                //     name: AppType.Meetings,
+                //     icon: 'fas fa-video',
+                // },
             ];
             const router = useRouter();
 
