@@ -33,12 +33,12 @@
     select {
         @apply outline-none border-accent;
     }
-    button {
+    /* button {
         @apply py-1 px-2 mx-2;
     }
     button:focus {
         @apply outline-none;
-    }
+    } */
 }
 .fade-enter-active,
 .fade-leave-active {

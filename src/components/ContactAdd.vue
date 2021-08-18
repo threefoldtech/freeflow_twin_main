@@ -133,7 +133,8 @@
         },
         emits: ['closeDialog'],
         setup(props, { emit }) {
-            const { contacts } = useContactsState();
+            //const { contacts } = useContactsState();
+            const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
             let addGroup = ref(false);
             let usernameAdd = ref('');
             let userAddLocation = ref('');
