@@ -2,7 +2,7 @@
     <div
         @mouseover="showActions = true"
         @mouseleave="showActions = false"
-        class="flex break-words"
+        class="flex break-all"
         :class="{
             'justify-end': isMine,
             'my-1': !disabled,

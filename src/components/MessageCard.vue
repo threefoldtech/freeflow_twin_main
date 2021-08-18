@@ -41,7 +41,7 @@
                     >
                         {{ message.from }}
                     </header>
-                    <main class="max-w-[500px] break-words flex justify-between">
+                    <main class="max-w-[500px] break-all flex justify-between">
                         <MessageContent :message="message" :key="message.type"></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
@@ -95,7 +95,7 @@
                             'bg-my': reply.from === user.id,
                         }"
                     >
-                        <main class="max-w-[750px] break-words flex justify-between">
+                        <main class="max-w-[750px] break-all flex justify-between">
                             <MessageContent :message="reply"></MessageContent>
                         </main>
                     </div>
