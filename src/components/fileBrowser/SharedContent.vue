@@ -6,7 +6,7 @@
         </div>
         <table class="w-full box-border" v-if="sharedContent.length > 0">
             <thead>
-                <tr v-if="searchResults !== 'None'">
+                <tr>
                     <th class="text-left select-none pl-4">Name</th>
                     <th class="text-left select-none">Size</th>
                 </tr>
@@ -16,11 +16,12 @@
                     v-for="item in sharedContent"
                     class="hover:bg-gray-200 h-10 border-b border-t border-gray-300 cursor-pointer"
                     @click="goTo(item)"
+                    :key="item.name"
                 >
                     <td>
                         <div class="flex flex-row items-center pl-4 py-1">
                             <div class="mr-3 w-7">
-                                <i
+                                <i :key="item.name"
                                     class="fa-2x"
                                     :class="
                                         getIconDirty(getFileType(getExtension(item.name))) +
@@ -54,24 +55,36 @@
         getIconColor,
         getIconColorDirty,
         getIconDirty,
+        getSharedContent,
+        getSharedFolderContent,
+        goIntoSharedFolder,
         parseJwt,
         sharedContent,
     } from '@/store/fileBrowserStore';
     import { SharedFileInterface } from '@/types';
     import { defineComponent } from '@vue/runtime-core';
+    import { onBeforeMount } from 'vue';
     import { useRouter } from 'vue-router';
 
     export default defineComponent({
         name: 'SharedContent',
         components: {},
         setup() {
+            onBeforeMount(async () => {
+                await getSharedContent();
+            })
+
             const router = useRouter();
             const epochToDate = epoch => {
                 let d = new Date(epoch).toLocaleDateString();
 
                 return d === '1/20/1980' ? 'Never' : d;
             };
-            const goTo = (item: SharedFileInterface) => {
+            const goTo = async (item: SharedFileInterface) => {
+                if(item.isFolder){
+                    goIntoSharedFolder(item)
+                    return
+                }
                 return router.push({
                     name: 'editfile',
                     params: {

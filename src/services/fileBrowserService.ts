@@ -4,6 +4,7 @@ import { createPercentProgressNotification, fail, success } from '@/store/notifi
 import { ProgressNotification } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
+import { PathInfoModel } from '@/store/fileBrowserStore';
 
 const endpoint = `${config.baseUrl}api/browse`;
 
@@ -154,13 +155,11 @@ export const addShare = async (userId: string, path: string, filename: string, s
         size: size,
     });
 };
-export const saveToken = async (token: string, filename: string, size: number) => {
-    return await axios.post<string>(`${endpoint}/files/insertToken`, { token: token, filename: filename, size: size });
-};
+
 export const getShared = async (shareStatus: string) => {
     const params = new URLSearchParams();
     params.append('shareStatus', shareStatus);
-    return await axios.get<ShareInfo[]>(`${endpoint}/files/getShares`, { params: params });
+    return await axios.get<SharedFileInterface[]>(`${endpoint}/files/getShares`, { params: params });
 };
 export const getShareWithId = async (id: string) => {
     const params = new URLSearchParams();
@@ -169,14 +168,26 @@ export const getShareWithId = async (id: string) => {
     return <SharedFileInterface>res.data;
 };
 
-export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string) => {
+export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string, path:string) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
-    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}`;
+    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
     externalUrl = externalUrl + apiEndPointToCall;
     const res = await axios.get(externalUrl);
     return <EditPathInfo>res.data;
+};
+
+export const getSharedFolderContent = async (owner: ContactInterface, shareId: string, userId: string, path:string) => {
+    let externalUrl = `http://[${owner.location}]`;
+    externalUrl = calcExternalResourceLink(externalUrl);
+
+    let apiEndPointToCall = `/api/browse/share/${shareId}/folder?path=${path}`;
+    apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
+
+    externalUrl = externalUrl + apiEndPointToCall;
+    const res = await axios.get(externalUrl);
+    return <PathInfoModel[]>res.data;
 };

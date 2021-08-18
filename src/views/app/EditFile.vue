@@ -35,20 +35,21 @@
             onMounted(async () => {
                 const path = atob(<string>route.params.path);
                 const shareId = <string>route.params.shareId;
-                //@todo find better way to get name
-                const name = window.location.host.split('.')[0];
+                let name 
                 let documentServerconfig;
                 let fileAccesDetails: EditPathInfo;
 
                 if (shareId) {
                     const shareDetails = await fetchShareDetails(shareId);
-                    fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId);
+                    fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
+                    name = shareDetails.owner.id
                 } else {
                     fileAccesDetails = (await getFileInfo(path)).data;
+                                            //@todo find better way to get name
+                        name = window.location.host.split('.')[0];
                 }
 
                 const fileType = getFileType(getExtension(fileAccesDetails.fullName));
-
                 if ([FileType.Excel, FileType.Word, FileType.Powerpoint].some(x => x === fileType)) {
                     documentServerconfig = generateDocumentserverConfig(
                         name,
@@ -83,12 +84,6 @@
                     //       const result = await Api.downloadFile(item.path);
                     //       fileDownload(result.data, item.fullName);
                 }
-
-                get(`${config.documentServerUrl}/web-apps/apps/api/documents/api.js`, () => {
-                    console.log(documentServerconfig);
-                    //@ts-ignore
-                    new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
-                });
             });
 
             const generateDocumentserverConfig = (

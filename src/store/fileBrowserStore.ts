@@ -40,6 +40,10 @@ export interface FullPathInfoModel extends Api.EditPathInfo {
     fileType: FileType;
 }
 
+export interface ShareContent extends PathInfoModel {
+    // share: 
+}
+
 export const rootDirectory = '/';
 export const currentDirectory = ref<string>(rootDirectory);
 export const currentDirectoryContent = ref<PathInfoModel[]>([]);
@@ -52,7 +56,9 @@ export const searchResults = ref<PathInfoModel[] | string>([]);
 export const isDraggingFiles = ref<boolean>(false);
 export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
-export const sharedContent = ref<Api.ShareInfo[]>([]);
+export const sharedContent = ref<SharedFileInterface[]>([]);
+
+export const currentShare = ref<SharedFileInterface>(undefined)
 
 watch([currentDirectory], () => {
     updateContent();
@@ -513,6 +519,35 @@ export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
     sharedContent.value = result.data;
 };
+
+export const goIntoSharedFolder = async (share:SharedFileInterface) => {
+    let path : string;
+    if(!currentShare.value ){
+        path = "/"
+        currentShare.value = share
+    }
+    else{
+        path =  share.path
+    }    
+    const items = await getSharedFolderContent(share.owner,share.id, path)
+    sharedContent.value = items.map(item => {
+        let itemName = item.name
+        if(item.extension){
+            itemName = itemName + '.' + item.extension
+        }  
+        return  <SharedFileInterface>{
+        id: share.id,
+        path: item.path,
+        owner: share.owner,
+        name: itemName,
+        isFolder: item.isDirectory,
+        size: item.size,
+        lastModified: item.lastModified.getTime ? item.lastModified.getTime() : undefined,
+        permissions: share.permissions
+    }
+})
+}
+
 export const getToken = async (userId: string, path: string, filename: string, size: number, writable) => {
     const result = await Api.addShare(userId, path, filename, size, writable);
     return result;
@@ -532,9 +567,9 @@ export const fetchShareDetails = async (shareId: string) => {
     return shareDetails;
 };
 
-export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: string) => {
+export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: string, path:string) => {
     const { user } = useAuthState();
-    const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id);
+    const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id, path);
     return fileAccessDetails;
 };
 
@@ -554,3 +589,8 @@ export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, sh
     const response = await axios.get(location);
     return response.data;
 };
+
+export const getSharedFolderContent  = async (owner,shareId, path:string) => {
+    const { user } = useAuthState();
+    return await Api.getSharedFolderContent(owner,shareId,<string>user.id, path)
+}

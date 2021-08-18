@@ -6,7 +6,6 @@ import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
-import { saveToken } from '@/services/fileBrowserService';
 import { login } from '@/services/authService';
 const state = reactive<State>({
     socket: '',
@@ -42,7 +41,6 @@ const initializeSocket = (username: string) => {
     state.socket.on('message', message => {
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE' && user.id === message.to) {
-            saveToken(message.body.token, message.body.fileName, message.body.size).then(r => console.log('SUCCES'));
         }
         if (message.type === 'READ') {
             handleRead(message);

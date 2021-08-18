@@ -18,7 +18,7 @@
     import { defineComponent, onBeforeMount } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
-    import { updateContent, getSharedContent, searchResults, sharedDir } from '@/store/fileBrowserStore';
+    import { updateContent, searchResults, sharedDir } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
 
@@ -34,7 +34,6 @@
         setup() {
             onBeforeMount(async () => {
                 await updateContent();
-                await getSharedContent();
             });
 
             return {
