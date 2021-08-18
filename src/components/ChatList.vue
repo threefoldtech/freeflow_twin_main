@@ -105,12 +105,12 @@
                     v-if="filteredChats && filteredChats.length"
                 >
                     <ChatCard
-                        v-for="chat in filteredChats"
-                        :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
-                        class="w-full rounded-lg collapsed-bar:rounded-none p-2 collapsed-bar:my-0 my-2 cursor-pointer"
-                        @click="setSelected(chat.chatId)"
-                        :collapsed="collapsed"
-                        :chat="chat"
+                        v-for='chat in filteredChats'
+                        :key='`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`'
+                        class='w-full rounded-lg collapsed-bar:rounded-none p-1.5 collapsed-bar:my-0 my-1 cursor-pointer'
+                        @click='setSelected(chat.chatId)'
+                        :collapsed='collapsed'
+                        :chat='chat'
                     />
                 </div>
             </div>
