@@ -76,13 +76,11 @@
                     </div>
                 </div>
             </div>
-            <div class="collapsed-bar:hidden px-2">
-                <input
-                    type="text"
-                    placeholder="Search"
-                    class="px2-2 border-gray-200 border-2 focus:border-accent border-r rounded-lg"
-                    v-model="searchValue"
-                />
+            <div class="mt-1 mx-2 relative rounded-md shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                <input type="text" v-model='searchValue' class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
             </div>
             <div v-if="filteredChatRequests.length > 0" class="bg-indigo-500 collapsed-bar:hidden px-2">
                 <h2 style="font-size: 1.5em">
@@ -144,6 +142,7 @@
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
     import { useScrollActions } from '@/store/scrollStore';
+    import { SearchIcon } from '@heroicons/vue/solid'
     export default defineComponent({
         name: 'Apps',
         props: {
@@ -158,6 +157,7 @@
             ChatCard,
             AvatarImg,
             ChatRequestList,
+            SearchIcon,
         },
         emits: ['closeDialog'],
         setup(props, context) {
