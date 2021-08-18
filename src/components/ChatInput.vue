@@ -6,7 +6,7 @@
                 <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
                 <i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>
             </div>
-            <div class="max-w-[750px] break-words">
+            <div class="max-w-[750px] break-all">
                 <b>{{ action.message.from }}</b>
                 <p>{{ getActionMessage }}</p>
             </div>

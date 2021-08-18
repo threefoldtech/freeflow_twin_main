@@ -1,24 +1,22 @@
 <template>
     <section
-        class="h-full bg-white w-full"
+        class="bg-white w-full flex flex-col overflow-hidden"
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,
             'md:w-[400px]': !collapsed,
         }"
     >
-        <div class="relative w-full pt-4 justify-center">
+        <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
             <div
                 class="
-                    chatcard
-                    cursor-pointer
-                    flex flex-row
+                    flex
                     items-center
-                    flex-row
                     collapsed-bar:flex-col-reverse
                     justify-center
                     collapsed-bar:mb-0
                     mb-2
+                    flex-grow-0
                 "
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
@@ -72,7 +70,7 @@
                     v-model="searchValue"
                 />
             </div>
-            <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2">
+            <div v-if="filteredChatRequests.length > 0" class=" bg-indigo-500 collapsed-bar:hidden px-2">
                 <h2 style="font-size: 1.5em">
                     You have
                     <span style="">
@@ -82,39 +80,39 @@
                 </h2>
                 <ChatRequestList :chat-requests="filteredChatRequests" />
             </div>
-            <div
-                class="
-                    relative
-                    overflow-y-auto
-                    w-full
-                    max-h-full
-                    h-full
-                    flex flex-col
+            <div class='flex-grow overflow-auto '>
+
+                <div
+                    v-if="filteredChatRequests.length === 0 && filteredChats.length == 0"
+                    class="text-center collapsed-bar:hidden"
+                >
+                    <p>It feels lonely over here :(</p>
+                    <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
+                </div>
+                <div
+                    class='
+                    flex
+                    flex-col
                     justify-center
                     items-center
                     px-2
                     collapsed-bar:px-0
-                "
-                v-if="filteredChats && filteredChats.length"
-            >
-                <ChatCard
-                    v-for="chat in filteredChats"
-                    :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
-                    class="w-full rounded-lg collapsed-bar:rounded-none p-2 collapsed-bar:my-0 my-2 cursor-pointer"
-                    @click="setSelected(chat.chatId)"
-                    :collapsed="collapsed"
-                    :chat="chat"
-                />
+                '
+                    v-if='filteredChats && filteredChats.length'
+                >
+                    <ChatCard
+                        v-for='chat in filteredChats'
+                        :key='`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`'
+                        class='w-full rounded-lg collapsed-bar:rounded-none p-2 collapsed-bar:my-0 my-2 cursor-pointer'
+                        @click='setSelected(chat.chatId)'
+                        :collapsed='collapsed'
+                        :chat='chat'
+                    />
+                </div>
             </div>
         </div>
 
-        <div
-            v-if="filteredChatRequests.length == 0 && filteredChats.length == 0"
-            class="text-center collapsed-bar:hidden"
-        >
-            <p>It feels lonely over here :(</p>
-            <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
-        </div>
+
 
         <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
             <template v-slot:title>
