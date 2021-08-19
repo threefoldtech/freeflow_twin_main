@@ -157,9 +157,14 @@
                 </div>
                 <div class="grid h-full w-full place-items-center" v-else>
                     <h2 v-if="isLoading">Loading</h2>
-                    <div class="flex flex-col justify-center items-center" v-else>
-                        <h1 class="text-3xl">404</h1>
-                        <h2>Chat '{{ selectedId }}' does not exist</h2>
+                    <div class='h-full flex flex-col items-center justify-center' v-else>
+                        <div>
+                            <img alt=''
+                                 class='h-48 self-center block rounded-md'
+                                 src='https://media0.giphy.com/media/14uQ3cOFteDaU/giphy.gif?cid=9dc0c3c4ejjgph9t6jer28bvuz97isp7r48wivzx2n7m0vj0&amp;rid=giphy.gif&amp;ct=g'>
+                        </div>
+                        <h1 class="mt-4 text-3xl">404</h1>
+                        <h2 class='mt-4 '>Chat '{{ selectedId }}' does not exist</h2>
                     </div>
                 </div>
                 <aside

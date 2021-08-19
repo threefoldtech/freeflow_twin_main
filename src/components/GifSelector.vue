@@ -75,7 +75,7 @@
             <div class='h-full flex flex-col items-center justify-center flex-grow' v-if='gifs.length === 0 && !searching'>
                 <div>
                     <img alt=''
-                          class='h-48 self-center block'
+                          class='h-48 self-center block rounded-md'
                           src='https://media0.giphy.com/media/14uQ3cOFteDaU/giphy.gif?cid=9dc0c3c4ejjgph9t6jer28bvuz97isp7r48wivzx2n7m0vj0&amp;rid=giphy.gif&amp;ct=g'>
                 </div>
                 <h2 class='text-cursive mt-2'>no Gifs found</h2>
