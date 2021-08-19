@@ -12,7 +12,7 @@
                     border-dashed border-4
                     w-80
                     h-40
-                    bg-accent
+                    bg-accent-300
                     border-white
                     justify-center
                     items-center

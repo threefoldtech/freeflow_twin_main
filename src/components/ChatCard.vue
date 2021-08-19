@@ -1,8 +1,8 @@
 <template>
     <div
         :class="{
-            'bg-gray-50': !router.currentRoute?.value.path.includes(chat.chatId),
-            'bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
+            'bg-gray-50 border border-gray-200': !router.currentRoute?.value.path.includes(chat.chatId),
+            'bg-gray-200 border border-gray-50': router.currentRoute?.value.path.includes(chat.chatId),
             'opacity-50': blocked,
         }"
         class="chatcard relative text-sm flex flex-row"

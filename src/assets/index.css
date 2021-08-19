@@ -129,3 +129,7 @@
 ::-webkit-scrollbar-thumb:hover {
     background-color: #a8bbbf;
 }
+
+::selection {
+    @apply bg-accent-300;
+}

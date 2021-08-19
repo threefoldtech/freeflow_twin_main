@@ -7,7 +7,18 @@ module.exports = {
     theme: {
         extend: {
             colors: {
-                accent: '#4EC48F',
+                accent: {
+                    50: '#eef5f2',
+                    100: '#cff0ed',
+                    200: '#97e8d5',
+                    300: '#5bcfa9',
+                    400: '#20b27a',
+                    500: '#169951',
+                    600: '#14833c',
+                    700: '#146631',
+                    800: '#0f4627',
+                    900: '#0b2b1f',
+                },
                 icon: '#44A687',
                 my: '#d0f0c0',
                 btngreen: '#16a085',
@@ -16,8 +27,7 @@ module.exports = {
         },
     },
     plugins: [
-        require('@tailwindcss/forms'),
-        plugin(function({ addVariant, e }) {
+        plugin(function ({ addVariant, e }) {
             addVariant('my-message', ({ modifySelectors, separator }) => {
                 modifySelectors(({ className }) => {
                     return `.my-message .${e(`my-message${separator}${className}`)}`;
@@ -31,6 +41,8 @@ module.exports = {
             });
         }),
         require('@tailwindcss/aspect-ratio'),
+        require('@tailwindcss/forms'),
+        require('@tailwindcss/typography'),
         require('tailwindcss-debug-screens'),
     ],
 };

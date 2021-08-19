@@ -136,7 +136,7 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                        'bg-accent': highlight(item),
+                                        'bg-accent-300': highlight(item),
                                         'bg-gray-100': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"

@@ -43,7 +43,7 @@
                             focus-within:ring-2
                             focus-within:ring-offset-2
                             focus-within:ring-offset-gray-100
-                            focus-within:ring-indigo-500
+                            focus-within:ring-accent-500
                             overflow-hidden
                         "
                     >
@@ -52,12 +52,13 @@
                 </li>
             </ul>
         </div>
-        <span v-if="gifs.length === 0">no Gifs found</span>
+        <span v-if="gifs.length === 0 && !searching">no Gifs found</span>
     </div>
 </template>
 <script lang="ts">
     import { fetchGif } from '@/services/gifService';
     import { ref, watch } from 'vue';
+    import { debounce } from 'lodash';
 
     export default {
         name: 'GifSelector',
@@ -65,14 +66,23 @@
         setup(props) {
             const gifs = ref([]);
             const searchTerm = ref('');
+            const searching = ref(true);
+
+            const debouncedFetch = debounce((st) => {
+                searching.value = true
+                gifs.value = []
+                fetchGif(st).then(gs => {
+                    gifs.value = gs.data.map(g => g.images.original.url);
+                    searching.value = false;
+                });
+            }, 150)
 
             fetchGif().then(gs => {
                 gifs.value = gs.data.map(g => g.images.original.url);
+                searching.value = false;
             });
             watch(searchTerm, st => {
-                fetchGif(st).then(gs => {
-                    gifs.value = gs.data.map(g => g.images.original.url);
-                });
+                debouncedFetch(st)
             });
 
             return { gifs, searchTerm };

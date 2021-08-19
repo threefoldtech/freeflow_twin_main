@@ -59,7 +59,7 @@
                                 <input
                                     id="manualContactAdd"
                                     v-model="manualContactAdd"
-                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm"
+                                    class="focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm"
                                     name="manualContactAdd"
                                     type="text"
                                 />
@@ -82,7 +82,7 @@
                                         rounded-md
                                         text-white
                                         bg-btngreen
-                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
                                     "
                                     type="submit"
                                     value="Manually add"

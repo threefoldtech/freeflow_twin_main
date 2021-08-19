@@ -45,7 +45,7 @@
                         <MessageContent :message="message" :key="message.type"></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
-                        <i class="fas fa-check-double text-accent" v-if="isread"></i>
+                        <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
                         <i class="fas fa-check text-gray-400" v-else></i>
                     </div>
                 </div>

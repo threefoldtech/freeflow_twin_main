@@ -2,7 +2,7 @@
     <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif" />
     <div v-if="action" class="flex justify-between m-2 p-4 bg-white rounded-xl">
         <div class="flex flex-row">
-            <div class="text-accent mr-4 self-center">
+            <div class="text-accent-300 mr-4 self-center">
                 <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
                 <i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>
             </div>
@@ -61,7 +61,7 @@
                 <i v-if="collapsed" class="fas fa-chevron-down"></i>
                 <i v-else class="fas fa-chevron-up"></i>
             </button>
-            <div class="bg-indigo-100 inline-flex text-sm rounded flex-row h-8 pl-3 self-center mr-2" v-if="attachment">
+            <div class="bg-accent-100 inline-flex text-sm rounded flex-row h-8 pl-3 self-center mr-2" v-if="attachment">
                 <div class="self-center">
                     <i class="fas fa-file"></i>
                 </div>
@@ -73,8 +73,11 @@
                 </button>
             </div>
             <form class="w-full" @submit.prevent="chatsend">
-                <input type="text" ref="message" v-focus />
+                <div class="mt-1 border-b border-gray-300 focus-within:border-icon">
+                    <input type="text" class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-icon focus:ring-0 sm:text-sm" placeholder='Write a message ...'>
+                </div>
             </form>
+
             <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatsend">
                 <i class="fas fa-paper-plane"></i>
             </button>
