@@ -172,6 +172,8 @@ export const getFileAccessDetails = async (owner: ContactInterface, shareId: str
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
+    path = encodeURIComponent(path)
+
     let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
