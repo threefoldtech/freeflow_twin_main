@@ -51,8 +51,7 @@
                 </div>
 
                 <div
-                    style="margin-top: auto"
-                    class="group-hover:flex pb-4 pl-4 md:hidden"
+                    class="group-hover:flex pb-4 pl-4 md:hidden mt-auto xl:sticky xl:bottom-0"
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
                 >
                     <span
