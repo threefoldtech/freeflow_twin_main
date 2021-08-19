@@ -74,7 +74,7 @@
             </div>
             <form class="w-full" @submit.prevent="chatsend">
                 <div class="mt-1 border-b border-gray-300 focus-within:border-icon">
-                    <input type="text" class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-icon focus:ring-0 sm:text-sm" placeholder='Write a message ...'>
+                    <input type="text" ref="message" class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-icon focus:ring-0 sm:text-sm" placeholder='Write a message ...'>
                 </div>
             </form>
 
