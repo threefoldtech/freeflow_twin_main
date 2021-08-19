@@ -362,10 +362,15 @@
             };
 
             const getActionMessage = computed(() => {
-                if (action.value.message.type === MessageTypes.QUOTE)
-                    return (action.value.message.body as QuoteBodyType).message;
+                switch (action.value.message.type) {
+                    case MessageTypes.QUOTE:
+                        return (action.value.message.body as QuoteBodyType).message;
+                    case  MessageTypes.STRING:
+                        return action.value.message.body;
+                    default:
+                        return action.value.message.type;
 
-                return action.value.message.body;
+                }
             });
 
             const collapsed = ref(true);
