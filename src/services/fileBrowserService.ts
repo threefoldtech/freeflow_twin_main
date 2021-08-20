@@ -198,3 +198,7 @@ export const getSharedFolderContent = async (
     const res = await axios.get(externalUrl);
     return <PathInfoModel[]>res.data;
 };
+
+export const getShareByPath = async (path:string):Promise<SharedFileInterface> => {
+    return (await axios.get(`${endpoint}/share/path/`, { params: {path} })).data;
+}

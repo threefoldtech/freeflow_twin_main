@@ -143,8 +143,8 @@ export enum SharePermission {
     Write = 'w',
 }
 export interface SharePermissionInterface {
-    userId: string | undefined;
-    types: SharePermission[];
+    chatId: string | undefined;
+    types: SharePermission[]
 }
 
 export interface ContactInterface {

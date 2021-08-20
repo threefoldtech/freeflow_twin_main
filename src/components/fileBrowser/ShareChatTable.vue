@@ -1,23 +1,14 @@
 <template>
-    <!--<div class="flex flex-row items-center">
-        <label class="mr-2" for="username">Username:</label>
-        <input
+  <input
             v-model="searchTerm"
             @focus="handleInput"
             @input="handleInput"
-            :placeholder="placeholder"
             v-focus
             tabindex="0"
             maxlength="50"
+             class="focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border border-gray-300 rounded-md mb-2 p-1" 
+             placeholder="Search" 
         />
-        <span
-          v-if="modelValue"
-          @click.prevent="reset()"
-          class="cursor-pointer"
-        >
-          <i class="fas fa-times"></i>
-        </span>
-    </div>-->
     <div class="flex flex-col">
         <div class="-my-2 sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -75,7 +66,10 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="(item, index) in searchResults()" :key="index">
+                            <tr
+                                v-for="(item) in searchResults()"
+                                :key="item"
+                            >
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex">
                                         <div class="flex-shrink-0 h-10 w-10">
@@ -89,16 +83,22 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <Toggle :v-model="writeRights"></Toggle>
+                                    <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
+                                        <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-btngreen text-white': !item.canWrite }"> Read</span>
+                                        <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-btngreen text-white': item.canWrite }"> Write</span>
+                                    </div>
                                 </td>
-                                <td>
+                                <td :key="item.isAlreadySent" class="text-center">
                                     <button
                                         @click="shareFile(item.chatId)"
-                                        style="backgroundcolor: #16a085"
-                                        class="text-white py-2 px-4 rounded-md justify-self-end"
+                                        class="text-white py-2 px-4 rounded-md justify-self-end bg-btngreen"
+                                        v-if="!item.isAlreadySent"
                                     >
                                         Share
                                     </button>
+                                    <span class="text-xs" v-else>
+                                        File has been shared.
+                                    </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -109,73 +109,93 @@
     </div>
 </template>
 <script lang="ts">
-    import { Chat } from '@/types';
-    import { selectedPaths, getToken } from '@/store/fileBrowserStore';
-    import { defineComponent, ref, computed, onMounted } from 'vue';
-    import Toggle from '@/components/Toggle.vue';
-    import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-    const { sendMessage } = usechatsActions();
-    import { createNotification } from '@/store/notificiationStore';
-    export default defineComponent({
-        components: { Toggle, AvatarImg },
-        props: {
-            data: {
-                type: Array,
-                required: true,
-            },
+import { Chat } from '@/types';
+import { selectedPaths, getToken } from '@/store/fileBrowserStore';
+import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
+import Toggle from '@/components/Toggle.vue';
+import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
+import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+import AvatarImg from '@/components/AvatarImg.vue';
+import { SystemMessageTypes, MessageTypes } from '@/types';
+const { sendMessage } = usechatsActions();
+import { createNotification } from '@/store/notificiationStore';
+export default defineComponent({
+    components: { Toggle, AvatarImg },
+    props: {
+        data: {
+            type: Array,
+            required: true,
         },
-        emits: ['update:modelValue', 'clicked'],
+    },
+    emits: ['update:modelValue', 'clicked'],
 
-        setup(props, { emit }) {
-            const searchTerm = ref('');
-            let writeRights = ref(false);
+    setup(props, { emit }) {
+        const searchTerm = ref('');
+        const chats = ref([])
+        const alreadySentChatIds = ref(<String[]>[])
+        
 
-            const reset = () => {
-                emit('update:modelValue', '');
-                searchTerm.value = '';
-            };
-
-            const handleInput = evt => {
-                emit('update:modelValue', evt.target.value);
-            };
-
-            const searchResults = () => {
-                return props.data.filter((item: Chat) => {
-                    return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
-                });
-            };
-
-            async function shareFile(chatId) {
-                const size = selectedPaths.value[0].size;
-                const filename = selectedPaths.value[0].fullName;
-                const response = await getToken(chatId, selectedPaths.value[0].path, filename, size, writeRights.value);
-                sendMessage(
-                    chatId,
-                    { token: response.data.token, fileName: filename, size: size },
-                    MessageTypes.FILE_SHARE
-                );
-                //showShareDialog.value = false
-                createNotification('Shared File', 'File has been shared with ' + chatId);
+        onBeforeMount(()=>{
+           chats.value =  props.data.map( (item:Chat) => {
+               return {
+                   name:item.name,
+                   chatId:item.chatId,
+                   canWrite:false,
+                   isAlreadySent: false
+               }
             }
+        )
+        })
 
-            return {
-                reset,
-                handleInput,
-                searchTerm,
-                searchResults,
-                selectedPaths,
-                writeRights,
-                shareFile,
-            };
-        },
-    });
+
+        const reset = () => {
+            emit('update:modelValue', '');
+            searchTerm.value = '';
+        };
+
+        const handleInput = evt => {
+            emit('update:modelValue', evt.target.value);
+        };
+
+        const searchResults = () => {
+            return chats.value.filter((item: Chat) => {
+                return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
+            });
+        };
+
+        async function shareFile(chatId) {
+            const size = selectedPaths.value[0].size;
+            const filename = selectedPaths.value[0].fullName;
+            console.log(chatId)
+            const chat = chats.value.find(chat =>chat.chatId ==chatId)
+            console.log(chat)
+
+            const response = await getToken(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
+            sendMessage(
+                chatId,
+                { token: response.data.token, fileName: filename, size: size },
+                MessageTypes.FILE_SHARE
+            );
+            chat.isAlreadySent = true
+            console.log(chat)
+            createNotification('Shared File', 'File has been shared with ' + chatId);
+        }
+
+        return {
+            reset,
+            handleInput,
+            searchTerm,
+            searchResults,
+            selectedPaths,
+            shareFile,
+            alreadySentChatIds
+        };
+    },
+});
 </script>
 
 <style scoped>
-    .mh-48 {
-        max-height: 10rem;
-    }
+.mh-48 {
+    max-height: 10rem;
+}
 </style>
