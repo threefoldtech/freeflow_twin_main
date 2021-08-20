@@ -74,7 +74,12 @@
             </div>
             <form class="w-full" @submit.prevent="chatsend">
                 <div class="mt-1 border-b border-gray-300 focus-within:border-icon">
-                    <input type="text" ref="message" class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-icon focus:ring-0 sm:text-sm" placeholder='Write a message ...'>
+                    <input
+                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-icon focus:ring-0 sm:text-sm"
+                        autofocus
+                        type="text"
+                        ref="message"
+                        placeholder='Write a message ...'>
                 </div>
             </form>
 
@@ -326,6 +331,7 @@
             };
 
             nextTick(() => {
+                message.value.focus();
                 const emojiPicker = document.querySelector('unicode-emoji-picker');
                 emojiPicker.addEventListener('emoji-pick', event => {
                     message.value.value = `${message.value.value}${event.detail.emoji}`;
@@ -356,10 +362,15 @@
             };
 
             const getActionMessage = computed(() => {
-                if (action.value.message.type === MessageTypes.QUOTE)
-                    return (action.value.message.body as QuoteBodyType).message;
+                switch (action.value.message.type) {
+                    case MessageTypes.QUOTE:
+                        return (action.value.message.body as QuoteBodyType).message;
+                    case  MessageTypes.STRING:
+                        return action.value.message.body;
+                    default:
+                        return action.value.message.type;
 
-                return action.value.message.body;
+                }
             });
 
             const collapsed = ref(true);
