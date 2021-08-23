@@ -1,11 +1,33 @@
 <template>
-    <div id="docwrapper" class="h-screen">
+<div v-if="fileType">
+    <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
         <div id="placeholder"></div>
     </div>
+    <div v-else class="flex items-center justify-center bg-gray-100 h-screen">
+        <div v-if="fileType == FileType.Video">
+            <video controls >
+                <source :src="readUrl" >
+            </video>
+        </div>
+        <div v-else-if="fileType == FileType.Image">
+            <img :src="readUrl" />
+        </div>
+        </div>
+</div>
 </template>
 
 <script lang="ts">
-    import { defineComponent, onMounted, ref } from 'vue';
+    const generateUrl = (
+        protocol:("http"|"https"),
+        owner:string,
+        path:string,
+        token:string,
+        )=> {
+            return `${protocol}://${owner}/api/browse/internal/files?path=${path}&token=${token}`;
+        }
+
+
+    import { computed, defineComponent, onMounted, ref } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import {
         createModel,
@@ -31,6 +53,12 @@
         setup() {
             const route = useRoute();
             const router = useRouter();
+            const fileType = ref<FileType>()
+            const readUrl = ref<string>()
+            
+            const isSupportedInDocumentServer = computed(()=> {
+return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x => x === fileType.value)
+            })
 
             onMounted(async () => {
                 const path = atob(<string>route.params.path);
@@ -43,14 +71,26 @@
                     const shareDetails = await fetchShareDetails(shareId);
                     fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
                     name = shareDetails.owner.id;
+                    console.log("sharedetails ", shareDetails)
+                        
+                    let apiEndpoint =  generateUrl("http",`[${shareDetails.owner.location}]`, fileAccesDetails.path,fileAccesDetails.readToken)
+                    apiEndpoint =encodeURIComponent(apiEndpoint);
+                    const externalfileurl = calcExternalResourceLink(apiEndpoint)
+
+
+                    readUrl.value = externalfileurl
                 } else {
                     fileAccesDetails = (await getFileInfo(path)).data;
                     //@todo find better way to get name
                     name = window.location.host.split('.')[0];
+                    readUrl.value = generateUrl('https', window.location.hostname, fileAccesDetails.path,fileAccesDetails.readToken)
+
                 }
 
-                const fileType = getFileType(getExtension(fileAccesDetails.fullName));
-                if ([FileType.Excel, FileType.Word, FileType.Powerpoint].some(x => x === fileType)) {
+                fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
+
+                console.log(fileType.value)
+                if (isSupportedInDocumentServer.value) {
                     documentServerconfig = generateDocumentserverConfig(
                         name,
                         fileAccesDetails.path,
@@ -66,25 +106,22 @@
                         new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
                     });
 
-                    //   } else if (fileType === FileType.Image) {
-                    //       const response = await Api.downloadFile(fileAccesDetails.readToken);
-                    //       const result = window.URL.createObjectURL(response.data);
-                    //       setImageSrc(result);
-                    //   } else if (item.fileType === FileType.Pdf) {
-                    //       const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
-                    //       const file = new Blob([response.data], { type: 'application/pdf' });
-                    //       const url = URL.createObjectURL(file);
-                    //       window.open(url, '_blank');
-                    //   } else if (item.fileType === FileType.Video) {
-                    //       const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
-                    //       const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
-                    //       const url = URL.createObjectURL(file);
-                    //       window.open(url, '_blank');
-                    //   } else {
-                    //       const result = await Api.downloadFile(item.path);
-                    //       fileDownload(result.data, item.fullName);
-                }
+                      }else if (fileType.value === FileType.Image) {
+                        //   readUrl.value = generateUrl(name, fileAccesDetails.path,fileAccesDetails.readToken)
+                            //   const response = await Api.downloadFile(fileAccesDetails.readToken);
+                        //   const result = window.URL.createObjectURL(response.data);
+                        //   setImageSrc(result);
+        
+                      } else if (fileType.value === FileType.Video) {
+                        //   readUrl.value = generateUrl(name, fileAccesDetails.path,fileAccesDetails.readToken)
+                            //   const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
+                        //   const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
+                        //   const url = URL.createObjectURL(file);
+                        //   window.open(url, '_blank');
+                      }
             });
+
+
 
             const generateDocumentserverConfig = (
                 ownerId: string,
@@ -95,8 +132,8 @@
                 extension: string,
                 fileName: string
             ) => {
-                const readUrl = `http://${ownerId}-chat/api/browse/internal/files?path=${path}&token=${readToken}`;
-                const writeUrl = `http://${ownerId}-chat/api/browse/internal/files?path=${path}&token=${writeToken}`;
+                const readUrl = generateUrl('http',`${ownerId}-chat`,path,readToken);
+                const writeUrl = generateUrl('http',`${ownerId}-chat`,path,writeToken);
                 //@todo find better way to get name
                 const name = window.location.host.split('.')[0];
                 return {
@@ -122,6 +159,12 @@
                     },
                 };
             };
+            return {
+                FileType,
+                fileType,
+                isSupportedInDocumentServer,
+                readUrl
+            }
         },
     });
 </script>

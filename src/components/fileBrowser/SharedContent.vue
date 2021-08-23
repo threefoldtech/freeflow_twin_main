@@ -87,13 +87,15 @@
                     return;
                 }
                 console.log("going to", item.path)
-                return router.push({
+                const url =  router.resolve({
                     name: 'editfile',
                     params: {
                         path: btoa(item.path),
                         shareId: item.id,
                     },
+                    
                 });
+                window.open(url.href, '_blank')
             };
 
             return {
