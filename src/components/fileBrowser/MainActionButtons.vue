@@ -1,5 +1,5 @@
 <template>
-    <div class="mr-2">
+    <div class="mx-2" :class='{"hidden" : sharedDir}' >
         <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-btngreen">
             <i class="fas fa-plus"></i> New Folder
         </button>
@@ -50,7 +50,7 @@
     import { defineComponent, ref } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { createDirectory, uploadFiles } from '@/store/fileBrowserStore';
+    import { createDirectory, uploadFiles,sharedDir } from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
     import {DocumentTextIcon, XIcon} from '@heroicons/vue/solid';
 
@@ -85,11 +85,11 @@
                 createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
             };
-            
+
             const deleteFile = (file: File) => {
                 selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
                 console.log(newFileInput.value.files);
-                
+
                 const indexOfKey = parseInt(Object.keys(newFileInput.value.files).find(index => newFileInput.value.files[index].name === file.name));
                 console.log(indexOfKey);
                 
@@ -141,6 +141,7 @@
                 clearFiles,
                 updateCreateFileDialog,
                 deleteFile,
+                sharedDir
             };
         },
     });

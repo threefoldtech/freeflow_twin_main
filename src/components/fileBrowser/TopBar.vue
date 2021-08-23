@@ -22,7 +22,7 @@
             </div>
             <div class="flex flex-row items-center">
                 <options></options>
-                <buttons></buttons>
+                <buttons ></buttons>
             </div>
         </div>
         <breadcrumbs></breadcrumbs>

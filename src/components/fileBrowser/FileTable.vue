@@ -216,7 +216,7 @@
         isDraggingFiles,
         sharedDir,
         sharedContent,
-        getSharedContent,
+        getSharedContent, searchResults, searchDirValue,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
@@ -305,6 +305,9 @@
             };
             const goToShared = async () => {
                 sharedDir.value = true;
+                selectedPaths.value = [];
+                searchResults.value = [];
+                searchDirValue.value = '';
                 await getSharedContent();
             };
 
