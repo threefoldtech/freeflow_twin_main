@@ -67,9 +67,9 @@
             const showCreateFolderDialog = ref(false);
             const showCreateFileDialog = ref(false);
             const newFolderInput = ref<HTMLInputElement>();
-            const newFileInput = ref<HTMLInputElement>();
+            const newFileInput = ref<any>(undefined);
             const selectedFiles = ref<File[]>([]);
-            //const newFileInputArray = ref<File[]>([]);
+            const newFileInputArray = ref<File[]>([]);
 
             const updateCreateFolderDialog = (val: boolean) => {
                 if (!val) {
@@ -92,8 +92,13 @@
                 
                 const indexOfKey = parseInt(Object.keys(newFileInput.value.files).find(index => newFileInput.value.files[index].name === file.name));
                 console.log(indexOfKey);
-                delete newFileInput.value.files[indexOfKey];
+                
+                newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
+                newFileInput.value.value = newFileInputArray.value;
+                console.log(newFileInput.value.files);
+                // delete newFileInput.value.files[indexOfKey].name;
             }
+
             const updateCreateFileDialog = (val: boolean) => {
                 if (!val) {
                     showCreateFileDialog.value = false;
@@ -116,7 +121,11 @@
             };
 
             const handleFileSelectChange = () => {
-                Array.from(newFileInput.value?.files).forEach(file => selectedFiles.value.push(file));
+                console.log(selectedFiles.value);
+                newFileInputArray.value = Array.from(newFileInput.value?.files);
+                console.log(newFileInputArray.value);
+                newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+                console.log(selectedFiles.value);
             };
 
             return {
@@ -124,6 +133,7 @@
                 showCreateFileDialog,
                 newFolderInput,
                 newFileInput,
+                newFileInputArray,
                 handleDragAndDrop,
                 updateCreateFolderDialog,
                 handleFileSelectChange,
