@@ -82,7 +82,7 @@
                 </div>
                 <input type="text" v-model='searchValue' class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
             </div>
-            <div v-if="filteredChatRequests.length > 0" class="bg-accent-500 collapsed-bar:hidden px-2">
+            <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2 mt-4">
                 <h2 style="font-size: 1.5em">
                     You have
                     <span style="">
@@ -95,7 +95,7 @@
             <div class="flex-grow overflow-auto">
                 <div
                     v-if="filteredChatRequests.length === 0 && filteredChats.length == 0"
-                    class="text-center collapsed-bar:hidden"
+                    class="text-center collapsed-bar:hidden mt-4"
                 >
                     <p>No messages yet</p>
                     <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
