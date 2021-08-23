@@ -125,7 +125,7 @@
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer"> Files shared with me </span>
+                                            <span class="hover:underline cursor-pointer"> Shared with me </span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
@@ -136,7 +136,7 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                        'bg-accent': highlight(item),
+                                        'bg-accent-300': highlight(item),
                                         'bg-gray-100': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"

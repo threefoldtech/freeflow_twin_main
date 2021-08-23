@@ -172,6 +172,8 @@ export const getFileAccessDetails = async (owner: ContactInterface, shareId: str
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
+    path = encodeURIComponent(path)
+
     let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
@@ -196,3 +198,7 @@ export const getSharedFolderContent = async (
     const res = await axios.get(externalUrl);
     return <PathInfoModel[]>res.data;
 };
+
+export const getShareByPath = async (path:string):Promise<SharedFileInterface> => {
+    return (await axios.get(`${endpoint}/share/path/`, { params: {path} })).data;
+}

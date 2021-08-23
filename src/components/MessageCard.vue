@@ -45,14 +45,13 @@
                         <MessageContent :message="message" :key="message.type"></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
-                        <i class="fas fa-check-double text-accent" v-if="isread"></i>
+                        <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
                         <i class="fas fa-check text-gray-400" v-else></i>
                     </div>
                 </div>
 
                 <div
-                    style="margin-top: auto"
-                    class="group-hover:flex pb-4 pl-4 md:hidden"
+                    class="group-hover:flex pb-4 pl-4 md:hidden mt-auto xl:sticky xl:bottom-0"
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
                 >
                     <span

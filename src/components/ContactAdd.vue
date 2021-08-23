@@ -74,7 +74,7 @@
                                         rounded-md
                                         text-white
                                         bg-btngreen
-                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
                                     "
                                     type="submit"
                                     value="Manually add"

@@ -62,7 +62,7 @@
                             absolute
                             -top-1
                             right-1
-                            bg-accent
+                            bg-accent-300
                             h-4
                             w-4
                             rounded-full
@@ -82,7 +82,7 @@
                 </div>
                 <input type="text" v-model='searchValue' class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
             </div>
-            <div v-if="filteredChatRequests.length > 0" class="bg-indigo-500 collapsed-bar:hidden px-2">
+            <div v-if="filteredChatRequests.length > 0" class="bg-accent-500 collapsed-bar:hidden px-2">
                 <h2 style="font-size: 1.5em">
                     You have
                     <span style="">
@@ -105,12 +105,12 @@
                     v-if="filteredChats && filteredChats.length"
                 >
                     <ChatCard
-                        v-for="chat in filteredChats"
-                        :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
-                        class="w-full rounded-lg collapsed-bar:rounded-none p-2 collapsed-bar:my-0 my-2 cursor-pointer"
-                        @click="setSelected(chat.chatId)"
-                        :collapsed="collapsed"
-                        :chat="chat"
+                        v-for='chat in filteredChats'
+                        :key='`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`'
+                        class='w-full rounded-lg collapsed-bar:rounded-none p-1.5 collapsed-bar:my-0 my-1 cursor-pointer'
+                        @click='setSelected(chat.chatId)'
+                        :collapsed='collapsed'
+                        :chat='chat'
                     />
                 </div>
             </div>

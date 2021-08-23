@@ -113,41 +113,17 @@
         </jdialog>
         <jdialog v-model="showShareDialog" @update-model-value="showShareDialog = false" noActions>
             <template v-slot:title>
-                <h1 class="text-center">Share file</h1>
-                <!--<div class="flex items-end justify-end mr-2">
-          <label class="flex items-center cursor-pointer">
-            
-            <div class="mr-3 text-gray-700 font-medium">
-              Read
-            </div>
-            <div class="relative">
-              
-              <input type="checkbox" v-model="writeRights" class="sr-only">
-              
-              <div class="block bg-gray-600 w-14 h-8 rounded-full"></div>
-              
-              <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
-            </div>
-            
-            <div class="ml-3 text-gray-700 font-medium">
-              Write
-            </div>
-          </label>
-
-        </div> -->
+                <h1 class="text-center">Share files</h1>
             </template>
-            <chatTable :data="chats"></chatTable>
-            <!--<div
-          v-for='chat in chats'
-          class='h-auto border-b border-t border-gray-300 flex flex-row items-center'
-          :key='chat.chatId'
-      >
-        <AvatarImg :id="chat.chatId" alt="contact image" class="my-2"/>
-        <span class="flex-1 ml-2"> {{ chat.chatId }}</span>
-        <div @click="shareFile(chat.chatId)" class="mr-2 hover:bg-gray-200 cursor-pointer">
-          <i class='fas fill-current text-green-400 fa-paper-plane fa-2x'></i>
-        </div>
-      </div>-->
+
+            <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2" :key="selectedTab">
+                <div class="flex-grow" v-for="(tab,index) in tabs" :key="tab">
+                <button @click="selectedTab = index" class="w-full p-2 rounded-xl " :class ="{'bg-btngreen text-white':index==selectedTab}">{{tab}}</button>
+                </div>
+            </div>
+
+            <chatTable v-if="selectedTab === 0" :data="chats"></chatTable>
+            <edit-share v-if="selectedTab === 1 " :selectedFile="selectedPaths[0]"></edit-share>
         </jdialog>
     </div>
 </template>
@@ -175,6 +151,7 @@
     import Dialog from '@/components/Dialog.vue';
     import Button from '@/components/Button.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
+    import EditShare from '@/components/fileBrowser/EditShare.vue';
     import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
     import { useSocketActions } from '@/store/socketStore';
     import Avatar from '@/components/Avatar.vue';
@@ -185,9 +162,15 @@
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
 
+    const tabs = [
+        "Create shares",
+        "Edit shares"
+    ]
+    const selectedTab = ref(0)
+
     export default defineComponent({
         name: 'SelectedOptions',
-        components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable },
+        components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable,EditShare },
         setup() {
             let debounce;
             let showDeleteDialog = ref(false);
@@ -219,18 +202,7 @@
                 selectedAction.value = Action.COPY;
                 await copyPasteSelected();
             }
-            async function shareFile(chatId) {
-                const size = selectedPaths.value[0].size;
-                const filename = selectedPaths.value[0].fullName;
-                const response = await getToken(chatId, selectedPaths.value[0].path, filename, size, writeRights.value);
-                sendMessage(
-                    chatId,
-                    { token: response.data.token, fileName: filename, size: size },
-                    MessageTypes.FILE_SHARE
-                );
-                showShareDialog.value = false;
-                createNotification('Shared File', 'File has been shared with ' + chatId);
-            }
+   
             return {
                 selectedPaths,
                 deleteFiles,
@@ -251,10 +223,11 @@
                 copyFiles,
                 showShareDialog,
                 chats,
-                shareFile,
                 createNotification,
                 sharedDir,
                 writeRights,
+                tabs,
+                selectedTab
             };
         },
     });

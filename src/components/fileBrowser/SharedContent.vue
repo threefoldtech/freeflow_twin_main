@@ -1,8 +1,8 @@
 <template>
     <div class="h-full overflow-y-auto">
-        <h1 class="p-2">Files shared with me:</h1>
+        <h1 class="p-2">Shared with me:</h1>
         <div class="flex flex-row" v-if="sharedContent.length === 0">
-            <h2 class="align-middle ml-2">No files shared with you yet</h2>
+            <h2 class="align-middle ml-2">Nothing has been shared with you yet</h2>
         </div>
         <table class="w-full box-border" v-if="sharedContent.length > 0">
             <thead>
@@ -86,6 +86,7 @@
                     goIntoSharedFolder(item);
                     return;
                 }
+                console.log("going to", item.path)
                 return router.push({
                     name: 'editfile',
                     params: {

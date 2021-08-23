@@ -33,7 +33,7 @@
                 absolute
                 -top-1
                 -right-1
-                bg-accent
+                bg-accent-300
                 h-4
                 w-4
                 rounded-full
