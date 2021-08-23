@@ -88,15 +88,9 @@
             
             const deleteFile = (file: File) => {
                 selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
-                console.log(newFileInput.value.files);
-                
-                const indexOfKey = parseInt(Object.keys(newFileInput.value.files).find(index => newFileInput.value.files[index].name === file.name));
-                console.log(indexOfKey);
                 
                 newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
                 newFileInput.value.value = newFileInputArray.value;
-                console.log(newFileInput.value.files);
-                // delete newFileInput.value.files[indexOfKey].name;
             }
 
             const updateCreateFileDialog = (val: boolean) => {
@@ -117,7 +111,7 @@
 
             const clearFiles = () => {
                 selectedFiles.value = [];
-                console.log(newFileInput.value.files);
+                newFileInput.value.value = null;
             };
 
             const handleFileSelectChange = () => {
