@@ -27,6 +27,7 @@
                     :error="usernameAddError"
                     placeholder="Search for user..."
                     @clicked="handleClicked"
+                    focus
                 ></user-table>
                 <Disclosure v-slot="{ open }">
                     <DisclosureButton
@@ -91,7 +92,7 @@
                     <div>
                         <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
                         <div>
-                            <input type="text" name="groupname" id="groupname" v-model="groupnameAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Group name" />
+                            <input type="text" name="groupname" id="groupname" v-model="groupnameAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Group name" v-focus/>
                         </div>
                     </div>
                     <br />
