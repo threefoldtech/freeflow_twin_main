@@ -12,7 +12,11 @@
         <div v-else-if="fileType == FileType.Image">
             <img :src="readUrl" />
         </div>
+        <div v-else class="text-center">
+            <h1 class="mb-2"> Sorry, we are not able to display the file </h1>
+            <a class="bg-btngreen text-white p-2" :href="readUrl">Download file</a> 
         </div>
+    </div>
 </div>
 </template>
 
@@ -23,6 +27,8 @@
         path:string,
         token:string,
         )=> {
+            path=encodeURIComponent(path)
+            token=encodeURIComponent(token)
             return `${protocol}://${owner}/api/browse/internal/files?path=${path}&token=${token}`;
         }
 
