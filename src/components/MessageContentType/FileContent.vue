@@ -1,5 +1,9 @@
 <template>
-    <a class="px-4 my-2 my-message:bg-my" :href="calcExternalResourceLink(message.body.url)" download>
+    <a
+        class="px-4 my-2 my-message:bg-my"
+        :href="calcExternalResourceLink(message.body.url)"
+        :download='message.body.filename'
+    >
         <div
             class="
                 icon
