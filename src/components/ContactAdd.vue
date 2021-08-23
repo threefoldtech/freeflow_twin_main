@@ -23,7 +23,7 @@
             <div class="flex flex-col">
                 <user-table
                     v-model="usernameAdd"
-                    :data="contacts"
+                    :data="possibleUsers"
                     :error="usernameAddError"
                     placeholder="Search for user..."
                     @clicked="handleClicked"
@@ -249,7 +249,8 @@
             axios.get(`${config.spawnerUrl}api/v1/list`, {}).then(r => {
                 const { user } = useAuthState();
                 const posContacts = <Contact[]>r.data;
-                possibleUsers.value = posContacts.filter(pu => pu.id !== user.id);
+                const alreadyExistingChatIds = [...contacts.map(c => c.id),user.id]
+                possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx =>aEx === pu.id));
             });
 
             return {

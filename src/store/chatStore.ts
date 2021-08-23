@@ -124,6 +124,7 @@ const addChat = (chat: Chat) => {
 
 export const removeChat = chatId => {
     state.chats = state.chats.filter(c => c.chatId !== chatId);
+    state.chatRequests = state.chatRequests.filter(c => c.chatId !== chatId);
     sortChats();
     selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
@@ -482,6 +483,7 @@ export const usechatsActions = () => {
         addGroupchat,
         readMessage,
         acceptChat,
+        removeChat,
         updateContactsInGroup,
         updateChat,
         getNewMessages,
