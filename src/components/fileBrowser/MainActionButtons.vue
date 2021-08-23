@@ -1,5 +1,5 @@
 <template>
-    <div class="mr-2">
+    <div class="mx-2" :class='{"hidden" : sharedDir}' >
         <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-btngreen">
             <i class="fas fa-plus"></i> New Folder
         </button>
@@ -50,7 +50,7 @@
     import { defineComponent, ref } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { createDirectory, uploadFiles } from '@/store/fileBrowserStore';
+    import { createDirectory, uploadFiles,sharedDir } from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
     import {DocumentTextIcon, XIcon} from '@heroicons/vue/solid';
 
@@ -67,9 +67,9 @@
             const showCreateFolderDialog = ref(false);
             const showCreateFileDialog = ref(false);
             const newFolderInput = ref<HTMLInputElement>();
-            const newFileInput = ref<HTMLInputElement>();
+            const newFileInput = ref<any>(undefined);
             const selectedFiles = ref<File[]>([]);
-            //const newFileInputArray = ref<File[]>([]);
+            const newFileInputArray = ref<File[]>([]);
 
             const updateCreateFolderDialog = (val: boolean) => {
                 if (!val) {
@@ -85,15 +85,14 @@
                 createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
             };
-            
+
             const deleteFile = (file: File) => {
                 selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
-                console.log(newFileInput.value.files);
                 
-                const indexOfKey = parseInt(Object.keys(newFileInput.value.files).find(index => newFileInput.value.files[index].name === file.name));
-                console.log(indexOfKey);
-                delete newFileInput.value.files[indexOfKey];
+                newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
+                newFileInput.value.value = newFileInputArray.value;
             }
+
             const updateCreateFileDialog = (val: boolean) => {
                 if (!val) {
                     showCreateFileDialog.value = false;
@@ -112,11 +111,15 @@
 
             const clearFiles = () => {
                 selectedFiles.value = [];
-                console.log(newFileInput.value.files);
+                newFileInput.value.value = null;
             };
 
             const handleFileSelectChange = () => {
-                Array.from(newFileInput.value?.files).forEach(file => selectedFiles.value.push(file));
+                console.log(selectedFiles.value);
+                newFileInputArray.value = Array.from(newFileInput.value?.files);
+                console.log(newFileInputArray.value);
+                newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+                console.log(selectedFiles.value);
             };
 
             return {
@@ -124,6 +127,7 @@
                 showCreateFileDialog,
                 newFolderInput,
                 newFileInput,
+                newFileInputArray,
                 handleDragAndDrop,
                 updateCreateFolderDialog,
                 handleFileSelectChange,
@@ -131,6 +135,7 @@
                 clearFiles,
                 updateCreateFileDialog,
                 deleteFile,
+                sharedDir
             };
         },
     });

@@ -18,7 +18,7 @@
     import { defineComponent, onBeforeMount } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
-    import { updateContent, searchResults, sharedDir } from '@/store/fileBrowserStore';
+    import { updateContent, searchResults, sharedDir, selectedPaths, searchDirValue } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
 
@@ -34,6 +34,10 @@
         setup() {
             onBeforeMount(async () => {
                 await updateContent();
+                sharedDir.value = false;
+                selectedPaths.value = [];
+                searchResults.value = [];
+                searchDirValue.value = '';
             });
 
             return {
