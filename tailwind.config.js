@@ -12,6 +12,7 @@ module.exports = {
                 my: '#d0f0c0',
                 btngreen: '#16a085',
                 btnred: '#ef4444',
+                bordergrey: '#E1E6EB',
             },
         },
     },

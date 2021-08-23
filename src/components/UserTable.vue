@@ -1,18 +1,9 @@
 <template>
-    <div class="flex flex-row items-center">
-        <label class="mr-2" for="username">Username:</label>
-        <input
-            v-model="searchTerm"
-            @focus="handleInput"
-            @input="handleInput"
-            :placeholder="placeholder"
-            v-focus
-            tabindex="0"
-            maxlength="50"
-        />
-        <span v-if="modelValue" @click.prevent="reset()" class="cursor-pointer">
-            <i class="fas fa-times"></i>
-        </span>
+    <div class="mt-4 relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
+        <input type="text" v-model='searchTerm' @focus="handleInput" @input="handleInput" class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" :placeholder="placeholder" v-focus />
     </div>
     <span class="text-red-600" v-if="error != ''"> {{ error }} </span>
     <div class="flex flex-col mt-4">
@@ -51,7 +42,7 @@
                                                     {{ item.id }}
                                                 </div>
                                                 <div class="text-sm text-gray-500">
-                                                    {{ item.location }}
+                                                    <LocationMarkerIcon class="h-5 w-5 text-gray-400" aria-hidden="true" /> {{ item.location }}
                                                 </div>
                                             </div>
                                         </div>
@@ -74,12 +65,14 @@
         </div>
     </div>
 </template>
+
 <script lang="ts">
     import { Contact } from '@/types';
     import { defineComponent, ref, computed, onMounted } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { SearchIcon, LocationMarkerIcon } from '@heroicons/vue/solid';
     export default defineComponent({
-        components: { AvatarImg },
+        components: { AvatarImg, SearchIcon, LocationMarkerIcon },
         props: {
             modelValue: {
                 type: String,

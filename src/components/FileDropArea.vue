@@ -9,22 +9,19 @@
             <div
                 class="
                     flex
-                    border-dashed border-4
-                    w-80
+                    border-dashed border-2
+                    w-full
                     h-40
-                    bg-accent
-                    border-white
+                    border-bordergrey
                     justify-center
                     items-center
                     flex-col
                     bg-opacity-75
                     pointer-events-none
+                    rounded-lg
                 "
             >
-                <div class="">
-                    <i class="fas fa-file fa-3x text-white"></i>
-                </div>
-                <p class="text-white text-lg bold">Drag and drop files here</p>
+                <p class="text-black text-lg bold">Drag and drop files here</p>
             </div>
         </div>
         <slot class="pointer-events-none"></slot>

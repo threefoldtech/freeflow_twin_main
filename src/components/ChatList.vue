@@ -80,7 +80,7 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
-                <input type="text" v-model='searchValue' class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+                <input type="text" v-model='searchValue' class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
             </div>
             <div v-if="filteredChatRequests.length > 0" class="bg-indigo-500 collapsed-bar:hidden px-2">
                 <h2 style="font-size: 1.5em">
@@ -97,7 +97,7 @@
                     v-if="filteredChatRequests.length === 0 && filteredChats.length == 0"
                     class="text-center collapsed-bar:hidden"
                 >
-                    <p>It feels lonely over here :(</p>
+                    <p>No messages yet</p>
                     <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
                 </div>
                 <div
@@ -142,7 +142,7 @@
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
     import { useScrollActions } from '@/store/scrollStore';
-    import { SearchIcon } from '@heroicons/vue/solid'
+    import { SearchIcon } from '@heroicons/vue/solid';
     export default defineComponent({
         name: 'Apps',
         props: {

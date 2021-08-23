@@ -1,7 +1,6 @@
 <template>
     <div
         class="grid place-items-center h-screen"
-        style="background: url(https://www.toptal.com/designers/subtlepatterns/patterns/geometric-leaves.png)"
     >
         <h1>
             Welcome <b>{{ name }}</b

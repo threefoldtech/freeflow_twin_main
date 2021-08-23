@@ -47,32 +47,24 @@
                             focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
                         "
                     >
-                        <span>Advanced</span>
-                        <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform" />
+                        <span class="ml-6">Advanced</span>
+                        <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
                     </DisclosureButton>
                     <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700" for="manualContactAdd"
-                                >Location</label
-                            >
-                            <div class="mt-1">
-                                <input
-                                    id="manualContactAdd"
-                                    v-model="manualContactAdd"
-                                    class="focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm"
-                                    name="manualContactAdd"
-                                    type="text"
-                                />
-                            </div>
                             <div>
+                                <label for="manualContactAdd" class="block text-sm font-medium text-gray-700">Location</label>
+                                <div>
+                                    <input type="text" name="manualContactAdd" id="manualContactAdd" v-model="manualContactAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Location" />
+                                </div>
+                            </div>
+                            <div class="w-full flex justify-end">
                                 <input
                                     class="
-                                        -ml-2
-                                        inline-flex
                                         w-auto
-                                        items-center
                                         px-3
                                         py-2
+                                        mt-2
                                         border
                                         cursor-pointer
                                         border-transparent
@@ -95,9 +87,13 @@
         </form>
         <form v-if="isActive('group')" class="w-full" @submit.prevent="groupAdd">
             <div class="flex place-items-center">
-                <label class="mr-2" for="username">Group name: </label>
                 <div class="w-full">
-                    <input id="username" v-model="groupnameAdd" class="mb-2" maxlength="50" placeholder="Group name" />
+                    <div>
+                        <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
+                        <div>
+                            <input type="text" name="groupname" id="groupname" v-model="groupnameAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Group name" />
+                        </div>
+                    </div>
                     <br />
                     <span v-if="groupnameAddError != ''" class="text-red-600">
                         {{ groupnameAddError }}
@@ -121,7 +117,7 @@
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 text-white rounded-md justify-self-end bg-btngreen">Add Group</button>
+                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btngreen">Add Group</button>
             </div>
         </form>
     </div>

@@ -17,11 +17,11 @@
                 <div class="py-2 flex-col">
                     <slot />
                 </div>
-                <div class="flex justify-end" v-if="!noActions">
-                    <button @click="$emit('update-model-value', false)">
+                <div class="flex justify-end mt-2" v-if="!noActions">
+                    <button class="rounded-md border border-gray-400 px-4 py-2 justify-self-end" @click="$emit('update-model-value', false)">
                         {{ cancelButtonText }}
                     </button>
-                    <button @click="$emit('update-model-value', true)">
+                    <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btngreen" @click="$emit('update-model-value', true)">
                         {{ okButtonText }}
                     </button>
                 </div>

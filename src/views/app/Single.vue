@@ -130,9 +130,9 @@
                                 Do you really want to block
                                 <b> {{ chat.name }} </b>?
                             </div>
-                            <div class="grid grid-cols-2 mt-2">
-                                <button @click="doBlockChat" class="bg-red-500 p-2 text-white font-bold">YES</button>
-                                <button @click="showDialog = false" class="p-2">NO</button>
+                            <div class="flex justify-end mt-2">
+                                <button @click="showDialog = false" class="rounded-md border border-gray-400 px-4 py-2 justify-self-end">Cancel</button>
+                                <button @click="doBlockChat" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred">Delete</button>
                             </div>
                         </jdialog>
                         <jdialog

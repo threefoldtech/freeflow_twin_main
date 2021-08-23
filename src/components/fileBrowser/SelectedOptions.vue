@@ -64,32 +64,50 @@
             </div>
         </div>
 
-        <jdialog v-model="showRenameDialog" @update-model-value="showRenameDialog = false" noActions class="max-w-10">
+        <jdialog v-model='showDeleteDialog' @update-model-value='showDeleteDialog = false' noActions class='max-w-10'>
+            <template v-slot:title class='center'>
+                <h1 class='text-center'>Deleting Files</h1>
+            </template>
+            <div>
+                Do you really want to delete {{ selectedPaths.length }} item(s)? When deleted these items will be forever lost!
+            </div>
+            <div class='flex justify-end mt-2'>
+                <button @click='showDeleteDialog = false' class='rounded-md border border-gray-400 px-4 py-2 justify-self-end'>
+                    Cancel
+                </button>
+                <button @click='deleteFiles(selectedPaths);showDeleteDialog = false;' class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred'>
+                    Delete
+                </button>
+            </div>
+        </jdialog>
+
+        <jdialog v-model="showRenameDialog" @update-model-value="showRenameDialog = false" noActions>
             <template v-slot:title class="center">
                 <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
             <div>
-                <input v-model="newName" :placeholder="selectedPaths[0].name" tabindex="0" maxlength="260" />
+                <label for="rename" class="sr-only">Rename</label>
+                <input type="text" v-model="newName" name="rename" id="rename" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md" :placeholder="selectedPaths[0].name" />
             </div>
-            <div class="grid grid-cols-2 mt-2">
+            <div class="flex justify-end mt-2">
+                <button
+                    @click="
+                        showRenameDialog = false;
+                        newName = '';
+                    "
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                >
+                    Cancel
+                </button>
                 <button
                     @click="
                         renameFile(selectedPaths[0], newName);
                         newName = '';
                         showRenameDialog = false;
                     "
-                    class="bg-red-500 p-2 text-white font-bold"
+                    class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btngreen"
                 >
-                    RENAME
-                </button>
-                <button
-                    @click="
-                        showRenameDialog = false;
-                        newName = '';
-                    "
-                    class="p-2"
-                >
-                    CANCEL
+                    Rename
                 </button>
             </div>
         </jdialog>
@@ -191,7 +209,7 @@
                     searchDir();
                 }, 600);
             }
-
+            
             async function cutFiles() {
                 selectedAction.value = Action.CUT;
                 await copyPasteSelected();
