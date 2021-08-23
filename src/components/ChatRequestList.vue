@@ -9,7 +9,7 @@
                 class='flex items-center rounded-xl py-1 px-2 m-2 bg-red-500 text-white btn disabled:bg-gray-300'
                 @click='denyChatRequest(chat.chatId)'
             >
-                DENY
+                DECLINE
             </button>
             <button
                 class='flex items-center rounded-xl py-1 px-2 m-2 bg-accent-300 text-white btn disabled:bg-gray-300'
