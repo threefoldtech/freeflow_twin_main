@@ -39,6 +39,7 @@
         "socketio-file-upload": "^0.7.3",
         "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.7",
         "tailwindcss-debug-screens": "^2.1.0",
+        "tailwindcss-hero-patterns": "^0.0.1",
         "typescript": "^4.3.5",
         "unicode-emoji-picker": "^1.1.1",
         "universal-cookie": "^4.0.4",
