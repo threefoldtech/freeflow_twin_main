@@ -133,8 +133,9 @@
             };
             const doRemoveFromGroup = () => {
                 const { updateContactsInGroup } = usechatsActions();
-                //@ts-ignore
-                updateContactsInGroup(props.chat.chatId, toBeRemovedUser, true);
+                updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, true);
+                showRemoveUserDialog.value = false;
+                toBeRemovedUser.value = null
             };
             const addToGroup = contact => {
                 const { updateContactsInGroup } = usechatsActions();
