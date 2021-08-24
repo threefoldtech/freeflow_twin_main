@@ -21,6 +21,7 @@
 
     console.log('Version: ' + version);
 
+    //@ts-ignore
     const isDev = import.meta.env.DEV;
     const location = ref();
     myYggdrasilAddress().then(v => location.value = v);
