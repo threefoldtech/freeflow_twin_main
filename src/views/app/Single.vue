@@ -37,7 +37,7 @@
                             <span class="ml-1 text-left">Call</span>
                         </button>
 
-                        <button @click="null" class="flex">
+                        <button @click="infoChat" class="flex">
                             <div class="w-8">
                                 <i class="fas fa-info-circle"></i>
                             </div>
@@ -136,6 +136,118 @@
                             </div>
                         </jdialog>
                         <jdialog
+                            v-model="showInfo"
+                            @update-model-value="showInfo = false"
+                            noActions
+                            class="max-w-10"
+                        >
+                            <template v-slot:title class="center">
+                                <h1 class="text-center">Info</h1>
+                            </template>
+                            <div class="grid grid-cols-2">
+                                <a
+                                    :class="{ active: isActive('edit') }"
+                                    class="nav-link grid-cols-6 text-center py-2"
+                                    href="#"
+                                    @click.prevent="setActive('edit')"
+                                >
+                                    Edit users
+                                </a>
+                                <a
+                                    :class="{ active: isActive('add') }"
+                                    class="nav-link grid-cols-6 text-center py-2"
+                                    href="#"
+                                    @click.prevent="setActive('add')"
+                                >
+                                    Add users
+                                </a>
+                            </div>
+                            <!-- Edit users in groupchat -->
+                            <div class="flex flex-col mt-4" v-if="isActive('edit')">
+                                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                          Username
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                    <tr v-for='contact in chat.contacts' :key='contact.id + chat.contacts.length'>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                            <div class="flex items-center justify-between">
+                                                                <div class="flex">
+                                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                                        <AvatarImg :id="contact.id" alt="contact image" />
+                                                                    </div>
+                                                                    <div class="ml-4">
+                                                                        <div class="text-sm font-medium text-gray-900">
+                                                                            {{ contact.id }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                v-if='iAmAdmin' @click='removeFromGroup(contact)'
+                                                                class="text-white py-2 px-4 rounded-md justify-self-end bg-btnred"
+                                                                >
+                                                                    Remove
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Add users in groupchat -->
+                            <div class="flex flex-col mt-4" v-if="isActive('add')">
+                                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                                        <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                                            <table class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
+                                                    <tr>
+                                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                          Username
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-white divide-y divide-gray-200">
+                                                    <tr v-for='(contact, i) in contacts' :key='i'>
+                                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                                            <div class="flex items-center justify-between">
+                                                                <div class="flex">
+                                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                                        <AvatarImg :id="contact.id" alt="contact image" />
+                                                                    </div>
+                                                                    <div class="ml-4">
+                                                                        <div class="text-sm font-medium text-gray-900">
+                                                                            {{ contact.id }}
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <button
+                                                                v-if='iAmAdmin' @click='addToGroup(contact)'
+                                                                class="text-white py-2 px-4 rounded-md justify-self-end bg-btngreen"
+                                                                >
+                                                                    Add
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </jdialog>
+                        <jdialog
                             v-model="showDeleteDialog"
                             @update-model-value="showDeleteDialog = false"
                             noActions
@@ -153,6 +265,25 @@
                                 <button @click="doDeleteChat" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred">Delete</button>
                             </div>
                         </jdialog>
+                        <jdialog
+                            v-model="showRemoveUserDialog"
+                            @update-model-value="showRemoveUserDialog = false; toBeRemovedUser=null"
+                            noActions
+                            class="max-w-10"
+                        >
+                            <template v-slot:title class="center">
+                                <h1 class="text-center">Remove User</h1>
+                            </template>
+                            <div>
+                                Do you really want to Remove the user from
+                                <b> {{ chat.name }} </b>?
+                            </div>
+                            <div class="flex justify-end mt-2">
+                                <button @click="showRemoveUserDialog = false" class="rounded-md border border-gray-400 px-4 py-2 justify-self-end">Cancel</button>
+                                <button @click="doRemoveFromGroup" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred">Remove</button>
+                            </div>
+                        </jdialog>
+                        
                     </FileDropArea>
                 </div>
                 <div class="grid h-full w-full place-items-center" v-else>
@@ -226,6 +357,7 @@
     import appLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
     import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
+    import { useContactsState } from '@/store/contactStore';
 
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
@@ -280,7 +412,8 @@
 
             const { retrievechats, sendFile } = usechatsActions();
             onBeforeMount(retrievechats);
-
+            
+            const { contacts } = useContactsState();
             const { chats } = usechatsState();
             const { sendMessage } = usechatsActions();
             const { user } = useAuthState();
@@ -290,6 +423,9 @@
             const router = useRouter();
             let showDialog = ref(false);
             let showDeleteDialog = ref(false);
+            let showInfo = ref(false);
+            const showRemoveUserDialog = ref(false);
+            const toBeRemovedUser = ref();
             const propRefs = toRefs(props);
             const truncate = (value, limit = 20) => {
                 if (value.length > limit) {
@@ -386,6 +522,9 @@
             const deleteChat = () => {
                 showDeleteDialog.value = true;
             };
+            const infoChat = () => {
+                showInfo.value = true;
+            };
             const doDeleteChat = () => {
                 sendRemoveChat(chat.value.chatId);
                 router.push({ name: 'chat' });
@@ -453,6 +592,46 @@
                 return isBlocked(<string>chat.value.chatId);
             });
 
+            
+
+            const removeFromGroup = contact => {
+                showRemoveUserDialog.value = true;
+                toBeRemovedUser.value = contact;
+            };
+            const doRemoveFromGroup = () => {
+                const { updateContactsInGroup } = usechatsActions();
+                //@ts-ignore
+                updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
+            };
+
+            const iAmAdmin = computed(() => {
+                const { user } = useAuthState();
+                //@ts-ignore
+                console.log(chat.value.adminId);
+                return chat.value.adminId == user.id;
+            });
+
+            let activeItem = ref('edit');
+            const isActive = menuItem => {
+                return activeItem.value === menuItem;
+            };
+
+            const setActive = menuItem => {
+                activeItem.value = menuItem;
+            };
+
+            const addToGroup = contact => {
+                const { updateContactsInGroup } = usechatsActions();
+                //@ts-ignore
+                updateContactsInGroup(chat.value.chatId, contact, false);
+            };
+            const filteredContacts = computed(() => {
+                return contacts.filter(
+                    //@ts-ignore
+                    c => !chat.value.contacts.map(x => x.id).includes(c.id),
+                );
+            });
+
             return {
                 chats,
                 selectedId,
@@ -467,6 +646,7 @@
                 statusList,
                 popupMeeting,
                 deleteChat,
+                infoChat,
                 doDeleteChat,
                 blockChat,
                 doBlockChat,
@@ -475,6 +655,7 @@
                 reads,
                 showDialog,
                 showDeleteDialog,
+                showInfo,
                 showMenu,
                 showSideBar: getShowSideBar(),
                 toggleSideBar,
@@ -483,10 +664,23 @@
                 blocked,
                 sendFile,
                 isLoading,
+                removeFromGroup,
+                showRemoveUserDialog,
+                toBeRemovedUser,
+                doRemoveFromGroup,
+                iAmAdmin,
+                isActive,
+                setActive,
+                addToGroup,
+                contacts: filteredContacts,
                 ...propRefs,
             };
         },
     });
 </script>
 
-<style scoped type="text/css"></style>
+<style scoped type="text/css">
+    a.active {
+        background: #e5e7eb;
+    }
+</style>
