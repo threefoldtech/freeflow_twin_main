@@ -28,7 +28,9 @@
                        class='focus:ring-accent-500 focus:border-accent-500 block w-full pr-10 sm:text-sm border-gray-300 rounded-md'
                        name='searchTerm'
                        placeholder='Search ...'
-                       type='text'>
+                       type='text'
+                       v-focus
+                >
 
             </div>
             <div
