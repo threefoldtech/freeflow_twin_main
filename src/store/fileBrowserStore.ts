@@ -153,10 +153,8 @@ export const goToFolderInCurrentDirectory = (item: PathInfoModel) => {
 };
 
 export const goToHome = () => {
-    if (sharedDir.value === true) {
-        sharedDir.value = false;
-        return;
-    }
+    sharedDir.value = false;
+    currentShare.value= undefined
     currentDirectory.value = rootDirectory;
 };
 
