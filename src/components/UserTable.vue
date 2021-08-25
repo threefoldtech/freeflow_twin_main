@@ -5,7 +5,6 @@
         </div>
         <input type="text" v-model='searchTerm' @focus="handleInput" @input="handleInput" class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" :placeholder="placeholder" v-focus />
     </div>
-    <span class="text-red-600" v-if="error != ''"> {{ error }} </span>
     <div class="flex flex-col mt-4">
         <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -68,16 +67,12 @@
 
 <script lang="ts">
     import { Contact } from '@/types';
-    import { defineComponent, ref, computed, onMounted } from 'vue';
+    import { defineComponent, ref, computed, onMounted, PropType } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon, LocationMarkerIcon } from '@heroicons/vue/solid';
     export default defineComponent({
         components: { AvatarImg, SearchIcon, LocationMarkerIcon },
         props: {
-            modelValue: {
-                type: String,
-                required: false,
-            },
             placeholder: {
                 type: String,
                 required: false,
@@ -87,33 +82,21 @@
                 type: Array,
                 required: true,
             },
-            error: {
-                type: String,
-                default: '',
-            },
         },
-        emits: ['update:modelValue', 'clicked'],
+        emits: ['addContact'],
 
         setup(props, { emit }) {
             const chosenOption = ref('');
             const searchTerm = ref('');
 
             const reset = () => {
-                emit('update:modelValue', '');
                 chosenOption.value = '';
                 searchTerm.value = '';
             };
 
-            const handleInput = evt => {
-                emit('update:modelValue', evt.target.value);
-            };
-
-            const handleClick = item => {
-                console.log(chosenOption.value);
-                chosenOption.value = item.id;
-                searchTerm.value = item.id;
-                emit('update:modelValue', item.id);
-                emit('clicked');
+            const handleClick = (item:Contact) => {
+                console.log(item);
+                emit('addContact', item);
             };
 
             const searchResults = () => {
@@ -124,7 +107,6 @@
 
             return {
                 reset,
-                handleInput,
                 handleClick,
                 chosenOption,
                 searchTerm,

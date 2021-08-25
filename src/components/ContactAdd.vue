@@ -19,14 +19,11 @@
             </a>
         </div>
 
-        <form v-if="isActive('user')" class="w-full" @submit.prevent="contactAdd">
             <div class="flex flex-col">
                 <user-table
-                    v-model="usernameAdd"
                     :data="possibleUsers"
-                    :error="usernameAddError"
                     placeholder="Search for user..."
-                    @clicked="handleClicked"
+                    @addContact="contactAdd"
                     focus
                 ></user-table>
                 <Disclosure v-slot="{ open }">
@@ -49,18 +46,24 @@
                         "
                     >
                         <span class="ml-6">Advanced</span>
+
                         <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
                     </DisclosureButton>
                     <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
                         <div>
                             <div>
-                                <label for="manualContactAdd" class="block text-sm font-medium text-gray-700">Location</label>
+                                <label for="manualContactAddUsername" class="block text-sm font-medium text-gray-700">Name</label>
                                 <div>
-                                    <input type="text" name="manualContactAdd" id="manualContactAdd" v-model="manualContactAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Location" />
+                                    <input type="text" name="manualContactAddUsername" id="manualContactAddUsername" v-model="manualContactAddUsername" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Username" />
+                                    <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
+                                </div>
+                                <label for="manualContactAddLocation" class="block text-sm font-medium text-gray-700">Location</label>
+                                <div>
+                                    <input type="text" name="manualContactAddLocation" id="manualContactAddLocation" v-model="manualContactAddLocation" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Location" />
                                 </div>
                             </div>
                             <div class="w-full flex justify-end">
-                                <input
+                                <button
                                     class="
                                         w-auto
                                         px-3
@@ -77,15 +80,14 @@
                                         bg-btngreen
                                         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
                                     "
-                                    type="submit"
-                                    value="Manually add"
-                                />
+                                    value=""
+                                    @click="contactAdd"
+                                >Manually add</button>
                             </div>
                         </div>
                     </DisclosurePanel>
                 </Disclosure>
             </div>
-        </form>
         <form v-if="isActive('group')" class="w-full" @submit.prevent="groupAdd">
             <div class="flex place-items-center">
                 <div class="w-full">
@@ -139,6 +141,7 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
 
+
     export default defineComponent({
         name: 'ContactAdd',
         components: {
@@ -155,7 +158,6 @@
             const { contacts } = useContactsState();
             //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
             let addGroup = ref(false);
-            let usernameAdd = ref('');
             let userAddLocation = ref('');
             let usernameAddError = ref('');
             let groupnameAdd = ref('');
@@ -164,35 +166,33 @@
             let usersInGroup = ref<Contact[]>([]);
             let possibleUsers = ref<Contact[]>([]);
             let contactAddError = ref('');
-            let manualContactAdd = ref('');
 
-            const contactAdd = () => {
-                try {
-                    let userId = usernameAdd.value;
-                    if (!userId) {
-                        usernameAddError.value = 'Cannot add empty user!';
-                        return;
-                    }
+            let manualContactAddUsername = ref<string>('');
+            let manualContactAddLocation = ref('');
 
-                    if (!manualContactAdd && !possibleUsers.value.find(pu => pu.id === userId)) {
-                        usernameAddError.value = 'Not able to find DigitalTwin of this user';
-                        return;
-                    }
+            const contactAdd = (contact:Contact) => {
+                const contactToAdd:Contact = {
+                    id: contact?.id ? contact.id : manualContactAddUsername.value,
+                    location:  contact?.location ? contact.location : manualContactAddLocation.value
+                } 
+                console.log("contact to add ", contactToAdd)
+                try {   
                     const { chats } = usechatsState();
-                    if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == userId)) {
+
+                    if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
                         usernameAddError.value = 'Already added this user';
                         return;
                     }
                     const { addContact } = useContactsActions();
-                    addContact(userId, manualContactAdd.value ? manualContactAdd.value : userAddLocation.value);
-                    usernameAdd.value = '';
+                    addContact( contactToAdd.id  ,contactToAdd.location);
+                    manualContactAddUsername.value = undefined;
                     contactAddError.value = '';
                     emit('closeDialog');
 
                     //@todo: setTimeout is dirty should be removed
                     // next tick was not possible reason: chat was not loaded yet
                     setTimeout(() => {
-                        selectedId.value = userId;
+                        selectedId.value = <string>contactToAdd.id;
                     }, 1000);
                 } catch (err) {
                     console.log('adding contact failed');
@@ -200,11 +200,8 @@
                 }
             };
 
-            const handleClicked = () => {
-                const posUser = possibleUsers.value.find(pu => pu.id == usernameAdd.value);
-                if (posUser) {
-                    userAddLocation.value = posUser.location;
-                }
+            const handleClicked = (item) => {
+                    userAddLocation.value = item.location;
             };
 
             let activeItem = ref('user');
@@ -256,7 +253,6 @@
 
             return {
                 addGroup,
-                usernameAdd,
                 usernameAddError,
                 groupnameAdd,
                 groupnameAddError,
@@ -270,7 +266,8 @@
                 contacts,
                 possibleUsers,
                 handleClicked,
-                manualContactAdd,
+                manualContactAddUsername,
+                manualContactAddLocation,
             };
         },
     });
