@@ -45,5 +45,6 @@ module.exports = {
         require('@tailwindcss/forms'),
         require('@tailwindcss/typography'),
         require('tailwindcss-debug-screens'),
+        require('tailwindcss-hero-patterns'),
     ],
 };

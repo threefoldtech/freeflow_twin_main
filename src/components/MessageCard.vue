@@ -1,16 +1,16 @@
 <template>
     <div
-        class="group flex flex-row"
+        class="group flex flex-row lg:flex-row"
         :class="{
             'mb-2': isLastMessage,
-            'my-message': isMine,
+            'my-message flex-row-reverse ': isMine,
         }"
         v-if="message.type !== MessageTypes.SYSTEM"
         @click="selectedMessageId = message.id"
     >
         <AvatarImg
             small
-            class="mr-2"
+            class="mx-2"
             :class="{
                 'opacity-0': !isLastMessage,
             }"
@@ -18,7 +18,7 @@
             :showOnlineStatus="false"
         />
         <div class="flex-1">
-            <div class="flex flex-row flex-wrap">
+            <div class="flex flex-row flex-wrap my-message:flex-row-reverse lg:my-message:flex-row">
                 <div
                     class="
                         flex flex-col
@@ -41,7 +41,7 @@
                     >
                         {{ message.from }}
                     </header>
-                    <main class="max-w-[500px] break-all flex justify-between">
+                    <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
                         <MessageContent :message="message" :key="message.type"></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">

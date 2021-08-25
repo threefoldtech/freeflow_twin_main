@@ -247,7 +247,7 @@
             };
 
             // @todo: config
-            axios.get(`${config.spawnerUrl}api/v1/list`, {}).then(r => {
+            axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
                 const { user } = useAuthState();
                 const posContacts = <Contact[]>r.data;
                 const alreadyExistingChatIds = [...contacts.map(c => c.id),user.id]

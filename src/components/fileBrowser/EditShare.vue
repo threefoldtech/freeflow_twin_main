@@ -41,7 +41,7 @@
 </template>
 <script lang="ts">
 import { Chat, SharedFileInterface } from '@/types';
-import { selectedPaths, getToken } from '@/store/fileBrowserStore';
+import { selectedPaths, addShare } from '@/store/fileBrowserStore';
 import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
 import Toggle from '@/components/Toggle.vue';
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';

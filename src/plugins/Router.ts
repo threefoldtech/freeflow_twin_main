@@ -14,6 +14,7 @@ import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
 import config from '../../public/config/config';
+import { disableSidebar } from '@/services/sidebarService';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -110,6 +111,13 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
+    }
+    next();
+});
+
+router.beforeEach(async (to, from, next) => {
+    if (document.body.clientWidth < 1280) {
+        disableSidebar();
     }
     next();
 });

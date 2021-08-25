@@ -6,8 +6,8 @@
             v-focus
             tabindex="0"
             maxlength="50"
-             class="focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border border-gray-300 rounded-md mb-2 p-1" 
-             placeholder="Search" 
+             class="focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border border-gray-300 rounded-md mb-2 p-1"
+             placeholder="Search"
         />
     <div class="flex flex-col">
         <div class="-my-2 sm:-mx-6 lg:-mx-8">
@@ -110,7 +110,7 @@
 </template>
 <script lang="ts">
 import { Chat } from '@/types';
-import { selectedPaths, getToken } from '@/store/fileBrowserStore';
+import { selectedPaths, addShare } from '@/store/fileBrowserStore';
 import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
 import Toggle from '@/components/Toggle.vue';
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
@@ -133,7 +133,7 @@ export default defineComponent({
         const searchTerm = ref('');
         const chats = ref([])
         const alreadySentChatIds = ref(<String[]>[])
-        
+
 
         onBeforeMount(()=>{
            chats.value =  props.data.map( (item:Chat) => {
@@ -170,12 +170,7 @@ export default defineComponent({
             const chat = chats.value.find(chat =>chat.chatId ==chatId)
             console.log(chat)
 
-            const response = await getToken(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
-            sendMessage(
-                chatId,
-                { token: response.data.token, fileName: filename, size: size },
-                MessageTypes.FILE_SHARE
-            );
+            await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
             chat.isAlreadySent = true
             console.log(chat)
             createNotification('Shared File', 'File has been shared with ' + chatId);

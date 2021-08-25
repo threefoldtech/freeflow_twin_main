@@ -1,28 +1,15 @@
 <template>
     <div>
         <div class="flex flex-row my-4 items-center justify-between">
-            <div class="collapsed-bar:hidden px-2 relative" v-if="sharedDir === false">
-                <input
-                    type="text"
-                    placeholder="Search"
-                    class="px2-2 border-gray-200 border-2 focus:border-accent-300 border-r rounded-lg"
-                    v-model="searchDirValue"
-                    @input="debounceSearch"
-                />
-                <span
-                    v-if="searchDirValue"
-                    @click.prevent="
-                        searchDirValue = '';
-                        searchResults = [];
-                    "
-                    class="absolute inset-y-0 right-1 pr-3 flex items-center cursor-pointer"
-                >
-                    x
-                </span>
+            <div class="mt-1 mx-2 relative rounded-md shadow-sm" v-if="sharedDir === false">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
+                <input type="text" v-model="searchDirValue" @input="debounceSearch" class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
             </div>
             <div class="flex flex-row items-center">
                 <options></options>
-                <buttons ></buttons>
+                <buttons></buttons>
             </div>
         </div>
         <breadcrumbs></breadcrumbs>
@@ -44,7 +31,7 @@
         moveFiles,
         selectedAction,
         Action,
-        getToken,
+        addShare,
         sharedDir,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
@@ -56,7 +43,7 @@
     import { useSocketActions } from '@/store/socketStore';
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
-
+    import { SearchIcon } from '@heroicons/vue/solid';
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
 
@@ -68,6 +55,7 @@
             breadcrumbs: Breadcrumbs,
             options: SelectedOptions,
             buttons: MainActionButtons,
+            SearchIcon
         },
         setup() {
             let debounce;
