@@ -1,15 +1,37 @@
 <template>
-    <component
-        :is="contentComponent"
-        :message="message"
-        :preventRecursion="preventRecursion"
-        :type="contentComponent"
+    <StringContent
+        v-if='message.type === MessageTypes.STRING'
+        :message='message' />
+    <SystemContent
+        v-else-if='message.type === MessageTypes.SYSTEM'
+        :message='message' />
+    <AudioContent
+        v-else-if='message.type === MessageTypes.FILE && isAudio(message.body.filename)'
+        :message='message' />
+    <ImageContent
+        v-else-if='message.type === MessageTypes.FILE && isImage(message.body.filename)'
+        :message='message' />
+    <FileContent
+        v-else-if='message.type === MessageTypes.FILE'
+        :message='message' />
+    <GifContent
+        v-else-if='message.type === MessageTypes.GIF'
+        :message='message' />
+    <QuoteContent
+        v-else-if='message.type === MessageTypes.QUOTE'
+        :message='message'
+        :preventRecursion='preventRecursion'
     />
+    <FileShareContent
+        v-else-if='message.type === MessageTypes.FILE_SHARE'
+        :message='message'
+    />
+    <StringContent
+        v-else
+        :message='message' />
 </template>
 
-<script lang="ts">
-    import { defineComponent } from 'vue';
-
+<script lang='ts' setup>
     import StringContent from '@/components/MessageContentType/StringContent.vue';
     import SystemContent from '@/components/MessageContentType/SystemContent.vue';
     import FileContent from '@/components/MessageContentType/FileContent.vue';
@@ -18,34 +40,13 @@
     import GifContent from '@/components/MessageContentType/GifContent.vue';
     import QuoteContent from '@/components/MessageContentType/QuoteContent.vue';
     import FileShareContent from '@/components/MessageContentType/FileShareContent.vue';
-    import { getComponentForType } from '@/services/contentService';
+    import { isAudio, isImage } from '@/services/contentService';
+    import { Message, MessageBodyType, MessageTypes } from '@/types';
 
-    export default defineComponent({
-        name: 'MessageContent',
-        components: {
-            StringContent,
-            SystemContent,
-            FileContent,
-            AudioContent,
-            ImageContent,
-            GifContent,
-            FileShareContent,
-            QuoteContent,
-        },
-        props: {
-            message: {
-                type: Object,
-                required: true,
-            },
-            preventRecursion: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        setup(props) {
-            return {
-                contentComponent: getComponentForType(props.message),
-            };
-        },
-    });
+    interface Props {
+        message: Message<MessageBodyType>;
+        preventRecursion?: boolean;
+    }
+
+    const props = withDefaults(defineProps<Props>(), { preventRecursion: false });
 </script>
