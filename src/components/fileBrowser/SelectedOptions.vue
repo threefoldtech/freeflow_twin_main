@@ -145,7 +145,7 @@
         moveFiles,
         selectedAction,
         Action,
-        getToken,
+        addShare,
         sharedDir,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
@@ -192,7 +192,7 @@
                     searchDir();
                 }, 600);
             }
-            
+
             async function cutFiles() {
                 selectedAction.value = Action.CUT;
                 await copyPasteSelected();
@@ -202,7 +202,7 @@
                 selectedAction.value = Action.COPY;
                 await copyPasteSelected();
             }
-   
+
             return {
                 selectedPaths,
                 deleteFiles,

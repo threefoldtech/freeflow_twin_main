@@ -31,7 +31,7 @@
         moveFiles,
         selectedAction,
         Action,
-        getToken,
+        addShare,
         sharedDir,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';

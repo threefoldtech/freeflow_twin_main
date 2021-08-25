@@ -1,15 +1,15 @@
 import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { Router, useRouter } from 'vue-router';
+import { getShareWithId } from '@/services/fileBrowserService';
+import { Router } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { getShareWithId } from '@/services/fileBrowserService';
 import { ContactInterface, DtId, SharedFileInterface } from '@/types';
-import axios, { ResponseType } from 'axios';
+import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 
@@ -547,9 +547,8 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
     });
 };
 
-export const getToken = async (userId: string, path: string, filename: string, size: number, writable) => {
-    const result = await Api.addShare(userId, path, filename, size, writable);
-    return result;
+export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
+    return await Api.addShare(userId, path, filename, size, writable);
 };
 
 export const parseJwt = token => {

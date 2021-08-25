@@ -40,7 +40,8 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('message', message => {
         const { user } = useAuthState();
-        if (message.type === 'FILE_SHARE' && user.id === message.to) {
+        if (message.type === 'FILE_SHARE_REQUEST') {
+            return;
         }
         if (message.type === 'READ') {
             handleRead(message);
