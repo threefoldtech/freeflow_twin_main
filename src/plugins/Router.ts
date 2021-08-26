@@ -63,13 +63,13 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true, app: AppType.Quantum },
     },
     {
-        path: '/filebrowser/edit/:path/:shareId?',
+        path: '/quantum/edit/:path/:shareId?',
         name: 'editfile',
         component: EditFile,
         meta: {
-            back: 'filebrowser',
+            back: 'quantum',
             requiresAuth: true,
-            app: AppType.Filebrowser,
+            app: AppType.Quantum,
         },
     },
     {
