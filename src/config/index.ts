@@ -1,6 +1,5 @@
 interface IConfig {
     baseUrl: string,
-    spawnerUrl: string,
     appBackend: string,
     documentServerUrl: string,
     giphyApiKey: string,
