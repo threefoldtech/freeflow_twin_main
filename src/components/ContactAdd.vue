@@ -19,7 +19,7 @@
             </a>
         </div>
 
-            <div class="flex flex-col">
+            <div class="flex flex-col ">
                 <user-table
                     :data="possibleUsers"
                     placeholder="Search for user..."
@@ -174,9 +174,9 @@
                 const contactToAdd:Contact = {
                     id: contact?.id ? contact.id : manualContactAddUsername.value,
                     location:  contact?.location ? contact.location : manualContactAddLocation.value
-                } 
+                }
                 console.log("contact to add ", contactToAdd)
-                try {   
+                try {
                     const { chats } = usechatsState();
 
                     if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
