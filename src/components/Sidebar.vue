@@ -73,11 +73,11 @@
                     icon: 'fas fa-file-alt',
                     enabled: true,
                 },
-                {
-                    name: AppType.Forum,
-                    icon: 'fas fa-stream',
-                    enabled: true,
-                },
+                // {
+                //     name: AppType.Forum,
+                //     icon: 'fas fa-stream',
+                //     enabled: true,
+                // },
                 {
                     name: AppType.Glass,
                     icon: 'fas fa-search',
