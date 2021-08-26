@@ -64,22 +64,22 @@
         setup() {
             const apps = [
                 {
-                    name: AppType.Chat,
+                    name: AppType.Whisper,
                     icon: 'fas fa-comments',
                     enabled: true,
                 },
                 {
-                    name: AppType.Filebrowser,
+                    name: AppType.Quantum,
                     icon: 'fas fa-file-alt',
                     enabled: true,
                 },
+                // {
+                //     name: AppType.Forum,
+                //     icon: 'fas fa-stream',
+                //     enabled: true,
+                // },
                 {
-                    name: AppType.Forum,
-                    icon: 'fas fa-stream',
-                    enabled: true,
-                },
-                {
-                    name: AppType.Browser,
+                    name: AppType.Glass,
                     icon: 'fas fa-search',
                     enabled: true,
                 },

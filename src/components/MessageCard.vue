@@ -36,7 +36,7 @@
                     }"
                 >
                     <header
-                        class="p-4 pt-2 pb-0 -mb-1.5 font-bold my-message:text-icon"
+                        class="p-4 pt-2 pb-0 font-bold my-message:text-icon"
                         v-if="isFirstMessage && isGroup"
                     >
                         {{ message.from }}

@@ -34,42 +34,42 @@ const routes: Array<RouteRecordRaw> = [
         component: Unauthorised,
     },
     {
-        path: '/chat',
+        path: '/whisper',
         component: Basic,
         children: [
             {
                 path: '',
-                name: 'chat',
+                name: 'whisper',
                 component: Chat,
-                meta: { requiresAuth: true, app: AppType.Chat },
+                meta: { requiresAuth: true, app: AppType.Whisper },
             },
             {
                 path: ':id',
                 name: 'single',
                 component: Single,
                 meta: {
-                    back: 'chat',
+                    back: 'whisper',
                     requiresAuth: true,
-                    app: AppType.Chat,
+                    app: AppType.Whisper,
                 },
             },
         ],
     },
     {
         // fake security since the actual filebrowser has no security yet?
-        name: 'filebrowser',
-        path: '/filebrowser',
+        name: 'quantum',
+        path: '/quantum',
         component: FileBrowser,
-        meta: { requiresAuth: true, app: AppType.Filebrowser },
+        meta: { requiresAuth: true, app: AppType.Quantum },
     },
     {
-        path: '/filebrowser/edit/:path/:shareId?',
+        path: '/quantum/edit/:path/:shareId?',
         name: 'editfile',
         component: EditFile,
         meta: {
-            back: 'filebrowser',
+            back: 'quantum',
             requiresAuth: true,
-            app: AppType.Filebrowser,
+            app: AppType.Quantum,
         },
     },
     {
@@ -81,11 +81,11 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        name: 'browser',
-        path: '/browser',
+        name: 'glass',
+        path: '/glass',
         component: Browser,
         meta: {
-            app: AppType.Browser,
+            app: AppType.Glass,
         },
     },
     {

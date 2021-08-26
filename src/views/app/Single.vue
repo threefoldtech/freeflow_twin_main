@@ -427,7 +427,7 @@
             };
             const doDeleteChat = () => {
                 sendRemoveChat(chat.value.chatId);
-                router.push({ name: 'chat' });
+                router.push({ name: 'whisper' });
             };
 
             const blockChat = () => {
@@ -436,7 +436,7 @@
             const doBlockChat = () => {
                 showDialog.value = false;
                 sendBlockChat(chat.value.chatId);
-                router.push({ name: 'chat' });
+                router.push({ name: 'whisper' });
             };
 
             const unBlockChat = async () => {
