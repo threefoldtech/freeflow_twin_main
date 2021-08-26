@@ -29,7 +29,7 @@ export interface Message<T> {
     to: Id | DtId;
     body: T;
     timeStamp: Date;
-    type: String;
+    type: MessageBodyType | String;
     subject: Id | null;
     replies: Message<MessageBodyType>[];
     updated?: Date;
