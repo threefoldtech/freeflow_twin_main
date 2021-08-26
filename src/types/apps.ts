@@ -1,7 +1,7 @@
 export enum AppType {
-    Chat = 'chat',
-    Filebrowser = 'filebrowser',
+    Whisper = 'whisper',
+    Glass = 'glass',
     Forum = 'forum',
-    Browser = 'browser',
+    Quantum = 'quantum',
     Meetings = 'meetings',
 }
