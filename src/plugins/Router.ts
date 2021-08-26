@@ -13,7 +13,7 @@ import EditFile from '@/views/app/EditFile.vue';
 import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
-import config from '../../public/config/config';
+import config from '@/config';
 import { disableSidebar } from '@/services/sidebarService';
 
 const routes: Array<RouteRecordRaw> = [

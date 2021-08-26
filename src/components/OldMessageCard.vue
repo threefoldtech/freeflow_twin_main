@@ -168,7 +168,7 @@
     import { usechatsActions } from '../store/chatStore';
     import { Message, MessageBodyType, QuoteBodyType, StringMessageType } from '../types/index';
     import { uuidv4 } from '@/common';
-    import config from '../../public/config/config';
+    import config from '@/config';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { calculateBaseUrl } from '@/services/urlService';
 

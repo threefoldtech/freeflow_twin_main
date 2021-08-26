@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
-import config from '../../public/config/config';
+import config from '@/config';
 import { createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
 import { ProgressNotification } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';

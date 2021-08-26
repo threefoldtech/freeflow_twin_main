@@ -46,7 +46,7 @@
         getFileType,
     } from '@/store/fileBrowserStore';
     import { get } from 'scriptjs';
-    import config from '../../../public/config/config';
+    import config from '@/config'; '../../../public/config/config';
     import { DtId } from '@/types';
     import axios, { ResponseType } from 'axios';
     import { useAuthState } from '@/store/authStore';

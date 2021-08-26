@@ -4,7 +4,7 @@ import './assets/index.css';
 import router from '@/plugins/Router';
 import '@fortawesome/fontawesome-free/js/all';
 import socketIo from '@/plugins/SocketIo';
-import config from '../public/config/config';
+import config from '@/config'; '@/config';
 import MessageContent from '@/components/MessageContent.vue';
 import { clickOutside } from '@/plugins/ClickOutside';
 import axios from 'axios';

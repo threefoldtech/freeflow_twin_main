@@ -17,7 +17,7 @@ import {
 } from '../types';
 import { useSocketActions } from './socketStore';
 import { useAuthState } from './authStore';
-import config from '../../public/config/config';
+import config from '@/config';
 import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';

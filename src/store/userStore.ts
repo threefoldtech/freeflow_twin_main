@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../../public/config/config';
+import config from '@/config';
 
 export const setNewAvatar = async selectedFile => {
     var formData = new FormData();

@@ -3,7 +3,7 @@ import { toRefs } from 'vue';
 import axios from 'axios';
 import moment from 'moment';
 import { Contact, MessageTypes, SystemBody, SystemMessageTypes } from '../types';
-import config from '../../public/config/config';
+import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
 import { Chat } from '../types';
 import { usechatsActions, usechatsState } from './chatStore';

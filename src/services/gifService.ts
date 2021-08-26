@@ -1,5 +1,5 @@
 import { GiphyFetch } from '@giphy/js-fetch-api/dist';
-import config from '../../public/config/config';
+import config from '@/config';
 
 const gf = new GiphyFetch(config.giphyApiKey);
 
