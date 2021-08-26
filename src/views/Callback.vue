@@ -18,5 +18,5 @@
     localStorage.setItem('user', JSON.stringify(user));
 
     const router = useRouter();
-    router.push('/chat');
+    router.push('/whisper');
 </script>
