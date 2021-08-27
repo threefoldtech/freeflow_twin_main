@@ -22,7 +22,7 @@
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
                         @click="showAddUserDialog = true"
-                        class="bg-icon rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                        class="bg-primary rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
                     >
                         <i class="fas fa-plus"></i>
                     </button>
@@ -80,7 +80,7 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
-                <input type="text" v-model='searchValue' class="focus:ring-btngreen focus:border-btngreen block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+                <input type="text" v-model='searchValue' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
             </div>
             <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2 mt-4">
                 <h2 style="font-size: 1.5em">

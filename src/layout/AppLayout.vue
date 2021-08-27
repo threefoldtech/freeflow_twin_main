@@ -17,7 +17,7 @@
             </div>
             <div class="side hidden md:block">
                 <slot name="side">
-                    <Sidebar class="bg-icon md:block h-full"></Sidebar>
+                    <Sidebar class="bg-gradient-to-b from-gradienta to-gradientb md:block h-full"></Sidebar>
                 </slot>
             </div>
             <div class="content w-full h-full overflow-y-auto relative flex flex-col">

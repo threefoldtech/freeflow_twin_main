@@ -5,7 +5,7 @@
         </template>
         <div>
             <div class="avatar-container mb-2">
-                <div class="flex gap-2">
+                <div class="flex gap-2 items-center">
                     <div
                         class="avatar-container mr-2 flex justify-center items-center cursor-pointer"
                         @mouseover="isHoveringAvatar = true"
@@ -31,15 +31,16 @@
                         absolute
                         top-0
                         mt-2
+                        mr-2
                         right-0
                         px-2
                         py-1
                         flex flex-row
                         text-white
                         font-bold
-                        bg-green-400
-                        border-2 border-green-400
-                        hover:text-green-400 hover:bg-white
+                        bg-primary
+                        border-2 border-primary
+                        hover:text-primary hover:bg-white
                         rounded-md
                         cursor-pointer
                         items-center
@@ -63,9 +64,9 @@
                         ml-1
                         text-white
                         font-bold
-                        bg-green-400
-                        border-2 border-green-400
-                        hover:text-green-400 hover:bg-white
+                        bg-primary
+                        border-2 border-primary
+                        hover:text-primary hover:bg-white
                         rounded-md
                         cursor-pointer
                         items-center

@@ -84,14 +84,14 @@
                                 </td>
                                 <td>
                                     <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
-                                        <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-btngreen text-white': !item.canWrite }"> Read</span>
-                                        <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-btngreen text-white': item.canWrite }"> Write</span>
+                                        <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': !item.canWrite }"> Read</span>
+                                        <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': item.canWrite }"> Write</span>
                                     </div>
                                 </td>
                                 <td :key="item.isAlreadySent" class="text-center">
                                     <button
                                         @click="shareFile(item.chatId)"
-                                        class="text-white py-2 px-4 rounded-md justify-self-end bg-btngreen"
+                                        class="text-white py-2 px-4 rounded-md justify-self-end bg-primary"
                                         v-if="!item.isAlreadySent"
                                     >
                                         Share

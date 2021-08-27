@@ -488,16 +488,16 @@ export const getFileLastModified = (val: any) => {
 };
 
 export const getIconColor = (item: PathInfoModel) => {
-    if (item.isDirectory) return 'text-yellow-600';
+    if (item.isDirectory) return 'text-primary';
     switch (item.fileType) {
         case FileType.Excel:
-            return 'text-green-400';
+            return 'text-primarylight';
         case FileType.Word:
-            return 'text-blue-400';
+            return 'text-primarylight';
         case FileType.Powerpoint:
-            return 'text-red-400';
+            return 'text-primarylight';
         default:
-            return 'text-gray-600';
+            return 'text-primarylight';
     }
 };
 export const getIconColorDirty = (filetype: FileType) => {

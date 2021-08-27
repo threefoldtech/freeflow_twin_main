@@ -87,7 +87,7 @@
             </template>
             <div>
                 <label for="rename" class="sr-only">Rename</label>
-                <input type="text" v-model="newName" name="rename" id="rename" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md" :placeholder="selectedPaths[0].name" />
+                <input type="text" v-model="newName" name="rename" id="rename" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md" :placeholder="selectedPaths[0].name" />
             </div>
             <div class="flex justify-end mt-2">
                 <button
@@ -105,7 +105,7 @@
                         newName = '';
                         showRenameDialog = false;
                     "
-                    class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btngreen"
+                    class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
                 >
                     Rename
                 </button>
@@ -118,7 +118,7 @@
 
             <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2" :key="selectedTab">
                 <div class="flex-grow" v-for="(tab,index) in tabs" :key="tab">
-                <button @click="selectedTab = index" class="w-full p-2 rounded-xl " :class ="{'bg-btngreen text-white':index==selectedTab}">{{tab}}</button>
+                <button @click="selectedTab = index" class="w-full p-2 rounded-xl " :class ="{'bg-primary text-white':index==selectedTab}">{{tab}}</button>
                 </div>
             </div>
 

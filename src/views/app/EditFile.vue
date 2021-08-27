@@ -14,7 +14,7 @@
         </div>
         <div v-else class="text-center">
             <h1 class="mb-2"> Sorry, we are not able to display the file </h1>
-            <a class="bg-btngreen text-white p-2" :href="readUrl">Download file</a> 
+            <a class="bg-primary text-white p-2" :href="readUrl">Download file</a> 
         </div>
     </div>
 </div>

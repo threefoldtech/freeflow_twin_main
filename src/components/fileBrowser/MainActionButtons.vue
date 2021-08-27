@@ -1,9 +1,9 @@
 <template>
     <div class="mx-2" :class='{"hidden" : sharedDir}' >
-        <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-btngreen">
+        <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
             <i class="fas fa-plus"></i> New Folder
         </button>
-        <button @click="showCreateFileDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-btngreen">
+        <button @click="showCreateFileDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
             <i class="fas fa-plus"></i> Upload Files
         </button>
     </div>
@@ -14,7 +14,7 @@
         <div>
             <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
             <div>
-                <input type="text" name="newFolder" id="newFolder" ref="newFolderInput" v-model="manualContactAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="New folder name" />
+                <input type="text" name="newFolder" id="newFolder" ref="newFolderInput" v-model="manualContactAdd" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="New folder name" />
             </div>
         </div>
     </Dialog>
@@ -25,7 +25,7 @@
         </template>
         <div class="flex flex-col">
             <span>Files*</span>
-            <button class="py-2 px-4 text-white rounded-md bg-btngreen max-w-max" @click="newFileInput.click()">Select files</button>
+            <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">Select files</button>
         </div>
         <input type="file" ref="newFileInput" hidden multiple @change="handleFileSelectChange" />
         <FileDropArea :show="true" @send-file="handleDragAndDrop">

@@ -27,8 +27,8 @@
                 <span v-else>Can read</span>
             </div>
             <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
-                <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-btngreen text-white': data.data.length <=1 }"> Read</span>
-                <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-btngreen text-white': data.data.length > 1}"> Write</span>
+                <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length <=1 }"> Read</span>
+                <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length > 1}"> Write</span>
             </div> -->
         </template>
         <template #data-delete>

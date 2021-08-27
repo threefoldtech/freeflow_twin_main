@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-row items-center mb-4">
         <div class="ml-2 hover:text-green-500 cursor-pointer" @click="goToHome">
-            <i class="fas fa-home text-accent-300"></i>
+            <i class="fas fa-home text-primary"></i>
         </div>
         <!--<div
         class='rounded-full w-6 h-6 flex justify-center items-center'

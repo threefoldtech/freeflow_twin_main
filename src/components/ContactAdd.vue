@@ -19,7 +19,7 @@
             </a>
         </div>
 
-            <div class="flex flex-col ">
+            <div v-if="isActive('user')" class="flex flex-col">
                 <user-table
                     :data="possibleUsers"
                     placeholder="Search for user..."
@@ -54,12 +54,12 @@
                             <div>
                                 <label for="manualContactAddUsername" class="block text-sm font-medium text-gray-700">Name</label>
                                 <div>
-                                    <input type="text" name="manualContactAddUsername" id="manualContactAddUsername" v-model="manualContactAddUsername" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Username" />
+                                    <input type="text" name="manualContactAddUsername" id="manualContactAddUsername" v-model="manualContactAddUsername" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Username" />
                                     <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
                                 </div>
                                 <label for="manualContactAddLocation" class="block text-sm font-medium text-gray-700">Location</label>
                                 <div>
-                                    <input type="text" name="manualContactAddLocation" id="manualContactAddLocation" v-model="manualContactAddLocation" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Location" />
+                                    <input type="text" name="manualContactAddLocation" id="manualContactAddLocation" v-model="manualContactAddLocation" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Location" />
                                 </div>
                             </div>
                             <div class="w-full flex justify-end">
@@ -77,7 +77,7 @@
                                         font-medium
                                         rounded-md
                                         text-white
-                                        bg-btngreen
+                                        bg-primary
                                         focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
                                     "
                                     value=""
@@ -88,13 +88,13 @@
                     </DisclosurePanel>
                 </Disclosure>
             </div>
-        <form v-if="isActive('group')" class="w-full" @submit.prevent="groupAdd">
-            <div class="flex place-items-center">
+        <form v-if="isActive('group')" class="w-full overflow-x-hidden" @submit.prevent="groupAdd">
+            <div class="flex place-items-center mx-1">
                 <div class="w-full">
                     <div>
                         <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
                         <div>
-                            <input type="text" name="groupname" id="groupname" v-model="groupnameAdd" class="shadow-sm focus:ring-btngreen focus:border-btngreen block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Group name" v-focus/>
+                            <input type="text" name="groupname" id="groupname" v-model="groupnameAdd" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Group name" v-focus/>
                         </div>
                     </div>
                     <br />
@@ -120,7 +120,7 @@
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btngreen">Add Group</button>
+                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">Add Group</button>
             </div>
         </form>
     </div>

@@ -7,13 +7,7 @@
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <img alt="Threefold logo" src="../../public/TF-small.svg" width="50" />
-
-                    <img alt="Threefold logo" src="../../public/digitaltwin.png" width="100" />
-                    <!-- <div class="text-sm">
-                        <strong>digital </strong>
-                        <span>twin</span>
-                    </div> -->
+                    <img alt="Threefold logo" src="../../public/uhuru.svg" width="65" />
                 </div>
             </div>
             <br />
@@ -22,7 +16,7 @@
                 :key="app.name"
                 :class="{
                     'cursor-pointer': app.enabled,
-                    selected: app?.enabled && router.currentRoute?.value.meta.app !== app.name,
+                    'bg-primarylight rounded-xl': app?.enabled && router.currentRoute?.value.meta.app === app.name,
                     'text-gray-500': !app?.enabled,
                 }"
                 class="mb-4 grid text-center text-white"
@@ -32,10 +26,7 @@
                     style="position: relative"
                     @click="changePage(app.name)"
                 >
-                    <i :class="`fas ${app.icon} text-2xl`"></i>
-                    <h3>
-                        {{ app.name }}
-                    </h3>
+                    <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
             </div>
             <div class="flex-grow"></div>
@@ -65,12 +56,12 @@
             const apps = [
                 {
                     name: AppType.Whisper,
-                    icon: 'fas fa-comments',
+                    icon: '../../public/whisper.svg',
                     enabled: true,
                 },
                 {
                     name: AppType.Quantum,
-                    icon: 'fas fa-file-alt',
+                    icon: '../../public/quantum.svg',
                     enabled: true,
                 },
                 // {
@@ -80,7 +71,7 @@
                 // },
                 {
                     name: AppType.Glass,
-                    icon: 'fas fa-search',
+                    icon: '../../public/glass.svg',
                     enabled: true,
                 },
                 // {
@@ -132,9 +123,5 @@
         height: 100%;
         background: #e69b5950;
         border-left: 8px solid #e69b59;
-    }
-
-    .selected {
-        color: rgb(159, 241, 215);
     }
 </style>
