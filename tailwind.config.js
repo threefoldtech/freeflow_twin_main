@@ -1,4 +1,5 @@
 const plugin = require('tailwindcss/plugin');
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
     purge: ['./public/**/*.html', './src/**/*.vue', './src/**/*.ts', './index.html'],
@@ -8,18 +9,18 @@ module.exports = {
         extend: {
             colors: {
                 accent: {
-                    50: '#eef5f2',
-                    100: '#cff0ed',
-                    200: '#97e8d5',
-                    300: '#5bcfa9',
-                    400: '#20b27a',
-                    500: '#169951',
-                    600: '#14833c',
-                    700: '#146631',
-                    800: '#0f4627',
-                    900: '#0b2b1f',
+                    '50':  '#f8fafb',
+                    '100': '#e9f1fc',
+                    '200': '#d1daf8',
+                    '300': '#abb5ee',
+                    '400': '#898ce1',
+                    '500': '#6f67d5',
+                    '600': '#5a4bc1',
+                    '700': '#44389d',
+                    '800': '#2e266f',
+                    '900': '#1a1743',
                 },
-                icon: '#44A687',
+                icon: '#2e266f',
                 my: '#d0f0c0',
                 btnred: '#D43838',
                 bordergrey: '#E1E6EB',
@@ -37,6 +38,11 @@ module.exports = {
                 gradientb:"#36127C"
             },
         },
+        fontFamily: {
+            sans: ['inter', ...defaultTheme.fontFamily.sans],
+            serif: [...defaultTheme.fontFamily.serif],
+            mono: [...defaultTheme.fontFamily.mono],
+          },
     },
     plugins: [
         plugin(function ({ addVariant, e }) {
@@ -58,4 +64,5 @@ module.exports = {
         require('tailwindcss-debug-screens'),
         require('tailwindcss-hero-patterns'),
     ],
+    
 };

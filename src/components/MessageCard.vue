@@ -28,7 +28,7 @@
                         shadow
                         relative
                         overflow-hidden
-                        my-message:bg-my
+                        my-message:bg-accent-200
                     "
                     :class="{
                         'rounded-tl-xl': isFirstMessage,
@@ -36,7 +36,7 @@
                     }"
                 >
                     <header
-                        class="p-4 pt-2 pb-0 font-bold my-message:text-icon"
+                        class="p-4 pt-2 pb-0 font-bold my-message:bg-icon"
                         v-if="isFirstMessage && isGroup"
                     >
                         {{ message.from }}
@@ -91,7 +91,7 @@
                         class="flex rounded-xl overflow-hidden"
                         :class="{
                             'bg-white': reply.from !== user.id,
-                            'bg-my': reply.from === user.id,
+                            'bg-accent-300': reply.from === user.id,
                         }"
                     >
                         <main class="max-w-[750px] break-all flex justify-between">

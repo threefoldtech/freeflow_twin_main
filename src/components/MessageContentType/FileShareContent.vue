@@ -1,5 +1,5 @@
 <template>
-    <a class="px-4 my-2 my-message:bg-my cursor-pointer" @click="goToShared()" v-if="message.body">
+    <a class="px-4 my-2 my-message:bg-accent-200 cursor-pointer" @click="goToShared()" v-if="message.body">
         <h3 class="my-message:text-icon text-center">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>

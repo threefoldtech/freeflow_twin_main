@@ -3,7 +3,7 @@
         class="grid relative"
         :class="{
             'h-16 w-16': large,
-            'h-12 w-12': !small && !xsmall,
+            'h-12 w-12': !small && !xsmall && !large,
             'h-8 w-8': small,
             'h-6 w-6': xsmall,
         }"

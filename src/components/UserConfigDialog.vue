@@ -12,13 +12,13 @@
                         @mouseleave="isHoveringAvatar = false"
                     >
                         <div
-                            class="overlay flex justify-center items-center"
+                            class="overlay flex justify-center items-center peer "
                             :class="isHoveringAvatar ? 'block' : 'hidden'"
                             @click="selectFile"
                         >
-                            <i class="fas fa-pen text-white"></i>
+                            <i class="fas fa-pen text-icon"></i>
                         </div>
-                        <AvatarImg :id="user.id" large />
+                        <AvatarImg :id="user.id" large class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden" />
                     </div>
                     <h1 class="text-center my-4">{{ user.id }}</h1>
                 </div>
@@ -35,7 +35,7 @@
                         right-0
                         px-2
                         py-1
-                        flex flex-row
+                        flex flex-row 
                         text-white
                         font-bold
                         bg-primary
