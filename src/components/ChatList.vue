@@ -76,7 +76,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mt-1 mx-2 relative rounded-md shadow-sm">
+            <div v-if="!collapsed" class="mt-1 mx-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
