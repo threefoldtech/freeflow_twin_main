@@ -365,13 +365,13 @@
     .arrow.asc {
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-bottom: 4px solid #42b983;
+        border-bottom: 4px solid #1F0F5B;
     }
 
     .arrow.desc {
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-top: 4px solid #42b983;
+        border-top: 4px solid #1F0F5B;
     }
 
     .hiddenItems {

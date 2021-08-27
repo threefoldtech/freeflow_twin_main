@@ -73,9 +73,9 @@
                 </button>
             </div>
             <form class="w-full" @submit.prevent="chatsend">
-                <div class="mt-1 border-b border-gray-300 focus-within:border-icon">
+                <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                     <input
-                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-icon focus:ring-0 sm:text-sm"
+                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
                         autofocus
                         type="text"
                         ref="message"
