@@ -1,33 +1,34 @@
 <template>
-    <div class="overflow-y-auto" ref="messageBox" @scroll="handleScroll">
-        <div class="relative w-full mt-8 px-4">
-            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
+    <div ref='messageBox' class='overflow-y-auto' @scroll='handleScroll'>
+        <div class='relative w-full mt-8 px-4'>
+            <div v-if='chatInfo.isLoading' class='flex flex-col justify-center items-center w-full'>
                 <Spinner />
                 <span>Loading more messages</span>
             </div>
-            <div v-for="(message, i) in chat.messages">
-                <div v-if="showDivider(chat, i)" class="grey--text text-sm text-center p-4">
+            <div v-for='(message, i) in chat.messages'>
+                <div v-if='showDivider(chat, i)' class='grey--text text-sm text-center p-4'>
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
 
                 <MessageCard
-                    :isread="i <= lastRead"
-                    :isreadbyme="i <= lastReadByMe"
-                    :message="message"
-                    :chatId="chat.chatId"
-                    :isGroup="chat.isGroup"
-                    :isMine="message.from === user.id"
-                    :isLastMessage="isLastMessage(chat, i)"
-                    :isFirstMessage="isFirstMessage(chat, i)"
-                    :key="`${message.id}-${i <= lastRead}`"
+                    :key='`${message.id}-${i <= lastRead}`'
+                    :chatId='chat.chatId'
+                    :isFirstMessage='isFirstMessage(chat, i)'
+                    :isGroup='chat.isGroup'
+                    :isLastMessage='isLastMessage(chat, i)'
+                    :isMine='message.from === user.id'
+                    :isread='i <= lastRead'
+                    :isreadbyme='i <= lastReadByMe'
+                    :message='message'
+                    @copy='copyMessage($event, message)'
                 />
             </div>
 
-            <slot name="viewAnchor" />
+            <slot name='viewAnchor' />
         </div>
     </div>
 </template>
-<script lang="ts">
+<script lang='ts'>
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
@@ -37,7 +38,7 @@
     import { usechatsActions } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
-    import { Chat } from '@/types';
+    import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
 
     export default {
         name: 'MessageBox',
@@ -79,6 +80,32 @@
                 addScrollEvent(true);
             });
 
+            const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
+                let data = '';
+                switch (message.type) {
+                    case MessageTypes.STRING:
+                    case MessageTypes.GIF:
+                        data = <string>message.body;
+                        break;
+                    case MessageTypes.FILE:
+                        // @ts-ignore
+                        data = <string>message.body.filename;
+                        break;
+                    case MessageTypes.FILE_SHARE:
+                        // @ts-ignore
+                        data = <string>message.body.name;
+                        break;
+                    case MessageTypes.QUOTE:
+                        // @ts-ignore
+                        data = <string>message.body.message;
+                        break;
+                    default:
+                        return;
+                }
+                event.clipboardData.setData('text/plain', JSON.stringify(message.body));
+                event.preventDefault();
+            };
+
             const { user } = useAuthState();
             return {
                 isLastMessage,
@@ -91,8 +118,9 @@
                 messageBox,
                 handleScroll,
                 chatInfo: computed(() => getChatInfo(<string>props.chat.chatId)),
+                copyMessage,
             };
         },
     };
 </script>
-<style scoped type="text/css"></style>
+<style scoped type='text/css'></style>
