@@ -42,8 +42,11 @@
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ item.id }}
                                                 </div>
-                                                <div class="text-sm text-gray-500">
-                                                    <LocationMarkerIcon class="h-5 w-5 text-gray-400" aria-hidden="true" /> {{ item.location }}
+                                                <div class="flex align-center text-sm text-gray-500">
+                                                    <em class="w-5 text-gray-400 fas fa-map-marker-alt mr-2" aria-hidden="true" /> {{ item.location }}
+                                                </div>
+                                                <div class="flex align-center text-sm text-gray-500">
+                                                    <em class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center" aria-hidden="true" /> {{ item.app_id }}
                                                 </div>
                                             </div>
                                         </div>
