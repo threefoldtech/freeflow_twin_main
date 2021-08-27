@@ -18,7 +18,7 @@
                     justify-center
                     items-center
                     text-white
-                    my-message:bg-icon
+                    my-message:bg-accent-500
                 "
             >
                 <i class="fas fa-share-alt"></i>
