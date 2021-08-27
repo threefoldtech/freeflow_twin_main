@@ -19,7 +19,7 @@
                     'bg-primarylight rounded-xl': app?.enabled && router.currentRoute?.value.meta.app === app.name,
                     'text-gray-500': !app?.enabled,
                 }"
-                class="mb-4 grid text-center text-white"
+                class="mb-4 grid"
             >
                 <div
                     class="h-20 w-20 rounded-full grid place-items-center mb-1"
