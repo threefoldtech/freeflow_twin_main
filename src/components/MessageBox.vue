@@ -102,7 +102,8 @@
                     default:
                         return;
                 }
-                event.clipboardData.setData('text/plain', JSON.stringify(message.body));
+                console.log(`COPY: ${data}`);
+                event.clipboardData.setData('text/plain', data);
                 event.preventDefault();
             };
 
