@@ -79,6 +79,11 @@
                                         </div>
                                     </div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-row items-center text-md">
+                                        {{ formatBytes(item.size, 2) }}
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -97,12 +102,15 @@
         getFileType,
         getIcon,
         getIconColor,
+        getFileSize,
         getIconColorDirty,
         getIconDirty,
         getSharedContent,
         getSharedFolderContent,
         goIntoSharedFolder,
         parseJwt,
+        PathInfoModel,
+        selectedPaths,
         sharedContent,
     } from '@/store/fileBrowserStore';
     import { SharedFileInterface } from '@/types';
@@ -136,10 +144,12 @@
                         path: btoa(item.path),
                         shareId: item.id,
                     },
-                    
+
                 });
                 window.open(url.href, '_blank')
             };
+
+            const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item)
 
             return {
                 getIconColorDirty,
@@ -152,6 +162,7 @@
                 goTo,
                 getExtension,
                 formatBytes,
+                isSelected,
             };
         },
     });
