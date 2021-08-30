@@ -1,8 +1,8 @@
 <template>
     <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
     <div class="flex flex-col mx-2">
-        <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+        <div class="overflow-x-auto">
+            <div class="py-2 align-middle inline-block min-w-full">
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
                         <thead class="bg-gray-50">
