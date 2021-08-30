@@ -56,12 +56,12 @@
             const apps = [
                 {
                     name: AppType.Whisper,
-                    icon: '../../public/whisper.svg',
+                    icon: '/whisper.svg',
                     enabled: true,
                 },
                 {
                     name: AppType.Quantum,
-                    icon: '../../public/quantum.svg',
+                    icon: '/quantum.svg',
                     enabled: true,
                 },
                 // {
@@ -71,7 +71,7 @@
                 // },
                 {
                     name: AppType.Glass,
-                    icon: '../../public/glass.svg',
+                    icon: '/glass.svg',
                     enabled: true,
                 },
                 // {
