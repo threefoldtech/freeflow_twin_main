@@ -138,7 +138,7 @@
                 </ul>
             </div>
         </div>
-        <jdialog v-model="showEditAvatar" noActions>
+        <jdialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" noActions>
             <template v-slot:title>
                 <h1>Avatar</h1>
             </template>
@@ -157,9 +157,9 @@
                         :background="false"
                     />
                 </div>
-                <div class="flex flex-row justify-end">
-                    <Button @click="saveNewAvatar"> SAVE </Button>
-                    <Button @click="cancelNewAvatar"> CANCEL </Button>
+                <div class="flex flex-row justify-end mt-2">
+                    <button @click="cancelNewAvatar" class="rounded-md border border-gray-400 mr-2 px-4 py-2 justify-self-end"> CANCEL </button>
+                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary"> SAVE </button>
                 </div>
             </div>
         </jdialog>
@@ -181,11 +181,10 @@
     import { calcExternalResourceLink } from '../services/urlService';
     import VueCropper from 'vue-cropperjs';
     import 'cropperjs/dist/cropper.css';
-    import Button from '@/components/Button.vue';
 
     export default defineComponent({
         name: 'UserConfigDialog',
-        components: { AvatarImg, jdialog: Dialog, VueCropper, Button },
+        components: { AvatarImg, jdialog: Dialog, VueCropper },
         emits: ['addUser'],
         created: () => {
             initBlocklist();
