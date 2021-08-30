@@ -20,6 +20,7 @@
         <div class="flex-1">
             <div class="flex flex-row flex-wrap my-message:flex-row-reverse lg:my-message:flex-row">
                 <div
+                    tabindex="0"
                     class="
                         flex flex-col
                         rounded-md rounded-r-xl
@@ -29,6 +30,11 @@
                         relative
                         overflow-hidden
                         my-message:bg-accent-200
+                        focus:outline-none
+                        focus:ring-4
+                        ring-accent-500
+                        ring-offset-2
+
                     "
                     :class="{
                         'rounded-tl-xl': isFirstMessage,
@@ -36,7 +42,7 @@
                     }"
                 >
                     <header
-                        class="p-4 pt-2 pb-0 font-bold my-message:bg-accent-500"
+                        class="p-4 pt-2 pb-2 font-bold my-message:bg-accent-300"
                         v-if="isFirstMessage && isGroup"
                     >
                         {{ message.from }}

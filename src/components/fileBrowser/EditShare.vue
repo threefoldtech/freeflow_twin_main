@@ -1,25 +1,11 @@
 <template>
-    <input
-        v-model="searchTerm"
-        @focus="handleInput"
-        @input="handleInput"
-        v-focus
-        tabindex="0"
-        maxlength="50"
-        class="
-            focus:ring-accent-500
-            focus:border-accent-500
-            block
-            w-full
-            sm:text-sm
-            border border-gray-300
-            rounded-md
-            mb-2
-            p-1
-        "
-        placeholder="Search"
-    />
-
+    
+    <div class="my-2 relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
+        <input type="text" @focus="handleInput" @input="handleInput" v-model='searchTerm' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+    </div>
     <Table v-if="!isLoading" :headers="headers" :data="searchResults">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20 ">
@@ -37,7 +23,7 @@
             </span>
         </template>
     </Table>
-    <div v-else>loading</div>
+    <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
 </template>
 <script lang="ts">
 import { Chat, SharedFileInterface } from '@/types';
@@ -53,6 +39,7 @@ import { createNotification } from '@/store/notificiationStore';
 import { Table, IHeader, TEntry } from '@jimber/shared-components';
 import { isObject } from 'lodash';
 import { getShareByPath } from '@/services/fileBrowserService';
+import { SearchIcon } from '@heroicons/vue/solid';
 
 const headers:IHeader<TEntry>[] = [
     {
@@ -71,7 +58,7 @@ const headers:IHeader<TEntry>[] = [
 ];
 
 export default defineComponent({
-    components: { Toggle, AvatarImg, Table },
+    components: { SearchIcon, Toggle, AvatarImg, Table },
     props: {
         selectedFile: {
             type: Object,

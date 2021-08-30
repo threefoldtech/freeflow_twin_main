@@ -1,15 +1,15 @@
 <template>
     <appLayout>
         <template v-slot:top>
-            <div v-if='chat' class='w-full flex md:px-4'>
+            <div v-if='chat' class='w-full flex md:px-4 text-white'>
                 <div class='place-items-center grid mr-4'>
                     <AvatarImg :id='chat.chatId' :showOnlineStatus='false'></AvatarImg>
                 </div>
                 <div class='py-4 pl-2'>
-                    <p class='font-bold font overflow-hidden overflow-ellipsis'>
+                    <p class='font-bold font overflow-hidden overflow-ellipsis '>
                         {{ chat.name }}
                     </p>
-                    <p v-if='!chat.isGroup && !blocked' class='font-thin'>
+                    <p v-if='!chat.isGroup && !blocked' class='font-light'>
                         {{ status?.isOnline ? 'Is online' : 'Is offline' }}
                     </p>
                     <p v-if='!chat.isGroup && blocked' class='text-red-500'>BLOCKED</p>
@@ -223,7 +223,7 @@
                     @click='showDialog = false'>Cancel
             </button>
             <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred'
-                    @click='doBlockChat'>Delete
+                    @click='doBlockChat'>Block
             </button>
         </div>
     </jdialog>

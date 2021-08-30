@@ -57,6 +57,7 @@
                         absolute
                         top-1
                         mt-2
+                        mr-2
                         right-0
                         px-2
                         py-1
@@ -100,8 +101,8 @@
                 <h2>{{ blockedUsers.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
                 <ul v-if="blockedUsers.length > 0" class="max-h-28 overflow-y-auto">
                     <template v-for="blockedUser in blockedUsers" :key="blockedUser">
-                        <li>
-                            {{ blockedUser }}
+                        <li class="flex flex-row justify-between items-center mt-2  pb-2 border-b">
+                            <span>{{ blockedUser }}</span>
                             <button
                                 class="
                                     px-4
@@ -110,10 +111,10 @@
                                     font-medium
                                     rounded-md
                                     text-white
-                                    bg-blue-600
-                                    hover:bg-blue-500
-                                    focus:border-blue-700
-                                    active:bg-blue-700
+                                    bg-primary
+                                    hover:bg-primary
+                                    focus:border-primary
+                                    active:bg-primary
                                     ease-in-out
                                     duration-150
                                     cursor-pointer
