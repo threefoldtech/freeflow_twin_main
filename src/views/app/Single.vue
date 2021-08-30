@@ -223,7 +223,7 @@
                     @click='showDialog = false'>Cancel
             </button>
             <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred'
-                    @click='doBlockChat'>Delete
+                    @click='doBlockChat'>Block
             </button>
         </div>
     </jdialog>

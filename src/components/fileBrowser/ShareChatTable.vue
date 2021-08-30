@@ -1,14 +1,10 @@
 <template>
-  <input
-            v-model="searchTerm"
-            @focus="handleInput"
-            @input="handleInput"
-            v-focus
-            tabindex="0"
-            maxlength="50"
-             class="focus:ring-accent-500 focus:border-accent-500 block w-full sm:text-sm border border-gray-300 rounded-md mb-2 p-1"
-             placeholder="Search"
-        />
+    <div class="my-2 relative rounded-md shadow-sm">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
+        <input type="text" @focus="handleInput" @input="handleInput" v-model='searchTerm' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+    </div>
     <div class="flex flex-col">
         <div class="-my-2 sm:-mx-6 lg:-mx-8">
             <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
@@ -119,8 +115,9 @@ import AvatarImg from '@/components/AvatarImg.vue';
 import { SystemMessageTypes, MessageTypes } from '@/types';
 const { sendMessage } = usechatsActions();
 import { createNotification } from '@/store/notificiationStore';
+import { SearchIcon } from '@heroicons/vue/solid';
 export default defineComponent({
-    components: { Toggle, AvatarImg },
+    components: { SearchIcon, Toggle, AvatarImg },
     props: {
         data: {
             type: Array,
