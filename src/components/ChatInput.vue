@@ -106,7 +106,7 @@
     import { clearMessageAction, MessageAction, messageState, usechatsActions } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
     import { useAuthState } from '@/store/authStore';
-    import { Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
+    import { FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
@@ -367,6 +367,8 @@
                         return (action.value.message.body as QuoteBodyType).message;
                     case  MessageTypes.STRING:
                         return action.value.message.body;
+                    case MessageTypes.FILE:
+                        if(action.value.message.body.type === FileTypes.RECORDING) return "Voice message";
                     default:
                         return action.value.message.type;
 
