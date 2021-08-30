@@ -89,7 +89,8 @@ export const updateContent = async (path = currentDirectory.value) => {
 
 export const createDirectory = async (name: string, path = currentDirectory.value) => {
     const result = await Api.createDirectory(path, name);
-    if (result.status !== 201 || !result.data) throw new Error('Could not create new folder');
+    if ((result.status !== 200 && result.status !== 201) || !result.data)
+        throw new Error('Could not create new folder');
 
     currentDirectoryContent.value.push(createModel(result.data));
     await updateContent();
@@ -154,7 +155,7 @@ export const goToFolderInCurrentDirectory = (item: PathInfoModel) => {
 
 export const goToHome = () => {
     sharedDir.value = false;
-    currentShare.value= undefined
+    currentShare.value = undefined;
     currentDirectory.value = rootDirectory;
 };
 
@@ -223,7 +224,7 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
     if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
 
     const result = await Api.renameFile(oldPath, newPath);
-    if (result.status !== 201) throw new Error('Could not rename file');
+    if (result.status !== 200 && result.status !== 201) throw new Error('Could not rename file');
 
     selectedPaths.value = [];
     await updateContent();
