@@ -42,7 +42,7 @@
                     }"
                 >
                     <header
-                        class="p-4 pt-2 pb-0 font-bold my-message:bg-accent-500"
+                        class="p-4 pt-2 pb-2 font-bold my-message:bg-accent-300"
                         v-if="isFirstMessage && isGroup"
                     >
                         {{ message.from }}
