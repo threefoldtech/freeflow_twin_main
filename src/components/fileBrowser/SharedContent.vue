@@ -2,8 +2,8 @@
     <div class="h-full overflow-y-auto">
         <h1 class="p-2">Shared with me:</h1>
         <div class="flex flex-col mx-2">
-        <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+        <div class="overflow-x-auto">
+            <div class="py-2 align-middle inline-block min-w-full">
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
                         <thead class="bg-gray-50">
@@ -79,6 +79,11 @@
                                         </div>
                                     </div>
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-row items-center text-md">
+                                        {{ formatBytes(item.size, 2) }}
+                                    </div>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -97,12 +102,15 @@
         getFileType,
         getIcon,
         getIconColor,
+        getFileSize,
         getIconColorDirty,
         getIconDirty,
         getSharedContent,
         getSharedFolderContent,
         goIntoSharedFolder,
         parseJwt,
+        PathInfoModel,
+        selectedPaths,
         sharedContent,
     } from '@/store/fileBrowserStore';
     import { SharedFileInterface } from '@/types';
@@ -136,10 +144,12 @@
                         path: btoa(item.path),
                         shareId: item.id,
                     },
-                    
+
                 });
                 window.open(url.href, '_blank')
             };
+
+            const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item)
 
             return {
                 getIconColorDirty,
@@ -152,6 +162,7 @@
                 goTo,
                 getExtension,
                 formatBytes,
+                isSelected,
             };
         },
     });

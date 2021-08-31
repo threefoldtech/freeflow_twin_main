@@ -6,8 +6,8 @@
         <input type="text" @focus="handleInput" @input="handleInput" v-model='searchTerm' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
     </div>
     <div class="flex flex-col">
-        <div class="-my-2 sm:-mx-6 lg:-mx-8">
-            <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+        <div class="-my-2">
+            <div class="py-2 align-middle inline-block min-w-full">
                 <div style="max-height: 500px" class="shadow border-b overflow-auto border-gray-200 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
