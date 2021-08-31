@@ -1,27 +1,27 @@
 <template>
     <div class="relative" @dragenter="handleDragEnter" @dragover="handleDragOver" @drop="handleDrop">
         <div
-            class="hidden md:flex justify-center items-center absolute top-0 left-0 w-full h-full z-50"
+            class="hidden md:flex justify-center items-center absolute top-0 left-0 w-full h-full z-50 p-8"
             v-if="show || showOverlay"
-            :class="{ 'bg-opacity-75 bg-gray-500': showOverlay }"
+            :class="{ 'bg-accent-200/75': showOverlay }"
             @dragleave="handleDragLeave"
         >
             <div
                 class="
                     flex
-                    border-dashed border-2
+                    border-dashed border-8
                     w-full
-                    h-40
-                    border-bordergrey
+                    h-full
+                    border-accent-800/50
                     justify-center
                     items-center
                     flex-col
-                    bg-opacity-75
                     pointer-events-none
                     rounded-lg
+                    bg-white/25
                 "
             >
-                <p class="text-black text-lg bold">Drag and drop files here</p>
+                <p class="text-accent-800/50 text-xl font-bold">Drag and drop files here</p>
             </div>
         </div>
         <slot class="pointer-events-none"></slot>
