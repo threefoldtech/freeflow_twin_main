@@ -1,7 +1,7 @@
 interface IConfig {
     baseUrl: string,
     appBackend: string,
-    documentServerUrl: string,
+    documentServerLocation: string,
     giphyApiKey: string,
 }
 

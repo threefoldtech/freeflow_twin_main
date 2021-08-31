@@ -49,7 +49,7 @@
     import config from '@/config'; '../../../public/config/config';
     import { DtId } from '@/types';
     import axios, { ResponseType } from 'axios';
-    import { useAuthState } from '@/store/authStore';
+    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import { watchingUsers } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
@@ -69,14 +69,15 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
             onMounted(async () => {
                 const path = atob(<string>route.params.path);
                 const shareId = <string>route.params.shareId;
-                let name;
+                let location;
                 let documentServerconfig;
                 let fileAccesDetails: EditPathInfo;
+                const myAddress = await myYggdrasilAddress()
 
                 if (shareId) {
                     const shareDetails = await fetchShareDetails(shareId);
                     fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
-                    name = shareDetails.owner.id;
+                    location = shareDetails.owner.id;
                     console.log("sharedetails ", shareDetails)
                         
                     let apiEndpoint =  generateUrl("http",`[${shareDetails.owner.location}]`, fileAccesDetails.path,fileAccesDetails.readToken)
@@ -88,7 +89,7 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
                 } else {
                     fileAccesDetails = (await getFileInfo(path)).data;
                     //@todo find better way to get name
-                    name = window.location.host.split('.')[0];
+                    location = await myYggdrasilAddress()
                     readUrl.value = generateUrl('https', window.location.hostname, fileAccesDetails.path,fileAccesDetails.readToken)
 
                 }
@@ -98,7 +99,7 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
                 console.log(fileType.value)
                 if (isSupportedInDocumentServer.value) {
                     documentServerconfig = generateDocumentserverConfig(
-                        name,
+                        location,
                         fileAccesDetails.path,
                         fileAccesDetails.key,
                         fileAccesDetails.readToken,
@@ -106,7 +107,7 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
                         getExtension(fileAccesDetails.fullName),
                         fileAccesDetails.extension
                     );
-                    get(`${config.documentServerUrl}/web-apps/apps/api/documents/api.js`, () => {
+                    get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
                         console.log(documentServerconfig);
                         //@ts-ignore
                         new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
@@ -130,7 +131,7 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
 
 
             const generateDocumentserverConfig = (
-                ownerId: string,
+                location: string,
                 path: string,
                 key: string,
                 readToken: string,
@@ -138,10 +139,10 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
                 extension: string,
                 fileName: string
             ) => {
-                const readUrl = generateUrl('http',`${ownerId}-chat`,path,readToken);
-                const writeUrl = generateUrl('http',`${ownerId}-chat`,path,writeToken);
+                const readUrl = generateUrl('http',`[${location}]`,path,readToken);
+                const writeUrl = generateUrl('http',`[${location}]`,path,writeToken);
                 //@todo find better way to get name
-                const name = window.location.host.split('.')[0];
+                const myName = window.location.host.split('.')[0];
                 return {
                     document: {
                         fileType: extension,
@@ -158,8 +159,8 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
                             forcesave: true,
                         },
                         user: {
-                            id: name,
-                            name: name,
+                            id: myName,
+                            name: myName,
                         },
                         mode: writeToken ? 'edit' : 'view',
                     },

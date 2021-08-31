@@ -1,5 +1,5 @@
 {
     "appBackend": "https://login.staging.jimber.org/",
-    "documentServerUrl": "https://documentserver.digitaltwin.jimbertesting.be/",
+    "documentServerLocation": "https://documentserver.digitaltwin-test.jimbertesting.be/",
     "giphyApiKey": "uk3XRSO0vYrPDEQKDPZJ2wGz33qzIxST"
 }
