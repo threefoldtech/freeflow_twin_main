@@ -298,7 +298,9 @@ export const itemAction = async (item: PathInfoModel, router: Router, path = cur
     if (item.isDirectory) {
         return goToFolderInCurrentDirectory(item);
     }
+    console.log(item);
     const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName])) } });
+    console.log(result);
     window.open(result.href, '_blank');
 };
 
