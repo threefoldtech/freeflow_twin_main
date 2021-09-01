@@ -257,7 +257,7 @@ export const goToFileDirectory = (item: PathInfoModel) => {
 };
 
 export const goBack = () => {
-    if (sharedDir.value === true) {
+    if (sharedDir.value) {
         sharedDir.value = false;
         return;
     }
