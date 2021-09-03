@@ -29,7 +29,7 @@
             });
 
             function browse() {
-                iframeUrl.value = `https://browser.jimber.org`;
+                iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
                 console.log(iframeUrl.value);
             }
 
