@@ -4,6 +4,7 @@ import FileBrowser from '@/views/app/FileBrowser.vue';
 import VideoRoom from '@/views/app/VideoRoom.vue';
 import Forum from '@/views/app/Forum.vue';
 import Browser from '@/views/app/Browser.vue';
+import Kutana from '@/views/app/Kutana.vue';
 import Basic from '@/layout/Basic.vue';
 import Chat from '@/views/app/Chat.vue';
 import Single from '@/views/app/Single.vue';
@@ -94,6 +95,14 @@ const routes: Array<RouteRecordRaw> = [
         component: VideoRoom,
         meta: {
             app: AppType.Meetings,
+        },
+    },
+    {
+        name: 'kutana',
+        path: '/kutana',
+        component: Kutana,
+        meta: {
+            app: AppType.Kutana,
         },
     },
     {

@@ -74,6 +74,11 @@
                     icon: '/glass.svg',
                     enabled: true,
                 },
+                {
+                    name: AppType.Kutana,
+                    icon: '/kutana.svg',
+                    enabled: true,
+                },
                 // {
                 //     name: AppType.Meetings,
                 //     icon: 'fas fa-video',

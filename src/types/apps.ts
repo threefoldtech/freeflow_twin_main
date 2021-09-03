@@ -4,4 +4,5 @@ export enum AppType {
     Forum = 'forum',
     Quantum = 'quantum',
     Meetings = 'meetings',
+    Kutana = 'kutana',
 }
