@@ -77,7 +77,7 @@ return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x
                 if (shareId) {
                     const shareDetails = await fetchShareDetails(shareId);
                     fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
-                    location = shareDetails.owner.id;
+                    location = shareDetails.owner.location;
                     console.log("sharedetails ", shareDetails)
                         
                     let apiEndpoint =  generateUrl("http",`[${shareDetails.owner.location}]`, fileAccesDetails.path,fileAccesDetails.readToken)
