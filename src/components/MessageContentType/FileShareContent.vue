@@ -24,9 +24,7 @@
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="py-1 flex flex-col">
-                <div class="my-message:text-icon">
-                    {{ message.body.name }}
-                </div>
+                <div class="my-message:text-icon">{{ message.body.name }}</div>
                 <span class="my-message:text-icon opacity-70"> {{ formatBytes(message.body.size, 2) }}</span>
             </div>
         </div>
@@ -34,38 +32,59 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
-    import { useRouter } from 'vue-router';
+import { isUndefined } from 'lodash';
+import { defineComponent } from 'vue';
+import { useRouter } from 'vue-router';
 
-    declare const Buffer;
-    export default defineComponent({
-        name: 'FileShareContent',
-        props: {
-            message: { type: Object, required: true },
-        },
-        setup(props) {
-            const router = useRouter();
-            const formatBytes = function (bytes, decimals) {
-                if (bytes == 0) return '0 Bytes';
-                let k = 1024,
-                    dm = decimals || 2,
-                    sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-                    i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-            };
-            const goToShared = async function () {
-                // await getSharedContent();
-                // await router.push({name: 'filebrowser'});
-                // sharedDir.value = true;
-                console.log('reimplement go to shared from fileharecontent');
-            };
+declare const Buffer;
+export default defineComponent({
+    name: 'FileShareContent',
+    props: {
+        message: { type: Object, required: true },
+    },
+    setup(props) {
+        const router = useRouter();
+        const formatBytes = function (bytes, decimals) {
+            if (bytes == 0) return '0 Bytes';
+            let k = 1024,
+                dm = decimals || 2,
+                sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+                i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        };
+        const goToShared = async function () {
+            // await getSharedContent();
+            // sharedDir.value = true;
+            console.log(props.message.from);
+            if (props.message.from === window.location.host.split('.')[0]) {
+                // check if you sent it
+                const url = router.resolve({
+                    name: 'editoptions',
+                    params: {
+                        path: btoa(props.message.body.path),
+                        shareId: props.message.body.id,
+                    },
+                });
+                window.open(url.href, '_blank');
+                return;
+            } else {
+                const url = router.resolve({
+                    name: 'editfile',
+                    params: {
+                        path: btoa(props.message.body.path),
+                        shareId: props.message.body.id,
+                    },
+                });
+                window.open(url.href, '_blank');
+            }
+        };
 
-            return {
-                formatBytes,
-                // calcExternalResourceLink,
-                goToShared,
-            };
-        },
-    });
+        return {
+            formatBytes,
+            // calcExternalResourceLink,
+            goToShared,
+        };
+    },
+});
 </script>
 <style></style>

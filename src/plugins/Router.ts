@@ -11,6 +11,7 @@ import Single from '@/views/app/Single.vue';
 import Callback from '@/views/Callback.vue';
 import Unauthorised from '@/views/Unauthorised.vue';
 import EditFile from '@/views/app/EditFile.vue';
+import EditOptions from '@/views/app/EditOptions.vue';
 import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
@@ -67,6 +68,16 @@ const routes: Array<RouteRecordRaw> = [
         path: '/quantum/edit/:path/:shareId?',
         name: 'editfile',
         component: EditFile,
+        meta: {
+            back: 'quantum',
+            requiresAuth: true,
+            app: AppType.Quantum,
+        },
+    },
+    {
+        path: '/quantum/options/:path/:shareId?',
+        name: 'editoptions',
+        component: EditOptions,
         meta: {
             back: 'quantum',
             requiresAuth: true,
