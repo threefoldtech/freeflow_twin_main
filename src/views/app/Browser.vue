@@ -12,8 +12,7 @@
 
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, onBeforeUnmount, ref } from 'vue';
-    import { onMounted, onBeforeMount } from 'vue';
+    import { defineComponent, ref, onMounted } from 'vue';
 
     export default defineComponent({
         name: 'Apps',
@@ -30,12 +29,7 @@
 
             function browse() {
                 iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
-                console.log(iframeUrl.value);
             }
-
-            onBeforeUnmount(() => {
-                console.log(document.querySelector('#forum-iframe').innerHTML);
-            });
 
             return {
                 iframeUrl,
