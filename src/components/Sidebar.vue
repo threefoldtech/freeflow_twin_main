@@ -24,7 +24,7 @@
                 <div
                     class="h-20 w-20 rounded-full grid place-items-center mb-1"
                     style="position: relative"
-                    @click="changePage(app.name)"
+                    @click="changePageAndExecuteAction(app)"
                 >
                     <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
@@ -48,12 +48,17 @@
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
     import { AppType } from '@/types/apps';
+    import { useBrowserActions, useBrowserState, test } from '@/store/browserStore';
+    import { AppItemType } from '@/types/apps';
 
     export default defineComponent({
         name: 'Sidebar',
         components: { AvatarImg },
         setup() {
-            const apps = [
+            const { setHasBrowserBeenStartedOnce } = useBrowserActions();
+            const { hasBrowserBeenStartedOnce } = useBrowserState();
+
+            const apps: Array<AppItemType> = [
                 {
                     name: AppType.Whisper,
                     icon: '/whisper.svg',
@@ -73,6 +78,10 @@
                     name: AppType.Glass,
                     icon: '/glass.svg',
                     enabled: true,
+                    action: () => {
+                        console.log('executed');
+                        test.value = true;
+                    },
                 },
                 {
                     name: AppType.Kutana,
@@ -88,8 +97,15 @@
 
             const currentRoute = computed(() => router.currentRoute.value);
 
-            const changePage = (page: any) => {
-                router.push({ name: page });
+            const changePageAndExecuteAction = (page: AppItemType) => {
+                console.log('BEFORE CLICK : ' + test.value);
+
+                if (page.action) {
+                    page.action();
+                }
+                console.log('AFTER CLICK : ' + test.value);
+
+                router.push({ name: page.name });
             };
 
             const { user } = useAuthState();
@@ -104,7 +120,7 @@
             return {
                 currentRoute,
                 apps,
-                changePage,
+                changePageAndExecuteAction,
                 user,
                 showUserConfigDialog,
                 router,

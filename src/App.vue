@@ -30,7 +30,7 @@
         </template>
         <suspense> <router-view v-if="$route.path !== '/glass'" /> </suspense>
         <!-- Hot loading the browser, puts this component under the body. Issue needs to be revisited for more effecient way -->
-        <Browser :style="{ visibility: $route.path === '/glass' ? 'visible' : 'hidden' }" />
+        <Browser v-show="test" />
 
         <div
             v-if="isDev && location"
@@ -44,9 +44,10 @@
 <script lang="ts" setup>
     import version from '../public/config/version';
     import { myYggdrasilAddress } from '@/store/authStore';
-    import { ref } from 'vue';
+    import { ref, watch } from 'vue';
     import config from '@/config';
     import Browser from '@/views/app/Browser.vue';
+    import { useBrowserState, useBrowserActions, test } from '@/store/browserStore';
 
     console.log('Version: ' + version);
 
