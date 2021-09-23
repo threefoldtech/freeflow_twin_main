@@ -30,7 +30,7 @@
         </template>
         <suspense> <router-view v-if="$route.path !== '/glass'" /> </suspense>
         <!-- Hot loading the browser, puts this component under the body. Issue needs to be revisited for more effecient way -->
-        <Browser v-show="test" />
+        <Browser v-show="hasBrowserBeenStartedOnce" />
 
         <div
             v-if="isDev && location"
@@ -47,7 +47,9 @@
     import { ref, watch } from 'vue';
     import config from '@/config';
     import Browser from '@/views/app/Browser.vue';
-    import { useBrowserState, useBrowserActions, test } from '@/store/browserStore';
+    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+
+    //const {hasBrowserBeenStartedOnce} = useBrowserState()
 
     console.log('Version: ' + version);
 

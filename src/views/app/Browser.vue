@@ -1,8 +1,7 @@
 <template>
     <app-layout>
-        <pre>{{ hasBrowserBeenStartedOnce }}</pre>
         <iframe
-            v-if="test"
+            v-if="hasBrowserBeenStartedOnce"
             class="relative h-full w-full"
             title="forum"
             id="forum-iframe"
@@ -15,8 +14,8 @@
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref, onMounted } from 'vue';
-    import { useBrowserState, useBrowserActions, test } from '@/store/browserStore';
-    import { useRouter } from 'vue-router';
+    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    
 
     export default defineComponent({
         name: 'Apps',
@@ -25,18 +24,10 @@
         },
 
         setup({}, ctx) {
-            const router = useRouter();
-            const { setHasBrowserBeenStartedOnce } = useBrowserActions();
-            const { hasBrowserBeenStartedOnce } = useBrowserState();
-
+          
             const iframeUrl = ref('');
 
-            console.log('Inside browser: ' + hasBrowserBeenStartedOnce);
-
             onMounted(() => {
-                test.value = true;
-                console.log('onMounted: ' + hasBrowserBeenStartedOnce);
-
                 browse();
             });
 
@@ -47,7 +38,8 @@
             return {
                 iframeUrl,
                 hasBrowserBeenStartedOnce,
-                test,
+                //hasBrowserBeenStartedOnce,
+              
             };
         },
     });

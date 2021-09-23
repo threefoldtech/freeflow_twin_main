@@ -1,14 +1,24 @@
 import { reactive } from '@vue/reactivity';
 import { ref } from 'vue';
 
+
+export const hasBrowserBeenStartedOnce = ref(false);
+
+
+export const setHasBrowserBeenStartedOnce = () => {
+    hasBrowserBeenStartedOnce.value = true;
+}
+
+
+
+/*
 const state = reactive<State>({
     hasBrowserBeenStartedOnce: false,
 });
 
-export const test = ref(false);
+
 
 const setHasBrowserBeenStartedOnce = () => {
-    console.log('Setting var to true');
     state.hasBrowserBeenStartedOnce = true;
 };
 
@@ -27,3 +37,4 @@ export const useBrowserActions = () => {
 interface State {
     hasBrowserBeenStartedOnce: boolean;
 }
+*/

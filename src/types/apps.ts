@@ -11,5 +11,4 @@ export interface AppItemType {
     name: AppType;
     icon: string;
     enabled: boolean;
-    action?: Function;
 }
