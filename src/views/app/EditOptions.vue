@@ -18,10 +18,11 @@ import appLayout from '../../layout/AppLayout.vue';
 import { defineComponent, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
 import FileTable from '@/components/fileBrowser/FileTable.vue';
 import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
-import { updateContent, searchResults, sharedDir, getFile, selectItem, test } from '@/store/fileBrowserStore';
+import { searchResults, sharedDir, getFile, selectItem, currentDirectory } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
 import { useRoute, useRouter } from 'vue-router';
+import { showShareDialog } from '@/services/dialogService';
 
 export default defineComponent({
     name: 'Apps',
@@ -39,14 +40,8 @@ export default defineComponent({
             const path = atob(<string>route.params.path);
             const item = await getFile(path);
             selectItem(item);
-        });
-
-        onMounted(async () => {
-            document.onreadystatechange = () => {
-                if (document.readyState == 'complete') {
-                    document.getElementById('ShowShareDialog').click();
-                }
-            };
+            currentDirectory.value = '/';
+            showShareDialog.value = true;
         });
 
         return {

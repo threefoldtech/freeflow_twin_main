@@ -18,6 +18,9 @@ const authState = reactive<AuthState>({
     },
 });
 
+// @TODO get name from backend not URL
+export const loginName = window.location.host.split('.')[0];
+
 export const myYggdrasilAddress = async () => {
     const res = await axios.get(`${window.location.origin}/api/yggdrasil_address`);
     return res.data;

@@ -3,12 +3,7 @@
         <div v-if="selectedPaths.length > 0" class="mx-2">
             <p>{{ selectedPaths.length }} File(s) selected</p>
         </div>
-        <div
-            id="ShowShareDialog"
-            v-if="selectedPaths.length === 1"
-            class="mx-2 cursor-pointer"
-            @click="showShareDialog = true"
-        >
+        <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="showShareDialog = true">
             <span class="text-gray-400 hover:text-gray-500">
                 <i class="fas fa-share-alt"></i>
             </span>
@@ -196,6 +191,7 @@ import Avatar from '@/components/Avatar.vue';
 import AvatarImg from '@/components/AvatarImg.vue';
 import { SystemMessageTypes, MessageTypes } from '@/types';
 import { createNotification } from '@/store/notificiationStore';
+import { showShareDialog } from '@/services/dialogService';
 
 const { chats } = usechatsState();
 const { retrievechats, sendMessage } = usechatsActions();
@@ -211,7 +207,7 @@ export default defineComponent({
         let showDeleteDialog = ref(false);
         let showRenameDialog = ref(false);
         let newName = ref<string>('');
-        let showShareDialog = ref(false);
+
         let writeRights = ref(false);
 
         onBeforeMount(() => {
@@ -256,13 +252,13 @@ export default defineComponent({
             isDraggingFiles,
             cutFiles,
             copyFiles,
-            showShareDialog,
             chats,
             createNotification,
             sharedDir,
             writeRights,
             tabs,
             selectedTab,
+            showShareDialog,
         };
     },
 });

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
 import VideoRoom from '@/views/app/VideoRoom.vue';
@@ -37,7 +37,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/whisper',
-        component: Basic,
+        component: RouterView,
         children: [
             {
                 path: '',
@@ -60,7 +60,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         // fake security since the actual filebrowser has no security yet?
         name: 'quantum',
-        path: '/quantum',
+        path: '/quantum/:path?', //btoa? /quantum/:path?
         component: FileBrowser,
         meta: { requiresAuth: true, app: AppType.Quantum },
     },
@@ -78,6 +78,16 @@ const routes: Array<RouteRecordRaw> = [
         path: '/quantum/options/:path/:shareId?',
         name: 'editoptions',
         component: EditOptions,
+        meta: {
+            back: 'quantum',
+            requiresAuth: true,
+            app: AppType.Quantum,
+        },
+    },
+    {
+        path: '/quantum/sharedWithMe/:path?/:shareId?',
+        name: 'sharedWithMe',
+        component: FileBrowser,
         meta: {
             back: 'quantum',
             requiresAuth: true,
