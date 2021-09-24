@@ -3,7 +3,7 @@
         <template v-slot:default>
             <div class="flex flex-row w-full h-full">
                 <div class="flex flex-col flex-1">
-                    <TopBar />
+                    <TopBar ref="childRef" />
                     <FileTable v-if="searchResults.length === 0 && sharedDir === false" />
                     <ResultsTable v-if="searchResults.length > 0 && sharedDir === false" />
                     <SharedContent v-if="sharedDir === true" />
@@ -13,25 +13,16 @@
     </appLayout>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 import appLayout from '../../layout/AppLayout.vue';
-import { computed, defineComponent, onBeforeMount } from 'vue';
+import { defineComponent, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
 import FileTable from '@/components/fileBrowser/FileTable.vue';
 import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
-import {
-    updateContent,
-    searchResults,
-    sharedDir,
-    selectedPaths,
-    searchDirValue,
-    currentDirectory,
-    currentShare,
-} from '@/store/fileBrowserStore';
+import { searchResults, sharedDir, getFile, selectItem, currentDirectory } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
-import router from '@/plugins/Router';
 import { useRoute, useRouter } from 'vue-router';
-import { isUndefined } from 'lodash';
+import { showShareDialog } from '@/services/dialogService';
 
 export default defineComponent({
     name: 'Apps',
@@ -43,18 +34,14 @@ export default defineComponent({
         SharedContent,
     },
 
-    setup() {
+    setup({}, ctx) {
         const route = useRoute();
-        const router = useRouter();
-
         onBeforeMount(async () => {
-            currentDirectory.value = route.params.path;
-            if (isUndefined(currentDirectory.value)) currentDirectory.value = '';
-            await updateContent(currentDirectory.value); // bug to fix
-            sharedDir.value = false;
-            selectedPaths.value = [];
-            searchResults.value = [];
-            searchDirValue.value = '';
+            const path = atob(<string>route.params.path);
+            const item = await getFile(path);
+            selectItem(item);
+            currentDirectory.value = '/';
+            showShareDialog.value = true;
         });
 
         return {
@@ -64,5 +51,11 @@ export default defineComponent({
     },
 });
 </script>
+
+
+function emit(arg0: string) {
+  throw new Error('Function not implemented.');
+}
+
 
 <style scoped type="text/css"></style>
