@@ -12,6 +12,7 @@ import { ContactInterface, DtId, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
+import router from '@/plugins/Router';
 
 declare const Buffer;
 export enum FileType {
@@ -107,6 +108,14 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
             await updateContent();
         })
     );
+};
+
+export const goToShared = async () => {
+    sharedDir.value = true;
+    selectedPaths.value = [];
+    searchResults.value = [];
+    searchDirValue.value = '';
+    await getSharedContent();
 };
 
 export const uploadFile = async (file: File, path = currentDirectory.value) => {
@@ -546,6 +555,22 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
             permissions: share.permissions,
         };
     });
+    sharedDir.value = true;
+};
+
+export const goTo = async (item: SharedFileInterface) => {
+    if (item.isFolder) {
+        goIntoSharedFolder(item);
+        return;
+    }
+    const url = router.resolve({
+        name: 'editfile',
+        params: {
+            path: btoa(item.path),
+            shareId: item.id,
+        },
+    });
+    window.open(url.href, '_blank');
 };
 
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {

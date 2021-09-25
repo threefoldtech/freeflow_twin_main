@@ -48,13 +48,16 @@ export default defineComponent({
         const router = useRouter();
 
         onBeforeMount(async () => {
-            currentDirectory.value = route.params.path;
-            if (isUndefined(currentDirectory.value)) currentDirectory.value = '';
-            await updateContent(currentDirectory.value); // bug to fix
-            sharedDir.value = false;
-            selectedPaths.value = [];
-            searchResults.value = [];
-            searchDirValue.value = '';
+            if (!sharedDir.value) {
+                currentDirectory.value = route.params.path;
+                if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
+                await updateContent(currentDirectory.value);
+                sharedDir.value = false;
+                selectedPaths.value = [];
+                searchResults.value = [];
+                searchDirValue.value = '';
+                return;
+            }
         });
 
         return {
