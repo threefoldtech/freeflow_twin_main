@@ -56,10 +56,8 @@ export default defineComponent({
         const router = useRouter();
 
         onBeforeMount(async () => {
-            console.log(route.params);
             if (route.params.share === 'true') {
                 // should be only when folder
-                console.log('is shared');
                 let share = sharedItem.value;
                 goIntoSharedFolder(share);
             }
@@ -71,24 +69,18 @@ export default defineComponent({
 
             if (!sharedDir.value) {
                 if (route.params.editFileShare === 'true') {
-                    console.log('here');
                     const item = await getFile(currentDirectory.value);
 
                     selectItem(item);
 
                     selectedTab.value = 1;
-
                     showShareDialog.value = true;
-                    console.log(currentDirectory.value);
                     await updateContent(currentDirectory.value);
-                    console.log(currentDirectory.value);
 
                     return;
                 }
 
-                console.log(currentDirectory.value);
                 if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
-                console.log(currentDirectory.value);
                 await updateContent(currentDirectory.value);
                 sharedDir.value = false;
                 selectedPaths.value = [];
