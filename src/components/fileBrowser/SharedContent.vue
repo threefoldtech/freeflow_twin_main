@@ -59,9 +59,15 @@
                                                     :key="item.name"
                                                     class="fa-2x"
                                                     :class="
-                                                        getIconDirty(getFileType(getExtension(item.name))) +
+                                                        getIconDirty(
+                                                            item.isFolder,
+                                                            getFileType(getExtension(item.name))
+                                                        ) +
                                                         ' ' +
-                                                        getIconColorDirty(getFileType(getExtension(item.name)))
+                                                        getIconColorDirty(
+                                                            item.isFolder,
+                                                            getFileType(getExtension(item.name))
+                                                        )
                                                     "
                                                 ></i>
                                             </div>

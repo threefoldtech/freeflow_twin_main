@@ -26,12 +26,20 @@ import {
     searchDirValue,
     currentDirectory,
     currentShare,
+    getFile,
+    selectItem,
+    selectedTab,
+    goBack,
+    currentDirectoryContent,
+    sharedItem,
+    goIntoSharedFolder,
 } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
 import router from '@/plugins/Router';
 import { useRoute, useRouter } from 'vue-router';
 import { isUndefined } from 'lodash';
+import { showShareDialog } from '@/services/dialogService';
 
 export default defineComponent({
     name: 'Apps',
@@ -48,9 +56,39 @@ export default defineComponent({
         const router = useRouter();
 
         onBeforeMount(async () => {
+            console.log(route.params);
+            if (route.params.share === 'true') {
+                // should be only when folder
+                console.log('is shared');
+                let share = sharedItem.value;
+                goIntoSharedFolder(share);
+            }
+
+            if (route.params.path) {
+                currentDirectory.value = atob(<string>route.params.path);
+                console.log(currentDirectory.value);
+            }
+
             if (!sharedDir.value) {
-                currentDirectory.value = route.params.path;
+                if (route.params.editFileShare === 'true') {
+                    console.log('here');
+                    const item = await getFile(currentDirectory.value);
+
+                    selectItem(item);
+
+                    selectedTab.value = 1;
+
+                    showShareDialog.value = true;
+                    console.log(currentDirectory.value);
+                    await updateContent(currentDirectory.value);
+                    console.log(currentDirectory.value);
+
+                    return;
+                }
+
+                console.log(currentDirectory.value);
                 if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
+                console.log(currentDirectory.value);
                 await updateContent(currentDirectory.value);
                 sharedDir.value = false;
                 selectedPaths.value = [];

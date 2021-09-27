@@ -28,7 +28,7 @@
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="py-1 flex flex-col">
-                <div class="my-message:text-icon">{{ message.body.name }}</div>
+                <div class="my-message:text-icon">{{ message.body }}</div>
                 <span class="my-message:text-icon opacity-70"> {{ formatBytes(message.body.size, 2) }}</span>
             </div>
         </div>
@@ -44,8 +44,10 @@ import {
     goTo,
     currentDirectory,
     goIntoSharedFolder,
+    sharedItem,
 } from '@/store/fileBrowserStore';
 import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
+import { AppType } from '@/types/apps';
 
 import { useRouter } from 'vue-router';
 
@@ -59,19 +61,26 @@ const props = defineProps({
 const router = useRouter();
 const visitFileInMessage = (message: Message<FileShareMessageType>) => {
     if (message.from === loginName) {
-        const url = router.resolve({
-            name: 'editoptions',
+        router.push({
+            name: AppType.Quantum,
             params: {
                 path: btoa(message.body.path),
-                shareId: message.body.id,
+                editFileShare: 'true',
             },
         });
-        window.open(url.href, '_blank');
         return;
     }
     currentDirectory.value = '';
-    router.push('/quantum');
-    goToShared();
+    sharedItem.value = message.body;
+
+    router.push({
+        name: AppType.Quantum,
+        params: {
+            sharedWithMe: 'true',
+        },
+    });
+
+    // goToShared();
     goTo(message.body);
     sharedDir.value = true;
 };

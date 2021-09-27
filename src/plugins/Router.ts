@@ -85,7 +85,7 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/quantum/sharedWithMe/:path?/:shareId?',
+        path: '/quantum/:sharedWithMe?',
         name: 'sharedWithMe',
         component: FileBrowser,
         meta: {

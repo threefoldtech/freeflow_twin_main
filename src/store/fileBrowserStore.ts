@@ -8,11 +8,12 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { ContactInterface, DtId, SharedFileInterface } from '@/types';
+import { ContactInterface, DtId, FileShareMessageType, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
+import { AppType } from '@/types/apps';
 
 declare const Buffer;
 export enum FileType {
@@ -58,8 +59,10 @@ export const isDraggingFiles = ref<boolean>(false);
 export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
 export const sharedContent = ref<SharedFileInterface[]>([]);
+export const sharedItem = ref<FileShareMessageType>();
 
 export const currentShare = ref<SharedFileInterface>(undefined);
+export const selectedTab = ref(0);
 
 watch([currentDirectory], () => {
     updateContent();
@@ -165,7 +168,15 @@ export const goToFolderInCurrentDirectory = (item: PathInfoModel) => {
 export const goToHome = () => {
     sharedDir.value = false;
     currentShare.value = undefined;
+
+    router.push({
+        name: AppType.Quantum,
+        params: {
+            path: btoa('/'),
+        },
+    });
     currentDirectory.value = rootDirectory;
+
 };
 
 export const moveFiles = async (destination: string, items = selectedPaths.value.map(x => x.path)) => {
@@ -273,7 +284,6 @@ export const goBack = () => {
     if (currentDirectory.value === rootDirectory) return;
     const parts = currentDirectory.value.split('/');
     parts.pop();
-    console.log(parts);
     parts.length === 1 ? (currentDirectory.value = rootDirectory) : (currentDirectory.value = pathJoin(parts));
 };
 
@@ -307,9 +317,7 @@ export const itemAction = async (item: PathInfoModel, router: Router, path = cur
     if (item.isDirectory) {
         return goToFolderInCurrentDirectory(item);
     }
-    console.log(item);
     const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName])) } });
-    console.log(result);
     window.open(result.href, '_blank');
 };
 
@@ -361,7 +369,9 @@ export const getIcon = (item: PathInfoModel) => {
             return 'far fa-file';
     }
 };
-export const getIconDirty = (fileType: FileType) => {
+export const getIconDirty = (isFolder: boolean, fileType: FileType) => {
+    if (isFolder) return 'fas fa-folder';
+
     switch (fileType) {
         case FileType.Video:
             return 'far fa-file-video';
@@ -512,7 +522,8 @@ export const getIconColor = (item: PathInfoModel) => {
             return 'text-primarylight';
     }
 };
-export const getIconColorDirty = (filetype: FileType) => {
+export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
+    if (isFolder) return 'text-primary';
     switch (filetype) {
         case FileType.Excel:
             return 'text-green-400';
@@ -538,6 +549,7 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
     } else {
         path = share.path;
     }
+
     const items = await getSharedFolderContent(share.owner, share.id, path);
     sharedContent.value = items.map(item => {
         let itemName = item.name;
