@@ -27,6 +27,8 @@ export enum FileType {
     Excel,
     Powerpoint,
     Image,
+    Text,
+    Html,
 }
 
 export enum Action {
@@ -425,6 +427,8 @@ export const getFileType = (extension: string): FileType => {
         case 'jpg':
         case 'jpeg':
         case 'tiff':
+        case 'txt':
+            return FileType.Text;
         case 'png':
         case 'bmp':
         case 'gif':
@@ -473,6 +477,8 @@ export const getFileType = (extension: string): FileType => {
         case 'pptm':
         case 'pptx':
             return FileType.Powerpoint;
+        case 'html':
+            return FileType.Html;
         default:
             return FileType.Unknown;
     }
