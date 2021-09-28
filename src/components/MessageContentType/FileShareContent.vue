@@ -60,6 +60,7 @@ const props = defineProps({
 
 const router = useRouter();
 const visitFileInMessage = (message: Message<FileShareMessageType>) => {
+    sharedItem.value = message.body;
     if (message.from === loginName) {
         router.push({
             name: AppType.Quantum,
@@ -71,7 +72,6 @@ const visitFileInMessage = (message: Message<FileShareMessageType>) => {
         return;
     }
     currentDirectory.value = '';
-    sharedItem.value = message.body;
 
     router.push({
         name: AppType.Quantum,

@@ -59,19 +59,14 @@ export default defineComponent({
         onBeforeMount(async () => {
             if (route.params.path) {
                 currentDirectory.value = atob(<string>route.params.path);
-                console.log(currentDirectory.value);
             }
 
             if (!sharedDir.value) {
                 if (route.params.editFileShare === 'true') {
-                    const item = await getFile(currentDirectory.value);
-
-                    selectItem(item);
-
+                    selectItem(sharedItem.value);
                     selectedTab.value = 1;
                     showShareDialog.value = true;
                     await updateContent(currentDirectory.value);
-
                     return;
                 }
 
