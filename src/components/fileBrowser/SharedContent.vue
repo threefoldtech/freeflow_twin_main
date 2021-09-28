@@ -114,6 +114,7 @@ import {
     PathInfoModel,
     selectedPaths,
     sharedContent,
+    goTo,
 } from '@/store/fileBrowserStore';
 import { SharedFileInterface } from '@/types';
 import { defineComponent } from '@vue/runtime-core';
@@ -129,20 +130,6 @@ const epochToDate = epoch => {
     let d = new Date(epoch).toLocaleDateString();
 
     return d === '1/20/1980' ? 'Never' : d;
-};
-const goTo = async (item: SharedFileInterface) => {
-    if (item.isFolder) {
-        goIntoSharedFolder(item);
-        return;
-    }
-    const url = router.resolve({
-        name: 'editfile',
-        params: {
-            path: btoa(item.path),
-            shareId: item.id,
-        },
-    });
-    window.open(url.href, '_blank');
 };
 
 const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);

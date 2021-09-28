@@ -80,17 +80,9 @@ const visitFileInMessage = (message: Message<FileShareMessageType>) => {
         },
     });
 
-    // goToShared();
     goTo(message.body);
     sharedDir.value = true;
 };
 </script>
 <style></style>
 
-function goTo(body: FileShareMessageType) {
-  throw new Error('Function not implemented.');
-}
-
-function goTo(body: FileShareMessageType) {
-  throw new Error('Function not implemented.');
-}

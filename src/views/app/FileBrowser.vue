@@ -33,6 +33,7 @@ import {
     currentDirectoryContent,
     sharedItem,
     goIntoSharedFolder,
+    goTo,
 } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
@@ -56,12 +57,6 @@ export default defineComponent({
         const router = useRouter();
 
         onBeforeMount(async () => {
-            if (route.params.share === 'true') {
-                // should be only when folder
-                let share = sharedItem.value;
-                goIntoSharedFolder(share);
-            }
-
             if (route.params.path) {
                 currentDirectory.value = atob(<string>route.params.path);
                 console.log(currentDirectory.value);

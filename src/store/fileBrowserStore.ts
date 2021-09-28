@@ -549,8 +549,15 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
     } else {
         path = share.path;
     }
-
+    console.log("currentShare", currentShare.value)
+    console.log("path", share)
+    console.log('path', path)
+    console.log(share.owner, share.id, path)
     const items = await getSharedFolderContent(share.owner, share.id, path);
+
+
+
+    console.log(items)
     sharedContent.value = items.map(item => {
         let itemName = item.name;
         if (item.extension) {
@@ -567,10 +574,12 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
             permissions: share.permissions,
         };
     });
+    console.log('cur', path)
     sharedDir.value = true;
 };
 
 export const goTo = async (item: SharedFileInterface) => {
+    console.log(item)
     if (item.isFolder) {
         goIntoSharedFolder(item);
         return;
@@ -628,5 +637,6 @@ export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, sh
 
 export const getSharedFolderContent = async (owner, shareId, path: string) => {
     const { user } = useAuthState();
-    return await Api.getSharedFolderContent(owner, shareId, <string>user.id, path);
+    console.log("share id ", shareId)
+    return await Api.getSharedFolderContent(owner, shareId, <string>user.id, "/");
 };
