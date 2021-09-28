@@ -115,6 +115,7 @@ import {
     selectedPaths,
     sharedContent,
     goTo,
+    getFullFolderSkeleton
 } from '@/store/fileBrowserStore';
 import { SharedFileInterface } from '@/types';
 import { defineComponent } from '@vue/runtime-core';
@@ -123,6 +124,7 @@ import { useRouter } from 'vue-router';
 
 onBeforeMount(async () => {
     await getSharedContent();
+    await getFullFolderSkeleton();
 });
 
 const router = useRouter();

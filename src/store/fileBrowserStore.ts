@@ -2,7 +2,7 @@ import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
 import { getShareWithId } from '@/services/fileBrowserService';
-import { Router } from 'vue-router';
+import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
@@ -59,6 +59,8 @@ export const isDraggingFiles = ref<boolean>(false);
 export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
 export const sharedContent = ref<SharedFileInterface[]>([]);
+export const allSharedContent = ref<SharedFileInterface[]>([]);
+
 export const sharedItem = ref<PathInfoModel>();
 
 export const currentShare = ref<SharedFileInterface>(undefined);
@@ -118,6 +120,11 @@ export const goToShared = async () => {
     selectedPaths.value = [];
     searchResults.value = [];
     searchDirValue.value = '';
+
+    router.push({
+        name: 'sharedWithMe',
+        
+    })
     await getSharedContent();
 };
 
@@ -536,12 +543,76 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
+
+
+export const getFullFolderSkeleton = async () => {
+    /*
+    //console.log(allSharedContent.value[0].owner)
+    const allFolders = allSharedContent.value.map(async item => {
+        if(item.isFolder){
+            const nested = await getSharedFolderContent(item.owner, item.id, item.path)
+            nested.map(async item => {
+        //          console.log(item)
+                if(item.isDirectory){
+                    await getSharedFolderContent(allSharedContent.value[0].owner, item.id, item.path)
+                    return
+                }
+                return item
+            })
+            return ({...item, nested: nested}) 
+        }
+        return item;
+    })
+
+   // console.log(Promise.all(allFolders).then(function(results) {
+     //   console.log(results)
+    }))
+    */
+}
+
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
     sharedContent.value = result.data;
+    allSharedContent.value = result.data;
 };
 
+
 export const goIntoSharedFolder = async (share: SharedFileInterface) => {
+    console.log(share)
+
+    
+   
+    console.log(router.currentRoute.value.params)
+
+
+    if(router.currentRoute.value.params.sharedId){
+        console.log("Done")
+        console.log(router.currentRoute.value.params.sharedId)
+
+        if(router.currentRoute.value.params.path){
+            //decode here
+            router.push({name: 'sharedWithMeItemNested', params: {
+                sharedId: router.currentRoute.value.params.sharedId,
+                path: share.path.replace('/','')
+            }})
+            return;
+        }
+        
+        router.push({name: 'sharedWithMeItemNested', params: {
+            sharedId: router.currentRoute.value.params.sharedId,
+            path: share.path.replace('/','')
+        }})
+    }else{
+        console.log("No")
+        router.push({name: 'sharedWithMeItem', params: {
+            sharedId: share.id,
+        }})
+    }
+    
+    //console.log(router.currentRoute.value)
+
+    
+
     let path: string;
     if (!currentShare.value) {
         path = '/';
