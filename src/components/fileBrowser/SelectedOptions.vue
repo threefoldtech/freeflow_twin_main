@@ -180,6 +180,7 @@ import {
     Action,
     addShare,
     sharedDir,
+    selectedTab,
 } from '@/store/fileBrowserStore';
 import Dialog from '@/components/Dialog.vue';
 import Button from '@/components/Button.vue';
@@ -197,7 +198,6 @@ const { chats } = usechatsState();
 const { retrievechats, sendMessage } = usechatsActions();
 
 const tabs = ['Create shares', 'Edit shares'];
-const selectedTab = ref(0);
 
 export default defineComponent({
     name: 'SelectedOptions',

@@ -190,15 +190,17 @@ export const getSharedFolderContent = async (
 ) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
-
+    console.log("path in call--------------------", path)
+    path = "/"
     let apiEndPointToCall = `/api/browse/share/${shareId}/folder?path=${path}`;
-    apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
+    apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
+    console.log(apiEndPointToCall)
     externalUrl = externalUrl + apiEndPointToCall;
     const res = await axios.get(externalUrl);
     return <PathInfoModel[]>res.data;
 };
 
-export const getShareByPath = async (path:string):Promise<SharedFileInterface> => {
-    return (await axios.get(`${endpoint}/share/path/`, { params: {path} })).data;
+export const getShareByPath = async (path: string): Promise<SharedFileInterface> => {
+    return (await axios.get(`${endpoint}/share/path/`, { params: { path } })).data;
 }

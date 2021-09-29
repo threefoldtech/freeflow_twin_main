@@ -1,21 +1,19 @@
 <template>
-    <div v-if="fileType">
-        <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
-            <div id="placeholder"></div>
+    <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
+        <div id="placeholder"></div>
+    </div>
+    <div v-else class="flex items-center justify-center bg-gray-100 h-screen">
+        <div v-if="fileType == FileType.Video">
+            <video controls>
+                <source :src="readUrl" />
+            </video>
         </div>
-        <div v-else class="flex items-center justify-center bg-gray-100 h-screen">
-            <div v-if="fileType == FileType.Video">
-                <video controls>
-                    <source :src="readUrl" />
-                </video>
-            </div>
-            <div v-else-if="fileType == FileType.Image">
-                <img :src="readUrl" />
-            </div>
-            <div v-else class="text-center">
-                <h1 class="mb-2">Sorry, we are not able to display the file</h1>
-                <a class="bg-primary text-white p-2" :href="readUrl">Download file</a>
-            </div>
+        <div v-else-if="fileType == FileType.Image">
+            <img :src="readUrl" />
+        </div>
+        <div v-else class="text-center">
+            <h1 class="mb-2">Sorry, we are not able to display the file</h1>
+            <a class="bg-primary text-white p-2" :href="readUrl">Download file</a>
         </div>
     </div>
 </template>
@@ -55,7 +53,9 @@ const fileType = ref<FileType>();
 const readUrl = ref<string>();
 
 const isSupportedInDocumentServer = computed(() => {
-    return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x => x === fileType.value);
+    return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
+        x => x === fileType.value
+    );
 });
 
 onMounted(async () => {

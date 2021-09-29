@@ -1,5 +1,9 @@
 <template>
-    <a class="px-4 my-2 my-message:bg-accent-200 cursor-pointer" @click="goToShared(message)" v-if="message.body">
+    <a
+        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer"
+        @click="visitFileInMessage(message)"
+        v-if="message.body"
+    >
         <h3 class="my-message:text-icon text-center">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>
@@ -33,8 +37,17 @@
 
 <script setup lang="ts">
 import { loginName } from '@/store/authStore';
-import { formatBytes } from '@/store/fileBrowserStore';
+import {
+    formatBytes,
+    sharedDir,
+    goToShared,
+    goTo,
+    currentDirectory,
+    goIntoSharedFolder,
+    sharedItem,
+} from '@/store/fileBrowserStore';
 import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
+import { AppType } from '@/types/apps';
 
 import { useRouter } from 'vue-router';
 
@@ -46,26 +59,30 @@ const props = defineProps({
 });
 
 const router = useRouter();
-const goToShared = (message: Message<FileShareMessageType>) => {
+const visitFileInMessage = (message: Message<FileShareMessageType>) => {
+    sharedItem.value = message.body;
     if (message.from === loginName) {
-        const url = router.resolve({
-            name: 'editoptions',
+        router.push({
+            name: AppType.Quantum,
             params: {
                 path: btoa(message.body.path),
-                shareId: message.body.id,
+                editFileShare: 'true',
             },
         });
-        window.open(url.href, '_blank');
         return;
     }
-    const url = router.resolve({
-        name: 'editfile',
+    currentDirectory.value = '';
+
+    router.push({
+        name: AppType.Quantum,
         params: {
-            path: btoa(message.body.path),
-            shareId: message.body.id,
+            sharedWithMe: 'true',
         },
     });
-    window.open(url.href, '_blank');
+
+    goTo(message.body);
+    sharedDir.value = true;
 };
 </script>
 <style></style>
+

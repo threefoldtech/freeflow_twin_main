@@ -26,12 +26,21 @@ import {
     searchDirValue,
     currentDirectory,
     currentShare,
+    getFile,
+    selectItem,
+    selectedTab,
+    goBack,
+    currentDirectoryContent,
+    sharedItem,
+    goIntoSharedFolder,
+    goTo,
 } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
 import router from '@/plugins/Router';
 import { useRoute, useRouter } from 'vue-router';
 import { isUndefined } from 'lodash';
+import { showShareDialog } from '@/services/dialogService';
 
 export default defineComponent({
     name: 'Apps',
@@ -48,13 +57,27 @@ export default defineComponent({
         const router = useRouter();
 
         onBeforeMount(async () => {
-            currentDirectory.value = route.params.path;
-            if (isUndefined(currentDirectory.value)) currentDirectory.value = '';
-            await updateContent(currentDirectory.value); // bug to fix
-            sharedDir.value = false;
-            selectedPaths.value = [];
-            searchResults.value = [];
-            searchDirValue.value = '';
+            if (route.params.path) {
+                currentDirectory.value = atob(<string>route.params.path);
+            }
+
+            if (!sharedDir.value) {
+                if (route.params.editFileShare === 'true') {
+                    selectItem(sharedItem.value);
+                    selectedTab.value = 1;
+                    showShareDialog.value = true;
+                    await updateContent(currentDirectory.value);
+                    return;
+                }
+
+                if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
+                await updateContent(currentDirectory.value);
+                sharedDir.value = false;
+                selectedPaths.value = [];
+                searchResults.value = [];
+                searchDirValue.value = '';
+                return;
+            }
         });
 
         return {

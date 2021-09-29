@@ -59,11 +59,20 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         // fake security since the actual filebrowser has no security yet?
-        name: 'quantum',
-        path: '/quantum/:path?', //btoa? /quantum/:path?
-        component: FileBrowser,
+       
+        path: '/quantum', //btoa? /quantum/:path?
+        component: RouterView,
         meta: { requiresAuth: true, app: AppType.Quantum },
+        children: [
+            {
+            // fake security since the actual filebrowser has no security yet?
+            name: 'quantum',
+            path: '/:path?', //btoa? /quantum/:path?
+            component: FileBrowser,
+            meta: { requiresAuth: true, app: AppType.Quantum },
+        }]
     },
+    
     {
         path: '/quantum/edit/:path/:shareId?',
         name: 'editfile',
@@ -85,7 +94,7 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/quantum/sharedWithMe/:path?/:shareId?',
+        path: '/quantum/shared',
         name: 'sharedWithMe',
         component: FileBrowser,
         meta: {
@@ -93,6 +102,22 @@ const routes: Array<RouteRecordRaw> = [
             requiresAuth: true,
             app: AppType.Quantum,
         },
+        children: [
+            {
+                component: FileBrowser,
+                ///quantum/shared/:sharedId
+                name: 'sharedWithMeItem',
+                path: ':sharedId',
+                children: [
+                    {
+                        ///quantum/shared/:sharedId/:path
+                        path: ':path',
+                        name: 'sharedWithMeItemNested',
+                        component: FileBrowser
+                    }
+                ]
+            }
+        ]
     },
     {
         name: 'forum',

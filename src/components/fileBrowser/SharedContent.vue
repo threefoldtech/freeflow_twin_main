@@ -59,9 +59,15 @@
                                                     :key="item.name"
                                                     class="fa-2x"
                                                     :class="
-                                                        getIconDirty(getFileType(getExtension(item.name))) +
+                                                        getIconDirty(
+                                                            item.isFolder,
+                                                            getFileType(getExtension(item.name))
+                                                        ) +
                                                         ' ' +
-                                                        getIconColorDirty(getFileType(getExtension(item.name)))
+                                                        getIconColorDirty(
+                                                            item.isFolder,
+                                                            getFileType(getExtension(item.name))
+                                                        )
                                                     "
                                                 ></i>
                                             </div>
@@ -108,6 +114,8 @@ import {
     PathInfoModel,
     selectedPaths,
     sharedContent,
+    goTo,
+    getFullFolderSkeleton
 } from '@/store/fileBrowserStore';
 import { SharedFileInterface } from '@/types';
 import { defineComponent } from '@vue/runtime-core';
@@ -116,6 +124,7 @@ import { useRouter } from 'vue-router';
 
 onBeforeMount(async () => {
     await getSharedContent();
+    await getFullFolderSkeleton();
 });
 
 const router = useRouter();
@@ -123,20 +132,6 @@ const epochToDate = epoch => {
     let d = new Date(epoch).toLocaleDateString();
 
     return d === '1/20/1980' ? 'Never' : d;
-};
-const goTo = async (item: SharedFileInterface) => {
-    if (item.isFolder) {
-        goIntoSharedFolder(item);
-        return;
-    }
-    const url = router.resolve({
-        name: 'editfile',
-        params: {
-            path: btoa(item.path),
-            shareId: item.id,
-        },
-    });
-    window.open(url.href, '_blank');
 };
 
 const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
