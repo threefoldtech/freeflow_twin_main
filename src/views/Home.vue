@@ -29,6 +29,7 @@
             <footer class="flex-shrink-0 bg-gray-50">
                 <div class="mx-auto max-w-7xl w-full px-4 py-16 sm:px-6 lg:px-8">
                     <nav class="flex space-x-4">
+                        <span class="inline-block border-l border-gray-300" aria-hidden="true" />
                         <a
                             href="https://wiki.uhuru.me/"
                             target="_blank"
@@ -36,9 +37,6 @@
                             >Uhuru Wiki</a
                         >
                         <span class="inline-block border-l border-gray-300" aria-hidden="true" />
-                        <a href="#" class="text-sm font-medium text-gray-500 hover:text-gray-600">Status</a>
-                        <span class="inline-block border-l border-gray-300" aria-hidden="true" />
-                        <a href="#" class="text-sm font-medium text-gray-500 hover:text-gray-600">Twitter</a>
                     </nav>
                 </div>
             </footer>
@@ -65,7 +63,7 @@
 
     setTimeout(() => {
         loginAndPush();
-    }, 5200);
+    }, 1000000);
 </script>
 
 <style scoped type="text/css"></style>
