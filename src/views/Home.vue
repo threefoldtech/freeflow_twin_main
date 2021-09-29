@@ -63,7 +63,7 @@
 
     setTimeout(() => {
         loginAndPush();
-    }, 1000000);
+    }, 5200);
 </script>
 
 <style scoped type="text/css"></style>
