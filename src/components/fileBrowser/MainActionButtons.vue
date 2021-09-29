@@ -1,58 +1,68 @@
 <template>
-    <div class="mx-2" :class='{"hidden" : sharedDir}' >
-        <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
-            <i class="fas fa-plus"></i> New Folder
+    <div class='mx-2' :class='{"hidden" : sharedDir}'>
+        <button @click='showCreateFolderDialog = true' class='text-white py-2 px-4 mr-2 rounded-md bg-primary'>
+            <i class='fas fa-plus'></i> New Folder
         </button>
-        <button @click="showCreateFileDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
-            <i class="fas fa-plus"></i> Upload Files
+        <button @click='showCreateFileDialog = true' class='text-white py-2 px-4 mr-2 rounded-md bg-primary'>
+            <i class='fas fa-plus'></i> Upload Files
         </button>
     </div>
-    <Dialog :model-value="showCreateFolderDialog" @update-model-value="val => updateCreateFolderDialog(val)">
+    <Dialog :model-value='showCreateFolderDialog' @update-model-value='val => updateCreateFolderDialog(val)'>
         <template v-slot:title>
             <h1>Create folder</h1>
         </template>
         <div>
-            <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
-            <div>
-                <input type="text" name="newFolder" id="newFolder" ref="newFolderInput" v-model="manualContactAdd" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="New folder name" />
+            <label for='newFolder' class='block text-sm font-medium text-gray-700'>Folder name</label>
+            <div class='relative'>
+                <input type='text' name='newFolder' id='newFolder' ref='newFolderInput' v-model='manualContactAdd'
+                       class='shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1'
+                       placeholder='New folder name' />
+                <div @click='clearFolderInput'
+                     class='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'>
+                    <i class='fa fa-window-close h-5 w-5 text-gray-400'
+                       aria-hidden='true' />
+                </div>
             </div>
         </div>
     </Dialog>
 
-    <Dialog :model-value="showCreateFileDialog" @update-model-value="val => updateCreateFileDialog(val)">
+    <Dialog :model-value='showCreateFileDialog' @update-model-value='val => updateCreateFileDialog(val)'>
         <template v-slot:title>
             <h1>Add files</h1>
         </template>
-        <div class="flex flex-col">
+        <div class='flex flex-col'>
             <span>Files*</span>
-            <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">Select files</button>
+            <button class='py-2 px-4 text-white rounded-md bg-primary max-w-max' @click='newFileInput.click()'>Select
+                files
+            </button>
         </div>
-        <input type="file" ref="newFileInput" hidden multiple @change="handleFileSelectChange" />
-        <FileDropArea :show="true" @send-file="handleDragAndDrop">
-            <div class="h-44"></div>
+        <input type='file' ref='newFileInput' hidden multiple @change='handleFileSelectChange' />
+        <FileDropArea :show='true' @send-file='handleDragAndDrop'>
+            <div class='h-44'></div>
         </FileDropArea>
-        <div class="">
-            <div v-if="selectedFiles.length" v-for="file in selectedFiles" :key="`${file.name}-${file.lastModified}`" class="flex flex-row justify-between mt-2 pb-2 border-b border-bordergrey">
-                <div class="flex">
-                    <DocumentTextIcon class="h-5 w-5 mr-1 text-gray-400" aria-hidden="true" />
-                    <span>{{file.name}}</span>
+        <div class=''>
+            <div v-if='selectedFiles.length' v-for='file in selectedFiles' :key='`${file.name}-${file.lastModified}`'
+                 class='flex flex-row justify-between mt-2 pb-2 border-b border-bordergrey'>
+                <div class='flex'>
+                    <DocumentTextIcon class='h-5 w-5 mr-1 text-gray-400' aria-hidden='true' />
+                    <span>{{ file.name }}</span>
                 </div>
-                <XIcon class="h-5 w-5 mr-1 text-btnred cursor-pointer" aria-hidden="true" @click="deleteFile(file)" />
+                <XIcon class='h-5 w-5 mr-1 text-btnred cursor-pointer' aria-hidden='true' @click='deleteFile(file)' />
             </div>
-            <div v-else class="mt-2 pb-2 border-b border-bordergrey">
+            <div v-else class='mt-2 pb-2 border-b border-bordergrey'>
                 <span>No files selected</span>
             </div>
         </div>
     </Dialog>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
     import { defineComponent, ref } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { createDirectory, uploadFiles,sharedDir } from '@/store/fileBrowserStore';
+    import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
-    import {DocumentTextIcon, XIcon} from '@heroicons/vue/solid';
+    import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
 
     export default defineComponent({
         name: 'MainActionButtons',
@@ -61,7 +71,7 @@
             Dialog,
             FileDropArea,
             DocumentTextIcon,
-            XIcon
+            XIcon,
         },
         setup() {
             const showCreateFolderDialog = ref(false);
@@ -88,10 +98,10 @@
 
             const deleteFile = (file: File) => {
                 selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
-                
+
                 newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
                 newFileInput.value.value = newFileInputArray.value;
-            }
+            };
 
             const updateCreateFileDialog = (val: boolean) => {
                 if (!val) {
@@ -113,6 +123,15 @@
                 selectedFiles.value = [];
                 newFileInput.value.value = null;
             };
+            const clearFolderInput = () => {
+                newFolderInput.value.value = '';
+            };
+            const inputEmpty = () => {
+                if (!newFolderInput.value)return false;
+                if (!newFolderInput.value.value)return false;
+                return newFolderInput.value.value !== '';
+            };
+
 
             const handleFileSelectChange = () => {
                 console.log(selectedFiles.value);
@@ -135,7 +154,11 @@
                 clearFiles,
                 updateCreateFileDialog,
                 deleteFile,
-                sharedDir
+                sharedDir,
+                inputEmpty,
+                clearFolderInput,
+
+
             };
         },
     });

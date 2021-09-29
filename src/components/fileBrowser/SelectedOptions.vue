@@ -96,7 +96,7 @@
             <template v-slot:title class="center">
                 <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
-            <div>
+            <div class='relative'>
                 <label for="rename" class="sr-only">Rename</label>
                 <input
                     type="text"
@@ -115,6 +115,11 @@
                     "
                     :placeholder="selectedPaths[0].name"
                 />
+                <div v-if="newName !== ''" @click="newName = ''"
+                     class='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'>
+                    <i class='fa fa-window-close h-5 w-5 text-gray-400'
+                       aria-hidden='true' />
+                </div>
             </div>
             <div class="flex justify-end mt-2">
                 <button
