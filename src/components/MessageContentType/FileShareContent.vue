@@ -73,13 +73,6 @@ const visitFileInMessage = (message: Message<FileShareMessageType>) => {
     }
     currentDirectory.value = '';
 
-    router.push({
-        name: AppType.Quantum,
-        params: {
-            sharedWithMe: 'true',
-        },
-    });
-
     goTo(message.body);
     sharedDir.value = true;
 };
