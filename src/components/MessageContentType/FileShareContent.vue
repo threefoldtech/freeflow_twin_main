@@ -28,7 +28,7 @@
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="py-1 flex flex-col">
-                <div class="my-message:text-icon">{{ message.body }}</div>
+                <div class="my-message:text-icon">{{ message.body.name }}</div>
                 <span class="my-message:text-icon opacity-70"> {{ formatBytes(message.body.size, 2) }}</span>
             </div>
         </div>
