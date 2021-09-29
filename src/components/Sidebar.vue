@@ -7,7 +7,7 @@
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <img alt="Threefold logo" src="../../public/uhuru.svg" width="65" />
+                    <img alt="Threefold logo" src="../../Symbol_secundary_color.png" width="65" />
                 </div>
             </div>
             <br />
