@@ -425,6 +425,7 @@ export const getFileType = (extension: string): FileType => {
         case 'swf':
             return FileType.Video;
         case 'doc':
+            return FileType.Word;
         case 'docm':
         case 'docx':
         case 'dot':
@@ -432,13 +433,17 @@ export const getFileType = (extension: string): FileType => {
         case 'dotx':
             return FileType.Word;
         case 'jpg':
+            return FileType.Image;
         case 'jpeg':
+            return FileType.Image;
         case 'tiff':
         case 'txt':
             return FileType.Text;
         case 'png':
+            return FileType.Image;
         case 'bmp':
         case 'gif':
+            return FileType.Image;
         case 'webp':
         case 'svg':
             return FileType.Image;
