@@ -17,6 +17,14 @@ import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
 import config from '@/config';
 import { disableSidebar } from '@/services/sidebarService';
+import {
+    loadSharedItems,
+    fetchBasedOnRoute,
+    sharedFolderIsloading,
+    sharedDir,
+    showSharedFolderErrorModal,
+    loadLocalFolder,
+} from '@/store/fileBrowserStore';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -57,22 +65,25 @@ const routes: Array<RouteRecordRaw> = [
             },
         ],
     },
+    /*
     {
         // fake security since the actual filebrowser has no security yet?
-       
+
         path: '/quantum', //btoa? /quantum/:path?
         component: RouterView,
         meta: { requiresAuth: true, app: AppType.Quantum },
         children: [
             {
-            // fake security since the actual filebrowser has no security yet?
-            name: 'quantum',
-            path: '/:path?', //btoa? /quantum/:path?
-            component: FileBrowser,
-            meta: { requiresAuth: true, app: AppType.Quantum },
-        }]
+                // fake security since the actual filebrowser has no security yet?
+                name: 'quantum',
+                path: '/:path?', //btoa? /quantum/:path?
+                component: FileBrowser,
+                meta: { requiresAuth: true, app: AppType.Quantum },
+            },
+        ],
     },
-    
+    */
+
     {
         path: '/quantum/edit/:path/:shareId?',
         name: 'editfile',
@@ -94,30 +105,56 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/quantum/shared',
-        name: 'sharedWithMe',
+        path: '/quantum',
+        name: 'quantum',
         component: FileBrowser,
         meta: {
             back: 'quantum',
             requiresAuth: true,
             app: AppType.Quantum,
+            root_parent: 'quantum',
         },
         children: [
             {
+                path: ':folder',
+                name: 'quantumFolder',
                 component: FileBrowser,
-                ///quantum/shared/:sharedId
-                name: 'sharedWithMeItem',
-                path: ':sharedId',
+                meta: {},
+            },
+            {
+                path: 'shared',
+                name: 'sharedWithMe',
+                component: FileBrowser,
+                meta: {
+                    back: 'quantum',
+                    requiresAuth: true,
+                    app: AppType.Quantum,
+                    root_parent: 'quantum',
+                },
                 children: [
                     {
-                        ///quantum/shared/:sharedId/:path
-                        path: ':path',
-                        name: 'sharedWithMeItemNested',
-                        component: FileBrowser
-                    }
-                ]
-            }
-        ]
+                        component: FileBrowser,
+                        ///quantum/shared/:sharedId
+                        name: 'sharedWithMeItem',
+                        path: ':sharedId',
+                        meta: {
+                            root_parent: 'quantum',
+                        },
+                        children: [
+                            {
+                                ///quantum/shared/:sharedId/:path
+                                path: ':path',
+                                name: 'sharedWithMeItemNested',
+                                component: FileBrowser,
+                                meta: {
+                                    root_parent: 'quantum',
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
         name: 'forum',
@@ -167,7 +204,29 @@ router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
+
+    /* if (to.name === 'sharedWithMeItemNested' || to.name === 'sharedWithMeItem' || to.name === 'sharedWithMe') {
+        // await loadSharedItems();
+    } */
+    if (to.name === 'sharedWithMe') {
+        sharedDir.value = true;
+    }
+
     next();
+});
+
+router.afterEach(async (to, from) => {
+    if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder') {
+        sharedFolderIsloading.value = true;
+        await fetchBasedOnRoute();
+        await loadSharedItems();
+    } else {
+        sharedFolderIsloading.value = false;
+        showSharedFolderErrorModal.value = false;
+    }
+    if (to.name === 'quantumFolder') {
+        loadLocalFolder();
+    }
 });
 
 router.beforeEach(async (to, from, next) => {

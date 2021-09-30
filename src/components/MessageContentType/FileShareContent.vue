@@ -28,7 +28,7 @@
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="py-1 flex flex-col">
-                <div class="my-message:text-icon">{{ message.body }}</div>
+                <div class="my-message:text-icon">{{ message.body.name }}</div>
                 <span class="my-message:text-icon opacity-70"> {{ formatBytes(message.body.size, 2) }}</span>
             </div>
         </div>
@@ -36,53 +36,67 @@
 </template>
 
 <script setup lang="ts">
-import { loginName } from '@/store/authStore';
-import {
-    formatBytes,
-    sharedDir,
-    goToShared,
-    goTo,
-    currentDirectory,
-    goIntoSharedFolder,
-    sharedItem,
-} from '@/store/fileBrowserStore';
-import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
-import { AppType } from '@/types/apps';
+    import { loginName } from '@/store/authStore';
+    import {
+        formatBytes,
+        sharedDir,
+        goToShared,
+        goTo,
+        currentDirectory,
+        goIntoSharedFolder,
+        sharedItem,
+        sharedFolderIsloading,
+    } from '@/store/fileBrowserStore';
+    import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
+    import { AppType } from '@/types/apps';
 
-import { useRouter } from 'vue-router';
+    import { useRouter } from 'vue-router';
 
-const props = defineProps({
-    message: {
-        type: Object,
-        required: true,
-    },
-});
-
-const router = useRouter();
-const visitFileInMessage = (message: Message<FileShareMessageType>) => {
-    sharedItem.value = message.body;
-    if (message.from === loginName) {
-        router.push({
-            name: AppType.Quantum,
-            params: {
-                path: btoa(message.body.path),
-                editFileShare: 'true',
-            },
-        });
-        return;
-    }
-    currentDirectory.value = '';
-
-    router.push({
-        name: AppType.Quantum,
-        params: {
-            sharedWithMe: 'true',
+    const props = defineProps({
+        message: {
+            type: Object,
+            required: true,
         },
     });
 
-    goTo(message.body);
-    sharedDir.value = true;
-};
+    const router = useRouter();
+    const visitFileInMessage = (message: Message<FileShareMessageType>) => {
+        sharedItem.value = message.body;
+
+        /* if (message.from === loginName) {
+            router.push({
+                name: AppType.Quantum,
+                params: {
+                    path: btoa(message.body.path),
+                    editFileShare: 'true',
+                },
+            });
+            return;
+        } */
+
+        if (message.from === loginName) {
+            router.push({
+                name: 'quantumFolder',
+                params: {
+                    folder: btoa(message.body.path),
+                    editFileShare: 'true',
+                },
+            });
+            return;
+        }
+        currentDirectory.value = '';
+        console.log(message);
+
+        router.push({
+            name: 'sharedWithMeItem',
+            params: {
+                sharedWithMe: 'true',
+                sharedId: message.body.id,
+            },
+        });
+
+        goTo(message.body);
+        sharedDir.value = true;
+    };
 </script>
 <style></style>
-
