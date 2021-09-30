@@ -138,7 +138,7 @@
                 </button>
             </div>
         </jdialog>
-        <jdialog v-model="showShareDialog" @update-model-value="showShareDialog = false" noActions>
+        <jdialog v-model="showShareDialog" @update-model-value="resetShareDialog" noActions>
             <template v-slot:title>
                 <h1 class="text-center">Share files</h1>
             </template>
@@ -234,6 +234,11 @@ export default defineComponent({
             await copyPasteSelected();
         }
 
+        function resetShareDialog() {
+            showShareDialog.value = false;
+            selectedPaths.value = [];
+            selectedTab.value = 0;
+        }
         return {
             selectedPaths,
             deleteFiles,
@@ -259,6 +264,7 @@ export default defineComponent({
             tabs,
             selectedTab,
             showShareDialog,
+            resetShareDialog,
         };
     },
 });
