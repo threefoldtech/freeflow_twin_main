@@ -125,7 +125,7 @@ export const goToShared = async () => {
 
     router.push({
         name: 'sharedWithMe',
-        
+
     })
     await getSharedContent();
 };
@@ -482,6 +482,12 @@ export const getFileType = (extension: string): FileType => {
         case 'ppsx':
         case 'ppt':
         case 'pptm':
+        case 'ods':
+            return FileType.Excel;
+        case 'odt':
+            return FileType.Word;
+        case 'odp':
+            return FileType.Powerpoint;
         case 'pptx':
             return FileType.Powerpoint;
         case 'html':
@@ -586,38 +592,44 @@ export const getSharedContent = async () => {
 export const goIntoSharedFolder = async (share: SharedFileInterface) => {
     console.log(share)
 
-    
-   
+
+
     console.log(router.currentRoute.value.params)
 
 
-    if(router.currentRoute.value.params.sharedId){
+    if (router.currentRoute.value.params.sharedId) {
         console.log("Done")
         console.log(router.currentRoute.value.params.sharedId)
 
-        if(router.currentRoute.value.params.path){
+        if (router.currentRoute.value.params.path) {
             //decode here
-            router.push({name: 'sharedWithMeItemNested', params: {
-                sharedId: router.currentRoute.value.params.sharedId,
-                path: share.path.replace('/','')
-            }})
+            router.push({
+                name: 'sharedWithMeItemNested', params: {
+                    sharedId: router.currentRoute.value.params.sharedId,
+                    path: share.path.replace('/', '')
+                }
+            })
             return;
         }
-        
-        router.push({name: 'sharedWithMeItemNested', params: {
-            sharedId: router.currentRoute.value.params.sharedId,
-            path: share.path.replace('/','')
-        }})
-    }else{
+
+        router.push({
+            name: 'sharedWithMeItemNested', params: {
+                sharedId: router.currentRoute.value.params.sharedId,
+                path: share.path.replace('/', '')
+            }
+        })
+    } else {
         console.log("No")
-        router.push({name: 'sharedWithMeItem', params: {
-            sharedId: share.id,
-        }})
+        router.push({
+            name: 'sharedWithMeItem', params: {
+                sharedId: share.id,
+            }
+        })
     }
-    
+
     //console.log(router.currentRoute.value)
 
-    
+
 
     let path: string;
     if (!currentShare.value) {
