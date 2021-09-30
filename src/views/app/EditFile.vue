@@ -1,7 +1,4 @@
 <template>
-    showOffline: {{ showUserOfflineMessage }} <br />
-
-    isLoading {{ isLoading }}
     <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
         <div id="placeholder"></div>
     </div>
