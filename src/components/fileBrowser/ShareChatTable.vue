@@ -3,7 +3,14 @@
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
         </div>
-        <input type="text" @focus="handleInput" @input="handleInput" v-model='searchTerm' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+        <input
+            type="text"
+            @focus="handleInput"
+            @input="handleInput"
+            v-model="searchTerm"
+            class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+            placeholder="Search"
+        />
     </div>
     <div class="flex flex-col">
         <div class="-my-2">
@@ -62,10 +69,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr
-                                v-for="(item) in searchResults()"
-                                :key="item"
-                            >
+                            <tr v-for="item in searchResults()" :key="item">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex">
                                         <div class="flex-shrink-0 h-10 w-10">
@@ -79,9 +83,33 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
-                                        <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': !item.canWrite }"> Read</span>
-                                        <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': item.canWrite }"> Write</span>
+                                    <div
+                                        class="
+                                            cursor-pointer
+                                            rounded-xl
+                                            bg-gray-50
+                                            border border-gray-200
+                                            w-28
+                                            justify-between
+                                            flex
+                                            content-center
+                                            items-center
+                                        "
+                                    >
+                                        <span
+                                            @click="item.canWrite = false"
+                                            class="p-2 rounded-xl"
+                                            :class="{ 'bg-primary text-white': !item.canWrite }"
+                                        >
+                                            Read</span
+                                        >
+                                        <span
+                                            @click="item.canWrite = true"
+                                            class="p-2 rounded-xl"
+                                            :class="{ 'bg-primary text-white': item.canWrite }"
+                                        >
+                                            Write</span
+                                        >
                                     </div>
                                 </td>
                                 <td :key="item.isAlreadySent" class="text-center">
@@ -92,9 +120,7 @@
                                     >
                                         Share
                                     </button>
-                                    <span class="text-xs" v-else>
-                                        File has been shared.
-                                    </span>
+                                    <span class="text-xs" v-else> File has been shared. </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -128,22 +154,19 @@ export default defineComponent({
 
     setup(props, { emit }) {
         const searchTerm = ref('');
-        const chats = ref([])
-        const alreadySentChatIds = ref(<String[]>[])
+        const chats = ref([]);
+        const alreadySentChatIds = ref(<String[]>[]);
 
-
-        onBeforeMount(()=>{
-           chats.value =  props.data.map( (item:Chat) => {
-               return {
-                   name:item.name,
-                   chatId:item.chatId,
-                   canWrite:false,
-                   isAlreadySent: false
-               }
-            }
-        )
-        })
-
+        onBeforeMount(() => {
+            chats.value = props.data.map((item: Chat) => {
+                return {
+                    name: item.name,
+                    chatId: item.chatId,
+                    canWrite: false,
+                    isAlreadySent: false,
+                };
+            });
+        });
 
         const reset = () => {
             emit('update:modelValue', '');
@@ -163,13 +186,10 @@ export default defineComponent({
         async function shareFile(chatId) {
             const size = selectedPaths.value[0].size;
             const filename = selectedPaths.value[0].fullName;
-            console.log(chatId)
-            const chat = chats.value.find(chat =>chat.chatId ==chatId)
-            console.log(chat)
+            const chat = chats.value.find(chat => chat.chatId == chatId);
 
             await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
-            chat.isAlreadySent = true
-            console.log(chat)
+            chat.isAlreadySent = true;
             createNotification('Shared File', 'File has been shared with ' + chatId);
         }
 
@@ -180,7 +200,7 @@ export default defineComponent({
             searchResults,
             selectedPaths,
             shareFile,
-            alreadySentChatIds
+            alreadySentChatIds,
         };
     },
 });

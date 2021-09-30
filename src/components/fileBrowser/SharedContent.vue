@@ -1,7 +1,10 @@
 <template>
     <div class="h-full overflow-y-auto">
         <h1 class="p-2">Shared with me:</h1>
-        <div class="flex flex-col mx-2">
+        <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
+            <Spinner :xlarge="true" />
+        </div>
+        <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="py-2 align-middle inline-block min-w-full">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -97,44 +100,56 @@
 </template>
 
 <script setup lang="ts">
-import {
-    FileType,
-    formatBytes,
-    getExtension,
-    getFileType,
-    getIcon,
-    getIconColor,
-    getFileSize,
-    getIconColorDirty,
-    getIconDirty,
-    getSharedContent,
-    getSharedFolderContent,
-    goIntoSharedFolder,
-    parseJwt,
-    PathInfoModel,
-    selectedPaths,
-    sharedContent,
-    goTo,
-    getFullFolderSkeleton
-} from '@/store/fileBrowserStore';
-import { SharedFileInterface } from '@/types';
-import { defineComponent } from '@vue/runtime-core';
-import { onBeforeMount } from 'vue';
-import { useRouter } from 'vue-router';
+    import {
+        FileType,
+        formatBytes,
+        getExtension,
+        getFileType,
+        getIcon,
+        getIconColor,
+        getFileSize,
+        getIconColorDirty,
+        getIconDirty,
+        getSharedContent,
+        getSharedFolderContent,
+        goIntoSharedFolder,
+        parseJwt,
+        PathInfoModel,
+        selectedPaths,
+        sharedContent,
+        goTo,
+        sharedBreadcrumbs,
+        clickBreadcrumb,
+        sharedFolderIsloading,
+    } from '@/store/fileBrowserStore';
+    import { SharedFileInterface } from '@/types';
+    import { defineComponent } from '@vue/runtime-core';
+    import { onBeforeMount, watch, computed } from 'vue';
+    import { useRouter } from 'vue-router';
+    import Spinner from '@/components/Spinner.vue';
+    import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
 
-onBeforeMount(async () => {
-    await getSharedContent();
-    await getFullFolderSkeleton();
-});
+    onBeforeMount(async () => {
+        sharedBreadcrumbs.value = [];
+    });
 
-const router = useRouter();
-const epochToDate = epoch => {
-    let d = new Date(epoch).toLocaleDateString();
+    watch(sharedFolderIsloading, () => {});
 
-    return d === '1/20/1980' ? 'Never' : d;
-};
+    const router = useRouter();
 
-const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
+    const truncate = name => {
+        return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+    };
+
+    //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
+
+    const epochToDate = epoch => {
+        let d = new Date(epoch).toLocaleDateString();
+
+        return d === '1/20/1980' ? 'Never' : d;
+    };
+
+    const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
 </script>
 
 <style scoped></style>

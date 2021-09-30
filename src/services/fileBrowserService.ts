@@ -87,7 +87,7 @@ export const uploadFile = async (
         config = {
             ...config,
             onUploadProgress: function (progressEvent) {
-                console.log('test', Math.round((progressEvent.loaded * 100) / progressEvent.total));
+                //console.log('test', Math.round((progressEvent.loaded * 100) / progressEvent.total));
                 notification.progress = Math.round(progressEvent.loaded / progressEvent.total);
             },
         };
@@ -172,7 +172,7 @@ export const getFileAccessDetails = async (owner: ContactInterface, shareId: str
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
-    path = encodeURIComponent(path)
+    path = encodeURIComponent(path);
 
     let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
@@ -190,12 +190,12 @@ export const getSharedFolderContent = async (
 ) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
-    console.log("path in call--------------------", path)
-    path = "/"
+    //console.log('path in call--------------------', path);
+
     let apiEndPointToCall = `/api/browse/share/${shareId}/folder?path=${path}`;
 
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
-    console.log(apiEndPointToCall)
+    //console.log(apiEndPointToCall);
     externalUrl = externalUrl + apiEndPointToCall;
     const res = await axios.get(externalUrl);
     return <PathInfoModel[]>res.data;
@@ -203,4 +203,4 @@ export const getSharedFolderContent = async (
 
 export const getShareByPath = async (path: string): Promise<SharedFileInterface> => {
     return (await axios.get(`${endpoint}/share/path/`, { params: { path } })).data;
-}
+};

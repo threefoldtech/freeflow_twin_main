@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row items-center mb-4">
-        <div class="ml-2 hover:text-green-500 cursor-pointer" @click="goToHome">
+        <div class="ml-2 cursor-pointer" @click="goToHome">
             <i class="fas fa-home text-primary"></i>
         </div>
         <!--<div
@@ -14,22 +14,39 @@
       <i class='fas fa-arrow-up text-white'></i>
     </div>-->
         <div class="flex-1 mr-4">
-            <template v-for="(item, i) in parts">
-                <span v-if="i !== 0 && item">
-                    <i class="fas fa-chevron-right"></i>
-                </span>
-                <span
-                    class="cursor-pointer text-base p-2 rounded-md"
-                    v-if="item || i === 0"
-                    @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
-                    @dragenter="event => onDragEnter(event, i)"
-                    @dragleave="event => onDragLeave(event, i)"
-                    @dragover="event => event.preventDefault()"
-                    @drop="event => onDrop(event, i)"
-                >
-                    {{ i === 0 ? 'Home' : item }}
-                </span>
-            </template>
+            <div v-if="!sharedDir">
+                <template v-for="(item, i) in parts">
+                    <span v-if="i !== 0 && item">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span
+                        class="cursor-pointer text-base p-2 rounded-md"
+                        v-if="item || i === 0"
+                        @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
+                        @dragenter="event => onDragEnter(event, i)"
+                        @dragleave="event => onDragLeave(event, i)"
+                        @dragover="event => event.preventDefault()"
+                        @drop="event => onDrop(event, i)"
+                    >
+                        {{ i === 0 ? 'Home' : truncate(item) }}
+                    </span>
+                </template>
+            </div>
+            <div v-if="sharedDir">
+                <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
+                    <span v-if="i !== 0 && breadcrumb">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span
+                        class="cursor-pointer text-base p-2 rounded-md"
+                        v-if="breadcrumb || idx === 0"
+                        :key="idx"
+                        @click="clickBreadcrumb(breadcrumb, sharedBreadcrumbs, idx)"
+                    >
+                        {{ idx === 0 ? 'Shared with me' : truncate(breadcrumb.name) }}
+                    </span>
+                </template>
+            </div>
         </div>
     </div>
 </template>
@@ -44,6 +61,9 @@
         goBack,
         isDraggingFiles,
         moveFiles,
+        sharedBreadcrumbs,
+        sharedDir,
+        clickBreadcrumb,
     } from '@/store/fileBrowserStore';
     import { createNotification } from '@/store/notificiationStore';
 
@@ -79,6 +99,10 @@
                 selectedPaths.value = [];
             };
 
+            const truncate = name => {
+                return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+            };
+
             return {
                 goToHome,
                 goBack,
@@ -90,6 +114,10 @@
                 onDrop,
                 parts,
                 createNotification,
+                truncate,
+                sharedBreadcrumbs,
+                sharedDir,
+                clickBreadcrumb,
             };
         },
     });

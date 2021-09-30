@@ -45,6 +45,7 @@ import {
     currentDirectory,
     goIntoSharedFolder,
     sharedItem,
+    sharedFolderIsloading,
 } from '@/store/fileBrowserStore';
 import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
 import { AppType } from '@/types/apps';
@@ -61,21 +62,41 @@ const props = defineProps({
 const router = useRouter();
 const visitFileInMessage = (message: Message<FileShareMessageType>) => {
     sharedItem.value = message.body;
+
+    /* if (message.from === loginName) {
+            router.push({
+                name: AppType.Quantum,
+                params: {
+                    path: btoa(message.body.path),
+                    editFileShare: 'true',
+                },
+            });
+            return;
+        } */
+
     if (message.from === loginName) {
         router.push({
-            name: AppType.Quantum,
+            name: 'quantumFolder',
             params: {
-                path: btoa(message.body.path),
+                folder: btoa(message.body.path),
                 editFileShare: 'true',
             },
         });
         return;
     }
     currentDirectory.value = '';
+    console.log(message);
+
+    // router.push({
+    //     name: 'sharedWithMeItem',
+    //     params: {
+    //         sharedWithMe: 'true',
+    //         sharedId: message.body.id,
+    //     },
+    // });
 
     goTo(message.body);
     sharedDir.value = true;
 };
 </script>
 <style></style>
-
