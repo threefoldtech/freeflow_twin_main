@@ -1,3 +1,4 @@
+import { currentDirectory, sharedContent, sharedBreadcrumbs } from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
@@ -24,6 +25,7 @@ import {
     sharedDir,
     showSharedFolderErrorModal,
     loadLocalFolder,
+    updateContent,
 } from '@/store/fileBrowserStore';
 
 const routes: Array<RouteRecordRaw> = [
@@ -130,6 +132,7 @@ const routes: Array<RouteRecordRaw> = [
                     requiresAuth: true,
                     app: AppType.Quantum,
                     root_parent: 'quantum',
+                    sharedFolder: true,
                 },
                 children: [
                     {
@@ -139,6 +142,7 @@ const routes: Array<RouteRecordRaw> = [
                         path: ':sharedId',
                         meta: {
                             root_parent: 'quantum',
+                            sharedFolder: true,
                         },
                         children: [
                             {
@@ -148,6 +152,7 @@ const routes: Array<RouteRecordRaw> = [
                                 component: FileBrowser,
                                 meta: {
                                     root_parent: 'quantum',
+                                    sharedFolder: true,
                                 },
                             },
                         ],
@@ -216,7 +221,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.afterEach(async (to, from) => {
-    if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder') {
+    if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
         sharedFolderIsloading.value = true;
         await fetchBasedOnRoute();
         await loadSharedItems();
@@ -226,6 +231,16 @@ router.afterEach(async (to, from) => {
     }
     if (to.name === 'quantumFolder') {
         loadLocalFolder();
+    }
+    if (to.meta.sharedFolder) {
+        sharedDir.value = true;
+    }
+    if (to.name === 'sharedWithMe') {
+        console.log('here');
+    }
+    if (to.name === 'quantum') {
+        sharedDir.value = false;
+        await updateContent('/');
     }
 });
 

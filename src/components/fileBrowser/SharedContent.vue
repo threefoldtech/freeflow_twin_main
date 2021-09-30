@@ -1,18 +1,5 @@
 <template>
     <div class="h-full overflow-y-auto">
-        <div class="ml-2 flex flex-row space-x-4 items-center">
-            <p
-                v-for="(breadcrumb, idx) in sharedBreadcrumbs"
-                :key="idx"
-                @click="clickBreadcrumb(breadcrumb, sharedBreadcrumbs, idx)"
-                class="flex flex-row space-x-4 items-center"
-            >
-                <i v-if="idx !== 0 && breadcrumb" class="fas fa-chevron-right"></i>
-                <span class="block cursor-pointer hover:text-gray-900 hover:underline">{{
-                    truncate(breadcrumb?.name)
-                }}</span>
-            </p>
-        </div>
         <h1 class="p-2">Shared with me:</h1>
         <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
             <Spinner :xlarge="true" />
