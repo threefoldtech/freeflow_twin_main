@@ -1,4 +1,5 @@
 <template>
+    {{ isSupportedInDocumentServer }}
     <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
         <div id="placeholder"></div>
     </div>
@@ -13,6 +14,7 @@
         </div>
         <div v-else class="text-center">
             <h1 class="mb-2">Sorry, we are not able to display the file</h1>
+            {{ readUrl }}
             <a class="bg-primary text-white p-2" :href="readUrl">Download file</a>
         </div>
     </div>
@@ -67,6 +69,7 @@ onMounted(async () => {
     const myAddress = await myYggdrasilAddress();
 
     if (shareId) {
+        console.log(shareId, isSupportedInDocumentServer);
         const shareDetails = await fetchShareDetails(shareId);
         fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
         location = shareDetails.owner.location;
@@ -93,8 +96,9 @@ onMounted(async () => {
     }
 
     fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
+    console.log(fileType.value, isSupportedInDocumentServer);
 
-    if (isSupportedInDocumentServer.value) {
+    if (isSupportedInDocumentServer) {
         documentServerconfig = generateDocumentserverConfig(
             location,
             fileAccesDetails.path,
@@ -104,6 +108,7 @@ onMounted(async () => {
             getExtension(fileAccesDetails.fullName),
             fileAccesDetails.extension
         );
+        console.log(documentServerconfig);
         get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
             //@ts-ignore
             new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
