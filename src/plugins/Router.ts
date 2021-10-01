@@ -26,6 +26,7 @@ import {
     showSharedFolderErrorModal,
     loadLocalFolder,
     updateContent,
+    stopTimer,
 } from '@/store/fileBrowserStore';
 
 const routes: Array<RouteRecordRaw> = [
@@ -217,6 +218,8 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.afterEach(async (to, from) => {
+    //If file takes too long to load, if you switch page you still get the error modal. Now it doesn't
+    stopTimer();
     if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
         sharedFolderIsloading.value = true;
         await fetchBasedOnRoute();

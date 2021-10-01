@@ -637,7 +637,7 @@ function startTimer(milliseconds) {
         showSharedFolderErrorModal.value = true;
     }, milliseconds);
 }
-function stopTimer() {
+export function stopTimer() {
     clearTimeout(timer);
 }
 //Error dialog
