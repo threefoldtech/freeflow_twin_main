@@ -1,6 +1,7 @@
 <template>
     <app-layout>
         <iframe
+            v-if="hasBrowserBeenStartedOnce"
             class="relative h-full w-full"
             title="forum"
             id="forum-iframe"
@@ -12,8 +13,9 @@
 
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, ref } from 'vue';
-    import { onMounted, onBeforeMount } from 'vue';
+    import { defineComponent, ref, onMounted } from 'vue';
+    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    
 
     export default defineComponent({
         name: 'Apps',
@@ -22,7 +24,8 @@
         },
 
         setup({}, ctx) {
-            let iframeUrl = ref('');
+          
+            const iframeUrl = ref('');
 
             onMounted(() => {
                 browse();
@@ -30,11 +33,13 @@
 
             function browse() {
                 iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
-                console.log(iframeUrl.value);
             }
 
             return {
                 iframeUrl,
+                hasBrowserBeenStartedOnce,
+                //hasBrowserBeenStartedOnce,
+              
             };
         },
     });
