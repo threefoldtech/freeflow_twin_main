@@ -19,96 +19,157 @@
             </a>
         </div>
 
-            <div v-if="isActive('user')" class="flex flex-col">
-                <user-table
-                    :data="possibleUsers"
-                    placeholder="Search for user..."
-                    @addContact="contactAdd"
-                    focus
-                ></user-table>
-                <Disclosure v-slot="{ open }">
-                    <DisclosureButton
-                        class="
-                            flex
-                            justify-between
-                            w-full
-                            mt-4
-                            ml-0
-                            py-2
-                            text-sm
-                            font-medium
-                            text-left text-gray-500
-                            bg-gray-50
-                            rounded-lg
-                            hover:bg-gray-100
-                            focus:outline-none
-                            focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
-                        "
-                    >
-                        <span class="ml-6">Advanced</span>
+        <div v-if="isActive('user')" class="flex flex-col">
+            <user-table
+                :data="possibleUsers"
+                placeholder="Search for user..."
+                @addContact="contactAdd"
+                focus
+            ></user-table>
+            <Disclosure v-slot="{ open }">
+                <DisclosureButton
+                    class="
+                        flex
+                        justify-between
+                        w-full
+                        mt-4
+                        ml-0
+                        py-2
+                        text-sm
+                        font-medium
+                        text-left text-gray-500
+                        bg-gray-50
+                        rounded-lg
+                        hover:bg-gray-100
+                        focus:outline-none
+                        focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
+                    "
+                >
+                    <span class="ml-6">Advanced</span>
 
-                        <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
-                    </DisclosureButton>
-                    <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                    <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
+                </DisclosureButton>
+                <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
+                    <div>
                         <div>
-                            <div>
-                                <label for="manualContactAddUsername" class="block text-sm font-medium text-gray-700">Name</label>
-                                <div class='relative'>
-                                    <input type="text" name="manualContactAddUsername" id="manualContactAddUsername" v-model="manualContactAddUsername" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Username" />
-                                    <div v-if='manualContactAddUsername!== ""' @click='manualContactAddUsername=""'
-                                         class='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'>
-                                        <i class='fa fa-window-close h-5 w-5 text-gray-400'
-                                           aria-hidden='true' />
-                                    </div>
-                                    <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
-                                </div>
-                                <label for="manualContactAddLocation" class="block text-sm font-medium text-gray-700">Location</label>
-                                <div class='relative'>
-                                    <input type="text" name="manualContactAddLocation" id="manualContactAddLocation" v-model="manualContactAddLocation" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Location" />
-                                    <div v-if='manualContactAddLocation!== ""' @click='manualContactAddLocation=""'
-                                         class='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'>
-                                        <i class='fa fa-window-close h-5 w-5 text-gray-400'
-                                           aria-hidden='true' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="w-full flex justify-end">
-                                <button
+                            <label for="manualContactAddUsername" class="block text-sm font-medium text-gray-700"
+                                >Name</label
+                            >
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    name="manualContactAddUsername"
+                                    id="manualContactAddUsername"
+                                    v-model="manualContactAddUsername"
                                     class="
-                                        w-auto
-                                        px-3
-                                        py-2
-                                        mt-2
-                                        border
-                                        cursor-pointer
-                                        border-transparent
-                                        text-sm
-                                        leading-4
-                                        font-medium
+                                        shadow-sm
+                                        focus:ring-primary focus:border-primary
+                                        block
+                                        w-full
+                                        sm:text-sm
+                                        border-gray-300
                                         rounded-md
-                                        text-white
-                                        bg-primary
-                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
+                                        mt-1
                                     "
-                                    value=""
-                                    @click="contactAdd"
-                                >Manually add</button>
+                                    placeholder="Username"
+                                />
+                                <div
+                                    v-if="!!manualContactAddUsername"
+                                    @click="manualContactAddUsername = ''"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                >
+                                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </div>
+                                <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
+                            </div>
+                            <label for="manualContactAddLocation" class="block text-sm font-medium text-gray-700"
+                                >Location</label
+                            >
+                            <div class="relative">
+                                <input
+                                    type="text"
+                                    name="manualContactAddLocation"
+                                    id="manualContactAddLocation"
+                                    v-model="manualContactAddLocation"
+                                    class="
+                                        shadow-sm
+                                        focus:ring-primary focus:border-primary
+                                        block
+                                        w-full
+                                        sm:text-sm
+                                        border-gray-300
+                                        rounded-md
+                                        mt-1
+                                    "
+                                    placeholder="Location"
+                                />
+                                <div
+                                    v-if="!!manualContactAddLocation"
+                                    @click="manualContactAddLocation = ''"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                >
+                                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </div>
                             </div>
                         </div>
-                    </DisclosurePanel>
-                </Disclosure>
-            </div>
+                        <div class="w-full flex justify-end">
+                            <button
+                                class="
+                                    w-auto
+                                    px-3
+                                    py-2
+                                    mt-2
+                                    border
+                                    cursor-pointer
+                                    border-transparent
+                                    text-sm
+                                    leading-4
+                                    font-medium
+                                    rounded-md
+                                    text-white
+                                    bg-primary
+                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
+                                "
+                                value=""
+                                @click="contactAdd"
+                            >
+                                Manually add
+                            </button>
+                        </div>
+                    </div>
+                </DisclosurePanel>
+            </Disclosure>
+        </div>
         <form v-if="isActive('group')" class="w-full overflow-x-hidden" @submit.prevent="groupAdd">
             <div class="flex place-items-center mx-1">
                 <div class="w-full">
                     <div>
                         <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
-                        <div class='relative'>
-                            <input type="text" name="groupname" id="groupname" v-model="groupnameAdd" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="Group name" v-focus/>
-                            <div v-if='groupnameAdd!== ""' @click='groupnameAdd=""'
-                                 class='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'>
-                                <i class='fa fa-window-close h-5 w-5 text-gray-400'
-                                   aria-hidden='true' />
+                        <div class="relative">
+                            <input
+                                type="text"
+                                name="groupname"
+                                id="groupname"
+                                v-model="groupnameAdd"
+                                class="
+                                    shadow-sm
+                                    focus:ring-primary focus:border-primary
+                                    block
+                                    w-full
+                                    sm:text-sm
+                                    border-gray-300
+                                    rounded-md
+                                    mt-1
+                                "
+                                placeholder="Group name"
+                                v-focus
+                            />
+                            <div
+                                v-if="!!groupnameAdd"
+                                @click="groupnameAdd = ''"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            >
+                                <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
                             </div>
                         </div>
                     </div>
@@ -156,7 +217,6 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
 
-
     export default defineComponent({
         name: 'ContactAdd',
         components: {
@@ -185,21 +245,23 @@
             let manualContactAddUsername = ref<string>('');
             let manualContactAddLocation = ref('');
 
-            const contactAdd = (contact:Contact) => {
-                const contactToAdd:Contact = {
+            const contactAdd = (contact: Contact) => {
+                const contactToAdd: Contact = {
                     id: contact?.id ? contact.id : manualContactAddUsername.value,
-                    location:  contact?.location ? contact.location : manualContactAddLocation.value
-                }
-                console.log("contact to add ", contactToAdd)
+                    location: contact?.location ? contact.location : manualContactAddLocation.value,
+                };
+                console.log('contact to add ', contactToAdd);
                 try {
                     const { chats } = usechatsState();
 
-                    if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
+                    if (
+                        chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)
+                    ) {
                         usernameAddError.value = 'Already added this user';
                         return;
                     }
                     const { addContact } = useContactsActions();
-                    addContact( contactToAdd.id  ,contactToAdd.location);
+                    addContact(contactToAdd.id, contactToAdd.location);
                     manualContactAddUsername.value = undefined;
                     contactAddError.value = '';
                     emit('closeDialog');
@@ -215,8 +277,8 @@
                 }
             };
 
-            const handleClicked = (item) => {
-                    userAddLocation.value = item.location;
+            const handleClicked = item => {
+                userAddLocation.value = item.location;
             };
 
             let activeItem = ref('user');
@@ -262,8 +324,8 @@
             axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
                 const { user } = useAuthState();
                 const posContacts = <Contact[]>r.data;
-                const alreadyExistingChatIds = [...contacts.map(c => c.id),user.id]
-                possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx =>aEx === pu.id));
+                const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
+                possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
             });
 
             return {

@@ -50,8 +50,7 @@
                 font-bold
                 bg-primary
                 border-2 border-primary
-                hover:text-primary
-                hover:bg-white
+                hover:text-primary hover:bg-white
                 rounded-md
                 cursor-pointer
                 flex
@@ -96,7 +95,7 @@
             <template v-slot:title class="center">
                 <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
-            <div class='relative'>
+            <div class="relative">
                 <label for="rename" class="sr-only">Rename</label>
                 <input
                     type="text"
@@ -105,8 +104,7 @@
                     id="rename"
                     class="
                         shadow-sm
-                        focus:ring-primary
-                        focus:border-primary
+                        focus:ring-primary focus:border-primary
                         block
                         w-full
                         sm:text-sm
@@ -115,10 +113,12 @@
                     "
                     :placeholder="selectedPaths[0].name"
                 />
-                <div v-if="newName !== ''" @click="newName = ''"
-                     class='absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer'>
-                    <i class='fa fa-window-close h-5 w-5 text-gray-400'
-                       aria-hidden='true' />
+                <div
+                    v-if="!!newName"
+                    @click="newName = ''"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                >
+                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
             </div>
             <div class="flex justify-end mt-2">
@@ -167,111 +167,111 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-import {
-    selectedPaths,
-    deleteFiles,
-    downloadFiles,
-    copyPasteSelected,
-    copiedFiles,
-    clearClipboard,
-    renameFile,
-    searchDir,
-    searchDirValue,
-    searchResults,
-    isDraggingFiles,
-    moveFiles,
-    selectedAction,
-    Action,
-    addShare,
-    sharedDir,
-} from '@/store/fileBrowserStore';
-import Dialog from '@/components/Dialog.vue';
-import Button from '@/components/Button.vue';
-import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
-import EditShare from '@/components/fileBrowser/EditShare.vue';
-import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
-import { useSocketActions } from '@/store/socketStore';
-import Avatar from '@/components/Avatar.vue';
-import AvatarImg from '@/components/AvatarImg.vue';
-import { SystemMessageTypes, MessageTypes } from '@/types';
-import { createNotification } from '@/store/notificiationStore';
-import { showShareDialog } from '@/services/dialogService';
+    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import {
+        selectedPaths,
+        deleteFiles,
+        downloadFiles,
+        copyPasteSelected,
+        copiedFiles,
+        clearClipboard,
+        renameFile,
+        searchDir,
+        searchDirValue,
+        searchResults,
+        isDraggingFiles,
+        moveFiles,
+        selectedAction,
+        Action,
+        addShare,
+        sharedDir,
+    } from '@/store/fileBrowserStore';
+    import Dialog from '@/components/Dialog.vue';
+    import Button from '@/components/Button.vue';
+    import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
+    import EditShare from '@/components/fileBrowser/EditShare.vue';
+    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { useSocketActions } from '@/store/socketStore';
+    import Avatar from '@/components/Avatar.vue';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { SystemMessageTypes, MessageTypes } from '@/types';
+    import { createNotification } from '@/store/notificiationStore';
+    import { showShareDialog } from '@/services/dialogService';
 
-const { chats } = usechatsState();
-const { retrievechats, sendMessage } = usechatsActions();
+    const { chats } = usechatsState();
+    const { retrievechats, sendMessage } = usechatsActions();
 
-const tabs = ['Create shares', 'Edit shares'];
-const selectedTab = ref(0);
+    const tabs = ['Create shares', 'Edit shares'];
+    const selectedTab = ref(0);
 
-export default defineComponent({
-    name: 'SelectedOptions',
-    components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable, EditShare },
-    setup() {
-        let debounce;
-        let showDeleteDialog = ref(false);
-        let showRenameDialog = ref(false);
-        let newName = ref<string>('');
+    export default defineComponent({
+        name: 'SelectedOptions',
+        components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable, EditShare },
+        setup() {
+            let debounce;
+            let showDeleteDialog = ref(false);
+            let showRenameDialog = ref(false);
+            let newName = ref<string>('');
 
-        let writeRights = ref(false);
+            let writeRights = ref(false);
 
-        onBeforeMount(() => {
-            retrievechats();
-        });
-        function debounceSearch(event) {
-            clearTimeout(debounce);
-            debounce = setTimeout(() => {
-                if (searchDirValue.value === '') {
-                    searchResults.value = [];
-                    return;
-                }
-                searchDir();
-            }, 600);
-        }
+            onBeforeMount(() => {
+                retrievechats();
+            });
+            function debounceSearch(event) {
+                clearTimeout(debounce);
+                debounce = setTimeout(() => {
+                    if (searchDirValue.value === '') {
+                        searchResults.value = [];
+                        return;
+                    }
+                    searchDir();
+                }, 600);
+            }
 
-        async function cutFiles() {
-            selectedAction.value = Action.CUT;
-            await copyPasteSelected();
-        }
+            async function cutFiles() {
+                selectedAction.value = Action.CUT;
+                await copyPasteSelected();
+            }
 
-        async function copyFiles() {
-            selectedAction.value = Action.COPY;
-            await copyPasteSelected();
-        }
+            async function copyFiles() {
+                selectedAction.value = Action.COPY;
+                await copyPasteSelected();
+            }
 
-        return {
-            selectedPaths,
-            deleteFiles,
-            showDeleteDialog,
-            showRenameDialog,
-            downloadFiles,
-            copyPasteSelected,
-            copiedFiles,
-            clearClipboard,
-            newName,
-            renameFile,
-            searchDirValue,
-            searchDir,
-            searchResults,
-            debounceSearch,
-            isDraggingFiles,
-            cutFiles,
-            copyFiles,
-            chats,
-            createNotification,
-            sharedDir,
-            writeRights,
-            tabs,
-            selectedTab,
-            showShareDialog,
-        };
-    },
-});
+            return {
+                selectedPaths,
+                deleteFiles,
+                showDeleteDialog,
+                showRenameDialog,
+                downloadFiles,
+                copyPasteSelected,
+                copiedFiles,
+                clearClipboard,
+                newName,
+                renameFile,
+                searchDirValue,
+                searchDir,
+                searchResults,
+                debounceSearch,
+                isDraggingFiles,
+                cutFiles,
+                copyFiles,
+                chats,
+                createNotification,
+                sharedDir,
+                writeRights,
+                tabs,
+                selectedTab,
+                showShareDialog,
+            };
+        },
+    });
 </script>
 
 <style scoped>
-input:checked ~ .dot {
-    transform: translateX(100%);
-    background-color: #48bb78;
-}
+    input:checked ~ .dot {
+        transform: translateX(100%);
+        background-color: #48bb78;
+    }
 </style>
