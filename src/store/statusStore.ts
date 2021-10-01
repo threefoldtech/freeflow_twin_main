@@ -9,6 +9,7 @@ import { Contact } from '@/types';
 export const statusList = reactive<Object>({});
 export const fetching: string[] = [];
 export const watchingUsers = [];
+export const showUserOfflineMessage = ref<boolean>(false);
 
 export const fetchStatus = async (digitalTwinId: DtId) => {
     const { user } = useAuthState();
@@ -21,11 +22,19 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
             `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
-    const response = await axios.get(location);
-    let status = response.data;
+    let response;
+    try {
+        response = await axios.get(location, { timeout: 2000 });
+        let status = response.data;
+        statusList[<string>digitalTwinId] = status;
+        return status;
 
-    statusList[<string>digitalTwinId] = status;
-    return status;
+    }
+    catch (error) {
+        showUserOfflineMessage.value = true;
+
+    }
+
 };
 
 export const startFetchStatusLoop = async (contact: Contact) => {

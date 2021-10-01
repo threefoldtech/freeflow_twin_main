@@ -50,7 +50,8 @@
                 font-bold
                 bg-primary
                 border-2 border-primary
-                hover:text-primary hover:bg-white
+                hover:text-primary
+                hover:bg-white
                 rounded-md
                 cursor-pointer
                 flex
@@ -64,18 +65,28 @@
             </div>
         </div>
 
-        <jdialog v-model='showDeleteDialog' @update-model-value='showDeleteDialog = false' noActions class='max-w-10'>
-            <template v-slot:title class='center'>
-                <h1 class='text-center'>Deleting Files</h1>
+        <jdialog v-model="showDeleteDialog" @update-model-value="showDeleteDialog = false" noActions class="max-w-10">
+            <template v-slot:title class="center">
+                <h1 class="text-center">Deleting Files</h1>
             </template>
             <div>
-                Do you really want to delete {{ selectedPaths.length }} item(s)? When deleted these items will be forever lost!
+                Do you really want to delete {{ selectedPaths.length }} item(s)? When deleted these items will be
+                forever lost!
             </div>
-            <div class='flex justify-end mt-2'>
-                <button @click='showDeleteDialog = false' class='rounded-md border border-gray-400 px-4 py-2 justify-self-end'>
+            <div class="flex justify-end mt-2">
+                <button
+                    @click="showDeleteDialog = false"
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                >
                     Cancel
                 </button>
-                <button @click='deleteFiles(selectedPaths);showDeleteDialog = false;' class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred'>
+                <button
+                    @click="
+                        deleteFiles(selectedPaths);
+                        showDeleteDialog = false;
+                    "
+                    class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred"
+                >
                     Delete
                 </button>
             </div>
@@ -87,7 +98,23 @@
             </template>
             <div>
                 <label for="rename" class="sr-only">Rename</label>
-                <input type="text" v-model="newName" name="rename" id="rename" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md" :placeholder="selectedPaths[0].name" />
+                <input
+                    type="text"
+                    v-model="newName"
+                    name="rename"
+                    id="rename"
+                    class="
+                        shadow-sm
+                        focus:ring-primary
+                        focus:border-primary
+                        block
+                        w-full
+                        sm:text-sm
+                        border-gray-300
+                        rounded-md
+                    "
+                    :placeholder="selectedPaths[0].name"
+                />
             </div>
             <div class="flex justify-end mt-2">
                 <button
@@ -111,131 +138,141 @@
                 </button>
             </div>
         </jdialog>
-        <jdialog v-model="showShareDialog" @update-model-value="showShareDialog = false" noActions>
+        <jdialog v-model="showShareDialog" @update-model-value="resetShareDialog" noActions>
             <template v-slot:title>
                 <h1 class="text-center">Share files</h1>
             </template>
 
             <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2" :key="selectedTab">
-                <div class="flex-grow" v-for="(tab,index) in tabs" :key="tab">
-                <button @click="selectedTab = index" class="w-full p-2 rounded-xl " :class ="{'bg-primary text-white':index==selectedTab}">{{tab}}</button>
+                <div class="flex-grow" v-for="(tab, index) in tabs" :key="tab">
+                    <button
+                        @click="selectedTab = index"
+                        class="w-full p-2 rounded-xl"
+                        :class="{ 'bg-primary text-white': index == selectedTab }"
+                    >
+                        {{ tab }}
+                    </button>
                 </div>
             </div>
 
             <chatTable v-if="selectedTab === 0" :data="chats"></chatTable>
-            <edit-share v-if="selectedTab === 1 " :selectedFile="selectedPaths[0]"></edit-share>
+            <edit-share v-if="selectedTab === 1" :selectedFile="selectedPaths[0]"></edit-share>
         </jdialog>
     </div>
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-    import {
-        selectedPaths,
-        deleteFiles,
-        downloadFiles,
-        copyPasteSelected,
-        copiedFiles,
-        clearClipboard,
-        renameFile,
-        searchDir,
-        searchDirValue,
-        searchResults,
-        isDraggingFiles,
-        moveFiles,
-        selectedAction,
-        Action,
-        addShare,
-        sharedDir,
-    } from '@/store/fileBrowserStore';
-    import Dialog from '@/components/Dialog.vue';
-    import Button from '@/components/Button.vue';
-    import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
-    import EditShare from '@/components/fileBrowser/EditShare.vue';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
-    import { useSocketActions } from '@/store/socketStore';
-    import Avatar from '@/components/Avatar.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-    import { createNotification } from '@/store/notificiationStore';
+import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import {
+    selectedPaths,
+    deleteFiles,
+    downloadFiles,
+    copyPasteSelected,
+    copiedFiles,
+    clearClipboard,
+    renameFile,
+    searchDir,
+    searchDirValue,
+    searchResults,
+    isDraggingFiles,
+    moveFiles,
+    selectedAction,
+    Action,
+    addShare,
+    sharedDir,
+    selectedTab,
+} from '@/store/fileBrowserStore';
+import Dialog from '@/components/Dialog.vue';
+import Button from '@/components/Button.vue';
+import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
+import EditShare from '@/components/fileBrowser/EditShare.vue';
+import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+import { useSocketActions } from '@/store/socketStore';
+import Avatar from '@/components/Avatar.vue';
+import AvatarImg from '@/components/AvatarImg.vue';
+import { SystemMessageTypes, MessageTypes } from '@/types';
+import { createNotification } from '@/store/notificiationStore';
+import { showShareDialog } from '@/services/dialogService';
 
-    const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
+const { chats } = usechatsState();
+const { retrievechats, sendMessage } = usechatsActions();
 
-    const tabs = [
-        "Create shares",
-        "Edit shares"
-    ]
-    const selectedTab = ref(0)
+const tabs = ['Create shares', 'Edit shares'];
 
-    export default defineComponent({
-        name: 'SelectedOptions',
-        components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable,EditShare },
-        setup() {
-            let debounce;
-            let showDeleteDialog = ref(false);
-            let showRenameDialog = ref(false);
-            let newName = ref<string>('');
-            let showShareDialog = ref(false);
-            let writeRights = ref(false);
+export default defineComponent({
+    name: 'SelectedOptions',
+    components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable, EditShare },
+    setup() {
+        let debounce;
+        let showDeleteDialog = ref(false);
+        let showRenameDialog = ref(false);
+        let newName = ref<string>('');
 
-            onBeforeMount(() => {
-                retrievechats();
-            });
-            function debounceSearch(event) {
-                clearTimeout(debounce);
-                debounce = setTimeout(() => {
-                    if (searchDirValue.value === '') {
-                        searchResults.value = [];
-                        return;
-                    }
-                    searchDir();
-                }, 600);
-            }
+        let writeRights = ref(false);
 
-            async function cutFiles() {
-                selectedAction.value = Action.CUT;
-                await copyPasteSelected();
-            }
+        onBeforeMount(() => {
+            retrievechats();
+        });
+        function debounceSearch(event) {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => {
+                if (searchDirValue.value === '') {
+                    searchResults.value = [];
+                    return;
+                }
+                searchDir();
+            }, 600);
+        }
 
-            async function copyFiles() {
-                selectedAction.value = Action.COPY;
-                await copyPasteSelected();
-            }
+        async function cutFiles() {
+            selectedAction.value = Action.CUT;
+            await copyPasteSelected();
+        }
 
-            return {
-                selectedPaths,
-                deleteFiles,
-                showDeleteDialog,
-                showRenameDialog,
-                downloadFiles,
-                copyPasteSelected,
-                copiedFiles,
-                clearClipboard,
-                newName,
-                renameFile,
-                searchDirValue,
-                searchDir,
-                searchResults,
-                debounceSearch,
-                isDraggingFiles,
-                cutFiles,
-                copyFiles,
-                showShareDialog,
-                chats,
-                createNotification,
-                sharedDir,
-                writeRights,
-                tabs,
-                selectedTab
-            };
-        },
-    });
+        async function copyFiles() {
+            selectedAction.value = Action.COPY;
+            await copyPasteSelected();
+        }
+
+        function resetShareDialog() {
+            showShareDialog.value = false;
+            selectedPaths.value = [];
+            selectedTab.value = 0;
+        }
+        return {
+            selectedPaths,
+            deleteFiles,
+            showDeleteDialog,
+            showRenameDialog,
+            downloadFiles,
+            copyPasteSelected,
+            copiedFiles,
+            clearClipboard,
+            newName,
+            renameFile,
+            searchDirValue,
+            searchDir,
+            searchResults,
+            debounceSearch,
+            isDraggingFiles,
+            cutFiles,
+            copyFiles,
+            chats,
+            createNotification,
+            sharedDir,
+            writeRights,
+            tabs,
+            selectedTab,
+            showShareDialog,
+            resetShareDialog,
+        };
+    },
+});
 </script>
 
 <style scoped>
-    input:checked ~ .dot {
-        transform: translateX(100%);
-        background-color: #48bb78;
-    }
+input:checked ~ .dot {
+    transform: translateX(100%);
+    background-color: #48bb78;
+}
 </style>
