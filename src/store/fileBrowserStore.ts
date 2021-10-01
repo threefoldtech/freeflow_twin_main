@@ -579,7 +579,8 @@ export const getSharedContent = async () => {
 
 export const sharedBreadcrumbs = ref([]);
 
-export const clickBreadcrumb = (item, breadcrumbs, idx) => {
+export const clickBreadcrumb = async (item, breadcrumbs, idx) => {
+    //This function only applies in your 'shared with me' folders
     resetSharedFolder();
 
     if (idx === 0) {
@@ -601,10 +602,13 @@ export const clickBreadcrumb = (item, breadcrumbs, idx) => {
     }
 
     const params = router.currentRoute.value.params;
-    const splitted = String(params.path).split('/').slice(0);
+    let splitted = String(params.path).split('/').slice(0);
+    //Deleting all empty values
+    splitted = splitted.filter(function (element) {
+        return element !== '';
+    });
 
-    //Deleting all the everything after the selected breadcrumbs
-    const newPath = splitted.slice(0, idx);
+    const newPath = splitted.slice(0, idx - 1);
 
     router.push({
         name: 'sharedWithMeItemNested',

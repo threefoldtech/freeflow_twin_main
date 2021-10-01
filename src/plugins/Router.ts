@@ -209,10 +209,6 @@ router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
-
-    /* if (to.name === 'sharedWithMeItemNested' || to.name === 'sharedWithMeItem' || to.name === 'sharedWithMe') {
-        // await loadSharedItems();
-    } */
     if (to.name === 'sharedWithMe') {
         sharedDir.value = true;
     }
@@ -236,7 +232,6 @@ router.afterEach(async (to, from) => {
         sharedDir.value = true;
     }
     if (to.name === 'sharedWithMe') {
-        console.log('here');
     }
     if (to.name === 'quantum') {
         sharedDir.value = false;
