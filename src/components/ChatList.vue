@@ -80,7 +80,20 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
-                <input type="text" v-model='searchValue' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+                <input
+                    type="text"
+                    v-model="searchValue"
+                    class="
+                        focus:ring-primary focus:border-primary
+                        block
+                        w-full
+                        pl-10
+                        sm:text-sm
+                        border-gray-300
+                        rounded-md
+                    "
+                    placeholder="Search"
+                />
             </div>
             <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2 mt-4">
                 <h2 style="font-size: 1.5em">
@@ -105,23 +118,37 @@
                     v-if="filteredChats && filteredChats.length"
                 >
                     <ChatCard
-                        v-for='chat in filteredChats'
-                        :key='`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`'
-                        class='w-full rounded-lg collapsed-bar:rounded-none p-1.5 collapsed-bar:my-0 my-1 cursor-pointer'
-                        @selectChat='setSelected(chat.chatId)'
-                        :collapsed='collapsed'
-                        :chat='chat'
+                        v-for="chat in filteredChats"
+                        :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
+                        class="
+                            w-full
+                            rounded-lg
+                            collapsed-bar:rounded-none
+                            p-1.5
+                            collapsed-bar:my-0
+                            my-1
+                            cursor-pointer
+                        "
+                        @selectChat="setSelected(chat.chatId)"
+                        :collapsed="collapsed"
+                        :chat="chat"
                     />
                 </div>
             </div>
         </div>
+        <TransitionRoot appear :show="showAddUserDialog" as="template">
+            <HeadlessUIDialog as="div" @close="sendUpdate(false)">
+                <div class="fixed inset-0 z-10 overflow-y-auto">
+                    <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
+                        <template v-slot:title>
+                            <h1>Invite someone to chat</h1>
+                        </template>
 
-        <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
-            <template v-slot:title>
-                <h1>Invite someone to chat</h1>
-            </template>
-            <add-contact @closeDialog="sendUpdate(false)"> </add-contact>
-        </jdialog>
+                        <add-contact @closeDialog="sendUpdate(false)"> </add-contact>
+                    </jdialog>
+                </div>
+            </HeadlessUIDialog>
+        </TransitionRoot>
     </section>
 </template>
 
@@ -143,6 +170,8 @@
     import { showAddUserDialog } from '@/services/dialogService';
     import { useScrollActions } from '@/store/scrollStore';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import { Dialog as HeadlessUIDialog, DialogOverlay, TransitionRoot } from '@headlessui/vue';
+
     export default defineComponent({
         name: 'Apps',
         props: {
@@ -158,6 +187,9 @@
             AvatarImg,
             ChatRequestList,
             SearchIcon,
+            HeadlessUIDialog,
+            DialogOverlay,
+            TransitionRoot,
         },
         emits: ['closeDialog'],
         setup(props, context) {
