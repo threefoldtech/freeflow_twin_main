@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-2" :class='{"hidden" : sharedDir}' >
+    <div class="mx-2" :class="{ hidden: sharedDir }">
         <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
             <i class="fas fa-plus"></i> New Folder
         </button>
@@ -25,17 +25,24 @@
         </template>
         <div class="flex flex-col">
             <span>Files*</span>
-            <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">Select files</button>
+            <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">
+                Select files
+            </button>
         </div>
         <input type="file" ref="newFileInput" hidden multiple @change="handleFileSelectChange" />
         <FileDropArea :show="true" @send-file="handleDragAndDrop">
             <div class="h-44"></div>
         </FileDropArea>
         <div class="">
-            <div v-if="selectedFiles.length" v-for="file in selectedFiles" :key="`${file.name}-${file.lastModified}`" class="flex flex-row justify-between mt-2 pb-2 border-b border-bordergrey">
+            <div
+                v-if="selectedFiles.length"
+                v-for="file in selectedFiles"
+                :key="`${file.name}-${file.lastModified}`"
+                class="flex flex-row justify-between mt-2 pb-2 border-b border-bordergrey"
+            >
                 <div class="flex">
                     <DocumentTextIcon class="h-5 w-5 mr-1 text-gray-400" aria-hidden="true" />
-                    <span>{{file.name}}</span>
+                    <span>{{ file.name }}</span>
                 </div>
                 <XIcon class="h-5 w-5 mr-1 text-btnred cursor-pointer" aria-hidden="true" @click="deleteFile(file)" />
             </div>
@@ -47,67 +54,67 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref } from 'vue';
-    import Dialog from '@/components/Dialog.vue';
-    import FileDropArea from '@/components/FileDropArea.vue';
-    import { createDirectory, uploadFiles,sharedDir } from '@/store/fileBrowserStore';
-    import Button from '@/components/Button.vue';
-    import {DocumentTextIcon, XIcon} from '@heroicons/vue/solid';
+import { defineComponent, ref } from 'vue';
+import Dialog from '@/components/Dialog.vue';
+import FileDropArea from '@/components/FileDropArea.vue';
+import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
+import Button from '@/components/Button.vue';
+import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
 
-    export default defineComponent({
-        name: 'MainActionButtons',
-        components: {
-            Button,
-            Dialog,
-            FileDropArea,
-            DocumentTextIcon,
-            XIcon
-        },
-        setup() {
-            const showCreateFolderDialog = ref(false);
-            const showCreateFileDialog = ref(false);
-            const newFolderInput = ref<HTMLInputElement>();
-            const newFileInput = ref<any>(undefined);
-            const selectedFiles = ref<File[]>([]);
-            const newFileInputArray = ref<File[]>([]);
+export default defineComponent({
+    name: 'MainActionButtons',
+    components: {
+        Button,
+        Dialog,
+        FileDropArea,
+        DocumentTextIcon,
+        XIcon,
+    },
+    setup() {
+        const showCreateFolderDialog = ref(false);
+        const showCreateFileDialog = ref(false);
+        const newFolderInput = ref<HTMLInputElement>();
+        const newFileInput = ref<any>(undefined);
+        const selectedFiles = ref<File[]>([]);
+        const newFileInputArray = ref<File[]>([]);
 
-            const updateCreateFolderDialog = (val: boolean) => {
-                if (!val) {
-                    showCreateFolderDialog.value = false;
-                    return;
-                }
-
-                if (!newFolderInput.value) return;
-                if (!newFolderInput.value.value) {
-                    newFolderInput.value.classList.add('border-red-500');
-                    return;
-                }
-                createDirectory(newFolderInput.value.value);
+        const updateCreateFolderDialog = (val: boolean) => {
+            if (!val) {
                 showCreateFolderDialog.value = false;
-            };
-
-            const deleteFile = (file: File) => {
-                selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
-                
-                newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
-                newFileInput.value.value = newFileInputArray.value;
+                return;
             }
 
-            const updateCreateFileDialog = (val: boolean) => {
-                if (!val) {
-                    showCreateFileDialog.value = false;
-                    return;
-                }
+            if (!newFolderInput.value) return;
+            if (!newFolderInput.value.value) {
+                newFolderInput.value.classList.add('border-red-500');
+                return;
+            }
+            createDirectory(newFolderInput.value.value);
+            showCreateFolderDialog.value = false;
+        };
 
-                if (!selectedFiles.value?.length) return;
-                uploadFiles(selectedFiles.value);
-                clearFiles();
+        const deleteFile = (file: File) => {
+            selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
+
+            newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
+            newFileInput.value.value = newFileInputArray.value;
+        };
+
+        const updateCreateFileDialog = (val: boolean) => {
+            if (!val) {
                 showCreateFileDialog.value = false;
-            };
+                return;
+            }
 
-            const handleDragAndDrop = (files: File[]) => {
-                selectedFiles.value = files;
-            };
+            if (!selectedFiles.value?.length) return;
+            uploadFiles(selectedFiles.value);
+            clearFiles();
+            showCreateFileDialog.value = false;
+        };
+
+        const handleDragAndDrop = (files: File[]) => {
+            selectedFiles.value = files;
+        };
 
             const clearFiles = () => {
                 selectedFiles.value = [];

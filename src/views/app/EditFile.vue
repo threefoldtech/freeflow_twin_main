@@ -1,21 +1,26 @@
 <template>
-    <div v-if="fileType">
-        <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
-            <div id="placeholder"></div>
+    <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
+        <div id="placeholder"></div>
+    </div>
+    <div v-else class="flex items-center justify-center bg-gray-100 h-screen">
+        <div v-if="isLoading">
+            <Spinner />
         </div>
-        <div v-else class="flex items-center justify-center bg-gray-100 h-screen">
-            <div v-if="fileType == FileType.Video">
-                <video controls>
-                    <source :src="readUrl" />
-                </video>
-            </div>
-            <div v-else-if="fileType == FileType.Image">
-                <img :src="readUrl" />
-            </div>
-            <div v-else class="text-center">
-                <h1 class="mb-2">Sorry, we are not able to display the file</h1>
-                <a class="bg-primary text-white p-2" :href="readUrl">Download file</a>
-            </div>
+
+        <div v-else-if="fileType == FileType.Video">
+            <video controls>
+                <source :src="readUrl" />
+            </video>
+        </div>
+        <div v-else-if="fileType == FileType.Image">
+            <img :src="readUrl" />
+        </div>
+        <div v-else-if="showUserOfflineMessage" class="text-center">
+            <h1 class="mb-2">Unable to fetch the file. File owner seems to be offline.</h1>
+        </div>
+        <div v-else class="text-center">
+            <h1 class="mb-2">Sorry, we are not able to display the file</h1>
+            <a class="bg-primary text-white p-2" :href="readUrl">Download file</a>
         </div>
     </div>
 </template>
@@ -27,7 +32,7 @@ const generateUrl = (protocol: 'http' | 'https', owner: string, path: string, to
     return `${protocol}://${owner}/api/browse/internal/files?path=${path}&token=${token}`;
 };
 
-import { computed, defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
     createModel,
@@ -42,20 +47,25 @@ import {
 import { get } from 'scriptjs';
 import config from '@/config';
 ('../../../public/config/config');
-import { DtId } from '@/types';
+import { Contact, DtId } from '@/types';
 import axios, { ResponseType } from 'axios';
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
-import { watchingUsers } from '@/store/statusStore';
+import { fetchStatus, startFetchStatusLoop, watchingUsers, showUserOfflineMessage } from '@/store/statusStore';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
+import { showShareDialog } from '@/services/dialogService';
+import Spinner from '@/components/Spinner.vue';
 
 const route = useRoute();
 const router = useRouter();
 const fileType = ref<FileType>();
 const readUrl = ref<string>();
+const isLoading = ref<boolean>(true);
 
 const isSupportedInDocumentServer = computed(() => {
-    return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf].some(x => x === fileType.value);
+    return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
+        x => x === fileType.value
+    );
 });
 
 onMounted(async () => {
@@ -68,8 +78,15 @@ onMounted(async () => {
 
     if (shareId) {
         const shareDetails = await fetchShareDetails(shareId);
+        await startFetchStatusLoop(shareDetails.owner);
+        if (showUserOfflineMessage.value) {
+            isLoading.value = false;
+        }
         fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
+        isLoading.value = false;
+
         location = shareDetails.owner.location;
+
         let apiEndpoint = generateUrl(
             'http',
             `[${shareDetails.owner.location}]`,
@@ -94,7 +111,7 @@ onMounted(async () => {
 
     fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
-    if (isSupportedInDocumentServer.value) {
+    if (isSupportedInDocumentServer) {
         documentServerconfig = generateDocumentserverConfig(
             location,
             fileAccesDetails.path,
@@ -156,6 +173,9 @@ const generateDocumentserverConfig = (
             },
             mode: writeToken ? 'edit' : 'view',
         },
+        showUserOfflineMessage,
+        isLoading,
+        Spinner,
     };
 };
 </script>

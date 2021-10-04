@@ -1,17 +1,21 @@
+import { allSharedContent } from './fileBrowserStore';
 import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
 import { getShareWithId } from '@/services/fileBrowserService';
-import { Router } from 'vue-router';
+import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { ContactInterface, DtId, SharedFileInterface } from '@/types';
+import { ContactInterface, DtId, FileShareMessageType, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
+import router from '@/plugins/Router';
+import { AppType } from '@/types/apps';
+import { isArray } from 'lodash';
 
 declare const Buffer;
 export enum FileType {
@@ -25,6 +29,8 @@ export enum FileType {
     Excel,
     Powerpoint,
     Image,
+    Text,
+    Html,
 }
 
 export enum Action {
@@ -57,8 +63,12 @@ export const isDraggingFiles = ref<boolean>(false);
 export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
 export const sharedContent = ref<SharedFileInterface[]>([]);
+export const allSharedContent = ref<SharedFileInterface[]>([]);
+
+export const sharedItem = ref<PathInfoModel>();
 
 export const currentShare = ref<SharedFileInterface>(undefined);
+export const selectedTab = ref(0);
 
 watch([currentDirectory], () => {
     updateContent();
@@ -109,6 +119,18 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
     );
 };
 
+export const goToShared = async () => {
+    sharedDir.value = true;
+    selectedPaths.value = [];
+    searchResults.value = [];
+    searchDirValue.value = '';
+
+    router.push({
+        name: 'sharedWithMe',
+    });
+    await getSharedContent();
+};
+
 export const uploadFile = async (file: File, path = currentDirectory.value) => {
     const result = await Api.uploadFile(path, file);
     if ((result.status !== 200 && result.status !== 201) || !result.data)
@@ -150,12 +172,26 @@ export const goToFolderInCurrentDirectory = (item: PathInfoModel) => {
     let currentPath = currentDirectory.value;
     if (!currentPath || currentPath[currentPath.length - 1] !== rootDirectory) currentPath += '/';
     currentPath += item.name;
+
+    router.push({
+        name: 'quantumFolder',
+        params: {
+            folder: btoa(currentPath),
+        },
+    });
     currentDirectory.value = currentPath;
 };
 
 export const goToHome = () => {
     sharedDir.value = false;
     currentShare.value = undefined;
+
+    router.push({
+        name: AppType.Quantum,
+        params: {
+            path: btoa('/'),
+        },
+    });
     currentDirectory.value = rootDirectory;
 };
 
@@ -264,7 +300,6 @@ export const goBack = () => {
     if (currentDirectory.value === rootDirectory) return;
     const parts = currentDirectory.value.split('/');
     parts.pop();
-    console.log(parts);
     parts.length === 1 ? (currentDirectory.value = rootDirectory) : (currentDirectory.value = pathJoin(parts));
 };
 
@@ -296,12 +331,12 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, router: Router, path = currentDirectory.value) => {
     if (item.isDirectory) {
-        return goToFolderInCurrentDirectory(item);
+        goToFolderInCurrentDirectory(item);
+        return;
     }
-    console.log(item);
+
     const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName])) } });
-    console.log(result);
-    window.open(result.href, '_blank');
+    window.open(result.href, '_blank', 'noreferrer');
 };
 
 export const sortContent = () => {
@@ -352,7 +387,9 @@ export const getIcon = (item: PathInfoModel) => {
             return 'far fa-file';
     }
 };
-export const getIconDirty = (fileType: FileType) => {
+export const getIconDirty = (isFolder: boolean, fileType: FileType) => {
+    if (isFolder) return 'fas fa-folder';
+
     switch (fileType) {
         case FileType.Video:
             return 'far fa-file-video';
@@ -397,6 +434,7 @@ export const getFileType = (extension: string): FileType => {
         case 'swf':
             return FileType.Video;
         case 'doc':
+            return FileType.Word;
         case 'docm':
         case 'docx':
         case 'dot':
@@ -404,11 +442,17 @@ export const getFileType = (extension: string): FileType => {
         case 'dotx':
             return FileType.Word;
         case 'jpg':
+            return FileType.Image;
         case 'jpeg':
+            return FileType.Image;
         case 'tiff':
+        case 'txt':
+            return FileType.Text;
         case 'png':
+            return FileType.Image;
         case 'bmp':
         case 'gif':
+            return FileType.Image;
         case 'webp':
         case 'svg':
             return FileType.Image;
@@ -452,8 +496,16 @@ export const getFileType = (extension: string): FileType => {
         case 'ppsx':
         case 'ppt':
         case 'pptm':
+        case 'ods':
+            return FileType.Excel;
+        case 'odt':
+            return FileType.Word;
+        case 'odp':
+            return FileType.Powerpoint;
         case 'pptx':
             return FileType.Powerpoint;
+        case 'html':
+            return FileType.Html;
         default:
             return FileType.Unknown;
     }
@@ -503,7 +555,8 @@ export const getIconColor = (item: PathInfoModel) => {
             return 'text-primarylight';
     }
 };
-export const getIconColorDirty = (filetype: FileType) => {
+export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
+    if (isFolder) return 'text-primary';
     switch (filetype) {
         case FileType.Excel:
             return 'text-green-400';
@@ -516,36 +569,258 @@ export const getIconColorDirty = (filetype: FileType) => {
     }
 };
 
+export const getFullFolderSkeleton = async () => {};
+
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
     sharedContent.value = result.data;
+    allSharedContent.value = result.data;
+};
+
+export const sharedBreadcrumbs = ref([]);
+
+export const clickBreadcrumb = async (item, breadcrumbs, idx) => {
+    //This function only applies in your 'shared with me' folders
+    resetSharedFolder();
+
+    if (idx === 0) {
+        //Go to shared with me folder
+        router.push({
+            name: 'sharedWithMe',
+        });
+        return;
+    }
+    if (idx === 1) {
+        //If clicked on the first breadcrumb, go to root shared folder
+        router.push({
+            name: 'sharedWithMeItem',
+            params: {
+                sharedId: breadcrumbs[1].id,
+            },
+        });
+        return;
+    }
+
+    const params = router.currentRoute.value.params;
+    let splitted = String(params.path).split('/').slice(0);
+    //Deleting all empty values
+    splitted = splitted.filter(function (element) {
+        return element !== '';
+    });
+
+    const newPath = splitted.slice(0, idx - 1);
+
+    router.push({
+        name: 'sharedWithMeItemNested',
+        params: {
+            sharedId: params.sharedId,
+            path: `/${newPath.join('/')}`,
+        },
+    });
+};
+
+export const sharedFolderIsloading = ref(false);
+
+const resetSharedFolder = () => {
+    sharedDir.value = true;
+    selectedPaths.value = [];
+    searchResults.value = [];
+    searchDirValue.value = '';
+};
+
+//This timer is used for if a folder has been trying to load for too long.
+//If it takes too long => redirect to sharedwithme page
+let timer;
+function startTimer(milliseconds) {
+    timer = setTimeout(function () {
+        router.push({ name: 'sharedWithMe' });
+        showSharedFolderErrorModal.value = true;
+    }, milliseconds);
+}
+export function stopTimer() {
+    clearTimeout(timer);
+}
+//Error dialog
+export const showSharedFolderErrorModal = ref(false);
+
+export const loadLocalFolder = () => {
+    const folderId = atob(<string>router.currentRoute.value.params.folder);
+
+    currentDirectory.value = folderId.split('.').shift();
+};
+
+export const fetchBasedOnRoute = async () => {
+    const route = router.currentRoute.value;
+    //Starting lazy loader animation
+    sharedFolderIsloading.value = true;
+
+    if (route.name === 'quantum') {
+        await getSharedContent();
+
+        sharedFolderIsloading.value = false;
+        return;
+    }
+
+    if (route.meta.root_parent === 'quantum') {
+        await getSharedContent();
+        sharedFolderIsloading.value = true;
+    }
+
+    if (route.name === 'sharedWithMe') {
+        resetSharedFolder();
+
+        sharedFolderIsloading.value = false;
+
+        return;
+    }
+
+    if (route.name === 'sharedWithMeItem') {
+        const parent = allSharedContent.value.find(x => x.id === route.params.sharedId);
+        if (!parent) {
+            router.push({ name: 'sharedWithMe' });
+            sharedFolderIsloading.value = false;
+            return;
+        }
+        //Starting timer
+        if (sharedFolderIsloading.value) {
+            startTimer(5000);
+        }
+        //Fetching items
+        const items = await getSharedFolderContent(parent.owner, parent.id, '/');
+        //If there is something wrong with downloading the folder, return to shared with me.
+        stopTimer();
+
+        sharedContent.value = items.map(item => {
+            let itemName = item.name;
+            if (item.extension) {
+                itemName = itemName + '.' + item.extension;
+            }
+            return <SharedFileInterface>{
+                id: parent.id,
+                path: item.path,
+                owner: parent.owner,
+                name: itemName,
+                isFolder: item.isDirectory,
+                size: item.size,
+                lastModified: item.lastModified.getTime ? item.lastModified.getTime() : undefined,
+                permissions: parent.permissions,
+            };
+        });
+        sharedDir.value = true;
+        sharedFolderIsloading.value = false;
+        return;
+    }
+    if (route.name === 'sharedWithMeItemNested') {
+        //await getSharedContent();
+
+        const parent = allSharedContent.value.find(x => x.id === route.params.sharedId);
+        if (!parent) {
+            router.push({ name: 'sharedWithMe' });
+
+            sharedFolderIsloading.value = false;
+            return;
+        }
+
+        if (!isArray(route.params.path)) {
+            const folderTree = route.params.path.split('/');
+
+            const items = await getSharedFolderContent(
+                parent.owner,
+                parent.id,
+                '/' + `/${folderTree.slice(1).join('/')}`
+            );
+
+            sharedContent.value = items.map(item => {
+                let itemName = item.name;
+                if (item.extension) {
+                    itemName = itemName + '.' + item.extension;
+                }
+                return <SharedFileInterface>{
+                    id: parent.id,
+                    path: item.path,
+                    owner: parent.owner,
+                    name: itemName,
+                    isFolder: item.isDirectory,
+                    size: item.size,
+                    lastModified: item.lastModified.getTime ? item.lastModified.getTime() : undefined,
+                    permissions: parent.permissions,
+                };
+            });
+            sharedDir.value = true;
+            sharedFolderIsloading.value = false;
+        }
+    }
+};
+
+export const loadSharedItems = async () => {
+    sharedBreadcrumbs.value = [];
+
+    //https://bertmeeuws.digitaltwin.jimbertesting.be/quantum/shared/:sharedId/:path
+
+    const params = router.currentRoute.value.params;
+
+    if (params.sharedId) {
+        sharedBreadcrumbs.value.push({ name: 'Shared with me' });
+        const firstNode = allSharedContent.value.find(item => item.id === params.sharedId);
+        sharedBreadcrumbs.value.push(firstNode);
+
+        if (!firstNode) router.push({ name: 'sharedWithMe' });
+    }
+
+    if (params.path && params.sharedId) {
+        const decoded = params.path;
+
+        if (!Array.isArray(params.path)) {
+            const history = params.path.split('/');
+            history.forEach(element => {
+                if (element !== '') sharedBreadcrumbs.value.push({ name: element });
+            });
+        }
+    }
 };
 
 export const goIntoSharedFolder = async (share: SharedFileInterface) => {
-    let path: string;
-    if (!currentShare.value) {
-        path = '/';
-        currentShare.value = share;
-    } else {
-        path = share.path;
-    }
-    const items = await getSharedFolderContent(share.owner, share.id, path);
-    sharedContent.value = items.map(item => {
-        let itemName = item.name;
-        if (item.extension) {
-            itemName = itemName + '.' + item.extension;
+    if (router.currentRoute.value.params.sharedId) {
+        if (router.currentRoute.value.params.path) {
+            router.push({
+                name: 'sharedWithMeItemNested',
+                params: {
+                    sharedId: router.currentRoute.value.params.sharedId,
+                    path: share.path,
+                },
+            });
+            return;
         }
-        return <SharedFileInterface>{
-            id: share.id,
-            path: item.path,
-            owner: share.owner,
-            name: itemName,
-            isFolder: item.isDirectory,
-            size: item.size,
-            lastModified: item.lastModified.getTime ? item.lastModified.getTime() : undefined,
-            permissions: share.permissions,
-        };
+        router.push({
+            name: 'sharedWithMeItemNested',
+            params: {
+                sharedId: router.currentRoute.value.params.sharedId,
+                path: share.path,
+            },
+        });
+    } else {
+        router.push({
+            name: 'sharedWithMeItem',
+            params: {
+                sharedId: share.id,
+            },
+        });
+    }
+};
+
+export const goTo = async (item: SharedFileInterface) => {
+    if (item.isFolder) {
+        goIntoSharedFolder(item);
+        return;
+    }
+    const url = router.resolve({
+        name: 'editfile',
+        params: {
+            path: btoa(item.path),
+            shareId: item.id,
+        },
     });
+    window.open(url.href, '_blank');
 };
 
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
@@ -589,7 +864,8 @@ export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, sh
     return response.data;
 };
 
-export const getSharedFolderContent = async (owner, shareId, path: string) => {
+export const getSharedFolderContent = async (owner, shareId, path: string = '/') => {
     const { user } = useAuthState();
+
     return await Api.getSharedFolderContent(owner, shareId, <string>user.id, path);
 };

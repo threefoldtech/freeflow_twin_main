@@ -190,191 +190,188 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, onBeforeMount, ref } from 'vue';
-    import {
-        currentDirectory,
-        currentDirectoryContent,
-        itemAction,
-        PathInfoModel,
-        selectItem,
-        deselectAll,
-        selectAll,
-        selectedPaths,
-        deselectItem,
-        sortContent,
-        sortAction,
-        currentSort,
-        currentSortDir,
-        getFileLastModified,
-        getFileExtension,
-        getFileSize,
-        getIconColor,
-        getIcon,
-        uploadFiles,
-        equals,
-        moveFiles,
-        isDraggingFiles,
-        sharedDir,
-        sharedContent,
-        getSharedContent, searchResults, searchDirValue,
-    } from '@/store/fileBrowserStore';
-    import { useRouter } from 'vue-router';
-    import FileDropArea from '@/components/FileDropArea.vue';
-    import { useSocketActions } from '@/store/socketStore';
-    import { useAuthState } from '@/store/authStore';
+import { defineComponent, onBeforeMount, ref } from 'vue';
+import {
+    currentDirectory,
+    currentDirectoryContent,
+    itemAction,
+    PathInfoModel,
+    selectItem,
+    deselectAll,
+    selectAll,
+    selectedPaths,
+    deselectItem,
+    sortContent,
+    sortAction,
+    currentSort,
+    currentSortDir,
+    getFileLastModified,
+    getFileExtension,
+    getFileSize,
+    getIconColor,
+    getIcon,
+    uploadFiles,
+    equals,
+    moveFiles,
+    isDraggingFiles,
+    sharedDir,
+    sharedContent,
+    getSharedContent,
+    searchResults,
+    searchDirValue,
+    currentShare,
+    goToShared,
+} from '@/store/fileBrowserStore';
+import { useRouter } from 'vue-router';
+import FileDropArea from '@/components/FileDropArea.vue';
+import { useSocketActions } from '@/store/socketStore';
+import { useAuthState } from '@/store/authStore';
 
-    export default defineComponent({
-        name: 'FileTable',
-        computed: {
-            orderClass() {
-                return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
-            },
+export default defineComponent({
+    name: 'FileTable',
+    computed: {
+        orderClass() {
+            return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
         },
-        components: { FileDropArea },
-        setup() {
-            const hiddenItems = ref<HTMLDivElement>();
-            const ghostImage = ref<HTMLDivElement>();
-            const dragOverItem = ref<PathInfoModel>();
-            let tempCounter = 0;
-            const router = useRouter();
-            const { user } = useAuthState();
-            onBeforeMount(() => {
-                const { initializeSocket } = useSocketActions();
-                initializeSocket(user.id.toString());
-            });
+    },
+    components: { FileDropArea },
+    setup() {
+        const hiddenItems = ref<HTMLDivElement>();
+        const ghostImage = ref<HTMLDivElement>();
+        const dragOverItem = ref<PathInfoModel>();
+        let tempCounter = 0;
+        const router = useRouter();
+        const { user } = useAuthState();
+        onBeforeMount(() => {
+            const { initializeSocket } = useSocketActions();
+            initializeSocket(user.id.toString());
+        });
 
-            const handleSelect = (item: PathInfoModel) => {
-                if (!selectedPaths.value.includes(item)) selectItem(item);
-                else deselectItem(item);
-            };
+        const handleSelect = (item: PathInfoModel) => {
+            if (!selectedPaths.value.includes(item)) selectItem(item);
+            else deselectItem(item);
+        };
 
-            const isSelected = (item: PathInfoModel) => {
-                if (!selectedPaths.value.includes(item)) return false;
-                else return true;
-            };
+        const isSelected = (item: PathInfoModel) => {
+            if (!selectedPaths.value.includes(item)) return false;
+            else return true;
+        };
 
-            const handleAllSelect = (val: any) => {
-                if (val.target.checked) selectAll();
-                else deselectAll();
-            };
+        const handleAllSelect = (val: any) => {
+            if (val.target.checked) selectAll();
+            else deselectAll();
+        };
 
-            const handleItemClick = (item: PathInfoModel) => {
-                itemAction(item, router);
-            };
+        const handleItemClick = (item: PathInfoModel) => {
+            itemAction(item, router);
+        };
 
-            const onDragStart = (event, item) => {
-                isDraggingFiles.value = true;
-                if (!selectedPaths.value.includes(item)) selectItem(item);
-                event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
-            };
+        const onDragStart = (event, item) => {
+            isDraggingFiles.value = true;
+            if (!selectedPaths.value.includes(item)) selectItem(item);
+            event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
+        };
 
-            const onDragOver = (event: Event, item: PathInfoModel) => {
-                dragOverItem.value = item;
-            };
+        const onDragOver = (event: Event, item: PathInfoModel) => {
+            dragOverItem.value = item;
+        };
 
-            const canBeDropped = (item: PathInfoModel) => {
-                return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
-            };
+        const canBeDropped = (item: PathInfoModel) => {
+            return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
+        };
 
-            const onDragLeaveParent = () => {
-                tempCounter--;
-                if (tempCounter === 0) dragOverItem.value = undefined;
-            };
+        const onDragLeaveParent = () => {
+            tempCounter--;
+            if (tempCounter === 0) dragOverItem.value = undefined;
+        };
 
-            const onDragEnterParent = () => {
-                tempCounter++;
-            };
+        const onDragEnterParent = () => {
+            tempCounter++;
+        };
 
-            const highlight = (item: PathInfoModel) => {
-                return equals(item, dragOverItem.value) && canBeDropped(item);
-            };
+        const highlight = (item: PathInfoModel) => {
+            return equals(item, dragOverItem.value) && canBeDropped(item);
+        };
 
-            const onDrop = (item: PathInfoModel) => {
-                tempCounter = 0;
-                if (!canBeDropped(item)) return;
-                dragOverItem.value = undefined;
-                moveFiles(
-                    item.path,
-                    selectedPaths.value.map(x => x.path)
-                );
-                selectedPaths.value = [];
-            };
+        const onDrop = (item: PathInfoModel) => {
+            tempCounter = 0;
+            if (!canBeDropped(item)) return;
+            dragOverItem.value = undefined;
+            moveFiles(
+                item.path,
+                selectedPaths.value.map(x => x.path)
+            );
+            selectedPaths.value = [];
+        };
 
-            const onDragEnd = () => {
-                isDraggingFiles.value = false;
-            };
-            const goToShared = async () => {
-                sharedDir.value = true;
-                selectedPaths.value = [];
-                searchResults.value = [];
-                searchDirValue.value = '';
-                await getSharedContent();
-            };
+        const onDragEnd = () => {
+            isDraggingFiles.value = false;
+        };
 
-            return {
-                handleSelect,
-                isSelected,
-                handleAllSelect,
-                handleItemClick,
-                currentDirectoryContent,
-                currentDirectory,
-                selectedPaths,
-                sortContent,
-                sortAction,
-                currentSort,
-                currentSortDir,
-                uploadFiles,
-                getFileLastModified,
-                getFileExtension,
-                getFileSize,
-                getIconColor,
-                getIcon,
-                onDragStart,
-                hiddenItems,
-                ghostImage,
-                onDragOver,
-                equals,
-                dragOverItem,
-                highlight,
-                onDrop,
-                onDragEnterParent,
-                onDragLeaveParent,
-                onDragEnd,
-                sharedDir,
-                sharedContent,
-                goToShared,
-            };
-        },
-    });
+        return {
+            handleSelect,
+            isSelected,
+            handleAllSelect,
+            handleItemClick,
+            currentDirectoryContent,
+            currentDirectory,
+            selectedPaths,
+            sortContent,
+            sortAction,
+            currentSort,
+            currentSortDir,
+            uploadFiles,
+            getFileLastModified,
+            getFileExtension,
+            getFileSize,
+            getIconColor,
+            getIcon,
+            onDragStart,
+            hiddenItems,
+            ghostImage,
+            onDragOver,
+            equals,
+            dragOverItem,
+            highlight,
+            onDrop,
+            onDragEnterParent,
+            onDragLeaveParent,
+            onDragEnd,
+            sharedDir,
+            sharedContent,
+            goToShared,
+        };
+    },
+});
 </script>
 
 <style scoped>
-    th.active .arrow {
-        opacity: 1;
-    }
+th.active .arrow {
+    opacity: 1;
+}
 
-    .arrow {
-        display: inline-block;
-        vertical-align: middle;
-        width: 0;
-        height: 0;
-        margin-left: 5px;
-        opacity: 0;
-    }
+.arrow {
+    display: inline-block;
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+    margin-left: 5px;
+    opacity: 0;
+}
 
-    .arrow.asc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 4px solid #1F0F5B;
-    }
+.arrow.asc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #1f0f5b;
+}
 
-    .arrow.desc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid #1F0F5B;
-    }
+.arrow.desc {
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #1f0f5b;
+}
 
-    .hiddenItems {
-        z-index: -20;
-    }
+.hiddenItems {
+    z-index: -20;
+}
 </style>

@@ -1,3 +1,4 @@
+import { currentDirectory, sharedContent, sharedBreadcrumbs } from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
@@ -17,6 +18,19 @@ import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
 import config from '@/config';
 import { disableSidebar } from '@/services/sidebarService';
+
+import {
+    loadSharedItems,
+    fetchBasedOnRoute,
+    sharedFolderIsloading,
+    sharedDir,
+    showSharedFolderErrorModal,
+    loadLocalFolder,
+    updateContent,
+    stopTimer,
+  hasBrowserBeenStartedOnce, setHasBrowserBeenStartedOnce
+} from '@/store/fileBrowserStore';
+
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -57,13 +71,25 @@ const routes: Array<RouteRecordRaw> = [
             },
         ],
     },
+    /*
     {
         // fake security since the actual filebrowser has no security yet?
-        name: 'quantum',
-        path: '/quantum/:path?', //btoa? /quantum/:path?
-        component: FileBrowser,
+
+        path: '/quantum', //btoa? /quantum/:path?
+        component: RouterView,
         meta: { requiresAuth: true, app: AppType.Quantum },
+        children: [
+            {
+                // fake security since the actual filebrowser has no security yet?
+                name: 'quantum',
+                path: '/:path?', //btoa? /quantum/:path?
+                component: FileBrowser,
+                meta: { requiresAuth: true, app: AppType.Quantum },
+            },
+        ],
     },
+    */
+
     {
         path: '/quantum/edit/:path/:shareId?',
         name: 'editfile',
@@ -85,14 +111,59 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/quantum/sharedWithMe/:path?/:shareId?',
-        name: 'sharedWithMe',
+        path: '/quantum',
+        name: 'quantum',
         component: FileBrowser,
         meta: {
             back: 'quantum',
             requiresAuth: true,
             app: AppType.Quantum,
+            root_parent: 'quantum',
         },
+        children: [
+            {
+                path: ':folder',
+                name: 'quantumFolder',
+                component: FileBrowser,
+                meta: {},
+            },
+            {
+                path: 'shared',
+                name: 'sharedWithMe',
+                component: FileBrowser,
+                meta: {
+                    back: 'quantum',
+                    requiresAuth: true,
+                    app: AppType.Quantum,
+                    root_parent: 'quantum',
+                    sharedFolder: true,
+                },
+                children: [
+                    {
+                        component: FileBrowser,
+                        ///quantum/shared/:sharedId
+                        name: 'sharedWithMeItem',
+                        path: ':sharedId',
+                        meta: {
+                            root_parent: 'quantum',
+                            sharedFolder: true,
+                        },
+                        children: [
+                            {
+                                ///quantum/shared/:sharedId/:path
+                                path: ':path',
+                                name: 'sharedWithMeItemNested',
+                                component: FileBrowser,
+                                meta: {
+                                    root_parent: 'quantum',
+                                    sharedFolder: true,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
     },
     {
         name: 'forum',
@@ -138,11 +209,48 @@ const router = createRouter({
     routes,
 });
 
+//const {setHasBrowserBeenStartedOnce} = useBrowserActions()
+
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
+
+    //Starts the browser if the user navigates to /glass as first page
+    if(to.name === "glass"){
+        setHasBrowserBeenStartedOnce()
+    }
+
+    if (to.name === 'sharedWithMe') {
+        sharedDir.value = true;
+    }
+
     next();
+});
+
+router.afterEach(async (to, from) => {
+    //If file takes too long to load, if you switch page you still get the error modal. Now it doesn't
+    stopTimer();
+    if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
+        sharedFolderIsloading.value = true;
+        await fetchBasedOnRoute();
+        await loadSharedItems();
+    } else {
+        sharedFolderIsloading.value = false;
+        showSharedFolderErrorModal.value = false;
+    }
+    if (to.name === 'quantumFolder') {
+        loadLocalFolder();
+    }
+    if (to.meta.sharedFolder) {
+        sharedDir.value = true;
+    }
+    if (to.name === 'sharedWithMe') {
+    }
+    if (to.name === 'quantum') {
+        sharedDir.value = false;
+        await updateContent('/');
+    }
 });
 
 router.beforeEach(async (to, from, next) => {

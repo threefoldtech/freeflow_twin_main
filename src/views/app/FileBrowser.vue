@@ -1,4 +1,5 @@
 <template>
+    <SomethingWentWrongModal />
     <appLayout>
         <template v-slot:default>
             <div class="flex flex-row w-full h-full">
@@ -13,7 +14,7 @@
     </appLayout>
 </template>
 
-<script  lang="ts">
+<script lang="ts">
 import appLayout from '../../layout/AppLayout.vue';
 import { computed, defineComponent, onBeforeMount } from 'vue';
 import FileTable from '@/components/fileBrowser/FileTable.vue';
@@ -26,12 +27,24 @@ import {
     searchDirValue,
     currentDirectory,
     currentShare,
+    getFile,
+    selectItem,
+    selectedTab,
+    goBack,
+    currentDirectoryContent,
+    sharedItem,
+    goIntoSharedFolder,
+    goTo,
+    fetchBasedOnRoute,
 } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
 import router from '@/plugins/Router';
 import { useRoute, useRouter } from 'vue-router';
 import { isUndefined } from 'lodash';
+import { showShareDialog } from '@/services/dialogService';
+import Spinner from '@/components/Spinner.vue';
+import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
 
 export default defineComponent({
     name: 'Apps',
@@ -41,6 +54,8 @@ export default defineComponent({
         FileTable,
         ResultsTable,
         SharedContent,
+        Spinner,
+        SomethingWentWrongModal,
     },
 
     setup() {
@@ -48,13 +63,26 @@ export default defineComponent({
         const router = useRouter();
 
         onBeforeMount(async () => {
-            currentDirectory.value = route.params.path;
-            if (isUndefined(currentDirectory.value)) currentDirectory.value = '';
-            await updateContent(currentDirectory.value); // bug to fix
-            sharedDir.value = false;
-            selectedPaths.value = [];
-            searchResults.value = [];
-            searchDirValue.value = '';
+            if (route.params.name === 'sharedWithMeItemNested') {
+                currentDirectory.value = atob(<string>route.params.path);
+            }
+
+            if (!sharedDir.value) {
+                if (route.params.editFileShare === 'true') {
+                    selectItem(sharedItem.value);
+                    selectedTab.value = 1;
+                    showShareDialog.value = true;
+                    await updateContent(currentDirectory.value);
+                }
+
+                if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
+                await updateContent(currentDirectory.value);
+                sharedDir.value = false;
+                selectedPaths.value = [];
+                searchResults.value = [];
+                searchDirValue.value = '';
+                return;
+            }
         });
 
         return {

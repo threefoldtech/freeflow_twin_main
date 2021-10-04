@@ -7,7 +7,7 @@
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <img alt="Threefold logo" src="../../public/uhuru.svg" width="65" />
+                    <img alt="Threefold logo" src="../../Symbol_secundary_color.png" width="65" />
                 </div>
             </div>
             <br />
@@ -48,12 +48,16 @@
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
     import { AppType } from '@/types/apps';
+    import { AppItemType } from '@/types/apps';
 
     export default defineComponent({
         name: 'Sidebar',
         components: { AvatarImg },
         setup() {
-            const apps = [
+            
+
+ 
+            const apps: Array<AppItemType> = [
                 {
                     name: AppType.Whisper,
                     icon: '/whisper.svg',
@@ -73,6 +77,7 @@
                     name: AppType.Glass,
                     icon: '/glass.svg',
                     enabled: true,
+                   
                 },
                 {
                     name: AppType.Kutana,
@@ -88,8 +93,9 @@
 
             const currentRoute = computed(() => router.currentRoute.value);
 
-            const changePage = (page: any) => {
-                router.push({ name: page });
+            const changePage = (name: string) => {           
+                
+                router.push({ name });
             };
 
             const { user } = useAuthState();

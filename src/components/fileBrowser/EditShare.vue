@@ -1,14 +1,20 @@
 <template>
-    
     <div class="my-2 relative rounded-md shadow-sm">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
         </div>
-        <input type="text" @focus="handleInput" @input="handleInput" v-model='searchTerm' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+        <input
+            type="text"
+            @focus="handleInput"
+            @input="handleInput"
+            v-model="searchTerm"
+            class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+            placeholder="Search"
+        />
     </div>
     <Table v-if="!isLoading" :headers="headers" :data="searchResults">
         <template #data-types="data">
-            <div class="my-1 p-2 rounded-md border border-gray-200 w-20 ">
+            <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
                 <span v-if="canWrite(data.data)">Can write</span>
                 <span v-else>Can read</span>
             </div>
@@ -18,9 +24,7 @@
             </div> -->
         </template>
         <template #data-delete>
-            <span class="my-1 p-2 rounded-md bg-red-500 text-white">
-                Remove
-            </span>
+            <span class="my-1 p-2 rounded-md bg-red-500 text-white"> Remove </span>
         </template>
     </Table>
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
@@ -41,7 +45,7 @@ import { isObject } from 'lodash';
 import { getShareByPath } from '@/services/fileBrowserService';
 import { SearchIcon } from '@heroicons/vue/solid';
 
-const headers:IHeader<TEntry>[] = [
+const headers: IHeader<TEntry>[] = [
     {
         key: 'chatId',
         displayName: 'Chat',
@@ -87,16 +91,16 @@ export default defineComponent({
         };
 
         const searchResults = computed(() => {
-            return currentShare.value.permissions.filter((item) => {
+            return currentShare.value.permissions.filter(item => {
                 return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
             });
         });
 
-        const canWrite = computed ( () => {
-            return (param) => {
-                return !!param.find(perm => perm == 'w')
-            }
-        })
+        const canWrite = computed(() => {
+            return param => {
+                return !!param.find(perm => perm == 'w');
+            };
+        });
 
         return {
             reset,

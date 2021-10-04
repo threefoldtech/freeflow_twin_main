@@ -6,3 +6,9 @@ export enum AppType {
     Meetings = 'meetings',
     Kutana = 'kutana',
 }
+
+export interface AppItemType {
+    name: AppType;
+    icon: string;
+    enabled: boolean;
+}

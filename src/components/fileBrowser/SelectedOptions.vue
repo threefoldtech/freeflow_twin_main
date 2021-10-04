@@ -138,7 +138,7 @@
                 </button>
             </div>
         </jdialog>
-        <jdialog v-model="showShareDialog" @update-model-value="showShareDialog = false" noActions>
+        <jdialog v-model="showShareDialog" @update-model-value="resetShareDialog" noActions>
             <template v-slot:title>
                 <h1 class="text-center">Share files</h1>
             </template>
@@ -180,6 +180,7 @@ import {
     Action,
     addShare,
     sharedDir,
+    selectedTab,
 } from '@/store/fileBrowserStore';
 import Dialog from '@/components/Dialog.vue';
 import Button from '@/components/Button.vue';
@@ -197,7 +198,6 @@ const { chats } = usechatsState();
 const { retrievechats, sendMessage } = usechatsActions();
 
 const tabs = ['Create shares', 'Edit shares'];
-const selectedTab = ref(0);
 
 export default defineComponent({
     name: 'SelectedOptions',
@@ -234,6 +234,11 @@ export default defineComponent({
             await copyPasteSelected();
         }
 
+        function resetShareDialog() {
+            showShareDialog.value = false;
+            selectedPaths.value = [];
+            selectedTab.value = 0;
+        }
         return {
             selectedPaths,
             deleteFiles,
@@ -259,6 +264,7 @@ export default defineComponent({
             tabs,
             selectedTab,
             showShareDialog,
+            resetShareDialog,
         };
     },
 });

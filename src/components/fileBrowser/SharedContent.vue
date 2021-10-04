@@ -1,7 +1,10 @@
 <template>
     <div class="h-full overflow-y-auto">
         <h1 class="p-2">Shared with me:</h1>
-        <div class="flex flex-col mx-2">
+        <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
+            <Spinner :xlarge="true" />
+        </div>
+        <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="py-2 align-middle inline-block min-w-full">
                     <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
@@ -59,9 +62,15 @@
                                                     :key="item.name"
                                                     class="fa-2x"
                                                     :class="
-                                                        getIconDirty(getFileType(getExtension(item.name))) +
+                                                        getIconDirty(
+                                                            item.isFolder,
+                                                            getFileType(getExtension(item.name))
+                                                        ) +
                                                         ' ' +
-                                                        getIconColorDirty(getFileType(getExtension(item.name)))
+                                                        getIconColorDirty(
+                                                            item.isFolder,
+                                                            getFileType(getExtension(item.name))
+                                                        )
                                                     "
                                                 ></i>
                                             </div>
@@ -91,55 +100,56 @@
 </template>
 
 <script setup lang="ts">
-import {
-    FileType,
-    formatBytes,
-    getExtension,
-    getFileType,
-    getIcon,
-    getIconColor,
-    getFileSize,
-    getIconColorDirty,
-    getIconDirty,
-    getSharedContent,
-    getSharedFolderContent,
-    goIntoSharedFolder,
-    parseJwt,
-    PathInfoModel,
-    selectedPaths,
-    sharedContent,
-} from '@/store/fileBrowserStore';
-import { SharedFileInterface } from '@/types';
-import { defineComponent } from '@vue/runtime-core';
-import { onBeforeMount } from 'vue';
-import { useRouter } from 'vue-router';
+    import {
+        FileType,
+        formatBytes,
+        getExtension,
+        getFileType,
+        getIcon,
+        getIconColor,
+        getFileSize,
+        getIconColorDirty,
+        getIconDirty,
+        getSharedContent,
+        getSharedFolderContent,
+        goIntoSharedFolder,
+        parseJwt,
+        PathInfoModel,
+        selectedPaths,
+        sharedContent,
+        goTo,
+        sharedBreadcrumbs,
+        clickBreadcrumb,
+        sharedFolderIsloading,
+    } from '@/store/fileBrowserStore';
+    import { SharedFileInterface } from '@/types';
+    import { defineComponent } from '@vue/runtime-core';
+    import { onBeforeMount, watch, computed } from 'vue';
+    import { useRouter } from 'vue-router';
+    import Spinner from '@/components/Spinner.vue';
+    import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
 
-onBeforeMount(async () => {
-    await getSharedContent();
-});
-
-const router = useRouter();
-const epochToDate = epoch => {
-    let d = new Date(epoch).toLocaleDateString();
-
-    return d === '1/20/1980' ? 'Never' : d;
-};
-const goTo = async (item: SharedFileInterface) => {
-    if (item.isFolder) {
-        goIntoSharedFolder(item);
-        return;
-    }
-    const url = router.resolve({
-        name: 'editfile',
-        params: {
-            path: btoa(item.path),
-            shareId: item.id,
-        },
+    onBeforeMount(async () => {
+        sharedBreadcrumbs.value = [];
     });
-    window.open(url.href, '_blank');
-};
 
-const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
+    watch(sharedFolderIsloading, () => {});
+
+    const router = useRouter();
+
+    const truncate = name => {
+        return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+    };
+
+    //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
+
+    const epochToDate = epoch => {
+        let d = new Date(epoch).toLocaleDateString();
+
+        return d === '1/20/1980' ? 'Never' : d;
+    };
+
+    const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
 </script>
 
 <style scoped></style>
