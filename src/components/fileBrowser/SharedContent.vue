@@ -1,5 +1,5 @@
 <template>
-    <div class="h-full overflow-y-auto">
+    <div class="h-full overflow-y-auto px-3">
         <h1 class="p-2">Shared with me:</h1>
         <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
             <Spinner :xlarge="true" />
@@ -7,8 +7,24 @@
         <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="py-2 align-middle inline-block min-w-full">
-                    <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
+                    <div class="flex justify-end mb-2">
+                        <ViewListIcon
+                            class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
+                            :class="{ 'text-primary': fileBrowserTypeView === 'LIST' }"
+                            @click="changeView('LIST')"
+                        />
+                        <ViewGridIcon
+                            class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
+                            :class="{ 'text-primary': fileBrowserTypeView === 'GRID' }"
+                            @click="changeView('GRID')"
+                        />
+                    </div>
+                    <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                        <table
+                            v-if="fileBrowserTypeView === 'LIST'"
+                            class="min-w-full divide-y divide-gray-200 shadow"
+                            :key="currentDirectory"
+                        >
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th
@@ -92,6 +108,66 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        <ul
+                            role="list"
+                            v-else
+                            class="
+                                grid grid-cols-2
+                                gap-x-4 gap-y-8
+                                sm:grid-cols-3 sm:gap-x-6
+                                lg:grid-cols-4
+                                xl:gap-x-8
+                                mt-4
+                            "
+                        >
+                            <li v-for="item in sharedContent" :key="item.name" class="relative">
+                                <div
+                                    class="
+                                        group
+                                        w-full
+                                        aspect-w-10 aspect-h-7
+                                        rounded-lg
+                                        bg-gray-200
+                                        hover:bg-gray-300
+                                        transition
+                                        duration:200
+                                        focus-within:ring-2
+                                        focus-within:ring-offset-2
+                                        focus-within:ring-offset-gray-100
+                                        focus-within:ring-indigo-500
+                                        overflow-hidden
+                                        flex
+                                        justify-center
+                                        items-center
+                                    "
+                                    @click="goTo(item)"
+                                >
+                                    <div class="flex justify-center items-center cursor-pointer">
+                                        <i
+                                            :key="item.name"
+                                            class="fa-2x"
+                                            :class="
+                                                getIconDirty(item.isFolder, getFileType(getExtension(item.name))) +
+                                                ' ' +
+                                                getIconColorDirty(item.isFolder, getFileType(getExtension(item.name)))
+                                            "
+                                        ></i>
+                                        <button type="button" class="absolute inset-0 focus:outline-none">
+                                            <span class="sr-only">View details for {{ item.name }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
+                                    {{ item.name }}
+                                </p>
+                                <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+                                    From: {{ item.owner.id }}
+                                    <br />
+                                    {{ formatBytes(item.size, 2) }}
+                                </p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -100,6 +176,7 @@
 </template>
 
 <script setup lang="ts">
+    import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
     import {
         FileType,
         formatBytes,
@@ -121,6 +198,8 @@
         sharedBreadcrumbs,
         clickBreadcrumb,
         sharedFolderIsloading,
+        fileBrowserTypeView,
+        View,
     } from '@/store/fileBrowserStore';
     import { SharedFileInterface } from '@/types';
     import { defineComponent } from '@vue/runtime-core';
@@ -139,6 +218,10 @@
 
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+    };
+
+    const changeView = (type: string) => {
+        fileBrowserTypeView.value = type;
     };
 
     //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));

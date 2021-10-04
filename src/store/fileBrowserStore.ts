@@ -38,6 +38,11 @@ export enum Action {
     COPY,
 }
 
+export enum View {
+    LIST,
+    GRID,
+}
+
 export interface PathInfoModel extends Api.PathInfo {
     fileType: FileType;
 }
@@ -64,6 +69,7 @@ export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
 export const sharedContent = ref<SharedFileInterface[]>([]);
 export const allSharedContent = ref<SharedFileInterface[]>([]);
+export const fileBrowserTypeView = ref<string>('LIST');
 
 export const sharedItem = ref<PathInfoModel>();
 
