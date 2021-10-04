@@ -3,25 +3,72 @@
         <div
             @keydown.esc="$emit('update-model-value', false)"
             v-if="modelValue"
+            @click="$emit('update-model-value', false)"
             class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
         >
             <div
-                class="form-container z-50 bg-white p-4 w-full h-screen sm:h-auto sm:w-10/12 xl:w-3/5 max-w-full sm:rounded overflow-auto"
+                @click.stop
+                class="
+                    form-container
+                    z-50
+                    bg-white
+                    p-4
+                    w-full
+                    h-screen
+                    sm:h-3/5 sm:w-10/12
+                    xl:w-3/5
+                    max-w-full
+                    sm:rounded
+                    overflow-auto
+                "
             >
                 <div class="flex justify-between">
                     <slot name="title" />
-                    <button @click="$emit('update-model-value', false)">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div
+                        class="
+                            w-6
+                            h-6
+                            bg-transparent
+                            rounded-full
+                            hover:bg-gray-100
+                            flex
+                            justify-center
+                            items-center
+                            transition
+                            duration-300
+                        "
+                        @click="$emit('update-model-value', false)"
+                    >
+                        <button @click="$emit('update-model-value', false)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="py-2 flex-col">
                     <slot />
                 </div>
                 <div class="flex justify-end mt-2" v-if="!noActions">
-                    <button class="rounded-md border border-gray-400 px-4 py-2 justify-self-end" @click="$emit('update-model-value', false)">
+                    <button
+                        class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                        @click="$emit('update-model-value', false)"
+                    >
                         {{ cancelButtonText }}
                     </button>
-                    <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary" @click="$emit('update-model-value', true)">
+                    <button
+                        class="
+                            py-2
+                            px-4
+                            ml-2
+                            text-white
+                            rounded-md
+                            justify-self-end
+                            bg-primary
+                            hover:bg-accent-700
+                            transition
+                            duration-300
+                        "
+                        @click="$emit('update-model-value', true)"
+                    >
                         {{ okButtonText }}
                     </button>
                 </div>

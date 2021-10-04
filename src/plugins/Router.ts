@@ -28,9 +28,9 @@ import {
     loadLocalFolder,
     updateContent,
     stopTimer,
-  hasBrowserBeenStartedOnce, setHasBrowserBeenStartedOnce
 } from '@/store/fileBrowserStore';
 
+import { hasBrowserBeenStartedOnce, setHasBrowserBeenStartedOnce } from '@/store/browserStore';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -217,8 +217,8 @@ router.beforeEach(async (to, from, next) => {
     }
 
     //Starts the browser if the user navigates to /glass as first page
-    if(to.name === "glass"){
-        setHasBrowserBeenStartedOnce()
+    if (to.name === 'glass') {
+        setHasBrowserBeenStartedOnce();
     }
 
     if (to.name === 'sharedWithMe') {

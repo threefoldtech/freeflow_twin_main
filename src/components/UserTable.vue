@@ -52,7 +52,7 @@
                                         </div>
                                         <button
                                             @click="handleClick(item)"
-                                            class="text-white py-2 px-4 rounded-md justify-self-end bg-primary"
+                                            class="text-white py-2 px-4 rounded-md justify-self-end bg-primary hover:bg-accent-700 transition duration-300"
                                         >
                                             Invite to chat
                                         </button>

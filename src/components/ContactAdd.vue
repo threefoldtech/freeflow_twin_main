@@ -5,7 +5,11 @@
                 v-for="item in navigation"
                 :key="item.name"
                 class="nav-link grid-cols-6 text-center py-2 rounded-xl font-normal"
-                :class="[activeItem === item.name ? 'bg-primary text-white' : 'bg-gray-100 text-black']"
+                :class="[
+                    activeItem === item.name
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-100 text-black hover:bg-gray-200 transition duration-300',
+                ]"
                 href="#"
                 @click.prevent="setActive(item.name)"
             >
@@ -123,7 +127,7 @@
             <div class="flex place-items-center mx-1">
                 <div class="w-full">
                     <div>
-                        <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
+                        <label for="groupname" class="block text-sm font-medium text-gray-700 mt-2">Group name</label>
                         <div>
                             <input
                                 type="text"
@@ -163,12 +167,27 @@
 
             <div class="flex mt-4 justify-end w-full">
                 <button
-                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end transition hover:bg-gray-50"
                     @click="$emit('closeDialog')"
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">Add Group</button>
+                <button
+                    class="
+                        py-2
+                        px-4
+                        ml-2
+                        text-white
+                        rounded-md
+                        justify-self-end
+                        bg-primary
+                        hover:bg-accent-700
+                        transition
+                        duration-300
+                    "
+                >
+                    Add Group
+                </button>
             </div>
         </form>
     </div>

@@ -1,10 +1,16 @@
 <template>
     <div class="mx-2" :class="{ hidden: sharedDir }">
-        <button @click="showCreateFolderDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
+        <button
+            @click="showCreateFolderDialog = true"
+            class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
+        >
             <i class="fas fa-plus"></i> New Folder
         </button>
-        <button @click="showCreateFileDialog = true" class="text-white py-2 px-4 mr-2 rounded-md bg-primary">
-            <i class="fas fa-plus"></i> Upload Files
+        <button
+            @click="showCreateFileDialog = true"
+            class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
+        >
+            <i class="fas fa-plus"></i> Upload File(s)
         </button>
     </div>
     <Dialog :model-value="showCreateFolderDialog" @update-model-value="val => updateCreateFolderDialog(val)">
@@ -12,6 +18,9 @@
             <h1>Create folder</h1>
         </template>
         <div>
+            <p class="text-sm font-medium text-red-500" v-for="(error, idx) in createFolderErrors" :key="idx">
+                {{ error }}
+            </p>
             <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
             <div>
                 <input
@@ -22,8 +31,7 @@
                     v-model="manualContactAdd"
                     class="
                         shadow-sm
-                        focus:ring-primary
-                        focus:border-primary
+                        focus:ring-primary focus:border-primary
                         block
                         w-full
                         sm:text-sm
@@ -42,6 +50,9 @@
             <h1>Add files</h1>
         </template>
         <div class="flex flex-col">
+            <p class="text-sm font-medium text-red-500" v-for="(error, idx) in fileUploadErrors" :key="idx">
+                {{ error }}
+            </p>
             <span>Files*</span>
             <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">
                 Select files
@@ -72,95 +83,119 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import Dialog from '@/components/Dialog.vue';
-import FileDropArea from '@/components/FileDropArea.vue';
-import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
-import Button from '@/components/Button.vue';
-import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
+    import { defineComponent, onBeforeMount, ref, watch } from 'vue';
+    import Dialog from '@/components/Dialog.vue';
+    import FileDropArea from '@/components/FileDropArea.vue';
+    import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
+    import Button from '@/components/Button.vue';
+    import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
 
-export default defineComponent({
-    name: 'MainActionButtons',
-    components: {
-        Button,
-        Dialog,
-        FileDropArea,
-        DocumentTextIcon,
-        XIcon,
-    },
-    setup() {
-        const showCreateFolderDialog = ref(false);
-        const showCreateFileDialog = ref(false);
-        const newFolderInput = ref<HTMLInputElement>();
-        const newFileInput = ref<any>(undefined);
-        const selectedFiles = ref<File[]>([]);
-        const newFileInputArray = ref<File[]>([]);
+    export default defineComponent({
+        name: 'MainActionButtons',
+        components: {
+            Button,
+            Dialog,
+            FileDropArea,
+            DocumentTextIcon,
+            XIcon,
+        },
+        setup() {
+            const showCreateFolderDialog = ref(false);
+            const showCreateFileDialog = ref(false);
+            const newFolderInput = ref<HTMLInputElement>();
+            const newFileInput = ref<any>(undefined);
+            const selectedFiles = ref<File[]>([]);
+            const newFileInputArray = ref<File[]>([]);
+            const createFolderErrors = ref<string[]>([]);
+            const manualContactAdd = ref<string>('');
+            const fileUploadErrors = ref<string[]>([]);
 
-        const updateCreateFolderDialog = (val: boolean) => {
-            if (!val) {
+            watch(manualContactAdd, () => {
+                createFolderErrors.value = [];
+                if (manualContactAdd.value.includes('/')) {
+                    createFolderErrors.value.push("'/' are not allowed in folder names.");
+                }
+                if (manualContactAdd.value.length >= 50) {
+                    createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
+                }
+            });
+
+            const updateCreateFolderDialog = (val: boolean) => {
+                createFolderErrors.value = [];
+                if (!val) {
+                    showCreateFolderDialog.value = false;
+                    return;
+                }
+
+                if (!newFolderInput.value) return;
+                if (!newFolderInput.value.value) {
+                    createFolderErrors.value.push('Give the full folder a name.');
+                    newFolderInput.value.classList.add('border-red-500');
+                    return;
+                }
+                if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
+                createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
-                return;
-            }
+            };
 
-            if (!newFolderInput.value) return;
-            if (!newFolderInput.value.value) {
-                newFolderInput.value.classList.add('border-red-500');
-                return;
-            }
-            createDirectory(newFolderInput.value.value);
-            showCreateFolderDialog.value = false;
-        };
+            const deleteFile = (file: File) => {
+                selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
 
-        const deleteFile = (file: File) => {
-            selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
+                newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
+                newFileInput.value.value = newFileInputArray.value;
+            };
 
-            newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
-            newFileInput.value.value = newFileInputArray.value;
-        };
+            const updateCreateFileDialog = (val: boolean) => {
+                selectedFiles.value = [];
+                fileUploadErrors.value = [];
+                if (!val) {
+                    showCreateFileDialog.value = false;
+                    return;
+                }
 
-        const updateCreateFileDialog = (val: boolean) => {
-            if (!val) {
+                if (!selectedFiles.value?.length) {
+                    fileUploadErrors.value.push('Please upload atleast one file.');
+                    return;
+                }
+                uploadFiles(selectedFiles.value);
+                clearFiles();
                 showCreateFileDialog.value = false;
-                return;
-            }
+            };
 
-            if (!selectedFiles.value?.length) return;
-            uploadFiles(selectedFiles.value);
-            clearFiles();
-            showCreateFileDialog.value = false;
-        };
+            const handleDragAndDrop = (files: File[]) => {
+                selectedFiles.value.push(...files);
+            };
 
-        const handleDragAndDrop = (files: File[]) => {
-            selectedFiles.value = files;
-        };
+            const clearFiles = () => {
+                selectedFiles.value = [];
+                newFileInput.value.value = null;
+            };
 
-        const clearFiles = () => {
-            selectedFiles.value = [];
-            newFileInput.value.value = null;
-        };
+            const handleFileSelectChange = () => {
+                newFileInputArray.value = Array.from(newFileInput.value?.files);
+                newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+            };
 
-        const handleFileSelectChange = () => {
-            newFileInputArray.value = Array.from(newFileInput.value?.files);
-            newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
-        };
-
-        return {
-            showCreateFolderDialog,
-            showCreateFileDialog,
-            newFolderInput,
-            newFileInput,
-            newFileInputArray,
-            handleDragAndDrop,
-            updateCreateFolderDialog,
-            handleFileSelectChange,
-            selectedFiles,
-            clearFiles,
-            updateCreateFileDialog,
-            deleteFile,
-            sharedDir,
-        };
-    },
-});
+            return {
+                showCreateFolderDialog,
+                showCreateFileDialog,
+                newFolderInput,
+                newFileInput,
+                newFileInputArray,
+                handleDragAndDrop,
+                updateCreateFolderDialog,
+                handleFileSelectChange,
+                selectedFiles,
+                clearFiles,
+                updateCreateFileDialog,
+                deleteFile,
+                sharedDir,
+                createFolderErrors,
+                manualContactAdd,
+                fileUploadErrors,
+            };
+        },
+    });
 </script>
 
 <style scoped></style>
