@@ -14,25 +14,7 @@
         <div>
             <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
             <div>
-                <input
-                    type="text"
-                    name="newFolder"
-                    id="newFolder"
-                    ref="newFolderInput"
-                    v-model="manualContactAdd"
-                    class="
-                        shadow-sm
-                        focus:ring-primary
-                        focus:border-primary
-                        block
-                        w-full
-                        sm:text-sm
-                        border-gray-300
-                        rounded-md
-                        mt-1
-                    "
-                    placeholder="New folder name"
-                />
+                <input type="text" name="newFolder" id="newFolder" ref="newFolderInput" @input="disableSlash" v-model="manualContactAdd" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="New folder name" />
             </div>
         </div>
     </Dialog>
@@ -134,33 +116,39 @@ export default defineComponent({
             selectedFiles.value = files;
         };
 
-        const clearFiles = () => {
-            selectedFiles.value = [];
-            newFileInput.value.value = null;
-        };
+            const clearFiles = () => {
+                selectedFiles.value = [];
+                newFileInput.value.value = null;
+            };
+            const disableSlash = () => {
+                newFolderInput.value.value = newFolderInput.value.value.replaceAll(/\\|\//g,'') ;
+            };
+            const handleFileSelectChange = () => {
+                console.log(selectedFiles.value);
+                newFileInputArray.value = Array.from(newFileInput.value?.files);
+                console.log(newFileInputArray.value);
+                newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+                console.log(selectedFiles.value);
+            };
 
-        const handleFileSelectChange = () => {
-            newFileInputArray.value = Array.from(newFileInput.value?.files);
-            newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
-        };
-
-        return {
-            showCreateFolderDialog,
-            showCreateFileDialog,
-            newFolderInput,
-            newFileInput,
-            newFileInputArray,
-            handleDragAndDrop,
-            updateCreateFolderDialog,
-            handleFileSelectChange,
-            selectedFiles,
-            clearFiles,
-            updateCreateFileDialog,
-            deleteFile,
-            sharedDir,
-        };
-    },
-});
+            return {
+                showCreateFolderDialog,
+                showCreateFileDialog,
+                newFolderInput,
+                newFileInput,
+                newFileInputArray,
+                handleDragAndDrop,
+                updateCreateFolderDialog,
+                handleFileSelectChange,
+                selectedFiles,
+                clearFiles,
+                updateCreateFileDialog,
+                deleteFile,
+                sharedDir,
+                disableSlash
+            };
+        },
+    });
 </script>
 
 <style scoped></style>
