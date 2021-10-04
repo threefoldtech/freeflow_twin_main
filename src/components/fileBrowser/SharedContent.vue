@@ -121,6 +121,21 @@
                                 mt-4
                             "
                         >
+                            <p
+                                class="
+                                    px-6
+                                    py-4
+                                    whitespace-nowrap
+                                    col-span-4
+                                    text-base
+                                    font-medium
+                                    bg-gray-200
+                                    text-center text-gray-800
+                                "
+                                v-if="sharedContent.length === 0"
+                            >
+                                Nothing has been shared with you yet!
+                            </p>
                             <li v-for="item in sharedContent" :key="item.name" class="relative">
                                 <div
                                     class="

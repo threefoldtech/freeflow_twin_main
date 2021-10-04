@@ -1,7 +1,6 @@
 <template>
     <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
     <div class="overflow-x-auto">
-        <p></p>
         <div class="py-2 align-middle inline-block min-w-full">
             <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                 <table
