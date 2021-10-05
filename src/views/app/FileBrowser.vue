@@ -2,9 +2,9 @@
     <SomethingWentWrongModal />
     <appLayout>
         <template v-slot:default>
-            <div class="flex flex-row w-full h-full">
-                <div class="flex flex-col flex-1">
-                    <TopBar />
+            <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
+                <div  class="flex flex-col flex-1">
+                    <TopBar @click.stop />
                     <FileTable v-if="searchResults.length === 0 && sharedDir === false" />
                     <ResultsTable v-if="searchResults.length > 0 && sharedDir === false" />
                     <SharedContent v-if="sharedDir === true" />
@@ -36,6 +36,7 @@ import {
     goIntoSharedFolder,
     goTo,
     fetchBasedOnRoute,
+    
 } from '@/store/fileBrowserStore';
 import TopBar from '@/components/fileBrowser/TopBar.vue';
 import SharedContent from '@/components/fileBrowser/SharedContent.vue';
@@ -85,9 +86,15 @@ export default defineComponent({
             }
         });
 
+      
+
+
+
         return {
             searchResults,
             sharedDir,
+            selectedPaths
+          
         };
     },
 });

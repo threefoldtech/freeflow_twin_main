@@ -7,18 +7,7 @@
         <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="py-2 align-middle inline-block min-w-full">
-                    <div class="flex justify-end mb-2">
-                        <ViewListIcon
-                            class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
-                            :class="{ 'text-primary': fileBrowserTypeView === 'LIST' }"
-                            @click="changeView('LIST')"
-                        />
-                        <ViewGridIcon
-                            class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
-                            :class="{ 'text-primary': fileBrowserTypeView === 'GRID' }"
-                            @click="changeView('GRID')"
-                        />
-                    </div>
+                   <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table
                             v-if="fileBrowserTypeView === 'LIST'"
@@ -192,6 +181,7 @@
 
 <script setup lang="ts">
     import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue'
     import {
         FileType,
         formatBytes,
@@ -235,9 +225,7 @@
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
     };
 
-    const changeView = (type: string) => {
-        fileBrowserTypeView.value = type;
-    };
+    
 
     //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
 

@@ -3,19 +3,10 @@
         <div class="overflow-x-auto">
             <div class="py-2 px-4 align-middle inline-block min-w-full">
                 <div class="flex justify-end mb-2">
-                    <ViewListIcon
-                        class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
-                        :class="{ 'text-primary': fileBrowserTypeView === 'LIST' }"
-                        @click="changeView('LIST')"
-                    />
-                    <ViewGridIcon
-                        class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
-                        :class="{ 'text-primary': fileBrowserTypeView === 'GRID' }"
-                        @click="changeView('GRID')"
-                    />
+                    <ViewSelect/>
                 </div>
                 <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                    <FileDropArea class="h-full" @send-file="uploadFiles">
+                    <FileDropArea @click.stop class="h-full" @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
                             <div ref="ghostImage" class="bg-white p-2">
                                 Moving {{ selectedPaths.length }} selected File(s)
@@ -149,7 +140,7 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                        'bg-accent-300': highlight(item),
+                                       
                                         'bg-gray-100': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
@@ -329,6 +320,7 @@
 <script lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
     import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue'
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -373,7 +365,7 @@
                 return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
             },
         },
-        components: { FileDropArea, ViewGridIcon, ViewListIcon },
+        components: { FileDropArea, ViewGridIcon, ViewListIcon, ViewSelect},
         setup() {
             const hiddenItems = ref<HTMLDivElement>();
             const ghostImage = ref<HTMLDivElement>();
@@ -387,6 +379,7 @@
             });
 
             const handleSelect = (item: PathInfoModel) => {
+                console.log(selectedPaths.value)
                 if (!selectedPaths.value.includes(item)) selectItem(item);
                 else deselectItem(item);
             };
@@ -447,13 +440,9 @@
                 isDraggingFiles.value = false;
             };
 
-            const changeView = (type: string) => {
-                fileBrowserTypeView.value = type;
-            };
-
+            
             const goBack = () => {
                 router.go(-1);
-                
             };
 
             return {
@@ -489,7 +478,6 @@
                 sharedContent,
                 goToShared,
                 fileBrowserTypeView,
-                changeView,
                 goBack,
                 router,
             };

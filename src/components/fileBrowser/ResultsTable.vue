@@ -1,19 +1,9 @@
 <template>
+<div>
     <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
     <div class="overflow-x-auto">
         <div class="py-2 align-middle inline-block min-w-full">
-            <div class="flex justify-end mb-2">
-                <ViewListIcon
-                    class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
-                    :class="{ 'text-primary': fileBrowserTypeView === 'LIST' }"
-                    @click="changeView('LIST')"
-                />
-                <ViewGridIcon
-                    class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
-                    :class="{ 'text-primary': fileBrowserTypeView === 'GRID' }"
-                    @click="changeView('GRID')"
-                />
-            </div>
+          <ViewSelect />
             <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
                     <thead class="bg-gray-50">
@@ -130,10 +120,12 @@
             </div>
         </div>
     </div>
+    </div>
 </template>
 
 <script lang="ts">
     import { defineComponent } from 'vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue'
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -158,6 +150,11 @@
 
     export default defineComponent({
         name: 'ResultsTable',
+
+    components: {
+        ViewSelect
+    },
+
         setup() {
             const router = useRouter();
             const handleItemClick = (item: PathInfoModel) => {
