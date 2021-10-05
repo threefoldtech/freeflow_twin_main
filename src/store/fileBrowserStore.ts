@@ -569,7 +569,7 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
-export const getFullFolderSkeleton = async () => {};
+export const getFullFolderSkeleton = async () => { };
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
@@ -826,6 +826,12 @@ export const goTo = async (item: SharedFileInterface) => {
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
     return await Api.addShare(userId, path, filename, size, writable);
 };
+
+export const removeShare = async (userId: string, path: string) => {
+    return await Api.removeShare(userId, path);
+}
+
+
 
 export const parseJwt = token => {
     let base64Url = token.split('.')[1];

@@ -156,6 +156,14 @@ export const addShare = async (userId: string, path: string, filename: string, s
     });
 };
 
+export const removeShare = async (userId: string, path: string) => {
+    console.log(userId, path)
+    return await axios.post<GetShareToken>(`${endpoint}/files/removeShare`, {
+        chatId: userId,
+        path: path,
+    });
+}
+
 export const getShared = async (shareStatus: string) => {
     const params = new URLSearchParams();
     params.append('shareStatus', shareStatus);
