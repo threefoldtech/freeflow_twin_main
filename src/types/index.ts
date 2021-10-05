@@ -35,9 +35,9 @@ export interface Message<T> {
     updated?: Date;
 }
 
-export interface MessageBodyType { }
+export interface MessageBodyType {}
 
-export interface StringMessageType extends String, MessageBodyType { }
+export interface StringMessageType extends String, MessageBodyType {}
 
 export interface QuoteBodyType extends MessageBodyType {
     message: string;
@@ -62,9 +62,9 @@ export interface Chat {
     isGroup: boolean;
     adminId: Id;
 }
-export interface PersonChat extends Chat { }
+export interface PersonChat extends Chat {}
 
-export interface GroupChat extends Chat { }
+export interface GroupChat extends Chat {}
 
 export interface Contact extends AnonymousContact {
     location: string;
@@ -74,9 +74,9 @@ export interface AnonymousContact {
     id: DtId;
 }
 
-export interface DtId extends Id { }
+export interface DtId extends Id {}
 
-export interface Id extends String { }
+export interface Id extends String {}
 
 export interface Workspace extends GroupChat {
     subGroups: GroupChat[];
@@ -153,5 +153,4 @@ export interface ContactInterface {
     location: string;
 }
 
-export interface FileShareMessageType extends MessageBodyType, SharedFileInterface {
-}
+export interface FileShareMessageType extends MessageBodyType, SharedFileInterface {}

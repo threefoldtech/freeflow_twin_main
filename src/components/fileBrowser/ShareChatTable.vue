@@ -131,83 +131,83 @@
     </div>
 </template>
 <script lang="ts">
-import { Chat } from '@/types';
-import { selectedPaths, addShare } from '@/store/fileBrowserStore';
-import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
-import Toggle from '@/components/Toggle.vue';
-import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
-import AvatarImg from '@/components/AvatarImg.vue';
-import { SystemMessageTypes, MessageTypes } from '@/types';
-const { sendMessage } = usechatsActions();
-import { createNotification } from '@/store/notificiationStore';
-import { SearchIcon } from '@heroicons/vue/solid';
-export default defineComponent({
-    components: { SearchIcon, Toggle, AvatarImg },
-    props: {
-        data: {
-            type: Array,
-            required: true,
+    import { Chat } from '@/types';
+    import { selectedPaths, addShare } from '@/store/fileBrowserStore';
+    import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
+    import Toggle from '@/components/Toggle.vue';
+    import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
+    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { SystemMessageTypes, MessageTypes } from '@/types';
+    const { sendMessage } = usechatsActions();
+    import { createNotification } from '@/store/notificiationStore';
+    import { SearchIcon } from '@heroicons/vue/solid';
+    export default defineComponent({
+        components: { SearchIcon, Toggle, AvatarImg },
+        props: {
+            data: {
+                type: Array,
+                required: true,
+            },
         },
-    },
-    emits: ['update:modelValue', 'clicked'],
+        emits: ['update:modelValue', 'clicked'],
 
-    setup(props, { emit }) {
-        const searchTerm = ref('');
-        const chats = ref([]);
-        const alreadySentChatIds = ref(<String[]>[]);
+        setup(props, { emit }) {
+            const searchTerm = ref('');
+            const chats = ref([]);
+            const alreadySentChatIds = ref(<String[]>[]);
 
-        onBeforeMount(() => {
-            chats.value = props.data.map((item: Chat) => {
-                return {
-                    name: item.name,
-                    chatId: item.chatId,
-                    canWrite: false,
-                    isAlreadySent: false,
-                };
+            onBeforeMount(() => {
+                chats.value = props.data.map((item: Chat) => {
+                    return {
+                        name: item.name,
+                        chatId: item.chatId,
+                        canWrite: false,
+                        isAlreadySent: false,
+                    };
+                });
             });
-        });
 
-        const reset = () => {
-            emit('update:modelValue', '');
-            searchTerm.value = '';
-        };
+            const reset = () => {
+                emit('update:modelValue', '');
+                searchTerm.value = '';
+            };
 
-        const handleInput = evt => {
-            emit('update:modelValue', evt.target.value);
-        };
+            const handleInput = evt => {
+                emit('update:modelValue', evt.target.value);
+            };
 
-        const searchResults = () => {
-            return chats.value.filter((item: Chat) => {
-                return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
-            });
-        };
+            const searchResults = () => {
+                return chats.value.filter((item: Chat) => {
+                    return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
+                });
+            };
 
-        async function shareFile(chatId) {
-            const size = selectedPaths.value[0].size;
-            const filename = selectedPaths.value[0].fullName;
-            const chat = chats.value.find(chat => chat.chatId == chatId);
+            async function shareFile(chatId) {
+                const size = selectedPaths.value[0].size;
+                const filename = selectedPaths.value[0].fullName;
+                const chat = chats.value.find(chat => chat.chatId == chatId);
 
-            await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
-            chat.isAlreadySent = true;
-            createNotification('Shared File', 'File has been shared with ' + chatId);
-        }
+                await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
+                chat.isAlreadySent = true;
+                createNotification('Shared File', 'File has been shared with ' + chatId);
+            }
 
-        return {
-            reset,
-            handleInput,
-            searchTerm,
-            searchResults,
-            selectedPaths,
-            shareFile,
-            alreadySentChatIds,
-        };
-    },
-});
+            return {
+                reset,
+                handleInput,
+                searchTerm,
+                searchResults,
+                selectedPaths,
+                shareFile,
+                alreadySentChatIds,
+            };
+        },
+    });
 </script>
 
 <style scoped>
-.mh-48 {
-    max-height: 10rem;
-}
+    .mh-48 {
+        max-height: 10rem;
+    }
 </style>

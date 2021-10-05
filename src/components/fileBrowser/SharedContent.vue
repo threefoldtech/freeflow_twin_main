@@ -7,7 +7,7 @@
         <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="py-2 align-middle inline-block min-w-full">
-                   <ViewSelect />
+                    <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table
                             v-if="fileBrowserTypeView === 'LIST'"
@@ -181,7 +181,7 @@
 
 <script setup lang="ts">
     import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue'
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         FileType,
         formatBytes,
@@ -224,8 +224,6 @@
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
     };
-
-    
 
     //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
 

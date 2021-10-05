@@ -3,7 +3,7 @@ module.exports = {
     devServer: {
         disableHostCheck: true,
     },
-    publicPath: "/",
+    publicPath: '/',
     configureWebpack: {
         plugins: [new IgnorePlugin(/^\.\/locale$/, /moment$/)],
         optimization: {

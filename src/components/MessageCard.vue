@@ -30,21 +30,15 @@
                         relative
                         overflow-hidden
                         my-message:bg-accent-200
-                        focus:outline-none
-                        focus:ring-4
-                        ring-accent-500
-                        ring-offset-2
-
+                        focus:outline-none focus:ring-4
+                        ring-accent-500 ring-offset-2
                     "
                     :class="{
                         'rounded-tl-xl': isFirstMessage,
                         'rounded-bl-xl': isLastMessage,
                     }"
                 >
-                    <header
-                        class="p-4 pt-2 pb-2 font-bold my-message:bg-accent-300"
-                        v-if="isFirstMessage && isGroup"
-                    >
+                    <header class="p-4 pt-2 pb-2 font-bold my-message:bg-accent-300" v-if="isFirstMessage && isGroup">
                         {{ message.from }}
                     </header>
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">

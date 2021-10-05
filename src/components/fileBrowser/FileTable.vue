@@ -3,7 +3,7 @@
         <div class="overflow-x-auto">
             <div class="py-2 px-4 align-middle inline-block min-w-full">
                 <div class="flex justify-end mb-2">
-                    <ViewSelect/>
+                    <ViewSelect />
                 </div>
                 <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <FileDropArea @click.stop class="h-full" @send-file="uploadFiles">
@@ -140,7 +140,6 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                       
                                         'bg-gray-100': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
@@ -320,7 +319,7 @@
 <script lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
     import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue'
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -365,7 +364,7 @@
                 return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
             },
         },
-        components: { FileDropArea, ViewGridIcon, ViewListIcon, ViewSelect},
+        components: { FileDropArea, ViewGridIcon, ViewListIcon, ViewSelect },
         setup() {
             const hiddenItems = ref<HTMLDivElement>();
             const ghostImage = ref<HTMLDivElement>();
@@ -379,7 +378,7 @@
             });
 
             const handleSelect = (item: PathInfoModel) => {
-                console.log(selectedPaths.value)
+                console.log(selectedPaths.value);
                 if (!selectedPaths.value.includes(item)) selectItem(item);
                 else deselectItem(item);
             };
@@ -440,7 +439,6 @@
                 isDraggingFiles.value = false;
             };
 
-            
             const goBack = () => {
                 router.go(-1);
             };

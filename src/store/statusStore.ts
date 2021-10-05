@@ -28,13 +28,9 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
         let status = response.data;
         statusList[<string>digitalTwinId] = status;
         return status;
-
-    }
-    catch (error) {
+    } catch (error) {
         showUserOfflineMessage.value = true;
-
     }
-
 };
 
 export const startFetchStatusLoop = async (contact: Contact) => {

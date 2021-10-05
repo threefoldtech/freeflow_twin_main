@@ -75,11 +75,19 @@
             <form class="w-full" @submit.prevent="chatsend">
                 <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                     <input
-                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
+                        class="
+                            block
+                            w-full
+                            pl-1
+                            border-0 border-b-2 border-transparent
+                            focus:border-primary focus:ring-0
+                            sm:text-sm
+                        "
                         autofocus
                         type="text"
                         ref="message"
-                        placeholder='Write a message ...'>
+                        placeholder="Write a message ..."
+                    />
                 </div>
             </form>
 
@@ -365,13 +373,12 @@
                 switch (action.value.message.type) {
                     case MessageTypes.QUOTE:
                         return (action.value.message.body as QuoteBodyType).message;
-                    case  MessageTypes.STRING:
+                    case MessageTypes.STRING:
                         return action.value.message.body;
                     case MessageTypes.FILE:
-                        if(action.value.message.body.type === FileTypes.RECORDING) return "Voice message";
+                        if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
                     default:
                         return action.value.message.type;
-
                 }
             });
 

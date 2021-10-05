@@ -1,131 +1,163 @@
 <template>
-<div>
-    <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
-    <div class="overflow-x-auto">
-        <div class="py-2 align-middle inline-block min-w-full">
-          <ViewSelect />
-            <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th
-                                scope="col"
-                                class="
-                                    hidden
-                                    px-6
-                                    py-3
-                                    text-left text-xs
-                                    font-medium
-                                    text-gray-500
-                                    uppercase
-                                    tracking-wider
-                                "
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="h-auto w-auto"
-                                    @change="handleAllSelect"
-                                    :checked="
-                                        currentDirectoryContent.length === selectedPaths.length &&
-                                        currentDirectoryContent.length !== 0
+    <div>
+        <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
+        <div class="overflow-x-auto">
+            <div class="py-2 align-middle inline-block min-w-full">
+                <ViewSelect />
+                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th
+                                    scope="col"
+                                    class="
+                                        hidden
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
                                     "
-                                />
-                            </th>
-                            <th
-                                scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Name
-                            </th>
-                            <th
-                                scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Extension
-                            </th>
-                            <th
-                                scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Size
-                            </th>
-                            <th
-                                scope="col"
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                            >
-                                Last Modified
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-if="searchResults === 'None'">
-                            <td class="px-6 py-4 whitespace-nowrap">No Search results for {{ searchDirValue }}!</td>
-                        </tr>
-                        <tr
-                            v-for="item in searchResults"
-                            class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                            :class="{
-                                'bg-gray-100': isSelected(item),
-                            }"
-                            :key="item.fullName"
-                            @click="handleSelect(item)"
-                        >
-                            <td class="px-6 py-4 whitespace-nowrap hidden">
-                                <input
-                                    type="checkbox"
-                                    class="h-auto w-auto"
-                                    :checked="
-                                        selectedPaths.some(
-                                            x =>
-                                                x.fullName === item.fullName &&
-                                                x.extension === item.extension &&
-                                                x.path === item.path
-                                        )
+                                >
+                                    <input
+                                        type="checkbox"
+                                        class="h-auto w-auto"
+                                        @change="handleAllSelect"
+                                        :checked="
+                                            currentDirectoryContent.length === selectedPaths.length &&
+                                            currentDirectoryContent.length !== 0
+                                        "
+                                    />
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
                                     "
-                                />
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex flex-row items-center text-md">
-                                    <div class="mr-3 w-7 text-center">
-                                        <i class="fa-2x" :class="getIcon(item) + ' ' + getIconColor(item)"></i>
+                                >
+                                    Name
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Extension
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Size
+                                </th>
+                                <th
+                                    scope="col"
+                                    class="
+                                        px-6
+                                        py-3
+                                        text-left text-xs
+                                        font-medium
+                                        text-gray-500
+                                        uppercase
+                                        tracking-wider
+                                    "
+                                >
+                                    Last Modified
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <tr v-if="searchResults === 'None'">
+                                <td class="px-6 py-4 whitespace-nowrap">No Search results for {{ searchDirValue }}!</td>
+                            </tr>
+                            <tr
+                                v-for="item in searchResults"
+                                class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
+                                :class="{
+                                    'bg-gray-100': isSelected(item),
+                                }"
+                                :key="item.fullName"
+                                @click="handleSelect(item)"
+                            >
+                                <td class="px-6 py-4 whitespace-nowrap hidden">
+                                    <input
+                                        type="checkbox"
+                                        class="h-auto w-auto"
+                                        :checked="
+                                            selectedPaths.some(
+                                                x =>
+                                                    x.fullName === item.fullName &&
+                                                    x.extension === item.extension &&
+                                                    x.path === item.path
+                                            )
+                                        "
+                                    />
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex flex-row items-center text-md">
+                                        <div class="mr-3 w-7 text-center">
+                                            <i class="fa-2x" :class="getIcon(item) + ' ' + getIconColor(item)"></i>
+                                        </div>
+                                        <div class="flex flex-col items-start py-1">
+                                            <span
+                                                class="text-md hover:underline cursor-pointer"
+                                                @click="handleItemClick(item)"
+                                            >
+                                                {{ item.name }}
+                                            </span>
+                                            <span
+                                                class="text-xs opacity-50 cursor-pointer hover:underline"
+                                                @click="goToFileDirectory(item)"
+                                            >
+                                                {{ item.path }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="flex flex-col items-start py-1">
-                                        <span
-                                            class="text-md hover:underline cursor-pointer"
-                                            @click="handleItemClick(item)"
-                                        >
-                                            {{ item.name }}
-                                        </span>
-                                        <span
-                                            class="text-xs opacity-50 cursor-pointer hover:underline"
-                                            @click="goToFileDirectory(item)"
-                                        >
-                                            {{ item.path }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ getFileExtension(item) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ getFileSize(item) }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ getFileLastModified(item) }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ getFileExtension(item) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ getFileSize(item) }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ getFileLastModified(item) }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 </template>
 
 <script lang="ts">
     import { defineComponent } from 'vue';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue'
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -151,9 +183,9 @@
     export default defineComponent({
         name: 'ResultsTable',
 
-    components: {
-        ViewSelect
-    },
+        components: {
+            ViewSelect,
+        },
 
         setup() {
             const router = useRouter();
