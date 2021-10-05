@@ -1,5 +1,5 @@
-import config from '/config/config.json' assert { type: "json" };
+import config from '/config/config.json' assert { type: 'json' };
 
-config.baseUrl =  `${window.location.origin}/`
+config.baseUrl = `${window.location.origin}/`;
 
-window.config = config
+window.config = config;

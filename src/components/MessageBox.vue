@@ -1,34 +1,34 @@
 <template>
-    <div ref='messageBox' class='overflow-y-auto' @scroll='handleScroll'>
-        <div class='relative w-full mt-8 px-4'>
-            <div v-if='chatInfo.isLoading' class='flex flex-col justify-center items-center w-full'>
+    <div ref="messageBox" class="overflow-y-auto" @scroll="handleScroll">
+        <div class="relative w-full mt-8 px-4">
+            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
                 <span>Loading more messages</span>
             </div>
-            <div v-for='(message, i) in chat.messages'>
-                <div v-if='showDivider(chat, i)' class='grey--text text-sm text-center p-4'>
+            <div v-for="(message, i) in chat.messages">
+                <div v-if="showDivider(chat, i)" class="grey--text text-sm text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
 
                 <MessageCard
-                    :key='`${message.id}-${i <= lastRead}`'
-                    :chatId='chat.chatId'
-                    :isFirstMessage='isFirstMessage(chat, i)'
-                    :isGroup='chat.isGroup'
-                    :isLastMessage='isLastMessage(chat, i)'
-                    :isMine='message.from === user.id'
-                    :isread='i <= lastRead'
-                    :isreadbyme='i <= lastReadByMe'
-                    :message='message'
-                    @copy='copyMessage($event, message)'
+                    :key="`${message.id}-${i <= lastRead}`"
+                    :chatId="chat.chatId"
+                    :isFirstMessage="isFirstMessage(chat, i)"
+                    :isGroup="chat.isGroup"
+                    :isLastMessage="isLastMessage(chat, i)"
+                    :isMine="message.from === user.id"
+                    :isread="i <= lastRead"
+                    :isreadbyme="i <= lastReadByMe"
+                    :message="message"
+                    @copy="copyMessage($event, message)"
                 />
             </div>
 
-            <slot name='viewAnchor' />
+            <slot name="viewAnchor" />
         </div>
     </div>
 </template>
-<script lang='ts'>
+<script lang="ts">
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
@@ -124,4 +124,4 @@
         },
     };
 </script>
-<style scoped type='text/css'></style>
+<style scoped type="text/css"></style>

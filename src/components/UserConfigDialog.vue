@@ -12,13 +12,17 @@
                         @mouseleave="isHoveringAvatar = false"
                     >
                         <div
-                            class="overlay flex justify-center items-center peer "
+                            class="overlay flex justify-center items-center peer"
                             :class="isHoveringAvatar ? 'block' : 'hidden'"
                             @click="selectFile"
                         >
                             <i class="fas fa-pen text-icon"></i>
                         </div>
-                        <AvatarImg :id="user.id" large class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden" />
+                        <AvatarImg
+                            :id="user.id"
+                            large
+                            class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden"
+                        />
                     </div>
                     <h1 class="text-center my-4">{{ user.id }}</h1>
                 </div>
@@ -35,7 +39,7 @@
                         right-0
                         px-2
                         py-1
-                        flex flex-row 
+                        flex flex-row
                         text-white
                         font-bold
                         bg-primary
@@ -83,7 +87,22 @@
                         ref="statusInput"
                         v-model="userStatus"
                         style="resize: none"
-                        class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
+                        class="
+                            w-full
+                            autoexpand
+                            tracking-wide
+                            py-2
+                            px-4
+                            mb-3
+                            leading-relaxed
+                            appearance-none
+                            block
+                            w-full
+                            bg-gray-200
+                            border border-gray-200
+                            rounded
+                            focus:outline-none focus:bg-white focus:border-gray-500
+                        "
                         :disabled="!isEditingStatus"
                         :placeholder="myStatus"
                         maxlength="150"
@@ -101,7 +120,7 @@
                 <h2>{{ blockedUsers.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
                 <ul v-if="blockedUsers.length > 0" class="max-h-28 overflow-y-auto">
                     <template v-for="blockedUser in blockedUsers" :key="blockedUser">
-                        <li class="flex flex-row justify-between items-center mt-2  pb-2 border-b">
+                        <li class="flex flex-row justify-between items-center mt-2 pb-2 border-b">
                             <span>{{ blockedUser }}</span>
                             <button
                                 class="
@@ -158,8 +177,13 @@
                     />
                 </div>
                 <div class="flex flex-row justify-end mt-2">
-                    <button @click="cancelNewAvatar" class="rounded-md border border-gray-400 mr-2 px-4 py-2 justify-self-end"> CANCEL </button>
-                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary"> SAVE </button>
+                    <button
+                        @click="cancelNewAvatar"
+                        class="rounded-md border border-gray-400 mr-2 px-4 py-2 justify-self-end"
+                    >
+                        CANCEL
+                    </button>
+                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary">SAVE</button>
                 </div>
             </div>
         </jdialog>

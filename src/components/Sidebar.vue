@@ -54,9 +54,6 @@
         name: 'Sidebar',
         components: { AvatarImg },
         setup() {
-            
-
- 
             const apps: Array<AppItemType> = [
                 {
                     name: AppType.Whisper,
@@ -77,7 +74,6 @@
                     name: AppType.Glass,
                     icon: '/glass.svg',
                     enabled: true,
-                   
                 },
                 {
                     name: AppType.Kutana,
@@ -93,8 +89,7 @@
 
             const currentRoute = computed(() => router.currentRoute.value);
 
-            const changePage = (name: string) => {           
-                
+            const changePage = (name: string) => {
                 router.push({ name });
             };
 

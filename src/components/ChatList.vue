@@ -80,7 +80,20 @@
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
-                <input type="text" v-model='searchValue' class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md" placeholder="Search" />
+                <input
+                    type="text"
+                    v-model="searchValue"
+                    class="
+                        focus:ring-primary focus:border-primary
+                        block
+                        w-full
+                        pl-10
+                        sm:text-sm
+                        border-gray-300
+                        rounded-md
+                    "
+                    placeholder="Search"
+                />
             </div>
             <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2 mt-4">
                 <h2 style="font-size: 1.5em">
@@ -105,12 +118,20 @@
                     v-if="filteredChats && filteredChats.length"
                 >
                     <ChatCard
-                        v-for='chat in filteredChats'
-                        :key='`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`'
-                        class='w-full rounded-lg collapsed-bar:rounded-none p-1.5 collapsed-bar:my-0 my-1 cursor-pointer'
-                        @selectChat='setSelected(chat.chatId)'
-                        :collapsed='collapsed'
-                        :chat='chat'
+                        v-for="chat in filteredChats"
+                        :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
+                        class="
+                            w-full
+                            rounded-lg
+                            collapsed-bar:rounded-none
+                            p-1.5
+                            collapsed-bar:my-0
+                            my-1
+                            cursor-pointer
+                        "
+                        @selectChat="setSelected(chat.chatId)"
+                        :collapsed="collapsed"
+                        :chat="chat"
                     />
                 </div>
             </div>

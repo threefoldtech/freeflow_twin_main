@@ -1,1 +1,1 @@
-export default "{{version}}";
+export default '{{version}}';
