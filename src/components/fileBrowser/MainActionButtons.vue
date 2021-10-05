@@ -14,7 +14,25 @@
         <div>
             <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
             <div>
-                <input type="text" name="newFolder" id="newFolder" ref="newFolderInput" @input="disableSlash" v-model="manualContactAdd" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1" placeholder="New folder name" />
+                <input
+                    type="text"
+                    name="newFolder"
+                    id="newFolder"
+                    ref="newFolderInput"
+                    @input="disableSlash"
+                    v-model="manualContactAdd"
+                    class="
+                        shadow-sm
+                        focus:ring-primary focus:border-primary
+                        block
+                        w-full
+                        sm:text-sm
+                        border-gray-300
+                        rounded-md
+                        mt-1
+                    "
+                    placeholder="New folder name"
+                />
             </div>
         </div>
     </Dialog>
@@ -54,74 +72,74 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import Dialog from '@/components/Dialog.vue';
-import FileDropArea from '@/components/FileDropArea.vue';
-import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
-import Button from '@/components/Button.vue';
-import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
+    import { defineComponent, ref } from 'vue';
+    import Dialog from '@/components/Dialog.vue';
+    import FileDropArea from '@/components/FileDropArea.vue';
+    import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
+    import Button from '@/components/Button.vue';
+    import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
 
-export default defineComponent({
-    name: 'MainActionButtons',
-    components: {
-        Button,
-        Dialog,
-        FileDropArea,
-        DocumentTextIcon,
-        XIcon,
-    },
-    setup() {
-        const showCreateFolderDialog = ref(false);
-        const showCreateFileDialog = ref(false);
-        const newFolderInput = ref<HTMLInputElement>();
-        const newFileInput = ref<any>(undefined);
-        const selectedFiles = ref<File[]>([]);
-        const newFileInputArray = ref<File[]>([]);
+    export default defineComponent({
+        name: 'MainActionButtons',
+        components: {
+            Button,
+            Dialog,
+            FileDropArea,
+            DocumentTextIcon,
+            XIcon,
+        },
+        setup() {
+            const showCreateFolderDialog = ref(false);
+            const showCreateFileDialog = ref(false);
+            const newFolderInput = ref<HTMLInputElement>();
+            const newFileInput = ref<any>(undefined);
+            const selectedFiles = ref<File[]>([]);
+            const newFileInputArray = ref<File[]>([]);
 
-        const updateCreateFolderDialog = (val: boolean) => {
-            if (!val) {
+            const updateCreateFolderDialog = (val: boolean) => {
+                if (!val) {
+                    showCreateFolderDialog.value = false;
+                    return;
+                }
+
+                if (!newFolderInput.value) return;
+                if (!newFolderInput.value.value) {
+                    newFolderInput.value.classList.add('border-red-500');
+                    return;
+                }
+                createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
-                return;
-            }
+            };
 
-            if (!newFolderInput.value) return;
-            if (!newFolderInput.value.value) {
-                newFolderInput.value.classList.add('border-red-500');
-                return;
-            }
-            createDirectory(newFolderInput.value.value);
-            showCreateFolderDialog.value = false;
-        };
+            const deleteFile = (file: File) => {
+                selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
 
-        const deleteFile = (file: File) => {
-            selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
+                newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
+                newFileInput.value.value = newFileInputArray.value;
+            };
 
-            newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
-            newFileInput.value.value = newFileInputArray.value;
-        };
+            const updateCreateFileDialog = (val: boolean) => {
+                if (!val) {
+                    showCreateFileDialog.value = false;
+                    return;
+                }
 
-        const updateCreateFileDialog = (val: boolean) => {
-            if (!val) {
+                if (!selectedFiles.value?.length) return;
+                uploadFiles(selectedFiles.value);
+                clearFiles();
                 showCreateFileDialog.value = false;
-                return;
-            }
+            };
 
-            if (!selectedFiles.value?.length) return;
-            uploadFiles(selectedFiles.value);
-            clearFiles();
-            showCreateFileDialog.value = false;
-        };
-
-        const handleDragAndDrop = (files: File[]) => {
-            selectedFiles.value = files;
-        };
+            const handleDragAndDrop = (files: File[]) => {
+                selectedFiles.value = files;
+            };
 
             const clearFiles = () => {
                 selectedFiles.value = [];
                 newFileInput.value.value = null;
             };
             const disableSlash = () => {
-                newFolderInput.value.value = newFolderInput.value.value.replaceAll(/\\|\//g,'') ;
+                newFolderInput.value.value = newFolderInput.value.value.replaceAll(/\\|\//g, '');
             };
             const handleFileSelectChange = () => {
                 console.log(selectedFiles.value);
@@ -145,7 +163,7 @@ export default defineComponent({
                 updateCreateFileDialog,
                 deleteFile,
                 sharedDir,
-                disableSlash
+                disableSlash,
             };
         },
     });

@@ -6,7 +6,19 @@
             class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
         >
             <div
-                class="form-container z-50 bg-white p-4 w-full h-screen sm:h-auto sm:w-10/12 xl:w-3/5 max-w-full sm:rounded overflow-auto"
+                class="
+                    form-container
+                    z-50
+                    bg-white
+                    p-4
+                    w-full
+                    h-screen
+                    sm:h-auto sm:w-10/12
+                    xl:w-3/5
+                    max-w-full
+                    sm:rounded
+                    overflow-auto
+                "
             >
                 <div class="flex justify-between">
                     <slot name="title" />
@@ -18,10 +30,16 @@
                     <slot />
                 </div>
                 <div class="flex justify-end mt-2" v-if="!noActions">
-                    <button class="rounded-md border border-gray-400 px-4 py-2 justify-self-end" @click="$emit('update-model-value', false)">
+                    <button
+                        class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                        @click="$emit('update-model-value', false)"
+                    >
                         {{ cancelButtonText }}
                     </button>
-                    <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary" @click="$emit('update-model-value', true)">
+                    <button
+                        class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
+                        @click="$emit('update-model-value', true)"
+                    >
                         {{ okButtonText }}
                     </button>
                 </div>

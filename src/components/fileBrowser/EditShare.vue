@@ -30,94 +30,94 @@
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
 </template>
 <script lang="ts">
-import { Chat, SharedFileInterface } from '@/types';
-import { selectedPaths, addShare } from '@/store/fileBrowserStore';
-import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
-import Toggle from '@/components/Toggle.vue';
-import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
-import AvatarImg from '@/components/AvatarImg.vue';
-import { SystemMessageTypes, MessageTypes } from '@/types';
-const { sendMessage } = usechatsActions();
-import { createNotification } from '@/store/notificiationStore';
-import { Table, IHeader, TEntry } from '@jimber/shared-components';
-import { isObject } from 'lodash';
-import { getShareByPath } from '@/services/fileBrowserService';
-import { SearchIcon } from '@heroicons/vue/solid';
+    import { Chat, SharedFileInterface } from '@/types';
+    import { selectedPaths, addShare } from '@/store/fileBrowserStore';
+    import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
+    import Toggle from '@/components/Toggle.vue';
+    import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
+    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { SystemMessageTypes, MessageTypes } from '@/types';
+    const { sendMessage } = usechatsActions();
+    import { createNotification } from '@/store/notificiationStore';
+    import { Table, IHeader, TEntry } from '@jimber/shared-components';
+    import { isObject } from 'lodash';
+    import { getShareByPath } from '@/services/fileBrowserService';
+    import { SearchIcon } from '@heroicons/vue/solid';
 
-const headers: IHeader<TEntry>[] = [
-    {
-        key: 'chatId',
-        displayName: 'Chat',
-        enableSorting: true,
-    },
-    {
-        key: 'types',
-        displayName: 'Permission',
-    },
-    {
-        key: 'delete',
-        displayName: 'Delete',
-    },
-];
-
-export default defineComponent({
-    components: { SearchIcon, Toggle, AvatarImg, Table },
-    props: {
-        selectedFile: {
-            type: Object,
-            required: true,
+    const headers: IHeader<TEntry>[] = [
+        {
+            key: 'chatId',
+            displayName: 'Chat',
+            enableSorting: true,
         },
-    },
-    emits: ['update:modelValue', 'clicked'],
+        {
+            key: 'types',
+            displayName: 'Permission',
+        },
+        {
+            key: 'delete',
+            displayName: 'Delete',
+        },
+    ];
 
-    setup(props, { emit }) {
-        const searchTerm = ref('');
-        const isLoading = ref(true);
-        const currentShare = ref<SharedFileInterface>();
+    export default defineComponent({
+        components: { SearchIcon, Toggle, AvatarImg, Table },
+        props: {
+            selectedFile: {
+                type: Object,
+                required: true,
+            },
+        },
+        emits: ['update:modelValue', 'clicked'],
 
-        onBeforeMount(async () => {
-            currentShare.value = await getShareByPath(props.selectedFile.path);
-            isLoading.value = false;
-        });
+        setup(props, { emit }) {
+            const searchTerm = ref('');
+            const isLoading = ref(true);
+            const currentShare = ref<SharedFileInterface>();
 
-        const reset = () => {
-            emit('update:modelValue', '');
-            searchTerm.value = '';
-        };
-
-        const handleInput = evt => {
-            emit('update:modelValue', evt.target.value);
-        };
-
-        const searchResults = computed(() => {
-            return currentShare.value.permissions.filter(item => {
-                return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
+            onBeforeMount(async () => {
+                currentShare.value = await getShareByPath(props.selectedFile.path);
+                isLoading.value = false;
             });
-        });
 
-        const canWrite = computed(() => {
-            return param => {
-                return !!param.find(perm => perm == 'w');
+            const reset = () => {
+                emit('update:modelValue', '');
+                searchTerm.value = '';
             };
-        });
 
-        return {
-            reset,
-            handleInput,
-            searchTerm,
-            searchResults,
-            selectedPaths,
-            headers,
-            isLoading,
-            canWrite,
-        };
-    },
-});
+            const handleInput = evt => {
+                emit('update:modelValue', evt.target.value);
+            };
+
+            const searchResults = computed(() => {
+                return currentShare.value.permissions.filter(item => {
+                    return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
+                });
+            });
+
+            const canWrite = computed(() => {
+                return param => {
+                    return !!param.find(perm => perm == 'w');
+                };
+            });
+
+            return {
+                reset,
+                handleInput,
+                searchTerm,
+                searchResults,
+                selectedPaths,
+                headers,
+                isLoading,
+                canWrite,
+            };
+        },
+    });
 </script>
 
 <style scoped>
-.mh-48 {
-    max-height: 10rem;
-}
+    .mh-48 {
+        max-height: 10rem;
+    }
 </style>

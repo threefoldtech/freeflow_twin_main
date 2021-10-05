@@ -239,12 +239,12 @@
     .arrow.asc {
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-bottom: 4px solid #1F0F5B;
+        border-bottom: 4px solid #1f0f5b;
     }
 
     .arrow.desc {
         border-left: 4px solid transparent;
         border-right: 4px solid transparent;
-        border-top: 4px solid #1F0F5B;
+        border-top: 4px solid #1f0f5b;
     }
 </style>

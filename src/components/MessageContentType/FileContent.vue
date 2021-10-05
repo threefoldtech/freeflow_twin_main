@@ -2,7 +2,7 @@
     <a
         class="px-4 my-2 my-message:bg-accent-200"
         :href="calcExternalResourceLink(message.body.url)"
-        :download='message.body.filename'
+        :download="message.body.filename"
     >
         <div
             class="

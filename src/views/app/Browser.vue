@@ -15,7 +15,6 @@
     import appLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref, onMounted } from 'vue';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
-    
 
     export default defineComponent({
         name: 'Apps',
@@ -24,7 +23,6 @@
         },
 
         setup({}, ctx) {
-          
             const iframeUrl = ref('');
 
             onMounted(() => {
@@ -39,7 +37,6 @@
                 iframeUrl,
                 hasBrowserBeenStartedOnce,
                 //hasBrowserBeenStartedOnce,
-              
             };
         },
     });

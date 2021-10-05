@@ -1,9 +1,9 @@
 <template>
-    <div class='p-3 mt-2'>
+    <div class="p-3 mt-2">
         <audio
             controls
-            class='max-w-full'
-            :src='calcExternalResourceLink(message.body.url)'
+            class="max-w-full"
+            :src="calcExternalResourceLink(message.body.url)"
             @load="$emit('scroll')"
         ></audio>
     </div>

@@ -1,5 +1,19 @@
 <template>
-    <div class="items-center bg-gradient-to-r from-gradienta to-gradientb flex justify-between md:topgrid relative h-full px-4 md:px-0">
+    <div
+        class="
+            items-center
+            bg-gradient-to-r
+            from-gradienta
+            to-gradientb
+            flex
+            justify-between
+            md:topgrid
+            relative
+            h-full
+            px-4
+            md:px-0
+        "
+    >
         <div class="flex">
             <div class="h-5 ml-4 items-center">
                 <button
