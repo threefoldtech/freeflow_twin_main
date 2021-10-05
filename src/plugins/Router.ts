@@ -30,7 +30,7 @@ import {
     stopTimer,
 } from '@/store/fileBrowserStore';
 
-import { hasBrowserBeenStartedOnce, setHasBrowserBeenStartedOnce } from '@/store/browserStore';
+import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -208,8 +208,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes,
 });
-
-//const {setHasBrowserBeenStartedOnce} = useBrowserActions()
 
 router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {

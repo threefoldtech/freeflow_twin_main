@@ -1,6 +1,6 @@
 <template>
     <div
-        class="group flex flex-row lg:flex-row"
+        class="group flex flex-row"
         :class="{
             'mb-2': isLastMessage,
             'my-message flex-row-reverse ': isMine,
@@ -18,7 +18,7 @@
             :showOnlineStatus="false"
         />
         <div class="flex-1">
-            <div class="flex flex-row flex-wrap my-message:flex-row-reverse lg:my-message:flex-row">
+            <div class="flex flex-row flex-wrap my-message:flex-row-reverse">
                 <div
                     tabindex="0"
                     class="

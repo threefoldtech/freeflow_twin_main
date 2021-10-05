@@ -44,6 +44,34 @@
                 >
                     <span class="ml-6">Advanced</span>
 
+        <div v-if="isActive('user')" class="flex flex-col">
+            <user-table
+                :data="possibleUsers"
+                placeholder="Search for user..."
+                @addContact="contactAdd"
+                focus
+            ></user-table>
+            <Disclosure v-slot="{ open }">
+                <DisclosureButton
+                    class="
+                        flex
+                        justify-between
+                        w-full
+                        mt-4
+                        ml-0
+                        py-2
+                        text-sm
+                        font-medium
+                        text-left text-gray-500
+                        bg-gray-50
+                        rounded-lg
+                        hover:bg-gray-100
+                        focus:outline-none
+                        focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
+                    "
+                >
+                    <span class="ml-6">Advanced</span>
+
                     <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
                 </DisclosureButton>
                 <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">

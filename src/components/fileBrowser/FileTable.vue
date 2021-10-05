@@ -318,7 +318,6 @@
 
 <script lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
-    import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
     import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
@@ -364,7 +363,7 @@
                 return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
             },
         },
-        components: { FileDropArea, ViewGridIcon, ViewListIcon, ViewSelect },
+        components: { FileDropArea, ViewSelect },
         setup() {
             const hiddenItems = ref<HTMLDivElement>();
             const ghostImage = ref<HTMLDivElement>();
@@ -378,7 +377,6 @@
             });
 
             const handleSelect = (item: PathInfoModel) => {
-                console.log(selectedPaths.value);
                 if (!selectedPaths.value.includes(item)) selectItem(item);
                 else deselectItem(item);
             };

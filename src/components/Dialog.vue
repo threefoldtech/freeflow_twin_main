@@ -15,7 +15,7 @@
                     p-4
                     w-full
                     h-screen
-                    sm:h-3/5 sm:w-10/12
+                    sm:h-auto sm:w-10/12
                     xl:w-3/5
                     max-w-full
                     sm:rounded

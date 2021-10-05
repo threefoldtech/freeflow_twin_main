@@ -28,6 +28,7 @@
                     name="newFolder"
                     id="newFolder"
                     ref="newFolderInput"
+                    @input="disableSlash"
                     v-model="manualContactAdd"
                     class="
                         shadow-sm
@@ -83,7 +84,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, onBeforeMount, ref, watch } from 'vue';
+    import { defineComponent, ref, watch } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
     import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
