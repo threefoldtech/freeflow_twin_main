@@ -47,8 +47,7 @@
         "vue": "^3.2.2",
         "vue-cropperjs": "^5.0.0",
         "vue-router": "^4.0.11",
-        "vue-socket.io": "^3.0.10",
-        "yarn": "^1.22.15"
+        "vue-socket.io": "^3.0.10"
     },
     "devDependencies": {
         "@types/crypto-js": "^4.0.1",
