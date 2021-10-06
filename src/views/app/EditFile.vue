@@ -13,7 +13,7 @@
             </video>
         </div>
         <div v-else-if="fileType == FileType.Image">
-            <img :src="readUrl" />
+            <img class="object-contain" :src="readUrl" />
         </div>
         <div v-else-if="showUserOfflineMessage" class="text-center">
             <h1 class="mb-2">Unable to fetch the file. File owner seems to be offline.</h1>
@@ -52,7 +52,7 @@
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import { fetchStatus, startFetchStatusLoop, watchingUsers, showUserOfflineMessage } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
+    import { EditPathInfo, getFileInfo, PathInfo, downloadFile } from '@/services/fileBrowserService';
     import { showShareDialog } from '@/services/dialogService';
     import Spinner from '@/components/Spinner.vue';
 
@@ -99,6 +99,7 @@
             readUrl.value = externalfileurl;
         } else {
             fileAccesDetails = (await getFileInfo(path)).data;
+
             //@todo find better way to get name
             location = await myYggdrasilAddress();
             readUrl.value = generateUrl(
@@ -111,7 +112,7 @@
 
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
-        if (isSupportedInDocumentServer) {
+        if (isSupportedInDocumentServer.value) {
             documentServerconfig = generateDocumentserverConfig(
                 location,
                 fileAccesDetails.path,
@@ -126,16 +127,36 @@
                 new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
             });
         } else if (fileType.value === FileType.Image) {
-            //   readUrl.value = generateUrl(name, fileAccesDetails.path,fileAccesDetails.readToken)
-            //   const response = await Api.downloadFile(fileAccesDetails.readToken);
-            //   const result = window.URL.createObjectURL(response.data);
-            //   setImageSrc(result);
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+            readUrl.value = generateUrl(
+                'https',
+                window.location.hostname,
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
+            );
+            readUrl.value = readUrl.value;
+            isLoading.value = false;
         } else if (fileType.value === FileType.Video) {
-            //   readUrl.value = generateUrl(name, fileAccesDetails.path,fileAccesDetails.readToken)
-            //   const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
-            //   const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
-            //   const url = URL.createObjectURL(file);
-            //   window.open(url, '_blank');
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+            readUrl.value = generateUrl(
+                'https',
+                window.location.hostname,
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
+            );
+            isLoading.value = false;
+            //const response = await downloadFile(fileAccesDetails.readToken, 'arraybuffer');
+            //const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
+            //const url = URL.createObjectURL(file);
+            //window.open(readUrl.value, '_blank');
         }
     });
 
