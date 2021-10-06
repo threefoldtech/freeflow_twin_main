@@ -157,7 +157,6 @@ export const addShare = async (userId: string, path: string, filename: string, s
 };
 
 export const removeFilePermissions = async (userId: string, path: string) => {
-    console.log(userId, path);
     return await axios.post<GetShareToken>(`${endpoint}/files/removeFilePermissions`, {
         chatId: userId,
         path: path,
