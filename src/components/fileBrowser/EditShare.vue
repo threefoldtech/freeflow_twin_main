@@ -102,7 +102,7 @@
             });
 
             const remove = async (data: any) => {
-                removeFilePermissions(data.chatId, props.selectedFile.path);
+                removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
                 currentShare.value = await getShareByPath(props.selectedFile.path);
             };
 
