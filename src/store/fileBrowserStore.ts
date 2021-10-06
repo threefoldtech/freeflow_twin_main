@@ -827,10 +827,6 @@ export const addShare = async (userId: string, path: string, filename: string, s
     return await Api.addShare(userId, path, filename, size, writable);
 };
 
-export const removeShare = async (userId: string, path: string) => {
-    return await Api.removeShare(userId, path);
-}
-
 
 
 export const parseJwt = token => {

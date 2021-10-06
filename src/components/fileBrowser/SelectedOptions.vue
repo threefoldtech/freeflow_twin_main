@@ -142,7 +142,7 @@
             </template>
 
             <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2" :key="selectedTab">
-                <div class="flex-grow" v-for="(tab, index) in tabs" :key="tab">
+                <div class="flex-grow" v-for="(tab, index) in tabs" :key="`${tab}-${index}`">
                     <button
                         @click="selectedTab = index"
                         class="w-full p-2 rounded-xl"

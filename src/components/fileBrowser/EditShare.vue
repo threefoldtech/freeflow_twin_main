@@ -12,7 +12,7 @@
             placeholder="Search"
         />
     </div>
-    <Table v-if="!isLoading" :headers="headers" :data="searchResults">
+    <Table v-if="searchResults?.length > 0" :headers="headers" :data="searchResults">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
                 <span v-if="canWrite(data.data)">Write</span>
@@ -42,7 +42,7 @@ const { sendMessage } = usechatsActions();
 import { createNotification } from '@/store/notificiationStore';
 import { Table, IHeader, TEntry } from '@jimber/shared-components';
 import { isObject } from 'lodash';
-import { getShareByPath, removeShare } from '@/services/fileBrowserService';
+import { getShareByPath, removeFilePermissions } from '@/services/fileBrowserService';
 import { SearchIcon } from '@heroicons/vue/solid';
 import { useRoute } from 'vue-router';
 
@@ -74,12 +74,10 @@ export default defineComponent({
 
     setup(props, { emit }) {
         const searchTerm = ref('');
-        const isLoading = ref(true);
         const currentShare = ref<SharedFileInterface>();
 
         onBeforeMount(async () => {
             currentShare.value = await getShareByPath(props.selectedFile.path);
-            isLoading.value = false;
         });
 
         const reset = () => {
@@ -92,7 +90,7 @@ export default defineComponent({
         };
 
         const searchResults = computed(() => {
-            return currentShare.value.permissions.filter(item => {
+            return currentShare.value?.permissions?.filter(item => {
                 return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
             });
         });
@@ -103,10 +101,9 @@ export default defineComponent({
             };
         });
 
-        const remove = (data: any) => {
-            console.log(data.chatId);
-            console.log(selectedPaths.value[0]);
-            removeShare(data.chatId, selectedPaths.value[0].path);
+        const remove = async (data: any) => {
+            removeFilePermissions(data.chatId, props.selectedFile.path);
+            currentShare.value = await getShareByPath(props.selectedFile.path);
         };
 
         return {
@@ -116,7 +113,6 @@ export default defineComponent({
             searchResults,
             selectedPaths,
             headers,
-            isLoading,
             canWrite,
             remove,
         };
