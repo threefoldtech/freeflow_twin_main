@@ -71,6 +71,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
+    state.socket.on('shares_updated', (share) => {
+        //@todo implement this
+    });
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
