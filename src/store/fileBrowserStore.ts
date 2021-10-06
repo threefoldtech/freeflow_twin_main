@@ -329,13 +329,14 @@ export const deselectAll = () => {
     selectedPaths.value = [];
 };
 
-export const itemAction = async (item: PathInfoModel, router: Router, path = currentDirectory.value) => {
+export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;
     }
 
-    const result = router.resolve({ name: 'editfile', params: { path: btoa(pathJoin([path, item.fullName])) } });
+    const result = router.resolve({ name: 'editfile', params: { path: btoa(item.path) } }); //
+
     window.open(result.href, '_blank', 'noreferrer');
 };
 
