@@ -574,11 +574,8 @@ export const getFullFolderSkeleton = async () => {};
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
-    console.log("get shared content")
-    
     sharedContent.value = result.data;
     allSharedContent.value = result.data;
-    console.log(sharedContent.value)
 };
 
 export const sharedBreadcrumbs = ref([]);
@@ -847,10 +844,7 @@ export const fetchShareDetails = async (shareId: string) => {
 
 export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: string, path: string) => {
     const { user } = useAuthState();
-    console.log(user, "test")
     const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id, path);
-    console.log('deet', fileAccessDetails['message'])
-    if(fileAccessDetails['message'] === "ACCESS_DENIED") accessDenied.value = true;
     return fileAccessDetails;
 };
 

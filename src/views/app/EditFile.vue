@@ -58,6 +58,7 @@ import { calcExternalResourceLink } from '@/services/urlService';
 import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
 import { showShareDialog } from '@/services/dialogService';
 import Spinner from '@/components/Spinner.vue';
+import { isUndefined } from 'lodash';
 
 
 const route = useRoute();
@@ -80,10 +81,13 @@ onMounted(async () => {
     let fileAccesDetails: EditPathInfo;
     const myAddress = await myYggdrasilAddress();
 
+    
+
     if (shareId) {
         const shareDetails = await fetchShareDetails(shareId);
+        if(isUndefined(shareDetails)) isLoading.value = false;
         await startFetchStatusLoop(shareDetails.owner);
-        if (showUserOfflineMessage.value) {
+        if (showUserOfflineMessage.value || accessDenied.value ) {
             isLoading.value = false;
         }
         fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path);
@@ -129,7 +133,6 @@ onMounted(async () => {
                 //@ts-ignore
                 new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
             });
-
             return;
         }
         if (fileType.value === FileType.Image) {
@@ -163,7 +166,8 @@ onMounted(async () => {
             isLoading.value = false;
             return;
         }
-    })
+});
+
 
 const generateDocumentserverConfig = (
     location: string,

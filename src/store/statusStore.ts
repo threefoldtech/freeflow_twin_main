@@ -24,7 +24,7 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
     }
     let response;
     try {
-        response = await axios.get(location, { timeout: 2000 });
+        response = await axios.get(location, { timeout: 5000 });
         let status = response.data;
         statusList[<string>digitalTwinId] = status;
         return status;

@@ -4,7 +4,7 @@ import { createPercentProgressNotification, fail, success } from '@/store/notifi
 import { ProgressNotification } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
-import { PathInfoModel } from '@/store/fileBrowserStore';
+import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
 
 const endpoint = `${config.baseUrl}api/browse`;
 
@@ -173,6 +173,10 @@ export const getShareWithId = async (id: string) => {
     const params = new URLSearchParams();
     params.append('id', id);
     const res = await axios.get(`${endpoint}/files/getShareWithId`, { params: params });
+    if (res.data['message'] === 'ACCESS_DENIED') {
+        accessDenied.value = true;
+        return;
+    }
     return <SharedFileInterface>res.data;
 };
 
