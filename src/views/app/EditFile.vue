@@ -149,7 +149,7 @@ onMounted(async () => {
             isLoading.value = false;
             return;
         }
-        else if(fileType.value === FileType.Video) {
+        if(fileType.value === FileType.Video) {
             //If statement so that we don't override the URl of a file that is shared
             if (readUrl.value) {
                 isLoading.value = false;
