@@ -37,6 +37,11 @@ export enum Action {
     COPY,
 }
 
+export enum View {
+    LIST,
+    GRID,
+}
+
 export interface PathInfoModel extends Api.PathInfo {
     fileType: FileType;
 }
@@ -63,7 +68,10 @@ export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
 export const sharedContent = ref<SharedFileInterface[]>([]);
 export const allSharedContent = ref<SharedFileInterface[]>([]);
+
+export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
+
 
 export const sharedItem = ref<PathInfoModel>();
 
@@ -574,11 +582,8 @@ export const getFullFolderSkeleton = async () => {};
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
-    console.log("get shared content")
-    
     sharedContent.value = result.data;
     allSharedContent.value = result.data;
-    console.log(sharedContent.value)
 };
 
 export const sharedBreadcrumbs = ref([]);
@@ -847,10 +852,7 @@ export const fetchShareDetails = async (shareId: string) => {
 
 export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: string, path: string) => {
     const { user } = useAuthState();
-    console.log(user, "test")
     const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id, path);
-    console.log('deet', fileAccessDetails['message'])
-    if(fileAccessDetails['message'] === "ACCESS_DENIED") accessDenied.value = true;
     return fileAccessDetails;
 };
 

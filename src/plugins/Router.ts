@@ -247,7 +247,7 @@ router.afterEach(async (to, from) => {
     }
     if (to.name === 'quantum') {
         sharedDir.value = false;
-        await updateContent('/');
+        currentDirectory.value = '/';
     }
 });
 

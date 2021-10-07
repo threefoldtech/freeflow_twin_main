@@ -5,7 +5,17 @@
             'bg-gray-200 border border-gray-50': router.currentRoute?.value.path.includes(chat.chatId),
             'opacity-50': blocked,
         }"
-        class="chatcard relative text-sm flex flex-row focus:outline-none focus:ring-4 ring-accent-500 ring-offset-2"
+        class="
+            chatcard
+            relative
+            text-sm
+            flex flex-row
+            focus:outline-none focus:ring-4
+            ring-accent-500 ring-offset-2
+            hover:bg-gray-200
+            transition
+            duration-100
+        "
         tabindex="0"
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"

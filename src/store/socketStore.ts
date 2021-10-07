@@ -71,7 +71,7 @@ const initializeSocket = (username: string) => {
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
-    state.socket.on('shares_updated', (share) => {
+    state.socket.on('shares_updated', share => {
         //@todo implement this
     });
 };

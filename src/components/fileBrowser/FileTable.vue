@@ -1,17 +1,21 @@
 <template>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
-            <div class="py-2 align-middle inline-block min-w-full">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                    <FileDropArea class="h-full" @send-file="uploadFiles">
+            <div class="py-2 px-4 align-middle inline-block min-w-full">
+                <div class="flex justify-end mb-2">
+                    <ViewSelect />
+                </div>
+                <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <FileDropArea @click.stop class="h-full" @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
                             <div ref="ghostImage" class="bg-white p-2">
                                 Moving {{ selectedPaths.length }} selected File(s)
                             </div>
                         </div>
                         <table
+                            v-if="fileBrowserTypeView === 'LIST'"
                             :key="currentDirectory"
-                            class="min-w-full divide-y divide-gray-200"
+                            class="min-w-full divide-y divide-gray-200 shadow"
                             @dragenter="onDragEnterParent"
                             @dragleave="onDragLeaveParent"
                         >
@@ -136,7 +140,6 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                        'bg-accent-300': highlight(item),
                                         'bg-gray-100': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
@@ -182,6 +185,130 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <ul
+                            role="list"
+                            v-else
+                            class="
+                                grid grid-cols-2
+                                gap-x-4 gap-y-8
+                                sm:grid-cols-3 sm:gap-x-6
+                                lg:grid-cols-4
+                                xl:gap-x-8
+                                mt-4
+                            "
+                        >
+                            <p
+                                class="
+                                    px-6
+                                    py-4
+                                    whitespace-nowrap
+                                    col-span-4
+                                    text-base
+                                    font-medium
+                                    text-center text-gray-800
+                                    flex
+                                    justify-center
+                                    flex-col
+                                "
+                                v-if="sortContent().length === 0"
+                            >
+                                No items in this folder
+                                <span @click="goBack" class="mt-4 underline cursor-pointer">Go back</span>
+                            </p>
+                            <li v-if="currentDirectory === '/'">
+                                <div
+                                    class="
+                                        group
+                                        w-full
+                                        aspect-w-10 aspect-h-7
+                                        rounded-lg
+                                        bg-gray-200
+                                        hover:bg-gray-300
+                                        transition
+                                        duration:200
+                                        focus-within:ring-2
+                                        focus-within:ring-offset-2
+                                        focus-within:ring-offset-gray-100
+                                        focus-within:ring-indigo-500
+                                        overflow-hidden
+                                        flex
+                                        justify-center
+                                        items-center
+                                    "
+                                    @click="goToShared()"
+                                >
+                                    <div class="flex justify-center items-center cursor-pointer">
+                                        <li class="relative"></li>
+                                        <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
+                                        <p
+                                            class="
+                                                mt-2
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                                truncate
+                                                pointer-events-none
+                                            "
+                                        ></p>
+                                        <button type="button" class="absolute inset-0 focus:outline-none"></button>
+                                    </div>
+                                </div>
+                                <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
+                                    Shared with me
+                                </p>
+                            </li>
+                            <li
+                                v-for="item in sortContent()"
+                                :key="item.fullName"
+                                draggable="true"
+                                @dragover="event => onDragOver(event, item)"
+                                @dragstart="event => onDragStart(event, item)"
+                                @drop="() => onDrop(item)"
+                                class="relative"
+                                @click="handleItemClick(item)"
+                            >
+                                <div
+                                    class="
+                                        group
+                                        w-full
+                                        aspect-w-10 aspect-h-7
+                                        rounded-lg
+                                        bg-gray-200
+                                        hover:bg-gray-300
+                                        transition
+                                        duration:200
+                                        focus-within:ring-2
+                                        focus-within:ring-offset-2
+                                        focus-within:ring-offset-gray-100
+                                        focus-within:ring-indigo-500
+                                        overflow-hidden
+                                        flex
+                                        justify-center
+                                        items-center
+                                    "
+                                    @click="handleSelect(item)"
+                                >
+                                    <div class="flex justify-center items-center cursor-pointer">
+                                        <i
+                                            :key="item.name"
+                                            class="fa-2x"
+                                            :class="getIcon(item) + ' ' + getIconColor(item)"
+                                        ></i>
+                                        <button type="button" class="absolute inset-0 focus:outline-none">
+                                            <span class="sr-only">View details for {{ item.name }}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
+                                    {{ item.name
+                                    }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
+                                </p>
+                                <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+                                    {{ getFileLastModified(item) }}
+                                </p>
+                            </li>
+                        </ul>
                     </FileDropArea>
                 </div>
             </div>
@@ -191,6 +318,7 @@
 
 <script lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -221,6 +349,7 @@
         searchDirValue,
         currentShare,
         goToShared,
+        fileBrowserTypeView,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
@@ -234,7 +363,7 @@
                 return this.currentSortDir === 'asc' ? 'arrow asc' : 'arrow desc';
             },
         },
-        components: { FileDropArea },
+        components: { FileDropArea, ViewSelect },
         setup() {
             const hiddenItems = ref<HTMLDivElement>();
             const ghostImage = ref<HTMLDivElement>();
@@ -308,6 +437,10 @@
                 isDraggingFiles.value = false;
             };
 
+            const goBack = () => {
+                router.go(-1);
+            };
+
             return {
                 handleSelect,
                 isSelected,
@@ -340,6 +473,9 @@
                 sharedDir,
                 sharedContent,
                 goToShared,
+                fileBrowserTypeView,
+                goBack,
+                router,
             };
         },
     });
