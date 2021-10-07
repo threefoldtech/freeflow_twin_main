@@ -123,7 +123,7 @@
                 </DisclosurePanel>
             </Disclosure>
         </div>
-        <form v-if="isActive('group')" class="w-full overflow-x-hidden" @submit.prevent="groupAdd">
+        <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent="groupAdd">
             <div class="flex place-items-center mx-1">
                 <div class="w-full">
                     <div>

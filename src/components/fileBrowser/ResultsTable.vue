@@ -91,9 +91,13 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             <tr v-if="searchResults === 'None'">
-                                <td class="px-6 py-4 whitespace-nowrap">No Search results for {{ searchDirValue }}!</td>
+                                <td class="px-6 py-4 whitespace-nowrap">No Search results for {{ searchDirValue }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap"></td>
+                                <td class="px-6 py-4 whitespace-nowrap"></td>
+                                <td class="px-6 py-4 whitespace-nowrap"></td>
                             </tr>
                             <tr
+                                v-if="searchResults !== 'None'"
                                 v-for="item in searchResults"
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 :class="{
