@@ -145,7 +145,6 @@
                 }
                 createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
-                
             };
 
             const deleteFile = (file: File) => {
@@ -161,7 +160,6 @@
                     showCreateFileDialog.value = false;
                     return;
                 }
-                console.log(selectedFiles.value);
 
                 if (!selectedFiles.value?.length) {
                     fileUploadErrors.value.push('Please upload atleast one file.');
