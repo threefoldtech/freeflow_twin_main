@@ -78,7 +78,6 @@
                     if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
                     await updateContent(currentDirectory.value);
                     sharedDir.value = false;
-                    // selectedPaths.value = [];
                     searchResults.value = [];
                     searchDirValue.value = '';
                     return;

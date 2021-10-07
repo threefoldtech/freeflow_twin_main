@@ -14,7 +14,7 @@
             </video>
         </div>
         <div v-else-if="fileType == FileType.Image">
-            <img :src="readUrl" />
+            <img class="object-contain" :src="readUrl" />
         </div>
         <div v-else-if="showUserOfflineMessage" class="text-center">
             <h1 class="mb-2">Unable to fetch the file. File owner seems to be offline.</h1>
@@ -35,7 +35,6 @@ const generateUrl = (protocol: 'http' | 'https', owner: string, path: string, to
     token = encodeURIComponent(token);
     return `${protocol}://${owner}/api/browse/internal/files?path=${path}&token=${token}`;
 };
-
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
@@ -61,6 +60,7 @@ import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserServi
 import { showShareDialog } from '@/services/dialogService';
 import Spinner from '@/components/Spinner.vue';
 import { isUndefined } from 'lodash';
+
 
 const route = useRoute();
 const router = useRouter();
@@ -118,8 +118,8 @@ onMounted(async () => {
         );
     }
 
-    fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
+    fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
         if (isSupportedInDocumentServer.value) {
             documentServerconfig = generateDocumentserverConfig(
                 location,
@@ -152,7 +152,7 @@ onMounted(async () => {
             isLoading.value = false;
             return;
         }
-        if(fileType.value === FileType.Video) {
+        if (fileType.value === FileType.Video) {
             //If statement so that we don't override the URl of a file that is shared
             if (readUrl.value) {
                 isLoading.value = false;
@@ -167,11 +167,8 @@ onMounted(async () => {
             isLoading.value = false;
             return;
         }
-    
-    
-
-
 });
+
 
 const generateDocumentserverConfig = (
     location: string,
