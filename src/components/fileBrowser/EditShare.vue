@@ -12,19 +12,19 @@
             placeholder="Search"
         />
     </div>
-    <Table v-if="!isLoading" :headers="headers" :data="searchResults">
+    <Table v-if="searchResults?.length > 0" :headers="headers" :data="searchResults">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
-                <span v-if="canWrite(data.data)">Can write</span>
-                <span v-else>Can read</span>
+                <span v-if="canWrite(data.data)">Write</span>
+                <span v-else>Read</span>
             </div>
             <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
                 <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length <=1 }"> Read</span>
                 <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length > 1}"> Write</span>
             </div> -->
         </template>
-        <template #data-delete>
-            <span class="my-1 p-2 rounded-md bg-red-500 text-white"> Remove </span>
+        <template #data-delete="data">
+            <span class="my-1 p-2 rounded-md bg-red-500 text-white" @click="remove(data.row)"> Remove </span>
         </template>
     </Table>
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
@@ -42,8 +42,9 @@
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
     import { isObject } from 'lodash';
-    import { getShareByPath } from '@/services/fileBrowserService';
+    import { getShareByPath, removeFilePermissions } from '@/services/fileBrowserService';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import { useRoute } from 'vue-router';
 
     const headers: IHeader<TEntry>[] = [
         {
@@ -73,12 +74,10 @@
 
         setup(props, { emit }) {
             const searchTerm = ref('');
-            const isLoading = ref(true);
             const currentShare = ref<SharedFileInterface>();
 
             onBeforeMount(async () => {
                 currentShare.value = await getShareByPath(props.selectedFile.path);
-                isLoading.value = false;
             });
 
             const reset = () => {
@@ -91,7 +90,7 @@
             };
 
             const searchResults = computed(() => {
-                return currentShare.value.permissions.filter(item => {
+                return currentShare.value?.permissions?.filter(item => {
                     return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
                 });
             });
@@ -102,6 +101,11 @@
                 };
             });
 
+            const remove = async (data: any) => {
+                removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
+                currentShare.value = await getShareByPath(props.selectedFile.path);
+            };
+
             return {
                 reset,
                 handleInput,
@@ -109,8 +113,8 @@
                 searchResults,
                 selectedPaths,
                 headers,
-                isLoading,
                 canWrite,
+                remove,
             };
         },
     });
