@@ -115,34 +115,55 @@ onMounted(async () => {
 
 
     fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
+        if (isSupportedInDocumentServer.value) {
+            documentServerconfig = generateDocumentserverConfig(
+                location,
+                fileAccesDetails.path,
+                fileAccesDetails.key,
+                fileAccesDetails.readToken,
+                fileAccesDetails.writeToken,
+                getExtension(fileAccesDetails.fullName),
+                fileAccesDetails.extension
+            );
+            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+                //@ts-ignore
+                new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
+            });
 
-    if (isSupportedInDocumentServer) {
-        documentServerconfig = generateDocumentserverConfig(
-            location,
-            fileAccesDetails.path,
-            fileAccesDetails.key,
-            fileAccesDetails.readToken,
-            fileAccesDetails.writeToken,
-            getExtension(fileAccesDetails.fullName),
-            fileAccesDetails.extension
-        );
-        get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
-            //@ts-ignore
-            new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
-        });
-    } else if (fileType.value === FileType.Image) {
-        //   readUrl.value = generateUrl(name, fileAccesDetails.path,fileAccesDetails.readToken)
-        //   const response = await Api.downloadFile(fileAccesDetails.readToken);
-        //   const result = window.URL.createObjectURL(response.data);
-        //   setImageSrc(result);
-    } else if (fileType.value === FileType.Video) {
-        //   readUrl.value = generateUrl(name, fileAccesDetails.path,fileAccesDetails.readToken)
-        //   const response = await Api.downloadFile(fileAccesDetails.readToken, 'arraybuffer');
-        //   const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
-        //   const url = URL.createObjectURL(file);
-        //   window.open(url, '_blank');
-    }
-});
+            return;
+        }
+        if (fileType.value === FileType.Image) {
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+            readUrl.value = generateUrl(
+                'https',
+                window.location.hostname,
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
+            );
+            readUrl.value = readUrl.value;
+            isLoading.value = false;
+            return;
+        }
+        if (fileType.value === FileType.Video) {
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+            readUrl.value = generateUrl(
+                'https',
+                window.location.hostname,
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
+            );
+            isLoading.value = false;
+            return;
+        }
+    })
 
 const generateDocumentserverConfig = (
     location: string,
