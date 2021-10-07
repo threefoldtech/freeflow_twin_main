@@ -15,7 +15,7 @@
                 v-for="app in apps"
                 :key="app.name"
                 :class="{
-                    'cursor-pointer': app.enabled,
+                    'cursor-pointer transition duration-300 hover:bg-primarylight rounded-xl': app.enabled,
                     'bg-primarylight rounded-xl': app?.enabled && router.currentRoute?.value.meta.app === app.name,
                     'text-gray-500': !app?.enabled,
                 }"

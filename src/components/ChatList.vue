@@ -22,7 +22,18 @@
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
                         @click="showAddUserDialog = true"
-                        class="bg-primary rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                        class="
+                            bg-primary
+                            hover:bg-accent-800
+                            transition
+                            duration:300
+                            rounded-full
+                            text-white
+                            w-8
+                            h-8
+                            mx-2
+                            collapsed-bar:w-10 collapsed-bar:h-10
+                        "
                     >
                         <i class="fas fa-plus"></i>
                     </button>
@@ -137,10 +148,16 @@
             </div>
         </div>
 
-        <jdialog :modelValue="showAddUserDialog" @update-model-value="sendUpdate" noActions>
+        <jdialog
+            :modelValue="showAddUserDialog"
+            @update-model-value="sendUpdate"
+            @closeDialog="sendUpdate(false)"
+            noActions
+        >
             <template v-slot:title>
                 <h1>Invite someone to chat</h1>
             </template>
+
             <add-contact @closeDialog="sendUpdate(false)"> </add-contact>
         </jdialog>
     </section>
@@ -164,6 +181,8 @@
     import { showAddUserDialog } from '@/services/dialogService';
     import { useScrollActions } from '@/store/scrollStore';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import { Dialog as HeadlessUIDialog, DialogOverlay, TransitionRoot } from '@headlessui/vue';
+
     export default defineComponent({
         name: 'Apps',
         props: {
@@ -179,6 +198,9 @@
             AvatarImg,
             ChatRequestList,
             SearchIcon,
+            HeadlessUIDialog,
+            DialogOverlay,
+            TransitionRoot,
         },
         emits: ['closeDialog'],
         setup(props, context) {
@@ -228,6 +250,7 @@
 
             const sendUpdate = newVal => {
                 console.log('update it');
+                console.log('test');
                 showAddUserDialog.value = newVal;
             };
 

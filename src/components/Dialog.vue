@@ -3,9 +3,11 @@
         <div
             @keydown.esc="$emit('update-model-value', false)"
             v-if="modelValue"
+            @click="$emit('update-model-value', false)"
             class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
         >
             <div
+                @click.stop
                 class="
                     form-container
                     z-50
@@ -22,9 +24,25 @@
             >
                 <div class="flex justify-between">
                     <slot name="title" />
-                    <button @click="$emit('update-model-value', false)">
-                        <i class="fas fa-times"></i>
-                    </button>
+                    <div
+                        class="
+                            w-6
+                            h-6
+                            bg-transparent
+                            rounded-full
+                            hover:bg-gray-100
+                            flex
+                            justify-center
+                            items-center
+                            transition
+                            duration-300
+                        "
+                        @click="$emit('update-model-value', false)"
+                    >
+                        <button @click="$emit('update-model-value', false)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="py-2 flex-col">
                     <slot />
@@ -37,7 +55,18 @@
                         {{ cancelButtonText }}
                     </button>
                     <button
-                        class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
+                        class="
+                            py-2
+                            px-4
+                            ml-2
+                            text-white
+                            rounded-md
+                            justify-self-end
+                            bg-primary
+                            hover:bg-accent-700
+                            transition
+                            duration-300
+                        "
                         @click="$emit('update-model-value', true)"
                     >
                         {{ okButtonText }}

@@ -2,23 +2,20 @@
     <div class="place-items-start">
         <div class="grid grid-cols-2">
             <a
-                :class="{ active: isActive('user') }"
-                class="nav-link grid-cols-6 text-center py-2"
+                v-for="item in navigation"
+                :key="item.name"
+                class="nav-link grid-cols-6 text-center py-2 rounded-xl font-normal"
+                :class="[
+                    activeItem === item.name
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-100 text-black hover:bg-gray-200 transition duration-300',
+                ]"
                 href="#"
-                @click.prevent="setActive('user')"
+                @click.prevent="setActive(item.name)"
             >
-                Add a user
-            </a>
-            <a
-                :class="{ active: isActive('group') }"
-                class="nav-link grid-cols-6 text-center py-2"
-                href="#"
-                @click.prevent="setActive('group')"
-            >
-                Create a group
+                {{ item.text }}
             </a>
         </div>
-
         <div v-if="isActive('user')" class="flex flex-col">
             <user-table
                 :data="possibleUsers"
@@ -130,7 +127,7 @@
             <div class="flex place-items-center mx-1">
                 <div class="w-full">
                     <div>
-                        <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
+                        <label for="groupname" class="block text-sm font-medium text-gray-700 mt-2">Group name</label>
                         <div>
                             <input
                                 type="text"
@@ -170,12 +167,27 @@
 
             <div class="flex mt-4 justify-end w-full">
                 <button
-                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end transition hover:bg-gray-50"
                     @click="$emit('closeDialog')"
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">Add Group</button>
+                <button
+                    class="
+                        py-2
+                        px-4
+                        ml-2
+                        text-white
+                        rounded-md
+                        justify-self-end
+                        bg-primary
+                        hover:bg-accent-700
+                        transition
+                        duration-300
+                    "
+                >
+                    Add Group
+                </button>
             </div>
         </form>
     </div>
@@ -211,18 +223,23 @@
         setup(props, { emit }) {
             const { contacts } = useContactsState();
             //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
-            let addGroup = ref(false);
-            let userAddLocation = ref('');
-            let usernameAddError = ref('');
-            let groupnameAdd = ref('');
-            let groupnameAddError = ref('');
-            let usernameInGroupAdd = ref('');
-            let usersInGroup = ref<Contact[]>([]);
-            let possibleUsers = ref<Contact[]>([]);
-            let contactAddError = ref('');
+            const addGroup = ref(false);
+            const userAddLocation = ref('');
+            const usernameAddError = ref('');
+            const groupnameAdd = ref('');
+            const groupnameAddError = ref('');
+            const usernameInGroupAdd = ref('');
+            const usersInGroup = ref<Contact[]>([]);
+            const possibleUsers = ref<Contact[]>([]);
+            const contactAddError = ref('');
 
-            let manualContactAddUsername = ref<string>('');
-            let manualContactAddLocation = ref('');
+            const manualContactAddUsername = ref<string>('');
+            const manualContactAddLocation = ref('');
+
+            const navigation = ref([
+                { name: 'user', text: 'Add a user' },
+                { name: 'group', text: 'Create a group' },
+            ]);
 
             const contactAdd = (contact: Contact) => {
                 const contactToAdd: Contact = {
@@ -260,7 +277,8 @@
                 userAddLocation.value = item.location;
             };
 
-            let activeItem = ref('user');
+            const activeItem = ref('user');
+
             const isActive = menuItem => {
                 return activeItem.value === menuItem;
             };
@@ -324,13 +342,11 @@
                 handleClicked,
                 manualContactAddUsername,
                 manualContactAddLocation,
+                activeItem,
+                navigation,
             };
         },
     });
 </script>
 
-<style scoped>
-    a.active {
-        background: #e5e7eb;
-    }
-</style>
+<style scoped></style>

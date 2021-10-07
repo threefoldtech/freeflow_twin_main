@@ -1,8 +1,9 @@
 <template>
-    <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
-    <div class="flex flex-col mx-2">
+    <div>
+        <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
         <div class="overflow-x-auto">
             <div class="py-2 align-middle inline-block min-w-full">
+                <ViewSelect />
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
                         <thead class="bg-gray-50">
@@ -156,6 +157,7 @@
 
 <script lang="ts">
     import { defineComponent } from 'vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -174,11 +176,17 @@
         PathInfoModel,
         itemAction,
         goToFileDirectory,
+        fileBrowserTypeView,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
 
     export default defineComponent({
         name: 'ResultsTable',
+
+        components: {
+            ViewSelect,
+        },
+
         setup() {
             const router = useRouter();
             const handleItemClick = (item: PathInfoModel) => {
@@ -217,6 +225,7 @@
                 getIcon,
                 handleItemClick,
                 goToFileDirectory,
+                fileBrowserTypeView,
             };
         },
     });
