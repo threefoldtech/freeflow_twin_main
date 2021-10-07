@@ -126,7 +126,10 @@
                 //@ts-ignore
                 new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
             });
-        } else if (fileType.value === FileType.Image) {
+
+            return;
+        }
+        if (fileType.value === FileType.Image) {
             //If statement so that we don't override the URl of a file that is shared
             if (readUrl.value) {
                 isLoading.value = false;
@@ -140,7 +143,9 @@
             );
             readUrl.value = readUrl.value;
             isLoading.value = false;
-        } else if (fileType.value === FileType.Video) {
+            return;
+        }
+        if (fileType.value === FileType.Video) {
             //If statement so that we don't override the URl of a file that is shared
             if (readUrl.value) {
                 isLoading.value = false;
@@ -153,10 +158,7 @@
                 fileAccesDetails.readToken
             );
             isLoading.value = false;
-            //const response = await downloadFile(fileAccesDetails.readToken, 'arraybuffer');
-            //const file = new Blob([response.data], { type: `video/${fileAccesDetails.extension}` });
-            //const url = URL.createObjectURL(file);
-            //window.open(readUrl.value, '_blank');
+            return;
         }
     });
 
