@@ -1,5 +1,4 @@
 <template>
-{{accessDenied}}
     <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
         <div id="placeholder"></div>
     </div>
