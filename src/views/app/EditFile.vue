@@ -1,4 +1,5 @@
 <template>
+{{accessDenied}}
     <div v-if="isSupportedInDocumentServer" id="docwrapper" class="h-screen">
         <div id="placeholder"></div>
     </div>
@@ -59,6 +60,7 @@ import { calcExternalResourceLink } from '@/services/urlService';
 import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
 import { showShareDialog } from '@/services/dialogService';
 import Spinner from '@/components/Spinner.vue';
+import { isUndefined } from 'lodash';
 
 const route = useRoute();
 const router = useRouter();
@@ -84,7 +86,8 @@ onMounted(async () => {
 
     if (shareId) {
         const shareDetails = await fetchShareDetails(shareId);
-        // await startFetchStatusLoop(shareDetails.owner);
+        if(isUndefined(shareDetails)) isLoading.value = false;
+        await startFetchStatusLoop(shareDetails.owner);
         if (showUserOfflineMessage.value || accessDenied.value ) {
             isLoading.value = false;
         }
