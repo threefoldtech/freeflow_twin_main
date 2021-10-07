@@ -134,15 +134,16 @@
                     newFolderInput.value.classList.add('border-red-500');
                     return;
                 }
-                if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) {
-                    if (manualContactAdd.value.includes('/')) {
-                        createFolderErrors.value.push("'/' is not allowed in folder names.");
-                    }
-                    if (manualContactAdd.value.length >= 50) {
-                        createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
-                    }
-                    return;
+
+                if (manualContactAdd.value.includes('/')) {
+                    createFolderErrors.value.push("'/' is not allowed in folder names.");
                 }
+                if (manualContactAdd.value.length >= 50) {
+                    createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
+                }
+
+                if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
+
                 createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
             };
