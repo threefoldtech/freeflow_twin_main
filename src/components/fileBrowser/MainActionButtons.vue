@@ -114,7 +114,7 @@
             watch(manualContactAdd, () => {
                 createFolderErrors.value = [];
                 if (manualContactAdd.value.includes('/')) {
-                    createFolderErrors.value.push("'/' are not allowed in folder names.");
+                    createFolderErrors.value.push("'/' is not allowed in folder names.");
                 }
                 if (manualContactAdd.value.length >= 50) {
                     createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
@@ -130,13 +130,22 @@
 
                 if (!newFolderInput.value) return;
                 if (!newFolderInput.value.value) {
-                    createFolderErrors.value.push('Give the full folder a name.');
+                    createFolderErrors.value.push('Give the folder a name.');
                     newFolderInput.value.classList.add('border-red-500');
                     return;
                 }
-                if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
+                if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) {
+                    if (manualContactAdd.value.includes('/')) {
+                        createFolderErrors.value.push("'/' is not allowed in folder names.");
+                    }
+                    if (manualContactAdd.value.length >= 50) {
+                        createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
+                    }
+                    return;
+                }
                 createDirectory(newFolderInput.value.value);
                 showCreateFolderDialog.value = false;
+                
             };
 
             const deleteFile = (file: File) => {
@@ -147,12 +156,12 @@
             };
 
             const updateCreateFileDialog = (val: boolean) => {
-                selectedFiles.value = [];
                 fileUploadErrors.value = [];
                 if (!val) {
                     showCreateFileDialog.value = false;
                     return;
                 }
+                console.log(selectedFiles.value);
 
                 if (!selectedFiles.value?.length) {
                     fileUploadErrors.value.push('Please upload atleast one file.');
