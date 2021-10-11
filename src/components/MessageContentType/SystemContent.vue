@@ -12,9 +12,9 @@
         <button
             class="
                 text-xs text
-                bg-accent-500
+                bg-accent-800
                 focus:outline-none focus:ring-2
-                ring-accent-500 ring-offset-2 ring-offset-2
+                ring-accent-800 ring-offset-2 ring-offset-2
                 text-white
                 px-4
                 py-2
@@ -34,7 +34,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { popupCenter } from '@/services/popupService';
     import { usechatsActions, usechatsState } from '@/store/chatStore';
     import { useRoute } from 'vue-router';
@@ -43,49 +43,44 @@
     import { MessageTypes, SystemMessageTypes } from '@/types';
     import * as crypto from 'crypto-js';
 
-    export default defineComponent({
-        name: 'SystemContent',
-        props: {
-            message: { type: Object, required: true },
-        },
-        setup(props) {
-            const route = useRoute();
-            let selectedId = ref(<string>route.params.id);
-            const { chats } = usechatsState();
-            const { sendMessage } = usechatsActions();
-            const { user } = useAuthState();
-            const chat = computed(() => {
-                return chats.value.find(c => c.chatId == selectedId.value);
-            });
-            const joinVideo = () => {
-                // @ts-ignore
-                const videoRoomId =
-                    <string>props.message.body.id ??
-                    crypto
-                        .SHA1(
-                            chat.value.isGroup
-                                ? <string>chat.value.chatId
-                                : chat.value.contacts
-                                      .map(c => c.id)
-                                      .sort()
-                                      .join('-')
-                        )
-                        .toString();
+    interface IProp {
+        message: Object;
+    }
 
-                sendMessage(
-                    chat.value.chatId,
-                    {
-                        type: SystemMessageTypes.JOINED_VIDEOROOM,
-                        message: `${user.id} joined the video chat`,
-                        id: videoRoomId,
-                    },
-                    MessageTypes.SYSTEM
-                );
-
-                const videoRoomPopup = popupCenter(`/videoroom/${videoRoomId}`, 'video room', 800, 550);
-            };
-
-            return { joinVideo };
-        },
+    const props = defineProps<IProp>();
+    const route = useRoute();
+    let selectedId = ref(<string>route.params.id);
+    const { chats } = usechatsState();
+    const { sendMessage } = usechatsActions();
+    const { user } = useAuthState();
+    const chat = computed(() => {
+        return chats.value.find(c => c.chatId == selectedId.value);
     });
+    const joinVideo = () => {
+        // @ts-ignore
+        const videoRoomId =
+            <string>props.message.body.id ??
+            crypto
+                .SHA1(
+                    chat.value.isGroup
+                        ? <string>chat.value.chatId
+                        : chat.value.contacts
+                              .map(c => c.id)
+                              .sort()
+                              .join('-')
+                )
+                .toString();
+
+        sendMessage(
+            chat.value.chatId,
+            {
+                type: SystemMessageTypes.JOINED_VIDEOROOM,
+                message: `${user.id} joined the video chat`,
+                id: videoRoomId,
+            },
+            MessageTypes.SYSTEM
+        );
+
+        const videoRoomPopup = popupCenter(`/videoroom/${videoRoomId}`, 'video room', 800, 550);
+    };
 </script>

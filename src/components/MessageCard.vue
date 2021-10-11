@@ -3,7 +3,7 @@
         class="group flex flex-row"
         :class="{
             'mb-2': isLastMessage,
-            'my-message flex-row-reverse ': isMine,
+            'my-message flex-row-reverse md:flex-row lg:flex-row-reverse xl:flex-row ': isMine,
         }"
         v-if="message.type !== MessageTypes.SYSTEM"
         @click="selectedMessageId = message.id"
@@ -18,7 +18,14 @@
             :showOnlineStatus="false"
         />
         <div class="flex-1">
-            <div class="flex flex-row flex-wrap my-message:flex-row-reverse">
+            <div
+                class="
+                    flex flex-row flex-wrap
+                    my-message:flex-row-reverse my-message:md:flex-row
+                    lg:my-message:flex-row-reverse
+                    xl:my-message:flex-row
+                "
+            >
                 <div
                     tabindex="0"
                     class="
@@ -38,7 +45,7 @@
                         'rounded-bl-xl': isLastMessage,
                     }"
                 >
-                    <header class="p-4 pt-2 pb-2 font-bold my-message:bg-accent-300" v-if="isFirstMessage && isGroup">
+                    <header class="p-4 pt-2 pb-2 font-bold" v-if="isFirstMessage && isGroup">
                         {{ message.from }}
                     </header>
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">

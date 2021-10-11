@@ -5,7 +5,7 @@
         }"
         class="h-screen"
     >
-        <template v-if="isBeta">
+        <template v-if="false">
             <div
                 class="
                     fixed

@@ -1,17 +1,18 @@
 <template>
     <a
+        v-if="message.body"
         class="px-4 my-2 my-message:bg-accent-200 cursor-pointer"
         @click="visitFileInMessage(message)"
-        v-if="message.body"
     >
-        <h3 class="my-message:text-icon text-center">
+        <p class="my-message:text-icon text-center">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>
             shared
-        </h3>
+        </p>
         <div class="w-auto h-auto flex flex-row">
             <div
                 class="
+                    flex-shrink-0
                     icon
                     mr-2
                     bg-gray-600
@@ -28,14 +29,14 @@
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="py-1 flex flex-col">
-                <div class="my-message:text-icon">{{ message.body.name }}</div>
+                <div class="my-message:text-icon flex-shrink-0">{{ message.body.name }}</div>
                 <span class="my-message:text-icon opacity-70"> {{ formatBytes(message.body.size, 2) }}</span>
             </div>
         </div>
     </a>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
     import { loginName } from '@/store/authStore';
     import {
         formatBytes,
@@ -52,12 +53,11 @@
 
     import { useRouter } from 'vue-router';
 
-    const props = defineProps({
-        message: {
-            type: Object,
-            required: true,
-        },
-    });
+    interface IProp {
+        message: Object;
+    }
+
+    const props = defineProps<IProp>();
 
     const router = useRouter();
     const visitFileInMessage = (message: Message<FileShareMessageType>) => {

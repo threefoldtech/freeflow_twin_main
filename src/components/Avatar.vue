@@ -2,20 +2,12 @@
     <img class="rounded-full h-9 w-9" :src="src" alt="" />
 </template>
 
-<script lang="ts">
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
+    interface IProps {
+        src: string;
+    }
 
-    export default defineComponent({
-        name: 'Avatar',
-        props: {
-            src: String,
-        },
-        setup(props) {
-            return {
-                ...props,
-            };
-        },
-    });
+    defineProps<IProps>();
 </script>
 
 <style scoped></style>

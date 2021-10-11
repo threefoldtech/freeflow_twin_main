@@ -19,12 +19,10 @@
 <script lang="ts" setup>
     import { Status, Notification } from '@/types/notifications';
 
-    defineProps({
-        notification: {
-            type: Object,
-            required: true,
-        },
-    });
+    interface IProp {
+        notification: Object;
+    }
+    defineProps<IProp>();
 </script>
 
 <style scoped></style>

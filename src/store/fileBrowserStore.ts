@@ -72,7 +72,6 @@ export const allSharedContent = ref<SharedFileInterface[]>([]);
 export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
 
-
 export const sharedItem = ref<PathInfoModel>();
 
 export const currentShare = ref<SharedFileInterface>(undefined);

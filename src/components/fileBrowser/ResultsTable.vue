@@ -5,11 +5,10 @@
             <div class="py-2 align-middle inline-block min-w-full">
                 <ViewSelect />
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-200" :key="currentDirectory">
+                    <table :key="currentDirectory" class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th
-                                    scope="col"
                                     class="
                                         hidden
                                         px-6
@@ -20,19 +19,19 @@
                                         uppercase
                                         tracking-wider
                                     "
+                                    scope="col"
                                 >
                                     <input
-                                        type="checkbox"
-                                        class="h-auto w-auto"
-                                        @change="handleAllSelect"
                                         :checked="
                                             currentDirectoryContent.length === selectedPaths.length &&
                                             currentDirectoryContent.length !== 0
                                         "
+                                        class="h-auto w-auto"
+                                        type="checkbox"
+                                        @change="handleAllSelect"
                                     />
                                 </th>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -42,11 +41,11 @@
                                         uppercase
                                         tracking-wider
                                     "
+                                    scope="col"
                                 >
                                     Name
                                 </th>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -56,11 +55,11 @@
                                         uppercase
                                         tracking-wider
                                     "
+                                    scope="col"
                                 >
                                     Extension
                                 </th>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -70,11 +69,11 @@
                                         uppercase
                                         tracking-wider
                                     "
+                                    scope="col"
                                 >
                                     Size
                                 </th>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -84,6 +83,7 @@
                                         uppercase
                                         tracking-wider
                                     "
+                                    scope="col"
                                 >
                                     Last Modified
                                 </th>
@@ -97,19 +97,17 @@
                                 <td class="px-6 py-4 whitespace-nowrap"></td>
                             </tr>
                             <tr
-                                v-if="searchResults !== 'None'"
                                 v-for="item in searchResults"
-                                class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
+                                v-if="searchResults !== 'None'"
+                                :key="item.fullName"
                                 :class="{
                                     'bg-gray-100': isSelected(item),
                                 }"
-                                :key="item.fullName"
+                                class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 @click="handleSelect(item)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
                                     <input
-                                        type="checkbox"
-                                        class="h-auto w-auto"
                                         :checked="
                                             selectedPaths.some(
                                                 x =>
@@ -118,12 +116,14 @@
                                                     x.path === item.path
                                             )
                                         "
+                                        class="h-auto w-auto"
+                                        type="checkbox"
                                     />
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-row items-center text-md">
                                         <div class="mr-3 w-7 text-center">
-                                            <i class="fa-2x" :class="getIcon(item) + ' ' + getIconColor(item)"></i>
+                                            <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
                                         </div>
                                         <div class="flex flex-col items-start py-1">
                                             <span
@@ -184,55 +184,31 @@
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
 
-    export default defineComponent({
-        name: 'ResultsTable',
-
-        components: {
-            ViewSelect,
-        },
-
-        setup() {
-            const router = useRouter();
-            const handleItemClick = (item: PathInfoModel) => {
-                if (item.isDirectory) {
-                    goToFileDirectory(item);
-                    return;
-                }
-                itemAction(item, router);
-            };
-            const isSelected = (item: PathInfoModel) => {
-                if (!selectedPaths.value.includes(item)) return false;
-                else return true;
-            };
-            const handleAllSelect = (val: any) => {
-                if (val.target.checked) selectAll();
-                else deselectAll();
-            };
-            const handleSelect = (item: PathInfoModel) => {
-                if (!selectedPaths.value.includes(item)) selectItem(item);
-                else deselectItem(item);
-            };
-
-            return {
-                handleAllSelect,
-                currentDirectoryContent,
-                handleSelect,
-                searchResults,
-                isSelected,
-                searchDirValue,
-                currentDirectory,
-                selectedPaths,
-                getFileLastModified,
-                getFileExtension,
-                getFileSize,
-                getIconColor,
-                getIcon,
-                handleItemClick,
-                goToFileDirectory,
-                fileBrowserTypeView,
-            };
-        },
-    });
+    const router = useRouter();
+    const handleItemClick = (item: PathInfoModel) => {
+        if (item.isDirectory) {
+            goToFileDirectory(item);
+            return;
+        }
+        itemAction(item, router);
+    };
+    const isSelected = (item: PathInfoModel) => {
+        return selectedPaths.value.includes(item);
+    };
+    const handleAllSelect = (val: any) => {
+        if (val.target.checked) {
+            selectAll();
+            return;
+        }
+        deselectAll();
+    };
+    const handleSelect = (item: PathInfoModel) => {
+        if (!selectedPaths.value.includes(item)) {
+            selectItem(item);
+            return;
+        }
+        deselectItem(item);
+    };
 </script>
 
 <style scoped>

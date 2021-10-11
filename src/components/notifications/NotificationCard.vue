@@ -9,40 +9,30 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { computed, defineComponent, PropType } from 'vue';
     import { Notification, NotificationType, ProgressNotification } from '@/types/notifications';
     import InfoNotification from '@/components/notifications/InfoNotification.vue';
     import ProgressNotificationComponent from '@/components/notifications/ProgressNotification.vue';
     import { destroyNotification } from '@/store/notificiationStore';
 
-    export default defineComponent({
-        name: 'NotificationCard',
-        props: {
-            notification: {
-                type: Object as PropType<Notification>,
-            },
-        },
-        setup(props) {
-            const body = computed(() => {
-                if (props.notification.type === NotificationType.Info)
-                    return {
-                        content: InfoNotification,
-                        props: { notification: props.notification as Notification },
-                    };
+    interface IProp {
+        notification: Object;
+    }
 
-                if (props.notification.type === NotificationType.Progress)
-                    return {
-                        content: ProgressNotificationComponent,
-                        props: { notification: props.notification as ProgressNotification },
-                    };
-            });
-
+    const props = defineProps<IProp>();
+    const body = computed(() => {
+        if (props.notification.type === NotificationType.Info)
             return {
-                body,
-                destroyNotification,
+                content: InfoNotification,
+                props: { notification: props.notification as Notification },
             };
-        },
+
+        if (props.notification.type === NotificationType.Progress)
+            return {
+                content: ProgressNotificationComponent,
+                props: { notification: props.notification as ProgressNotification },
+            };
     });
 </script>
 

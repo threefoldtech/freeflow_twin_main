@@ -4,12 +4,12 @@
             <a
                 v-for="item in navigation"
                 :key="item.name"
-                class="nav-link grid-cols-6 text-center py-2 rounded-xl font-normal"
                 :class="[
                     activeItem === item.name
                         ? 'bg-primary text-white'
                         : 'bg-gray-100 text-black hover:bg-gray-200 transition duration-300',
                 ]"
+                class="nav-link grid-cols-6 text-center py-2 rounded-xl font-normal"
                 href="#"
                 @click.prevent="setActive(item.name)"
             >
@@ -19,9 +19,9 @@
         <div v-if="isActive('user')" class="flex flex-col">
             <user-table
                 :data="possibleUsers"
+                focus
                 placeholder="Search for user..."
                 @addContact="contactAdd"
-                focus
             ></user-table>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
@@ -49,13 +49,11 @@
                 <DisclosurePanel class="px-4 pt-4 pb-2 text-sm text-gray-500">
                     <div>
                         <div>
-                            <label for="manualContactAddUsername" class="block text-sm font-medium text-gray-700"
+                            <label class="block text-sm font-medium text-gray-700" for="manualContactAddUsername"
                                 >Name</label
                             >
                             <div>
                                 <input
-                                    type="text"
-                                    name="manualContactAddUsername"
                                     id="manualContactAddUsername"
                                     v-model="manualContactAddUsername"
                                     class="
@@ -68,17 +66,17 @@
                                         rounded-md
                                         mt-1
                                     "
+                                    name="manualContactAddUsername"
                                     placeholder="Username"
+                                    type="text"
                                 />
-                                <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
+                                <span v-if="error != ''" class="text-red-600"> {{ usernameAddError }} </span>
                             </div>
-                            <label for="manualContactAddLocation" class="block text-sm font-medium text-gray-700"
+                            <label class="block text-sm font-medium text-gray-700" for="manualContactAddLocation"
                                 >Location</label
                             >
                             <div>
                                 <input
-                                    type="text"
-                                    name="manualContactAddLocation"
                                     id="manualContactAddLocation"
                                     v-model="manualContactAddLocation"
                                     class="
@@ -91,7 +89,9 @@
                                         rounded-md
                                         mt-1
                                     "
+                                    name="manualContactAddLocation"
                                     placeholder="Location"
+                                    type="text"
                                 />
                             </div>
                         </div>
@@ -127,13 +127,12 @@
             <div class="flex place-items-center mx-1">
                 <div class="w-full">
                     <div>
-                        <label for="groupname" class="block text-sm font-medium text-gray-700 mt-2">Group name</label>
+                        <label class="block text-sm font-medium text-gray-700 mt-2" for="groupname">Group name</label>
                         <div>
                             <input
-                                type="text"
-                                name="groupname"
                                 id="groupname"
                                 v-model="groupnameAdd"
+                                v-focus
                                 class="
                                     shadow-sm
                                     focus:ring-primary focus:border-primary
@@ -144,8 +143,9 @@
                                     rounded-md
                                     mt-1
                                 "
+                                name="groupname"
                                 placeholder="Group name"
-                                v-focus
+                                type="text"
                             />
                         </div>
                     </div>
@@ -193,7 +193,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
     import { defineComponent, ref, computed, nextTick, watch } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
@@ -208,144 +208,107 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
 
-    export default defineComponent({
-        name: 'ContactAdd',
-        components: {
-            AvatarImg,
-            userTable,
-            userTableGroup,
-            Disclosure,
-            DisclosureButton,
-            DisclosurePanel,
-            ChevronUpIcon,
-        },
-        emits: ['closeDialog'],
-        setup(props, { emit }) {
-            const { contacts } = useContactsState();
-            //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
-            const addGroup = ref(false);
-            const userAddLocation = ref('');
-            const usernameAddError = ref('');
-            const groupnameAdd = ref('');
-            const groupnameAddError = ref('');
-            const usernameInGroupAdd = ref('');
-            const usersInGroup = ref<Contact[]>([]);
-            const possibleUsers = ref<Contact[]>([]);
-            const contactAddError = ref('');
+    const emit = defineEmits(['closeDialog']);
+    const { contacts } = useContactsState();
+    //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
+    const addGroup = ref(false);
+    const userAddLocation = ref('');
+    const usernameAddError = ref('');
+    const groupnameAdd = ref('');
+    const groupnameAddError = ref('');
+    const usernameInGroupAdd = ref('');
+    const usersInGroup = ref<Contact[]>([]);
+    const possibleUsers = ref<Contact[]>([]);
+    const contactAddError = ref('');
 
-            const manualContactAddUsername = ref<string>('');
-            const manualContactAddLocation = ref('');
+    const manualContactAddUsername = ref<string>('');
+    const manualContactAddLocation = ref('');
 
-            const navigation = ref([
-                { name: 'user', text: 'Add a user' },
-                { name: 'group', text: 'Create a group' },
-            ]);
+    const navigation = ref([
+        { name: 'user', text: 'Add a user' },
+        { name: 'group', text: 'Create a group' },
+    ]);
 
-            const contactAdd = (contact: Contact) => {
-                const contactToAdd: Contact = {
-                    id: contact?.id ? contact.id : manualContactAddUsername.value,
-                    location: contact?.location ? contact.location : manualContactAddLocation.value,
-                };
-                console.log('contact to add ', contactToAdd);
-                try {
-                    const { chats } = usechatsState();
+    const contactAdd = (contact: Contact) => {
+        const contactToAdd: Contact = {
+            id: contact?.id ? contact.id : manualContactAddUsername.value,
+            location: contact?.location ? contact.location : manualContactAddLocation.value,
+        };
+        console.log('contact to add ', contactToAdd);
+        try {
+            const { chats } = usechatsState();
 
-                    if (
-                        chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)
-                    ) {
-                        usernameAddError.value = 'Already added this user';
-                        return;
-                    }
-                    const { addContact } = useContactsActions();
-                    addContact(contactToAdd.id, contactToAdd.location);
-                    manualContactAddUsername.value = undefined;
-                    contactAddError.value = '';
-                    emit('closeDialog');
+            if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
+                usernameAddError.value = 'Already added this user';
+                return;
+            }
+            const { addContact } = useContactsActions();
+            addContact(contactToAdd.id, contactToAdd.location);
+            manualContactAddUsername.value = undefined;
+            contactAddError.value = '';
+            emit('closeDialog');
 
-                    //@todo: setTimeout is dirty should be removed
-                    // next tick was not possible reason: chat was not loaded yet
-                    setTimeout(() => {
-                        selectedId.value = <string>contactToAdd.id;
-                    }, 1000);
-                } catch (err) {
-                    console.log('adding contact failed');
-                    contactAddError.value = err;
-                }
-            };
+            //@todo: setTimeout is dirty should be removed
+            // next tick was not possible reason: chat was not loaded yet
+            setTimeout(() => {
+                selectedId.value = <string>contactToAdd.id;
+            }, 1000);
+        } catch (err) {
+            console.log('adding contact failed');
+            contactAddError.value = err;
+        }
+    };
 
-            const handleClicked = item => {
-                userAddLocation.value = item.location;
-            };
+    const handleClicked = item => {
+        userAddLocation.value = item.location;
+    };
 
-            const activeItem = ref('user');
+    const activeItem = ref('user');
 
-            const isActive = menuItem => {
-                return activeItem.value === menuItem;
-            };
+    const isActive = menuItem => {
+        return activeItem.value === menuItem;
+    };
 
-            const setActive = menuItem => {
-                activeItem.value = menuItem;
-                groupnameAddError.value = '';
-                usernameAddError.value = '';
-            };
+    const setActive = menuItem => {
+        activeItem.value = menuItem;
+        groupnameAddError.value = '';
+        usernameAddError.value = '';
+    };
 
-            const groupAdd = async () => {
-                const { addGroupchat } = usechatsActions();
-                const { user } = useAuthState();
-                const { chats } = usechatsState();
-                if (groupnameAdd.value == '') {
-                    groupnameAddError.value = 'Please enter a group name';
-                    return;
-                }
-                if (groupnameAdd.value.length > 20) {
-                    groupnameAddError.value = "The name can't contain more than 20 characters";
-                    return;
-                }
-                const mylocation = await myYggdrasilAddress();
-                usersInGroup.value.push({
-                    id: user.id,
-                    location: mylocation,
-                });
+    const groupAdd = async () => {
+        const { addGroupchat } = usechatsActions();
+        const { user } = useAuthState();
+        const { chats } = usechatsState();
+        if (groupnameAdd.value == '') {
+            groupnameAddError.value = 'Please enter a group name';
+            return;
+        }
+        if (groupnameAdd.value.length > 20) {
+            groupnameAddError.value = "The name can't contain more than 20 characters";
+            return;
+        }
+        const mylocation = await myYggdrasilAddress();
+        usersInGroup.value.push({
+            id: user.id,
+            location: mylocation,
+        });
 
-                addGroupchat(groupnameAdd.value, usersInGroup.value);
-                //@todo: setTimeout is dirty should be removed
-                // next tick was not possible reason: chat was not loaded yet
-                setTimeout(() => {
-                    selectedId.value = groupnameAdd.value;
-                }, 1000);
-                usersInGroup.value = [];
-                emit('closeDialog');
-            };
+        addGroupchat(groupnameAdd.value, usersInGroup.value);
+        //@todo: setTimeout is dirty should be removed
+        // next tick was not possible reason: chat was not loaded yet
+        setTimeout(() => {
+            selectedId.value = groupnameAdd.value;
+        }, 1000);
+        usersInGroup.value = [];
+        emit('closeDialog');
+    };
 
-            // @todo: config
-            axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
-                const { user } = useAuthState();
-                const posContacts = <Contact[]>r.data;
-                const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
-                possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
-            });
-
-            return {
-                addGroup,
-                usernameAddError,
-                groupnameAdd,
-                groupnameAddError,
-                usernameInGroupAdd,
-                userAddLocation,
-                contactAdd,
-                usersInGroup,
-                isActive,
-                setActive,
-                groupAdd,
-                contacts,
-                possibleUsers,
-                handleClicked,
-                manualContactAddUsername,
-                manualContactAddLocation,
-                activeItem,
-                navigation,
-            };
-        },
+    // @todo: config
+    axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
+        const { user } = useAuthState();
+        const posContacts = <Contact[]>r.data;
+        const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
+        possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
     });
 </script>
 

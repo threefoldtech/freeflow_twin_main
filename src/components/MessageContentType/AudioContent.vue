@@ -1,33 +1,23 @@
 <template>
     <div class="p-3 mt-2">
         <audio
-            controls
-            class="max-w-full"
             :src="calcExternalResourceLink(message.body.url)"
+            class="max-w-full"
+            controls
             @load="$emit('scroll')"
         ></audio>
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { computed, defineComponent } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import AudioPlayer from '@/components/AudioPlayer.vue';
 
-    export default defineComponent({
-        name: 'AudioContent',
-        components: { AudioPlayer },
-        props: {
-            message: { type: Object, required: true },
-        },
-        emits: ['scroll'],
-        setup(props) {
-            const url = computed(() => {
-                return;
-            });
-            return {
-                calcExternalResourceLink,
-            };
-        },
-    });
+    interface IProp {
+        message: Object;
+    }
+
+    const props = defineProps<IProp>();
+    const emits = defineEmits(['scroll']);
 </script>

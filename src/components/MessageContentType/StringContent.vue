@@ -1,46 +1,41 @@
 <template>
-    <span class="pt-2 pl-4 pb-2 pr-8 break-all" v-html="computedMessage"></span>
+    <span class="pt-2 group-chat:pt-0 pl-4 pb-2 pr-8 break-all" v-html="computedMessage"></span>
 </template>
 
-<script lang="ts">
-    // Disclaimer: This is not yet proven to be SAFE, this might contain XSS. Use with caution!
-    import { computed, defineComponent } from 'vue';
+<script lang="ts" setup>
+    import { computed } from 'vue';
 
+    // Disclaimer: This is not yet proven to be SAFE, this might contain XSS. Use with caution!
     const regularExpression = /((http|https):\/\/([a-zA-Z0-9.\/?=&\[\]:\_\-\;\%]+))/g;
 
-    export default defineComponent({
-        name: 'StringContent',
-        props: {
-            message: { type: Object, required: true },
-        },
-        setup(props) {
-            const escapeHtml = (unsafeHtml: string) => {
-                return unsafeHtml
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-            };
+    interface IProp {
+        message: Object;
+    }
 
-            const computedMessage = computed(() => {
-                let escapedHtml = escapeHtml(`${props.message.body}`);
-                const matches = escapedHtml.match(regularExpression);
+    const props = defineProps<IProp>();
+    const escapeHtml = (unsafeHtml: string) => {
+        return unsafeHtml
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
 
-                if (matches === null) {
-                    return escapedHtml;
-                }
+    const computedMessage = computed(() => {
+        let escapedHtml = escapeHtml(`${props.message.body}`);
+        const matches = escapedHtml.match(regularExpression);
 
-                escapedHtml = escapedHtml.replace(
-                    regularExpression,
-                    `<a class='hover:underline' href='$1' target='_BLANK'>$1</a>`
-                );
+        if (matches === null) {
+            return escapedHtml;
+        }
 
-                return escapedHtml;
-            });
+        escapedHtml = escapedHtml.replace(
+            regularExpression,
+            `<a class='hover:underline' href='$1' target='_BLANK'>$1</a>`
+        );
 
-            return { computedMessage };
-        },
+        return escapedHtml;
     });
 </script>
 
