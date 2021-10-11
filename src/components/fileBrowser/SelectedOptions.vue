@@ -63,8 +63,12 @@
                 <i class="fas fill-current text-red-400 fa-window-close fa-1x ml-1"></i>
             </div>
         </div>
-
-        <jdialog v-model="showDeleteDialog" @update-model-value="showDeleteDialog = false" noActions class="max-w-10">
+        <Dialog
+            :modelValue="showDeleteDialog"
+            @update-model-value="showDeleteDialog = false"
+            noActions
+            class="max-w-10"
+        >
             <template v-slot:title class="center">
                 <h1 class="text-center">Deleting Files</h1>
             </template>
@@ -89,9 +93,8 @@
                     Delete
                 </button>
             </div>
-        </jdialog>
-
-        <jdialog v-model="showRenameDialog" @update-model-value="showRenameDialog = false" noActions>
+        </Dialog>
+        <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" noActions>
             <template v-slot:title class="center">
                 <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
@@ -135,12 +138,11 @@
                     Rename
                 </button>
             </div>
-        </jdialog>
-        <jdialog v-model="showShareDialog" @update-model-value="resetShareDialog" noActions>
+        </Dialog>
+        <Dialog :modelValue="showShareDialog" @update-model-value="resetShareDialog" noActions>
             <template v-slot:title>
                 <h1 class="text-center">Share files</h1>
             </template>
-
             <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2" :key="selectedTab">
                 <div class="flex-grow" v-for="(tab, index) in tabs" :key="`${tab}-${index}`">
                     <button
@@ -152,14 +154,13 @@
                     </button>
                 </div>
             </div>
-
-            <chatTable v-if="selectedTab === 0" :data="chats"></chatTable>
-            <edit-share v-if="selectedTab === 1" :selectedFile="selectedPaths[0]"></edit-share>
-        </jdialog>
+            <ShareChatTable v-if="selectedTab === 0" :data="chats"></ShareChatTable>
+            <EditShare v-if="selectedTab === 1" :selectedFile="selectedPaths[0]"></EditShare>
+        </Dialog>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
     import {
         selectedPaths,

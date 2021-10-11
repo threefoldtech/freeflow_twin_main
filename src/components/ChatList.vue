@@ -148,7 +148,7 @@
             </div>
         </div>
 
-        <jdialog
+        <Dialog
             :modelValue="showAddUserDialog"
             noActions
             @closeDialog="sendUpdate(false)"
@@ -159,7 +159,7 @@
             </template>
 
             <add-contact @closeDialog="sendUpdate(false)"></add-contact>
-        </jdialog>
+        </Dialog>
     </section>
 </template>
 
