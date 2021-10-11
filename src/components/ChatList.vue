@@ -231,7 +231,6 @@
 
     const sendUpdate = newVal => {
         console.log('update it');
-        console.log('test');
         showAddUserDialog.value = newVal;
     };
 </script>
