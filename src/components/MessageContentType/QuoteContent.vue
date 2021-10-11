@@ -21,12 +21,12 @@
 <script lang="ts" setup>
     import MessageContent from '../MessageContent.vue';
 
-    defineProps({
-        message: { type: Object, required: true },
-        preventRecursion: {
-            type: Boolean,
-            default: false,
-            required: false,
-        },
+    interface IProp {
+        message: Object;
+        preventRecursion?: boolean;
+    }
+
+    const props = withDefaults(defineProps<IProp>(), {
+        preventRecursion: false,
     });
 </script>

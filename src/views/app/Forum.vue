@@ -1,6 +1,6 @@
 <template>
     <app-layout>
-        <iframe class="relative h-full w-full" title="forum" id="forum-iframe" :src="forumUrl" />
+        <iframe id="forum-iframe" :src="forumUrl" class="relative h-full w-full" title="forum" />
     </app-layout>
 </template>
 

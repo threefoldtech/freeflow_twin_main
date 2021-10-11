@@ -197,75 +197,42 @@
 
     const tabs = ['Create shares', 'Edit shares'];
 
-    export default defineComponent({
-        name: 'SelectedOptions',
-        components: { AvatarImg, Button, jdialog: Dialog, chatTable: ShareChatTable, EditShare },
-        setup() {
-            let debounce;
-            let showDeleteDialog = ref(false);
-            let showRenameDialog = ref(false);
-            let newName = ref<string>('');
+    let debounce;
+    const showDeleteDialog = ref(false);
+    const showRenameDialog = ref(false);
+    const newName = ref<string>('');
 
-            let writeRights = ref(false);
+    const writeRights = ref(false);
 
-            onBeforeMount(() => {
-                retrievechats();
-            });
-            function debounceSearch(event) {
-                clearTimeout(debounce);
-                debounce = setTimeout(() => {
-                    if (searchDirValue.value === '') {
-                        searchResults.value = [];
-                        return;
-                    }
-                    searchDir();
-                }, 600);
-            }
-
-            async function cutFiles() {
-                selectedAction.value = Action.CUT;
-                await copyPasteSelected();
-            }
-
-            async function copyFiles() {
-                selectedAction.value = Action.COPY;
-                await copyPasteSelected();
-            }
-
-            function resetShareDialog() {
-                showShareDialog.value = false;
-                selectedPaths.value = [];
-                selectedTab.value = 0;
-            }
-            return {
-                selectedPaths,
-                deleteFiles,
-                showDeleteDialog,
-                showRenameDialog,
-                downloadFiles,
-                copyPasteSelected,
-                copiedFiles,
-                clearClipboard,
-                newName,
-                renameFile,
-                searchDirValue,
-                searchDir,
-                searchResults,
-                debounceSearch,
-                isDraggingFiles,
-                cutFiles,
-                copyFiles,
-                chats,
-                createNotification,
-                sharedDir,
-                writeRights,
-                tabs,
-                selectedTab,
-                showShareDialog,
-                resetShareDialog,
-            };
-        },
+    onBeforeMount(() => {
+        retrievechats();
     });
+    const debounceSearch = event => {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+            if (searchDirValue.value === '') {
+                searchResults.value = [];
+                return;
+            }
+            searchDir();
+        }, 600);
+    };
+
+    const cutFiles = async () => {
+        selectedAction.value = Action.CUT;
+        await copyPasteSelected();
+    };
+
+    const copyFiles = async () => {
+        selectedAction.value = Action.COPY;
+        await copyPasteSelected();
+    };
+
+    const resetShareDialog = () => {
+        showShareDialog.value = false;
+        selectedPaths.value = [];
+        selectedTab.value = 0;
+    };
 </script>
 
 <style scoped>

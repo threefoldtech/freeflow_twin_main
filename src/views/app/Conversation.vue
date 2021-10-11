@@ -1,7 +1,7 @@
 <template>
     <appLayout>
         <template v-slot:top>
-            <div v-if="chat" class="w-full flex md:px-4 text-white">
+            <div v-if="chat" :class="{ 'group-chat': chat?.isGroup }" class="w-full flex md:px-4 text-white">
                 <div class="place-items-center grid mr-4">
                     <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
                 </div>
@@ -9,18 +9,18 @@
                     <p class="font-bold font overflow-hidden overflow-ellipsis">
                         {{ chat.name }}
                     </p>
-                    <p v-if="!chat.isGroup && !blocked" class="font-light">
+                    <p v-if="!blocked" class="font-light group-chat:hidden">
                         {{ status?.isOnline ? 'Is online' : 'Is offline' }}
                     </p>
-                    <p v-if="!chat.isGroup && blocked" class="text-red-500">BLOCKED</p>
-                    <p v-if="chat.isGroup" class="font-thin">Group chat</p>
+                    <p v-if="blocked" class="group-chat:hidden text-red-500">BLOCKED</p>
+                    <p class="font-thin hidden group-chat:span">Group chat</p>
                 </div>
             </div>
             <div v-else>Loading</div>
         </template>
 
         <template v-slot:actions>
-            <div>
+            <div :class="{ 'group-chat': chat?.isGroup }">
                 <div class="relative">
                     <button class="text-lg text-white md:hidden" @click="showMenu = true">
                         <i class="fas fa-ellipsis-v"></i>
@@ -85,7 +85,7 @@
             </div>
         </template>
         <template v-slot:default>
-            <div class="flex flex-row relative h-full w-full">
+            <div :class="{ 'group-chat': chat?.isGroup }" class="flex flex-row relative h-full w-full">
                 <ChatList class="hidden md:inline-block" />
                 <div
                     v-if="chat"
@@ -117,7 +117,7 @@
                                 </p>
                                 <p v-if="!blocked" class="font-thin">
                                     {{ getChatStatus.message }}
-                                    <span v-if="!chat.isGroup && getChatStatus?.lastSeen">
+                                    <span v-if="getChatStatus?.lastSeen" class="group-chat:hidden">
                                         , active <TimeContent :time="getChatStatus.lastSeen.toDate()" />
                                     </span>
                                 </p>
@@ -153,7 +153,7 @@
                             <template v-slot:viewAnchor>
                                 <div
                                     id="viewAnchor"
-                                    ref="viewAnchor"
+                                    :ref="viewAnchor"
                                     style="
                                         height: 40vh;
                                         position: absolute;
@@ -231,8 +231,14 @@
                                 {{ chat.name }}
                             </h2>
                             <p
-                                v-if="!chat.isGroup"
-                                class="break-all w-full overflow-y-auto font-bold text-center text-gray-300"
+                                class="
+                                    break-all
+                                    w-full
+                                    overflow-y-auto
+                                    font-bold
+                                    text-center text-gray-300
+                                    group-chat:hidden
+                                "
                             >
                                 {{ status?.status || 'No status found' }}
                             </p>

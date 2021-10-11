@@ -57,6 +57,12 @@ module.exports = {
                     return `.collapsed-bar .${e(`collapsed-bar${separator}${className}`)}`;
                 });
             });
+
+            addVariant('group-chat', ({ modifySelectors, separator }) => {
+                modifySelectors(({ className }) => {
+                    return `.group-chat .${e(`group-chat${separator}${className}`)}`;
+                });
+            });
         }),
         require('@tailwindcss/aspect-ratio'),
         require('@tailwindcss/forms'),

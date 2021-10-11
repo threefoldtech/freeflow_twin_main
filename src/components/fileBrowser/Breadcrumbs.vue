@@ -20,8 +20,9 @@
                         <i class="fas fa-chevron-right"></i>
                     </span>
                     <span
-                        class="cursor-pointer text-base p-2 rounded-md"
                         v-if="item || i === 0"
+                        :title="item"
+                        class="cursor-pointer text-base p-2 rounded-md"
                         @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
                         @dragenter="event => onDragEnter(event, i)"
                         @dragleave="event => onDragLeave(event, i)"
@@ -38,9 +39,10 @@
                         <i class="fas fa-chevron-right"></i>
                     </span>
                     <span
-                        class="cursor-pointer text-base p-2 rounded-md"
                         v-if="breadcrumb || idx === 0"
                         :key="idx"
+                        :title="breadcrumb.name"
+                        class="cursor-pointer text-base p-2 rounded-md"
                         @click="clickBreadcrumb(breadcrumb, sharedBreadcrumbs, idx)"
                     >
                         {{ idx === 0 ? 'Shared with me' : truncate(breadcrumb.name) }}
@@ -51,7 +53,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
     import {
         selectedPaths,
@@ -67,60 +69,37 @@
     } from '@/store/fileBrowserStore';
     import { createNotification } from '@/store/notificiationStore';
 
-    export default defineComponent({
-        name: 'Breadcrumbs',
-        components: {},
-        setup() {
-            const parts = computed(() => currentDirectory.value.split('/'));
+    const parts = computed(() => currentDirectory.value.split('/'));
 
-            const onDragEnter = (e: Event, i: number) => {
-                if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                (e.target as HTMLElement).classList.add('bg-accent-300');
-                (e.target as HTMLElement).classList.add('text-white');
-            };
+    const onDragEnter = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
+        (e.target as HTMLElement).classList.add('bg-accent-300');
+        (e.target as HTMLElement).classList.add('text-white');
+    };
 
-            const onDragLeave = (e: Event, i: number) => {
-                if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                (e.target as HTMLElement).classList.remove('bg-accent-300');
-                (e.target as HTMLElement).classList.remove('text-white');
-            };
+    const onDragLeave = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
+        (e.target as HTMLElement).classList.remove('bg-accent-300');
+        (e.target as HTMLElement).classList.remove('text-white');
+    };
 
-            const onDrop = (e: Event, i: number) => {
-                if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
-                let path = '/';
-                if (i > 0) {
-                    const parts = currentDirectory.value.split('/');
-                    parts.splice(i + 1);
-                    path = parts.join('/');
-                }
-                (e.target as HTMLElement).classList.remove('bg-accent-300');
-                (e.target as HTMLElement).classList.remove('text-white');
-                moveFiles(path);
-                selectedPaths.value = [];
-            };
+    const onDrop = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
+        let path = '/';
+        if (i > 0) {
+            const parts = currentDirectory.value.split('/');
+            parts.splice(i + 1);
+            path = parts.join('/');
+        }
+        (e.target as HTMLElement).classList.remove('bg-accent-300');
+        (e.target as HTMLElement).classList.remove('text-white');
+        moveFiles(path);
+        selectedPaths.value = [];
+    };
 
-            const truncate = name => {
-                return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
-            };
-
-            return {
-                goToHome,
-                goBack,
-                goToAPreviousDirectory,
-                currentDirectory,
-                isDraggingFiles,
-                onDragEnter,
-                onDragLeave,
-                onDrop,
-                parts,
-                createNotification,
-                truncate,
-                sharedBreadcrumbs,
-                sharedDir,
-                clickBreadcrumb,
-            };
-        },
-    });
+    const truncate = name => {
+        return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+    };
 </script>
 
 <style scoped>
