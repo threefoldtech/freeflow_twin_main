@@ -22,13 +22,12 @@
                 {{ error }}
             </p>
             <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
-            <div>
+            <div class="relative">
                 <input
                     type="text"
                     name="newFolder"
                     id="newFolder"
                     ref="newFolderInput"
-                    @input="disableSlash"
                     v-model="manualContactAdd"
                     class="
                         shadow-sm
@@ -42,6 +41,9 @@
                     "
                     placeholder="New folder name"
                 />
+                <div @click="clearFolderInput" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
+                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
             </div>
         </div>
     </Dialog>
@@ -179,6 +181,9 @@
                 selectedFiles.value = [];
                 newFileInput.value.value = null;
             };
+            const clearFolderInput = () => {
+                newFolderInput.value.value = '';
+            };
 
             const handleFileSelectChange = () => {
                 newFileInputArray.value = Array.from(newFileInput.value?.files);
@@ -202,6 +207,7 @@
                 createFolderErrors,
                 manualContactAdd,
                 fileUploadErrors,
+                clearFolderInput,
             };
         },
     });

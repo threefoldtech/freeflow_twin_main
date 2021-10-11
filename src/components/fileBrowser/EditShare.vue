@@ -11,6 +11,13 @@
             class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
             placeholder="Search"
         />
+        <div
+            v-if="!!searchTerm"
+            @click="searchTerm = ''"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+        >
+            <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
     </div>
     <Table v-if="searchResults?.length > 0" :headers="headers" :data="searchResults">
         <template #data-types="data">
