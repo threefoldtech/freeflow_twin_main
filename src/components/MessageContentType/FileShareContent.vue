@@ -4,7 +4,7 @@
         @click="visitFileInMessage(message)"
         v-if="message.body"
     >
-        <p class="my-message:text-icon text-center text-xs">
+        <p class="my-message:text-icon text-center text-xs mb-1">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>
             shared
@@ -16,8 +16,8 @@
                     mr-2
                     bg-gray-600
                     rounded-full
-                    h-12
-                    w-12
+                    h-9
+                    w-9
                     flex
                     justify-center
                     items-center
