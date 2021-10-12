@@ -20,6 +20,13 @@
                     "
                     placeholder="Search"
                 />
+                <div
+                    @click="clearInput"
+                    v-if="searchDirValue !== ''"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                >
+                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
             </div>
             <div class="flex flex-row items-center">
                 <options></options>
@@ -94,7 +101,10 @@
                 (e.target as HTMLElement).classList.add('bg-accent-300');
                 (e.target as HTMLElement).classList.add('text-white');
             };
-
+            function clearInput(event) {
+                searchDirValue.value = '';
+                searchResults.value = [];
+            }
             const onDragLeave = (e: Event, i: number) => {
                 if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
                 (e.target as HTMLElement).classList.remove('bg-accent-300');
@@ -130,6 +140,7 @@
                 onDrop,
                 createNotification,
                 sharedDir,
+                clearInput,
             };
         },
     });

@@ -52,7 +52,7 @@
                             <label for="manualContactAddUsername" class="block text-sm font-medium text-gray-700"
                                 >Name</label
                             >
-                            <div>
+                            <div class="relative">
                                 <input
                                     type="text"
                                     name="manualContactAddUsername"
@@ -70,12 +70,19 @@
                                     "
                                     placeholder="Username"
                                 />
+                                <div
+                                    v-if="!!manualContactAddUsername"
+                                    @click="manualContactAddUsername = ''"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                >
+                                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </div>
                                 <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
                             </div>
                             <label for="manualContactAddLocation" class="block text-sm font-medium text-gray-700"
                                 >Location</label
                             >
-                            <div>
+                            <div class="relative">
                                 <input
                                     type="text"
                                     name="manualContactAddLocation"
@@ -93,6 +100,13 @@
                                     "
                                     placeholder="Location"
                                 />
+                                <div
+                                    v-if="!!manualContactAddLocation"
+                                    @click="manualContactAddLocation = ''"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                                >
+                                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                                </div>
                             </div>
                         </div>
                         <div class="w-full flex justify-end">
@@ -128,7 +142,7 @@
                 <div class="w-full">
                     <div>
                         <label for="groupname" class="block text-sm font-medium text-gray-700 mt-2">Group name</label>
-                        <div>
+                        <div class="relative">
                             <input
                                 type="text"
                                 name="groupname"
@@ -147,6 +161,13 @@
                                 placeholder="Group name"
                                 v-focus
                             />
+                            <div
+                                v-if="!!groupnameAdd"
+                                @click="groupnameAdd = ''"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                            >
+                                <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                            </div>
                         </div>
                     </div>
                     <br />
