@@ -56,7 +56,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
     import { useAuthState } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
@@ -68,93 +68,68 @@
     import { useRoute, useRouter } from 'vue-router';
     import { showUserConfigDialog } from '@/services/dialogService';
 
-    export default defineComponent({
-        name: 'Topbar',
-        components: { AvatarImg, jdialog: Dialog },
-        emits: ['addUser'],
-        setup({}, ctx) {
-            const { user } = useAuthState();
-            const showEdit = ref(false);
-            const showEditPic = ref(false);
-            const fileinput = ref();
-            const file = ref();
-            const userStatus = ref('');
-            const isEditingStatus = ref(false);
-            const router = useRouter();
-            const route = useRoute();
-            const backOrMenu = () => {
-                if (route.meta && route.meta.back) {
-                    router.push({ name: <any>route.meta.back });
-                    return;
-                }
+    const emit = defineEmits(['addUser']);
 
-                showUserConfigDialog.value = true;
-            };
+    const { user } = useAuthState();
+    const showEdit = ref(false);
+    const showEditPic = ref(false);
+    const fileinput = ref();
+    const file = ref();
+    const userStatus = ref('');
+    const isEditingStatus = ref(false);
+    const router = useRouter();
+    const route = useRoute();
+    const backOrMenu = () => {
+        if (route.meta && route.meta.back) {
+            router.push({ name: <any>route.meta.back });
+            return;
+        }
 
-            const selectFile = () => {
-                fileinput.value.click();
-            };
-            const changeFile = () => {
-                file.value = fileinput.value?.files[0];
-                sendNewAvatar();
-            };
-            const removeFile = () => {
-                file.value = null;
-            };
+        showUserConfigDialog.value = true;
+    };
 
-            const sendNewAvatar = async () => {
-                const newUrl = await setNewAvatar(file.value);
-                await fetchStatus(user.id);
-                showUserConfigDialog.value = false;
-            };
+    const selectFile = () => {
+        fileinput.value.click();
+    };
+    const changeFile = () => {
+        file.value = fileinput.value?.files[0];
+        sendNewAvatar();
+    };
+    const removeFile = () => {
+        file.value = null;
+    };
 
-            const setEditStatus = (edit: boolean) => {
-                isEditingStatus.value = edit;
-                userStatus.value = user.status;
-            };
-            const sendNewStatus = async () => {
-                const { sendSocketUserStatus } = useSocketActions();
-                sendSocketUserStatus(userStatus.value);
-                user.status = userStatus.value;
-                isEditingStatus.value = false;
-            };
+    const sendNewAvatar = async () => {
+        const newUrl = await setNewAvatar(file.value);
+        await fetchStatus(user.id);
+        showUserConfigDialog.value = false;
+    };
 
-            // @todo: config
+    const setEditStatus = (edit: boolean) => {
+        isEditingStatus.value = edit;
+        userStatus.value = user.status;
+    };
+    const sendNewStatus = async () => {
+        const { sendSocketUserStatus } = useSocketActions();
+        sendSocketUserStatus(userStatus.value);
+        user.status = userStatus.value;
+        isEditingStatus.value = false;
+    };
 
-            onBeforeMount(() => {
-                initBlocklist();
-            });
+    // @todo: config
 
-            const unblockUser = async user => {
-                await deleteBlockedEntry(user);
-                showUserConfigDialog.value = false;
-            };
-
-            const addUser = () => {
-                ctx.emit('addUser');
-            };
-
-            return {
-                addUser,
-                backOrMenu,
-                user,
-                showEditPic,
-                showEdit,
-                fileinput,
-                file,
-                selectFile,
-                changeFile,
-                removeFile,
-                sendNewAvatar,
-                sendNewStatus,
-                userStatus,
-                setEditStatus,
-                isEditingStatus,
-                unblockUser,
-                route,
-            };
-        },
+    onBeforeMount(() => {
+        initBlocklist();
     });
+
+    const unblockUser = async user => {
+        await deleteBlockedEntry(user);
+        showUserConfigDialog.value = false;
+    };
+
+    const addUser = () => {
+        emit('addUser');
+    };
 </script>
 
 <style scoped></style>

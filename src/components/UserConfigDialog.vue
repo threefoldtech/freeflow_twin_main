@@ -1,5 +1,5 @@
 <template>
-    <jdialog v-model="showUserConfigDialog" @update-model-value="closeDialog" noActions>
+    <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" noActions>
         <template v-slot:title>
             <h1>Profile settings</h1>
         </template>
@@ -110,15 +110,15 @@
                     </textarea>
                 </suspense>
                 <div v-if="isEditingStatus" class="flex justify-end">
-                    <span id="current">{{ userStatus.length }}</span>
+                    <span id="current">{{ userStatus?.length }}</span>
                     <span id="maximum">&nbsp;/&nbsp;150</span>
                 </div>
             </div>
             <input class="hidden" type="file" id="fileInput" ref="fileInput" accept="image/*" @change="changeFile" />
 
             <div>
-                <h2>{{ blockedUsers.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
-                <ul v-if="blockedUsers.length > 0" class="max-h-28 overflow-y-auto">
+                <h2>{{ blockedUsers?.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
+                <ul v-if="blockedUsers?.length > 0" class="max-h-28 overflow-y-auto">
                     <template v-for="blockedUser in blockedUsers" :key="blockedUser">
                         <li class="flex flex-row justify-between items-center mt-2 pb-2 border-b">
                             <span>{{ blockedUser }}</span>
@@ -157,7 +157,7 @@
                 </ul>
             </div>
         </div>
-        <jdialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" noActions>
+        <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" noActions>
             <template v-slot:title>
                 <h1>Avatar</h1>
             </template>
@@ -186,11 +186,11 @@
                     <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary">SAVE</button>
                 </div>
             </div>
-        </jdialog>
-    </jdialog>
+        </Dialog>
+    </Dialog>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { computed, defineComponent, onBeforeMount, onMounted, ref, watch, watchEffect } from 'vue';
     import { useAuthState, getMyStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
@@ -206,164 +206,127 @@
     import VueCropper from 'vue-cropperjs';
     import 'cropperjs/dist/cropper.css';
 
-    export default defineComponent({
-        name: 'UserConfigDialog',
-        components: { AvatarImg, jdialog: Dialog, VueCropper },
-        emits: ['addUser'],
-        created: () => {
-            initBlocklist();
-        },
-        async setup({}, ctx) {
-            const { user } = useAuthState();
-            const showEditPic = ref(false);
-            const fileInput = ref();
-            const file = ref();
-            const userStatus = ref('');
-            const isEditingStatus = ref(false);
-            const router = useRouter();
-            const route = useRoute();
-            const myStatus = await getMyStatus();
-            const cropper = ref(null);
-            const isHoveringAvatar = ref(false);
-            const showEditAvatar = ref(false);
+    const emit = defineEmits(['addUser']);
 
-            watch(showEditAvatar, () => {
-                if (showEditAvatar.value) {
-                    window.addEventListener('keypress', enterPressed);
-                    return;
-                }
-                window.removeEventListener('keypress', enterPressed);
-            });
-            watchEffect(() => {
-                if (!cropper.value) {
-                    return;
-                }
-                if (!file.value) {
-                    cropper.value.destroy();
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = event => {
-                    cropper.value.replace(event.target.result);
-                };
-                reader.readAsDataURL(file.value);
-            });
-            const enterPressed = e => {
-                if (e.key === 'Enter') {
-                    saveNewAvatar();
-                }
-            };
-            const backOrMenu = () => {
-                if (route.meta && route.meta.back) {
-                    router.push({ name: <any>route.meta.back });
-                    return;
-                }
-                showUserConfigDialog.value = true;
-            };
+    initBlocklist();
 
-            const selectFile = () => {
-                fileInput.value.click();
-            };
+    const { user } = useAuthState();
+    const showEditPic = ref(false);
+    const fileInput = ref();
+    const file = ref();
+    const userStatus = ref('');
+    const isEditingStatus = ref(false);
+    const router = useRouter();
+    const route = useRoute();
+    const myStatus = await getMyStatus();
+    const cropper = ref(null);
+    const isHoveringAvatar = ref(false);
+    const showEditAvatar = ref(false);
 
-            const changeFile = () => {
-                const newFile = fileInput.value?.files[0];
-                if (!newFile || newFile.type.indexOf('image/') === -1) {
-                    return;
-                }
+    watch(showEditAvatar, () => {
+        if (showEditAvatar.value) {
+            window.addEventListener('keypress', enterPressed);
+            return;
+        }
+        window.removeEventListener('keypress', enterPressed);
+    });
+    watchEffect(() => {
+        if (!cropper.value) {
+            return;
+        }
+        if (!file.value) {
+            cropper.value.destroy();
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = event => {
+            cropper.value.replace(event.target.result);
+        };
+        reader.readAsDataURL(file.value);
+    });
+    const enterPressed = e => {
+        if (e.key === 'Enter') {
+            saveNewAvatar();
+        }
+    };
+    const backOrMenu = () => {
+        if (route.meta && route.meta.back) {
+            router.push({ name: <any>route.meta.back });
+            return;
+        }
+        showUserConfigDialog.value = true;
+    };
 
-                file.value = fileInput.value?.files[0];
-                showEditAvatar.value = true;
-                fileInput.value.value = null;
-            };
+    const selectFile = () => {
+        fileInput.value.click();
+    };
 
-            const saveNewAvatar = async () => {
-                const blob = await (await fetch(cropper.value.getCroppedCanvas().toDataURL(file.value.type))).blob();
-                const tempFile = new File([blob], 'avatar', {
-                    type: file.value.type,
-                });
-                await sendNewAvatar(tempFile);
-                showEditAvatar.value = false;
-            };
+    const changeFile = () => {
+        const newFile = fileInput.value?.files[0];
+        if (!newFile || newFile.type.indexOf('image/') === -1) {
+            return;
+        }
 
-            const cancelNewAvatar = () => {
-                showEditAvatar.value = false;
-            };
+        file.value = fileInput.value?.files[0];
+        showEditAvatar.value = true;
+        fileInput.value.value = null;
+    };
 
-            const removeFile = () => {
-                file.value = null;
-            };
+    const saveNewAvatar = async () => {
+        const blob = await (await fetch(cropper.value.getCroppedCanvas().toDataURL(file.value.type))).blob();
+        const tempFile = new File([blob], 'avatar', {
+            type: file.value.type,
+        });
+        await sendNewAvatar(tempFile);
+        showEditAvatar.value = false;
+    };
 
-            const closeDialog = newVal => {
-                showUserConfigDialog.value = newVal;
-            };
+    const cancelNewAvatar = () => {
+        showEditAvatar.value = false;
+    };
 
-            const sendNewAvatar = async (data: any) => {
-                await setNewAvatar(data);
-                await fetchStatus(user.id);
-            };
+    const removeFile = () => {
+        file.value = null;
+    };
 
-            const setEditStatus = (edit: boolean) => {
-                isEditingStatus.value = edit;
-                userStatus.value = user.status;
-            };
-            const sendNewStatus = async () => {
-                const { sendSocketUserStatus } = useSocketActions();
-                sendSocketUserStatus(userStatus.value);
-                user.status = userStatus.value;
-                isEditingStatus.value = false;
-            };
+    const closeDialog = newVal => {
+        showUserConfigDialog.value = newVal;
+    };
 
-            const unblockUser = async user => {
-                await deleteBlockedEntry(user);
-                showUserConfigDialog.value = false;
-            };
+    const sendNewAvatar = async (data: any) => {
+        await setNewAvatar(data);
+        await fetchStatus(user.id);
+    };
 
-            const addUser = () => {
-                ctx.emit('addUser');
-            };
-            const status = computed(() => {
-                return statusList[<string>user.id];
-            });
+    const setEditStatus = (edit: boolean) => {
+        isEditingStatus.value = edit;
+        userStatus.value = user.status;
+    };
+    const sendNewStatus = async () => {
+        const { sendSocketUserStatus } = useSocketActions();
+        sendSocketUserStatus(userStatus.value);
+        user.status = userStatus.value;
+        isEditingStatus.value = false;
+    };
 
-            const src = computed(() => {
-                if (!status.value || !status.value.avatar) {
-                    return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
-                        <string>user.id
-                    )}.svg?m=14&b=%23ffffff`;
-                }
+    const unblockUser = async user => {
+        await deleteBlockedEntry(user);
+        showUserConfigDialog.value = false;
+    };
 
-                return calcExternalResourceLink(status.value.avatar);
-            });
+    const addUser = () => {
+        emit('addUser');
+    };
+    const status = computed(() => {
+        return statusList[<string>user.id];
+    });
 
-            return {
-                addUser,
-                backOrMenu,
-                user,
-                showEditPic,
-                fileInput,
-                file,
-                selectFile,
-                changeFile,
-                removeFile,
-                sendNewAvatar,
-                sendNewStatus,
-                userStatus,
-                setEditStatus,
-                isEditingStatus,
-                blockedUsers: blocklist,
-                unblockUser,
-                route,
-                showUserConfigDialog,
-                src,
-                myStatus,
-                cropper,
-                saveNewAvatar,
-                isHoveringAvatar,
-                showEditAvatar,
-                cancelNewAvatar,
-                closeDialog,
-            };
-        },
+    const src = computed(() => {
+        if (!status.value || !status.value.avatar) {
+            return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(<string>user.id)}.svg?m=14&b=%23ffffff`;
+        }
+
+        return calcExternalResourceLink(status.value.avatar);
     });
 </script>
 

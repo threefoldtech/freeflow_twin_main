@@ -69,7 +69,7 @@
     </nav>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { defineComponent, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -78,69 +78,53 @@
     import { AppType } from '@/types/apps';
     import { AppItemType } from '@/types/apps';
 
-    export default defineComponent({
-        name: 'Sidebar',
-        components: { AvatarImg },
-        setup() {
-            const apps: Array<AppItemType> = [
-                {
-                    name: AppType.Whisper,
-                    icon: '/whisper.svg',
-                    enabled: true,
-                },
-                {
-                    name: AppType.Quantum,
-                    icon: '/quantum.svg',
-                    enabled: true,
-                },
-                // {
-                //     name: AppType.Forum,
-                //     icon: 'fas fa-stream',
-                //     enabled: true,
-                // },
-                {
-                    name: AppType.Glass,
-                    icon: '/glass.svg',
-                    enabled: true,
-                },
-                {
-                    name: AppType.Kutana,
-                    icon: '/kutana.svg',
-                    enabled: true,
-                },
-                // {
-                //     name: AppType.Meetings,
-                //     icon: 'fas fa-video',
-                // },
-            ];
-            const router = useRouter();
-
-            const currentRoute = computed(() => router.currentRoute.value);
-
-            const changePage = (name: string) => {
-                router.push({ name });
-            };
-
-            const { user } = useAuthState();
-
-            const toggleShowUserConfigDialog = () => {
-                console.log('Showing user config dialog: ', showUserConfigDialog.value);
-                showUserConfigDialog.value = !showUserConfigDialog.value;
-
-                console.log('Showing user config dialog: ', showUserConfigDialog.value);
-            };
-
-            return {
-                currentRoute,
-                apps,
-                changePage,
-                user,
-                showUserConfigDialog,
-                router,
-                toggleShowUserConfigDialog,
-            };
+    const apps: Array<AppItemType> = [
+        {
+            name: AppType.Whisper,
+            icon: '/whisper.svg',
+            enabled: true,
         },
-    });
+        {
+            name: AppType.Quantum,
+            icon: '/quantum.svg',
+            enabled: true,
+        },
+        // {
+        //     name: AppType.Forum,
+        //     icon: 'fas fa-stream',
+        //     enabled: true,
+        // },
+        {
+            name: AppType.Glass,
+            icon: '/glass.svg',
+            enabled: true,
+        },
+        {
+            name: AppType.Kutana,
+            icon: '/kutana.svg',
+            enabled: true,
+        },
+        // {
+        //     name: AppType.Meetings,
+        //     icon: 'fas fa-video',
+        // },
+    ];
+    const router = useRouter();
+
+    const currentRoute = computed(() => router.currentRoute.value);
+
+    const changePage = (name: string) => {
+        router.push({ name });
+    };
+
+    const { user } = useAuthState();
+
+    const toggleShowUserConfigDialog = () => {
+        console.log('Showing user config dialog: ', showUserConfigDialog.value);
+        showUserConfigDialog.value = !showUserConfigDialog.value;
+
+        console.log('Showing user config dialog: ', showUserConfigDialog.value);
+    };
 </script>
 
 <style scoped>

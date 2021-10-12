@@ -29,23 +29,15 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent, onMounted } from 'vue';
+<script setup lang="ts">
+    import { computed } from 'vue';
     import { clearImageSrc, getImageSrc } from '@/store/imageStore';
 
-    export default defineComponent({
-        name: 'ImagePreview',
-        setup() {
-            const close = () => {
-                clearImageSrc();
-            };
+    const close = () => {
+        clearImageSrc();
+    };
 
-            return {
-                close,
-                src: getImageSrc(),
-            };
-        },
-    });
+    const src = getImageSrc();
 </script>
 
 <style scoped>

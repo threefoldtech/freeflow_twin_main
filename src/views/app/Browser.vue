@@ -22,7 +22,7 @@
             appLayout,
         },
 
-        setup({}, ctx) {
+        setup() {
             const iframeUrl = ref('');
 
             onMounted(() => {

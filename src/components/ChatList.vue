@@ -158,7 +158,7 @@
                 <h1>Invite someone to chat</h1>
             </template>
 
-            <add-contact @closeDialog="sendUpdate(false)"></add-contact>
+            <addContact @closeDialog="sendUpdate(false)"></addContact>
         </Dialog>
     </section>
 </template>
