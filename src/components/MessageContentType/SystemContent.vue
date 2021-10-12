@@ -27,7 +27,7 @@
             JOIN
         </button>
     </div>
-    <div v-else class="justify-around flex self-center mb-4">
+    <div v-else class="text-xs justify-around flex self-center mb-4">
         <u
             ><i>{{ message.body.message }}</i></u
         >

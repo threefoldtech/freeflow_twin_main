@@ -6,7 +6,7 @@
                 <span>Loading more messages</span>
             </div>
             <div v-for="(message, i) in chat.messages">
-                <div v-if="showDivider(chat, i)" class="grey--text text-sm text-center p-4">
+                <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
 
