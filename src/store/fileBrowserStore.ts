@@ -163,8 +163,9 @@ export const downloadFiles = async () => {
         selectedPaths.value.map(async f => {
             const result = await Api.downloadFile(f.path);
             if (result.status !== 200 && result.status !== 201) throw new Error('Could not download file');
-
-            fileDownload(result.data, f.fullName);
+            let itemName = f.fullName;
+            if (f.isDirectory) itemName += ".zip";
+            fileDownload(result.data, itemName);
             selectedPaths.value = [];
         })
     );
@@ -578,7 +579,7 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
-export const getFullFolderSkeleton = async () => {};
+export const getFullFolderSkeleton = async () => { };
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
