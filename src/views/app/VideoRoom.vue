@@ -21,29 +21,17 @@
     </iframe>
 </template>
 
-<script lang="ts">
-    import appLayout from '../../layout/AppLayout.vue';
+<script setup lang="ts">
+    import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent, computed } from 'vue';
     import { useAuthState } from '../../store/authStore';
     import { useRoute } from 'vue-router';
 
-    export default defineComponent({
-        name: 'Apps',
-        components: {
-            appLayout,
-        },
-        setup() {
-            const { user } = useAuthState();
-            const route = useRoute();
+    const { user } = useAuthState();
+    const route = useRoute();
 
-            const computedUrl = computed(() => {
-                return `https://freeflowconnect.threefold.me/?roomName=${route.params.id}&username=${user.id}.3bot`;
-            });
-
-            return {
-                computedUrl,
-            };
-        },
+    const computedUrl = computed(() => {
+        return `https://freeflowconnect.threefold.me/?roomName=${route.params.id}&username=${user.id}.3bot`;
     });
 </script>
 

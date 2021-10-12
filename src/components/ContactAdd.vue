@@ -17,12 +17,12 @@
             </a>
         </div>
         <div v-if="isActive('user')" class="flex flex-col">
-            <user-table
+            <UserTable
                 :data="possibleUsers"
                 focus
                 placeholder="Search for user..."
                 @addContact="contactAdd"
-            ></user-table>
+            ></UserTable>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
                     class="
@@ -156,13 +156,13 @@
                 </div>
             </div>
             <div>
-                <user-table-group
+                <UserTableGroup
                     v-model="usernameInGroupAdd"
                     :data="contacts"
                     :error="usernameAddError"
                     :usersInGroup="usersInGroup"
                     placeholder="Search for user..."
-                ></user-table-group>
+                ></UserTableGroup>
             </div>
 
             <div class="flex mt-4 justify-end w-full">
@@ -203,8 +203,8 @@
     import config from '@/config';
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import userTable from '@/components/UserTable.vue';
-    import userTableGroup from '@/components/UserTableGroup.vue';
+    import UserTable from '@/components/UserTable.vue';
+    import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
 
