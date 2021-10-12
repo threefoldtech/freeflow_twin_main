@@ -227,12 +227,12 @@
                             <div class="place-items-center grid relative">
                                 <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" class="-mt-7" />
                             </div>
-                            <h2 class="my-3 break-all text-center w-full overflow-y-auto max-h-28 text-xl">
+                            <h2 class="my-3 break-all text-center w-full overflow-y-auto max-h-28 text-lg">
                                 {{ chat.name }}
                             </h2>
                             <p
                                 v-if="!chat.isGroup"
-                                class="break-all w-full overflow-y-auto font-bold text-center text-gray-300"
+                                class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
                             >
                                 {{ status?.status || 'No status found' }}
                             </p>

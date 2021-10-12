@@ -37,7 +37,7 @@
                     >
                         <i class="fas fa-plus"></i>
                     </button>
-                    <h1 class="collapsed-bar:hidden pt-1">Messages</h1>
+                    <h1 class="collapsed-bar:hidden pt-1 text-lg">Messages</h1>
                 </div>
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
                     <button
