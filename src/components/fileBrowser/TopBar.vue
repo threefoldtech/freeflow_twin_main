@@ -22,15 +22,15 @@
                 />
             </div>
             <div class="flex flex-row items-center">
-                <options v-if="!sharedDir || selectedPaths.length > 0"></options>
-                <buttons v-if="!sharedDir"></buttons>
+                <SelectedOptions v-if="!sharedDir || selectedPaths.length > 0"></SelectedOptions>
+                <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
         </div>
-        <breadcrumbs></breadcrumbs>
+        <Breadcrumbs></Breadcrumbs>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
     import {
         selectedPaths,
@@ -60,73 +60,45 @@
     import { SearchIcon } from '@heroicons/vue/solid';
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
-    export default defineComponent({
-        name: 'TopBar',
-        components: {
-            Button,
-            jdialog: Dialog,
-            breadcrumbs: Breadcrumbs,
-            options: SelectedOptions,
-            buttons: MainActionButtons,
-            SearchIcon,
-        },
-        setup() {
-            let debounce;
-            const parts = computed(() => currentDirectory.value.split('/'));
-            onBeforeMount(() => {
-                retrievechats();
-            });
-            function debounceSearch(event) {
-                clearTimeout(debounce);
-                debounce = setTimeout(() => {
-                    if (searchDirValue.value === '') {
-                        searchResults.value = [];
-                        return;
-                    }
-                    searchDir();
-                }, 600);
-            }
-            const onDragEnter = (e: Event, i: number) => {
-                if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
-                (e.target as HTMLElement).classList.add('bg-accent-300');
-                (e.target as HTMLElement).classList.add('text-white');
-            };
-            const onDragLeave = (e: Event, i: number) => {
-                if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
-                (e.target as HTMLElement).classList.remove('bg-accent-300');
-                (e.target as HTMLElement).classList.remove('text-white');
-            };
-            const onDrop = (e: Event, i: number) => {
-                if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
-                let path = '/';
-                if (i > 0) {
-                    const parts = currentDirectory.value.split('/');
-                    parts.splice(i + 1);
-                    path = parts.join('/');
-                }
-                (e.target as HTMLElement).classList.remove('bg-accent-300');
-                (e.target as HTMLElement).classList.remove('text-white');
-                moveFiles(path);
-                selectedPaths.value = [];
-            };
-            return {
-                goToHome,
-                goBack,
-                goToAPreviousDirectory,
-                currentDirectory,
-                searchDirValue,
-                searchDir,
-                searchResults,
-                debounceSearch,
-                isDraggingFiles,
-                onDragEnter,
-                onDragLeave,
-                onDrop,
-                createNotification,
-                sharedDir,
-            };
-        },
+
+    let debounce;
+    const parts = computed(() => currentDirectory.value.split('/'));
+    onBeforeMount(() => {
+        retrievechats();
     });
+    function debounceSearch(event) {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+            if (searchDirValue.value === '') {
+                searchResults.value = [];
+                return;
+            }
+            searchDir();
+        }, 1);
+    }
+    const onDragEnter = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
+        (e.target as HTMLElement).classList.add('bg-accent-300');
+        (e.target as HTMLElement).classList.add('text-white');
+    };
+    const onDragLeave = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
+        (e.target as HTMLElement).classList.remove('bg-accent-300');
+        (e.target as HTMLElement).classList.remove('text-white');
+    };
+    const onDrop = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
+        let path = '/';
+        if (i > 0) {
+            const parts = currentDirectory.value.split('/');
+            parts.splice(i + 1);
+            path = parts.join('/');
+        }
+        (e.target as HTMLElement).classList.remove('bg-accent-300');
+        (e.target as HTMLElement).classList.remove('text-white');
+        moveFiles(path);
+        selectedPaths.value = [];
+    };
 </script>
 
 <style scoped>
