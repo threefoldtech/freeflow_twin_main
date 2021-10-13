@@ -84,7 +84,6 @@
 
                 <suspense>
                     <textarea
-                        ref="statusInput"
                         v-model="userStatus"
                         style="resize: none"
                         class="
