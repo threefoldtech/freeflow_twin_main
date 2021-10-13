@@ -21,7 +21,7 @@
             <p v-for="(error, idx) in createFolderErrors" :key="idx" class="text-sm font-medium text-red-500">
                 {{ error }}
             </p>
-            <label for="newFolder" class="block text-sm font-medium text-gray-700">Folder name</label>
+            <label class="block text-sm font-medium text-gray-700" for="newFolder">Folder name</label>
             <div class="relative">
                 <input
                     id="newFolder"
@@ -41,8 +41,8 @@
                     placeholder="New folder name"
                     type="text"
                 />
-                <div @click="clearFolderInput" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer">
-                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" @click="clearFolderInput">
+                    <i aria-hidden="true" class="fa fa-window-close h-5 w-5 text-gray-400" />
                 </div>
             </div>
         </div>
@@ -93,159 +93,25 @@
     import Button from '@/components/Button.vue';
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
 
-    export default defineComponent({
-        name: 'MainActionButtons',
-        components: {
-            Button,
-            Dialog,
-            FileDropArea,
-            DocumentTextIcon,
-            XIcon,
-        },
-        setup() {
-            const showCreateFolderDialog = ref(false);
-            const showCreateFileDialog = ref(false);
-            const newFolderInput = ref<HTMLInputElement>();
-            const newFileInput = ref<any>(undefined);
-            const selectedFiles = ref<File[]>([]);
-            const newFileInputArray = ref<File[]>([]);
-            const createFolderErrors = ref<string[]>([]);
-            const manualContactAdd = ref<string>('');
-            const fileUploadErrors = ref<string[]>([]);
+    const showCreateFolderDialog = ref(false);
+    const showCreateFileDialog = ref(false);
+    const newFolderInput = ref<HTMLInputElement>();
+    const newFileInput = ref<any>(undefined);
+    const selectedFiles = ref<File[]>([]);
+    const newFileInputArray = ref<File[]>([]);
+    const createFolderErrors = ref<string[]>([]);
+    const manualContactAdd = ref<string>('');
+    const fileUploadErrors = ref<string[]>([]);
 
-            watch(manualContactAdd, () => {
-                createFolderErrors.value = [];
-                if (manualContactAdd.value.includes('/')) {
-                    createFolderErrors.value.push("'/' is not allowed in folder names.");
-                }
-                if (manualContactAdd.value.length >= 50) {
-                    createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
-                }
-            });
-
-            const updateCreateFolderDialog = (val: boolean) => {
-                createFolderErrors.value = [];
-                if (!val) {
-                    showCreateFolderDialog.value = false;
-                    return;
-                }
-
-                if (!newFolderInput.value) return;
-                if (!newFolderInput.value.value) {
-                    createFolderErrors.value.push('Give the folder a name.');
-                    newFolderInput.value.classList.add('border-red-500');
-                    return;
-                }
-
-                if (manualContactAdd.value.includes('/')) {
-                    createFolderErrors.value.push("'/' is not allowed in folder names.");
-                }
-                if (manualContactAdd.value.length >= 50) {
-                    createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
-                }
-
-                if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
-
-                createDirectory(newFolderInput.value.value);
-                showCreateFolderDialog.value = false;
-            };
-
-            const deleteFile = (file: File) => {
-                selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
-
-                newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
-                newFileInput.value.value = newFileInputArray.value;
-            };
-
-            const updateCreateFileDialog = (val: boolean) => {
-                fileUploadErrors.value = [];
-                if (!val) {
-                    showCreateFileDialog.value = false;
-                    return;
-                }
-
-                if (!selectedFiles.value?.length) {
-                    fileUploadErrors.value.push('Please upload atleast one file.');
-                    return;
-                }
-                uploadFiles(selectedFiles.value);
-                clearFiles();
-                showCreateFileDialog.value = false;
-            };
-
-            const handleDragAndDrop = (files: File[]) => {
-                selectedFiles.value.push(...files);
-            };
-
-            const clearFiles = () => {
-                selectedFiles.value = [];
-                newFileInput.value.value = null;
-            };
-            const clearFolderInput = () => {
-                newFolderInput.value.value = '';
-            };
-
-            const handleFileSelectChange = () => {
-                newFileInputArray.value = Array.from(newFileInput.value?.files);
-                newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
-            };
-
-            return {
-                showCreateFolderDialog,
-                showCreateFileDialog,
-                newFolderInput,
-                newFileInput,
-                newFileInputArray,
-                handleDragAndDrop,
-                updateCreateFolderDialog,
-                handleFileSelectChange,
-                selectedFiles,
-                clearFiles,
-                updateCreateFileDialog,
-                deleteFile,
-                sharedDir,
-                createFolderErrors,
-                manualContactAdd,
-                fileUploadErrors,
-                clearFolderInput,
-            };
-        },
-    });
-
-    const updateCreateFolderDialog = (val: boolean) => {
+    watch(manualContactAdd, () => {
         createFolderErrors.value = [];
-        if (!val) {
-            showCreateFolderDialog.value = false;
-            return;
-        }
-
-        if (!newFolderInput.value) return;
-        if (!newFolderInput.value.value) {
-            createFolderErrors.value.push('Give the folder a name.');
-            newFolderInput.value.classList.add('border-red-500');
-            return;
-        }
-
-        if (addFolderName.value.includes('/')) {
+        if (manualContactAdd.value.includes('/')) {
             createFolderErrors.value.push("'/' is not allowed in folder names.");
         }
-        if (addFolderName.value.length >= 50) {
+        if (manualContactAdd.value.length >= 50) {
             createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
         }
-
-        if (addFolderName.value.includes('/') || addFolderName.value.length >= 50) return;
-
-        createDirectory(newFolderInput.value.value);
-        addFolderName.value = '';
-        showCreateFolderDialog.value = false;
-    };
-
-    const deleteFile = (file: File) => {
-        selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
-
-        newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
-        newFileInput.value.value = newFileInputArray.value;
-    };
+    });
 
     const updateCreateFileDialog = (val: boolean) => {
         fileUploadErrors.value = [];
@@ -271,10 +137,47 @@
         selectedFiles.value = [];
         newFileInput.value.value = null;
     };
+    const clearFolderInput = () => {
+        newFolderInput.value.value = '';
+    };
 
     const handleFileSelectChange = () => {
         newFileInputArray.value = Array.from(newFileInput.value?.files);
         newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+    };
+
+    const updateCreateFolderDialog = (val: boolean) => {
+        createFolderErrors.value = [];
+        if (!val) {
+            showCreateFolderDialog.value = false;
+            return;
+        }
+
+        if (!newFolderInput.value) return;
+        if (!newFolderInput.value.value) {
+            createFolderErrors.value.push('Give the folder a name.');
+            newFolderInput.value.classList.add('border-red-500');
+            return;
+        }
+
+        if (manualContactAdd.value.includes('/')) {
+            createFolderErrors.value.push("'/' is not allowed in folder names.");
+        }
+        if (manualContactAdd.value.length >= 50) {
+            createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
+        }
+
+        if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
+
+        createDirectory(newFolderInput.value.value);
+        showCreateFolderDialog.value = false;
+    };
+
+    const deleteFile = (file: File) => {
+        selectedFiles.value.splice(selectedFiles.value.indexOf(file), 1);
+
+        newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
+        newFileInput.value.value = newFileInputArray.value;
     };
 </script>
 
