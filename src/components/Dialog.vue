@@ -1,7 +1,7 @@
 <template>
     <transition name="fade">
         <div
-            v-if="modelValue"
+            v-if="props.modelValue"
             class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
             @click="$emit('update-model-value', false)"
             @keydown.esc="$emit('update-model-value', false)"
@@ -86,7 +86,7 @@
         cancelButtonText?: string;
     }
 
-    withDefaults(defineProps<IProps>(), {
+    const props = withDefaults(defineProps<IProps>(), {
         modelValue: false,
         noActions: false,
         okButtonText: 'Ok',

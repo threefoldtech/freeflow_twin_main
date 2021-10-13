@@ -11,35 +11,20 @@
     </app-layout>
 </template>
 
-<script lang="ts">
-    import appLayout from '../../layout/AppLayout.vue';
+<script setup lang="ts">
+    import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref, onMounted } from 'vue';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
 
-    export default defineComponent({
-        name: 'Apps',
-        components: {
-            appLayout,
-        },
+    const iframeUrl = ref('');
 
-        setup({}, ctx) {
-            const iframeUrl = ref('');
-
-            onMounted(() => {
-                browse();
-            });
-
-            function browse() {
-                iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
-            }
-
-            return {
-                iframeUrl,
-                hasBrowserBeenStartedOnce,
-                //hasBrowserBeenStartedOnce,
-            };
-        },
+    onMounted(() => {
+        browse();
     });
+
+    function browse() {
+        iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
+    }
 </script>
 
 <style scoped type="text/css"></style>

@@ -148,7 +148,7 @@
             </div>
         </div>
 
-        <jdialog
+        <Dialog
             :modelValue="showAddUserDialog"
             noActions
             @closeDialog="sendUpdate(false)"
@@ -157,19 +157,20 @@
             <template v-slot:title>
                 <h1>Invite someone to chat</h1>
             </template>
-
-            <add-contact @closeDialog="sendUpdate(false)"></add-contact>
-        </jdialog>
+            <template v-slot:default>
+                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+            </template>
+        </Dialog>
     </section>
 </template>
 
-<script lang="ts" setup>
+<script setup lang="ts">
     import moment from 'moment';
     import { useSocketActions } from '@/store/socketStore';
     import { defineComponent, ref, computed, onBeforeMount, inject } from 'vue';
     import { usechatsState, usechatsActions } from '@/store/chatStore';
     import { useAuthState, useAuthActions } from '@/store/authStore';
-    import addContact from '@/components/ContactAdd.vue';
+    import AddContact from '@/components/ContactAdd.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import ChatRequestList from '@/components/ChatRequestList.vue';
     import Dialog from '@/components/Dialog.vue';

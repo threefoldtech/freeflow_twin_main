@@ -13,8 +13,8 @@
     </appLayout>
 </template>
 
-<script lang="ts">
-    import appLayout from '../../layout/AppLayout.vue';
+<script setup lang="ts">
+    import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
@@ -24,31 +24,13 @@
     import { useRoute, useRouter } from 'vue-router';
     import { showShareDialog } from '@/services/dialogService';
 
-    export default defineComponent({
-        name: 'Apps',
-        components: {
-            TopBar,
-            appLayout,
-            FileTable,
-            ResultsTable,
-            SharedContent,
-        },
-
-        setup({}, ctx) {
-            const route = useRoute();
-            onBeforeMount(async () => {
-                const path = atob(<string>route.params.path);
-                const item = await getFile(path);
-                selectItem(item);
-                currentDirectory.value = '/';
-                showShareDialog.value = true;
-            });
-
-            return {
-                searchResults,
-                sharedDir,
-            };
-        },
+    const route = useRoute();
+    onBeforeMount(async () => {
+        const path = atob(<string>route.params.path);
+        const item = await getFile(path);
+        selectItem(item);
+        currentDirectory.value = '/';
+        showShareDialog.value = true;
     });
 </script>
 

@@ -32,7 +32,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { defineComponent, watch } from 'vue';
     import Sidebar from '@/components/Sidebar.vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
@@ -41,30 +41,22 @@
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
 
-    export default defineComponent({
-        name: 'AppLayout',
-        components: { NotificationSection, Sidebar, Topbar, UserConfigDialog, ImagePreview },
-        setup({}, ctx) {
-            const { notification } = useSocketState();
+    const { notification } = useSocketState();
 
-            let audio = null;
+    let audio = null;
 
-            watch(notification, (newNot: any, oldNot: any) => {
-                var focused = document.hasFocus();
+    watch(notification, (newNot: any, oldNot: any) => {
+        var focused = document.hasFocus();
 
-                if (focused) {
-                    return;
-                }
+        if (focused) {
+            return;
+        }
 
-                if (audio === null) {
-                    audio = new Audio(`/${newNot.sound}`);
-                }
+        if (audio === null) {
+            audio = new Audio(`/${newNot.sound}`);
+        }
 
-                audio.play();
-            });
-
-            return {};
-        },
+        audio.play();
     });
 </script>
 

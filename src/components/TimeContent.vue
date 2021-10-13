@@ -2,24 +2,14 @@
     {{ timeString }}
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { defineComponent, computed } from 'vue';
     import moment from 'moment';
 
-    export default defineComponent({
-        name: 'TimeContent',
-        props: {
-            time: { type: Date },
-        },
-        setup(props) {
-            const timeString = computed(() => {
-                return moment(props.time).fromNow();
-            });
+    const props = defineProps<{ time: Date }>();
 
-            return {
-                timeString,
-            };
-        },
+    const timeString = computed(() => {
+        return moment(props.time).fromNow();
     });
 </script>
 

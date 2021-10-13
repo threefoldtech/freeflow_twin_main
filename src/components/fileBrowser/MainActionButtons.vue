@@ -40,7 +40,6 @@
                     name="newFolder"
                     placeholder="New folder name"
                     type="text"
-                    @input="disableSlash"
                 />
             </div>
         </div>

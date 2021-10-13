@@ -1,5 +1,5 @@
 import { readonly, ref } from 'vue';
-const showSideBar = ref(false);
+export const showSideBar = ref(false);
 
 export const getShowSideBar = () => readonly(showSideBar);
 export const toggleSideBar = () => {

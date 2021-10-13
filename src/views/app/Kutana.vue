@@ -10,34 +10,21 @@
     </app-layout>
 </template>
 
-<script lang="ts">
-    import appLayout from '../../layout/AppLayout.vue';
+<script setup lang="ts">
+    import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref } from 'vue';
     import { onMounted, onBeforeMount } from 'vue';
 
-    export default defineComponent({
-        name: 'Kutana',
-        components: {
-            appLayout,
-        },
+    const iframeUrl = ref('');
 
-        setup({}, ctx) {
-            let iframeUrl = ref('');
-
-            onMounted(() => {
-                browse();
-            });
-
-            function browse() {
-                iframeUrl.value = `https://freeflowconnect.threefold.me/`;
-                console.log(iframeUrl.value);
-            }
-
-            return {
-                iframeUrl,
-            };
-        },
+    onMounted(() => {
+        browse();
     });
+
+    function browse() {
+        iframeUrl.value = `https://freeflowconnect.threefold.me/`;
+        console.log(iframeUrl.value);
+    }
 </script>
 
 <style scoped type="text/css"></style>

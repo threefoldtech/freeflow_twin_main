@@ -92,95 +92,68 @@
         </div>
     </div>
 </template>
-<script lang="ts">
+<script setup lang="ts">
     import { Contact } from '@/types';
-    import { defineComponent, ref, computed, onMounted, PropType } from 'vue';
+    import { defineComponent, ref, computed, onMounted, PropType, defineProps } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
-    export default defineComponent({
-        components: { AvatarImg, SearchIcon },
-        props: {
-            modelValue: {
-                type: String,
-                required: false,
-            },
-            placeholder: {
-                type: String,
-                required: false,
-                default: 'Enter text here.',
-            },
-            data: {
-                type: Array,
-                required: true,
-            },
-            usersInGroup: {
-                type: Array as PropType<Contact[]>,
-                required: true,
-            },
-            error: {
-                type: String,
-                default: '',
-            },
-            focus: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        emits: ['update:modelValue', 'clicked'],
 
-        setup(props, { emit }) {
-            const chosenOption = ref('');
-            const searchTerm = ref('');
+    interface IProps {
+        modelValue?: string;
+        placeholder: string;
+        data: any[];
+        usersInGroup: Contact[];
+        error: string;
+        focus: boolean;
+    }
 
-            const reset = () => {
-                emit('update:modelValue', '');
-                chosenOption.value = '';
-                searchTerm.value = '';
-            };
-
-            const handleInput = evt => {
-                emit('update:modelValue', evt.target.value);
-            };
-
-            const handleClick = item => {
-                console.log(chosenOption.value);
-                chosenOption.value = item.id;
-                searchTerm.value = item.id;
-                emit('update:modelValue', item.id);
-                emit('clicked');
-            };
-
-            const searchResults = () => {
-                return props.data.filter((item: Contact) => {
-                    return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
-                });
-            };
-
-            const userIsInGroup = (contact: Contact) => {
-                const user = props.usersInGroup.find(c => c.id == contact.id);
-                if (user) {
-                    return true;
-                }
-                return false;
-            };
-
-            const removeUserFromGroup = (contact: Contact) => {
-                const index = props.usersInGroup.findIndex(u => u.id == contact.id);
-                props.usersInGroup.splice(index, 1);
-            };
-
-            return {
-                reset,
-                handleInput,
-                handleClick,
-                chosenOption,
-                searchTerm,
-                searchResults,
-                userIsInGroup,
-                removeUserFromGroup,
-            };
-        },
+    const props = withDefaults(defineProps<IProps>(), {
+        placeholder: 'Enter text here.',
+        error: '',
+        focus: false,
     });
+
+    const emit = defineEmits(['update:modelValue', 'clicked']);
+
+    const chosenOption = ref('');
+    const searchTerm = ref('');
+
+    const reset = () => {
+        emit('update:modelValue', '');
+        chosenOption.value = '';
+        searchTerm.value = '';
+    };
+
+    const handleInput = evt => {
+        emit('update:modelValue', evt.target.value);
+    };
+
+    const handleClick = item => {
+        console.log(chosenOption.value);
+        chosenOption.value = item.id;
+        searchTerm.value = item.id;
+        emit('update:modelValue', item.id);
+        emit('clicked');
+    };
+
+    const searchResults = () => {
+        return props.data.filter((item: Contact) => {
+            return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
+        });
+    };
+
+    const userIsInGroup = (contact: Contact) => {
+        const user = props.usersInGroup.find(c => c.id == contact.id);
+        if (user) {
+            return true;
+        }
+        return false;
+    };
+
+    const removeUserFromGroup = (contact: Contact) => {
+        const index = props.usersInGroup.findIndex(u => u.id == contact.id);
+        props.usersInGroup.splice(index, 1);
+    };
 </script>
 
 <style scoped>
