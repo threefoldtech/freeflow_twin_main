@@ -1,11 +1,11 @@
 <template>
     <section
-        class="bg-white w-full flex flex-col overflow-hidden"
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,
             'md:w-[400px]': !collapsed,
         }"
+        class="bg-white w-full flex flex-col overflow-hidden"
     >
         <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
             <div
@@ -21,7 +21,6 @@
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
-                        @click="showAddUserDialog = true"
                         class="
                             bg-primary
                             hover:bg-accent-800
@@ -34,6 +33,7 @@
                             mx-2
                             collapsed-bar:w-10 collapsed-bar:h-10
                         "
+                        @click="showAddUserDialog = true"
                     >
                         <i class="fas fa-plus"></i>
                     </button>
@@ -41,6 +41,9 @@
                 </div>
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
                     <button
+                        :class="{
+                            'mr-2': !collapsed,
+                        }"
                         class="
                             rounded-full
                             w-8
@@ -50,9 +53,6 @@
                             flex
                             justify-center
                         "
-                        :class="{
-                            'mr-2': !collapsed,
-                        }"
                         @click="
                             collapsed = !collapsed;
                             searchValue = '';
@@ -89,10 +89,9 @@
             </div>
             <div v-if="!collapsed" class="mt-1 mx-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                    <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                    type="text"
                     v-model="searchValue"
                     class="
                         focus:ring-primary focus:border-primary
@@ -104,6 +103,7 @@
                         rounded-md
                     "
                     placeholder="Search"
+                    type="text"
                 />
                 <div
                     v-if="!!searchValue"
@@ -129,15 +129,17 @@
                     class="text-center collapsed-bar:hidden mt-4"
                 >
                     <p>No messages yet</p>
-                    <button @click="sendUpdate(true)" class="mt-2 border rounded-full px-4">Add a contact</button>
+                    <button class="mt-2 border rounded-full px-4" @click="sendUpdate(true)">Add a contact</button>
                 </div>
                 <div
-                    class="flex flex-col justify-center items-center pt-2 px-2 collapsed-bar:px-0"
                     v-if="filteredChats && filteredChats.length"
+                    class="flex flex-col justify-center items-center pt-2 px-2 collapsed-bar:px-0"
                 >
                     <ChatCard
                         v-for="chat in filteredChats"
                         :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
+                        :chat="chat"
+                        :collapsed="collapsed"
                         class="
                             w-full
                             rounded-lg
@@ -148,35 +150,34 @@
                             cursor-pointer
                         "
                         @selectChat="setSelected(chat.chatId)"
-                        :collapsed="collapsed"
-                        :chat="chat"
                     />
                 </div>
             </div>
         </div>
 
-        <jdialog
+        <Dialog
             :modelValue="showAddUserDialog"
-            @update-model-value="sendUpdate"
-            @closeDialog="sendUpdate(false)"
             noActions
+            @closeDialog="sendUpdate(false)"
+            @update-model-value="sendUpdate"
         >
             <template v-slot:title>
                 <h1>Invite someone to chat</h1>
             </template>
-
-            <add-contact @closeDialog="sendUpdate(false)"> </add-contact>
-        </jdialog>
+            <template v-slot:default>
+                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+            </template>
+        </Dialog>
     </section>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import moment from 'moment';
     import { useSocketActions } from '@/store/socketStore';
     import { defineComponent, ref, computed, onBeforeMount, inject } from 'vue';
     import { usechatsState, usechatsActions } from '@/store/chatStore';
     import { useAuthState, useAuthActions } from '@/store/authStore';
-    import addContact from '@/components/ContactAdd.vue';
+    import AddContact from '@/components/ContactAdd.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import ChatRequestList from '@/components/ChatRequestList.vue';
     import Dialog from '@/components/Dialog.vue';
@@ -190,95 +191,56 @@
     import { SearchIcon } from '@heroicons/vue/solid';
     import { Dialog as HeadlessUIDialog, DialogOverlay, TransitionRoot } from '@headlessui/vue';
 
-    export default defineComponent({
-        name: 'Apps',
-        props: {
-            modelValue: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        components: {
-            addContact,
-            jdialog: Dialog,
-            ChatCard,
-            AvatarImg,
-            ChatRequestList,
-            SearchIcon,
-            HeadlessUIDialog,
-            DialogOverlay,
-            TransitionRoot,
-        },
-        emits: ['closeDialog'],
-        setup(props, context) {
-            const { chats, chatRequests } = usechatsState();
-            const { retrievechats } = usechatsActions();
-            const collapsed = ref(false);
-            let selectedId = ref('');
+    const props = defineProps<{ modelValue?: boolean }>();
+    const emits = defineEmits(['closeDialog']);
+    const { chats, chatRequests } = usechatsState();
+    const { retrievechats } = usechatsActions();
+    const collapsed = ref(false);
+    let selectedId = ref('');
 
-            const status = computed(() => {
-                return statusList[selectedId.value];
-            });
-
-            const { user } = useAuthState();
-
-            const m = val => moment(val);
-            const searchValue = ref('');
-            let showContacts = ref(false);
-
-            const router = useRouter();
-
-            const setSelected = id => {
-                router.push({ name: 'single', params: { id } });
-            };
-
-            const filteredChats = computed(() => {
-                if (!searchValue.value) {
-                    return chats.value;
-                }
-                return chats.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
-            });
-            onBeforeMount(() => {
-                const { initializeSocket } = useSocketActions();
-                initializeSocket(user.id.toString());
-                retrievechats();
-            });
-
-            const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));
-
-            startFetchStatusLoop(user);
-
-            const filteredChatRequests = computed(() => {
-                const filteredChats = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
-
-                //@ts-ignore
-                return uniqBy(filteredChats, c => c.chatId);
-            });
-
-            const sendUpdate = newVal => {
-                console.log('update it');
-                console.log('test');
-                showAddUserDialog.value = newVal;
-            };
-
-            return {
-                status,
-                selectedId,
-                selectedChat,
-                setSelected,
-                chats,
-                filteredChatRequests,
-                searchValue,
-                filteredChats,
-                showContacts,
-                user,
-                collapsed,
-                m,
-                sendUpdate,
-                showAddUserDialog,
-            };
-        },
+    const status = computed(() => {
+        return statusList[selectedId.value];
     });
+
+    const { user } = useAuthState();
+
+    const m = val => moment(val);
+    const searchValue = ref('');
+    let showContacts = ref(false);
+
+    const router = useRouter();
+
+    const setSelected = id => {
+        router.push({ name: 'single', params: { id } });
+    };
+
+    const filteredChats = computed(() => {
+        if (!searchValue.value) {
+            return chats.value;
+        }
+        return chats.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
+    });
+    onBeforeMount(() => {
+        const { initializeSocket } = useSocketActions();
+        initializeSocket(user.id.toString());
+        retrievechats();
+    });
+
+    const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));
+
+    startFetchStatusLoop(user);
+
+    const filteredChatRequests = computed(() => {
+        const filteredChats = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
+
+        //@ts-ignore
+        return uniqBy(filteredChats, c => c.chatId);
+    });
+
+    const sendUpdate = newVal => {
+        console.log('update it');
+        showAddUserDialog.value = newVal;
+    };
 </script>
 
 <style scoped type="text/css"></style>

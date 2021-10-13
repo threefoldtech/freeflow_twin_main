@@ -8,7 +8,7 @@ import Browser from '@/views/app/Browser.vue';
 import Kutana from '@/views/app/Kutana.vue';
 import Basic from '@/layout/Basic.vue';
 import Chat from '@/views/app/Chat.vue';
-import Single from '@/views/app/Single.vue';
+import Conversation from '@/views/app/Conversation.vue';
 import Callback from '@/views/Callback.vue';
 import Unauthorised from '@/views/Unauthorised.vue';
 import EditFile from '@/views/app/EditFile.vue';
@@ -62,7 +62,7 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: ':id',
                 name: 'single',
-                component: Single,
+                component: Conversation,
                 meta: {
                     back: 'whisper',
                     requiresAuth: true,

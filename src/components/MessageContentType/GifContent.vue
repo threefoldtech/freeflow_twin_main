@@ -4,16 +4,10 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
+    interface IProp {
+        message: Object;
+    }
 
-    export default defineComponent({
-        name: 'GifContent',
-        props: {
-            message: { type: Object, required: true },
-        },
-        setup(props) {
-            return {};
-        },
-    });
+    const props = defineProps<IProp>();
 </script>

@@ -48,30 +48,22 @@
     </Switch>
 </template>
 
-<script>
+<script setup lang="ts">
     import { ref } from 'vue';
     import { Switch } from '@headlessui/vue';
 
-    export default {
-        components: {
-            Switch,
-        },
-        props: {
-            modelValue: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        emits: ['update-model-value'],
-        setup(props, { emit }) {
-            const changeModelValue = e => {
-                preventDefaults(e);
-                emit('update-model-value', !modelValue);
-            };
+    interface IProps {
+        modelValue: boolean;
+    }
 
-            return {
-                changeModelValue,
-            };
-        },
+    const props = withDefaults(defineProps<IProps>(), {
+        modelValue: true,
+    });
+
+    const emit = defineEmits(['update-model-value']);
+
+    const changeModelValue = e => {
+        e.preventDefault();
+        emit('update-model-value', !props.modelValue);
     };
 </script>

@@ -1,7 +1,7 @@
 <template>
     <appLayout>
         <template v-slot:top>
-            <div v-if="chat" class="w-full flex md:px-4 text-white">
+            <div v-if="chat" :class="{ 'group-chat': chat?.isGroup }" class="w-full flex md:px-4 text-white">
                 <div class="place-items-center grid mr-4">
                     <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
                 </div>
@@ -9,18 +9,17 @@
                     <p class="font-bold font overflow-hidden overflow-ellipsis">
                         {{ chat.name }}
                     </p>
-                    <p v-if="!chat.isGroup && !blocked" class="font-light">
+                    <p v-if="!blocked" class="font-light group-chat:hidden">
                         {{ status?.isOnline ? 'Is online' : 'Is offline' }}
                     </p>
-                    <p v-if="!chat.isGroup && blocked" class="text-red-500">BLOCKED</p>
-                    <p v-if="chat.isGroup" class="font-thin">Group chat</p>
+                    <p v-if="blocked" class="group-chat:hidden text-red-500">BLOCKED</p>
+                    <p class="font-thin hidden group-chat:span">Group chat</p>
                 </div>
             </div>
             <div v-else>Loading</div>
         </template>
-
         <template v-slot:actions>
-            <div>
+            <div :class="{ 'group-chat': chat?.isGroup }">
                 <div class="relative">
                     <button class="text-lg text-white md:hidden" @click="showMenu = true">
                         <i class="fas fa-ellipsis-v"></i>
@@ -85,7 +84,7 @@
             </div>
         </template>
         <template v-slot:default>
-            <div class="flex flex-row relative h-full w-full">
+            <div :class="{ 'group-chat': chat?.isGroup }" class="flex flex-row relative h-full w-full">
                 <ChatList class="hidden md:inline-block" />
                 <div
                     v-if="chat"
@@ -117,7 +116,7 @@
                                 </p>
                                 <p v-if="!blocked" class="font-thin">
                                     {{ getChatStatus.message }}
-                                    <span v-if="!chat.isGroup && getChatStatus?.lastSeen">
+                                    <span v-if="getChatStatus?.lastSeen" class="group-chat:hidden">
                                         , active <TimeContent :time="getChatStatus.lastSeen.toDate()" />
                                     </span>
                                 </p>
@@ -153,7 +152,7 @@
                             <template v-slot:viewAnchor>
                                 <div
                                     id="viewAnchor"
-                                    ref="viewAnchor"
+                                    :ref="viewAnchor"
                                     style="
                                         height: 40vh;
                                         position: absolute;
@@ -249,7 +248,7 @@
             </div>
         </template>
     </appLayout>
-    <jdialog v-model="showDialog" class="max-w-10" noActions @update-model-value="showDialog = false">
+    <Dialog v-model="showDialog" class="max-w-10" noActions @update-model-value="showDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Blocking</h1>
         </template>
@@ -265,8 +264,8 @@
                 Block
             </button>
         </div>
-    </jdialog>
-    <jdialog v-model="showDeleteDialog" class="max-w-10" noActions @update-model-value="showDeleteDialog = false">
+    </Dialog>
+    <Dialog v-model="showDeleteDialog" class="max-w-10" noActions @update-model-value="showDeleteDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Deleting Conversation</h1>
         </template>
@@ -285,13 +284,13 @@
                 Delete
             </button>
         </div>
-    </jdialog>
+    </Dialog>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { useScrollActions, useScrollState } from '@/store/scrollStore';
 
-    import appLayout from '../../layout/AppLayout.vue';
+    import AppLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
     import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
     import { useContactsState } from '@/store/contactStore';
@@ -321,298 +320,237 @@
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
 
-    export default defineComponent({
-        name: 'ChatView',
-        components: {
-            TimeContent,
-            FileDropArea,
-            Button,
-            MessageBox,
-            AvatarImg,
-            ChatInput,
-            MessageCard,
-            jdialog: Dialog,
-            appLayout,
-            GroupManagement,
-            ChatList,
-        },
-        setup(props) {
-            const route = useRoute();
-            let selectedId = ref(<string>route.params.id);
-            watch(
-                () => route.params.id,
-                id => {
-                    selectedId.value = <string>id;
-                    scrollToBottom(true);
-                }
-            );
+    const route = useRoute();
+    let selectedId = ref(<string>route.params.id);
+    watch(
+        () => route.params.id,
+        id => {
+            selectedId.value = <string>id;
+            scrollToBottom(true);
+        }
+    );
 
-            const { retrievechats, sendFile } = usechatsActions();
-            onBeforeMount(retrievechats);
+    const { retrievechats, sendFile } = usechatsActions();
+    onBeforeMount(retrievechats);
 
-            const { contacts } = useContactsState();
-            const { chats } = usechatsState();
-            const { sendMessage } = usechatsActions();
-            const { user } = useAuthState();
-            const m = val => moment(val);
-            const showMenu = ref(false);
-            const file = ref();
-            const router = useRouter();
-            let showDialog = ref(false);
-            let showDeleteDialog = ref(false);
-            let showInfo = ref(false);
-            const showRemoveUserDialog = ref(false);
-            const toBeRemovedUser = ref();
-            const propRefs = toRefs(props);
-            const truncate = (value, limit = 20) => {
-                if (value.length > limit) {
-                    value = value.substring(0, limit - 3) + '...';
-                }
-                return value;
+    const { contacts } = useContactsState();
+    const { chats } = usechatsState();
+    const { sendMessage } = usechatsActions();
+    const { user } = useAuthState();
+    const m = val => moment(val);
+    const showMenu = ref(false);
+    const file = ref();
+    const router = useRouter();
+    let showDialog = ref(false);
+    let showDeleteDialog = ref(false);
+    let showInfo = ref(false);
+    const showRemoveUserDialog = ref(false);
+    const toBeRemovedUser = ref();
+
+    const truncate = (value, limit = 20) => {
+        if (value.length > limit) {
+            value = value.substring(0, limit - 3) + '...';
+        }
+        return value;
+    };
+
+    const getMessagesSortedByUser = computed(() => {
+        let chatBlockIndex = 0;
+
+        return chat.value.messages.reduce((acc: any, message) => {
+            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
+                acc[chatBlockIndex].messages.push(message);
+                return acc;
+            } else {
+                chatBlockIndex++;
+            }
+
+            acc[chatBlockIndex] = {
+                user: <string>message.from,
+                messages: [],
             };
+            acc[chatBlockIndex].messages.push(message);
 
-            const getMessagesSortedByUser = computed(() => {
-                let chatBlockIndex = 0;
+            return acc;
+        }, {});
+    });
 
-                return chat.value.messages.reduce((acc: any, message) => {
-                    if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
-                        acc[chatBlockIndex].messages.push(message);
-                        return acc;
-                    } else {
-                        chatBlockIndex++;
-                    }
+    const message = ref('');
 
-                    acc[chatBlockIndex] = {
-                        user: <string>message.from,
-                        messages: [],
-                    };
-                    acc[chatBlockIndex].messages.push(message);
+    const chat = computed(() => {
+        return chats.value.find(c => c.chatId == selectedId.value);
+    });
 
-                    return acc;
-                }, {});
-            });
+    const getChatStatus = computed(() => {
+        if (!chat.value) {
+            return;
+        }
 
-            const message = ref('');
+        if (chat.value.isGroup) {
+            let message = `${chat.value.contacts.length} members`;
+            const onlineMembers = chat.value.contacts
+                .filter(c => c.id != user.id)
+                .map(c => ({
+                    ...c,
+                    isOnline: statusList[<string>c.id]?.isOnline ?? false,
+                })).length;
 
-            const chat = computed(() => {
-                return chats.value.find(c => c.chatId == selectedId.value);
-            });
-
-            const getChatStatus = computed(() => {
-                if (!chat.value) {
-                    return;
-                }
-
-                if (chat.value.isGroup) {
-                    let message = `${chat.value.contacts.length} members`;
-                    const onlineMembers = chat.value.contacts
-                        .filter(c => c.id != user.id)
-                        .map(c => ({
-                            ...c,
-                            isOnline: statusList[<string>c.id]?.isOnline ?? false,
-                        })).length;
-
-                    if (onlineMembers > 0) {
-                        message += `, ${onlineMembers} online`;
-                    }
-
-                    return {
-                        message: message,
-                        lastSeen: undefined,
-                    };
-                }
-
-                const status = statusList[<string>chat.value.chatId];
-                let lastSeen: string | undefined = undefined;
-                lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
-                lastSeen = lastSeen?.slice(0, -3);
-                return {
-                    message: status?.isOnline ? 'Online' : 'Offline',
-                    lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
-                };
-            });
-
-            const popupMeeting = () => {
-                // @ts-ignore
-                // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
-                const str: string = chat.value.isGroup
-                    ? chat.value.chatId
-                    : chat.value.contacts
-                          .map(c => c.id)
-                          .sort()
-                          .join();
-
-                const id = crypto.SHA1(str);
-                sendMessage(
-                    chat.value.chatId,
-                    {
-                        type: SystemMessageTypes.JOINED_VIDEOROOM,
-                        message: `${user.id} joined the video chat`,
-                        id: id.toString(),
-                    } as JoinedVideoRoomBody,
-                    MessageTypes.SYSTEM
-                );
-
-                popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
-            };
-
-            const deleteChat = () => {
-                showDeleteDialog.value = true;
-            };
-            const infoChat = () => {
-                showInfo.value = true;
-            };
-            const doDeleteChat = () => {
-                sendRemoveChat(chat.value.chatId);
-                router.push({ name: 'whisper' });
-            };
-
-            const blockChat = () => {
-                showDialog.value = true;
-            };
-            const doBlockChat = () => {
-                showDialog.value = false;
-                sendBlockChat(chat.value.chatId);
-                router.push({ name: 'whisper' });
-            };
-
-            const unBlockChat = async () => {
-                await deleteBlockedEntry(chat.value.chatId);
-            };
-
-            const reads = computed(() => {
-                const preReads = {};
-                each(chat.value.read, (val: string, key: string) => {
-                    if (key === user.id) {
-                        return;
-                    }
-                    preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
-                });
-                return preReads;
-            });
-
-            const viewAnchor = ref(null);
-
-            const { isIntersecting } = useIntersectionObserver(viewAnchor);
-
-            const scrollToBottom = (force = false) => {
-                if (!force && !isIntersecting.value) return;
-
-                nextTick(() => {
-                    scrollMessageBoxToBottom();
-                });
-            };
-
-            onMounted(() => {
-                nextTick(() => {
-                    scrollToBottom(true);
-                });
-            });
-
-            const status = computed(() => {
-                return statusList[selectedId.value];
-            });
-
-            const { scrollEvents } = useScrollState();
-            const { shiftScrollEvent } = useScrollActions();
-
-            watch(scrollEvents, () => {
-                if (!scrollEvents || scrollEvents.length === 0) return;
-                nextTick(() => {
-                    scrollToBottom(scrollEvents[0]);
-                    shiftScrollEvent();
-                });
-            });
-
-            const blocked = computed(() => {
-                if (!chat.value || chat.value.isGroup) return false;
-                return isBlocked(<string>chat.value.chatId);
-            });
-
-            const removeFromGroup = contact => {
-                showRemoveUserDialog.value = true;
-                toBeRemovedUser.value = contact;
-            };
-            const doRemoveFromGroup = () => {
-                const { updateContactsInGroup } = usechatsActions();
-                //@ts-ignore
-                updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
-            };
-
-            const iAmAdmin = computed(() => {
-                const { user } = useAuthState();
-                //@ts-ignore
-                console.log(chat.value.adminId);
-                return chat.value.adminId == user.id;
-            });
-
-            let activeItem = ref('edit');
-            const isActive = menuItem => {
-                return activeItem.value === menuItem;
-            };
-
-            const setActive = menuItem => {
-                activeItem.value = menuItem;
-            };
-
-            const addToGroup = contact => {
-                const { updateContactsInGroup } = usechatsActions();
-                //@ts-ignore
-                updateContactsInGroup(chat.value.chatId, contact, false);
-            };
-            const filteredContacts = computed(() => {
-                return contacts.filter(
-                    //@ts-ignore
-                    c => !chat.value.contacts.map(x => x.id).includes(c.id)
-                );
-            });
+            if (onlineMembers > 0) {
+                message += `, ${onlineMembers} online`;
+            }
 
             return {
-                chats,
-                selectedId,
-                chat,
-                getMessagesSortedByUser,
-                truncate,
-                message,
-                file,
-                m,
-                scrollToBottom,
-                status,
-                statusList,
-                popupMeeting,
-                deleteChat,
-                infoChat,
-                doDeleteChat,
-                blockChat,
-                doBlockChat,
-                unBlockChat,
-                viewAnchor,
-                reads,
-                showDialog,
-                showDeleteDialog,
-                showInfo,
-                showMenu,
-                showSideBar: getShowSideBar(),
-                disableSidebar,
-                toggleSideBar,
-                getChatStatus,
-                moment,
-                blocked,
-                sendFile,
-                isLoading,
-                removeFromGroup,
-                showRemoveUserDialog,
-                toBeRemovedUser,
-                doRemoveFromGroup,
-                iAmAdmin,
-                isActive,
-                setActive,
-                addToGroup,
-                contacts: filteredContacts,
-                ...propRefs,
+                message: message,
+                lastSeen: undefined,
             };
-        },
+        }
+
+        const status = statusList[<string>chat.value.chatId];
+        let lastSeen: string | undefined = undefined;
+        lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
+        lastSeen = lastSeen?.slice(0, -3);
+        return {
+            message: status?.isOnline ? 'Online' : 'Offline',
+            lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
+        };
     });
+
+    const popupMeeting = () => {
+        // @ts-ignore
+        // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+        const str: string = chat.value.isGroup
+            ? chat.value.chatId
+            : chat.value.contacts
+                  .map(c => c.id)
+                  .sort()
+                  .join();
+
+        const id = crypto.SHA1(str);
+        sendMessage(
+            chat.value.chatId,
+            {
+                type: SystemMessageTypes.JOINED_VIDEOROOM,
+                message: `${user.id} joined the video chat`,
+                id: id.toString(),
+            } as JoinedVideoRoomBody,
+            MessageTypes.SYSTEM
+        );
+
+        popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
+    };
+
+    const deleteChat = () => {
+        showDeleteDialog.value = true;
+    };
+    const infoChat = () => {
+        showInfo.value = true;
+    };
+    const doDeleteChat = () => {
+        sendRemoveChat(chat.value.chatId);
+        router.push({ name: 'whisper' });
+    };
+
+    const blockChat = () => {
+        showDialog.value = true;
+    };
+    const doBlockChat = () => {
+        showDialog.value = false;
+        sendBlockChat(chat.value.chatId);
+        router.push({ name: 'whisper' });
+    };
+
+    const unBlockChat = async () => {
+        await deleteBlockedEntry(chat.value.chatId);
+    };
+
+    const reads = computed(() => {
+        const preReads = {};
+        each(chat.value.read, (val: string, key: string) => {
+            if (key === user.id) {
+                return;
+            }
+            preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
+        });
+        return preReads;
+    });
+
+    const viewAnchor = ref(null);
+
+    const { isIntersecting } = useIntersectionObserver(viewAnchor);
+
+    const scrollToBottom = (force = false) => {
+        if (!force && !isIntersecting.value) return;
+
+        nextTick(() => {
+            scrollMessageBoxToBottom();
+        });
+    };
+
+    onMounted(() => {
+        nextTick(() => {
+            scrollToBottom(true);
+        });
+    });
+
+    const status = computed(() => {
+        return statusList[selectedId.value];
+    });
+
+    const { scrollEvents } = useScrollState();
+    const { shiftScrollEvent } = useScrollActions();
+
+    watch(scrollEvents, () => {
+        if (!scrollEvents || scrollEvents.length === 0) return;
+        nextTick(() => {
+            scrollToBottom(scrollEvents[0]);
+            shiftScrollEvent();
+        });
+    });
+
+    const blocked = computed(() => {
+        if (!chat.value || chat.value.isGroup) return false;
+        return isBlocked(<string>chat.value.chatId);
+    });
+
+    const removeFromGroup = contact => {
+        showRemoveUserDialog.value = true;
+        toBeRemovedUser.value = contact;
+    };
+    const doRemoveFromGroup = () => {
+        const { updateContactsInGroup } = usechatsActions();
+        //@ts-ignore
+        updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
+    };
+
+    const iAmAdmin = computed(() => {
+        const { user } = useAuthState();
+        //@ts-ignore
+        console.log(chat.value.adminId);
+        return chat.value.adminId == user.id;
+    });
+
+    let activeItem = ref('edit');
+    const isActive = menuItem => {
+        return activeItem.value === menuItem;
+    };
+
+    const setActive = menuItem => {
+        activeItem.value = menuItem;
+    };
+
+    const addToGroup = contact => {
+        const { updateContactsInGroup } = usechatsActions();
+        //@ts-ignore
+        updateContactsInGroup(chat.value.chatId, contact, false);
+    };
+    const filteredContacts = computed(() => {
+        return contacts.filter(
+            //@ts-ignore
+            c => !chat.value.contacts.map(x => x.id).includes(c.id)
+        );
+    });
+
+    const showSideBar = getShowSideBar();
 </script>
 
 <style scoped type="text/css">

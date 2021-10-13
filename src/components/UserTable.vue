@@ -102,55 +102,41 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { Contact } from '@/types';
     import { defineComponent, ref, computed, onMounted, PropType } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon, LocationMarkerIcon } from '@heroicons/vue/solid';
-    export default defineComponent({
-        components: { AvatarImg, SearchIcon, LocationMarkerIcon },
-        props: {
-            placeholder: {
-                type: String,
-                required: false,
-                default: 'Enter text here.',
-            },
-            data: {
-                type: Array,
-                required: true,
-            },
-        },
-        emits: ['addContact'],
 
-        setup(props, { emit }) {
-            const chosenOption = ref('');
-            const searchTerm = ref('');
+    interface IProps {
+        placeholder?: string;
+        data: any[];
+    }
 
-            const reset = () => {
-                chosenOption.value = '';
-                searchTerm.value = '';
-            };
-
-            const handleClick = (item: Contact) => {
-                console.log(item);
-                emit('addContact', item);
-            };
-
-            const searchResults = () => {
-                return props.data.filter((item: Contact) => {
-                    return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
-                });
-            };
-
-            return {
-                reset,
-                handleClick,
-                chosenOption,
-                searchTerm,
-                searchResults,
-            };
-        },
+    const props = withDefaults(defineProps<IProps>(), {
+        placeholder: 'Enter text here.',
     });
+
+    const emit = defineEmits(['addContact']);
+
+    const chosenOption = ref('');
+    const searchTerm = ref('');
+
+    const reset = () => {
+        chosenOption.value = '';
+        searchTerm.value = '';
+    };
+
+    const handleClick = (item: Contact) => {
+        console.log(item);
+        emit('addContact', item);
+    };
+
+    const searchResults = () => {
+        return props.data.filter((item: Contact) => {
+            return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
+        });
+    };
 </script>
 
 <style scoped>

@@ -10,22 +10,9 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
     import { getKey, notifications } from '@/store/notificiationStore';
     import NotificationCard from '@/components/notifications/NotificationCard.vue';
-
-    export default defineComponent({
-        name: 'NotificationSection',
-        components: { NotificationCard },
-        setup() {
-            let i = 0;
-            return {
-                notifications,
-                getKey,
-            };
-        },
-    });
 </script>
 
 <style scoped></style>

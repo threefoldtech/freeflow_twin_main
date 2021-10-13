@@ -47,112 +47,94 @@
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { computed, defineComponent, ref } from 'vue';
     import { findLastIndex } from 'lodash';
     import { useAuthState } from '@/store/authStore';
-    import { FileTypes, Message, MessageBodyType, MessageTypes, SystemBody } from '@/types';
+    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, SystemBody } from '@/types';
     import moment from 'moment';
     import { statusList } from '@/store/statusStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useRouter } from 'vue-router';
     import { isBlocked } from '@/store/blockStore';
 
-    export default defineComponent({
-        name: 'ChatCard',
-        components: { AvatarImg },
-        props: {
-            chat: Object,
-            collapsed: Boolean,
-        },
-        emits: ['selectChat'],
-        setup(props) {
-            const { user } = useAuthState();
+    interface IProps {
+        chat: Chat;
+        collapsed: Boolean;
+    }
 
-            const lastReadByMe = computed(() => {
-                let lastReadMessage = props.chat.read[<string>user.id];
-                return findLastIndex(
-                    props.chat.messages,
-                    (message: Message<MessageBodyType>) => lastReadMessage === message.id
-                );
-            });
-            const lastMessage = computed(() => {
-                return props.chat && props.chat.messages && props.chat.messages.length
-                    ? props.chat.messages[props.chat.messages.length - 1]
-                    : 'No messages yet';
-            });
-            const newMessages = computed(() => {
-                return props.chat.messages.length - lastReadByMe.value - 1;
-            });
-            const timeAgo = time => {
-                return moment(time).fromNow();
-            };
+    const props = defineProps<IProps>();
+    const emits = defineEmits(['selectChat']);
+    const { user } = useAuthState();
 
-            const status = computed(() => {
-                return statusList[props.chat.chatId];
-            });
+    const lastReadByMe = computed(() => {
+        let lastReadMessage = props.chat.read[<string>user.id];
+        return findLastIndex(
+            props.chat.messages,
+            (message: Message<MessageBodyType>) => lastReadMessage === message.id
+        );
+    });
+    const lastMessage = computed(() => {
+        return props.chat && props.chat.messages && props.chat.messages.length
+            ? props.chat.messages[props.chat.messages.length - 1]
+            : 'No messages yet';
+    });
+    const newMessages = computed(() => {
+        return props.chat.messages.length - lastReadByMe.value - 1;
+    });
+    const timeAgo = time => {
+        return moment(time).fromNow();
+    };
 
-            const router = useRouter();
-            const currentRoute = computed(() => router.currentRoute.value);
+    const status = computed(() => {
+        return statusList[props.chat.chatId];
+    });
 
-            const lastMessageBody = computed(() => {
-                const lstmsg = lastMessage.value;
-                switch (lstmsg.type) {
-                    case 'GIF':
-                        return 'Gif was sent';
-                    case 'QUOTE':
-                        return lstmsg.body.message;
-                    case MessageTypes.SYSTEM:
-                        return (lstmsg.body as SystemBody).message;
-                    case 'FILE': {
-                        if (lstmsg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
-                        return 'File has been uploaded';
-                    }
-                    case 'FILE_SHARE': {
-                        if (lstmsg?.body?.isFolder) {
-                            return 'Folder has been shared';
-                        }
-                        return 'File has been shared';
-                    }
-                    case 'DELETE':
-                    default:
-                        return lstmsg.body;
+    const router = useRouter();
+    const currentRoute = computed(() => router.currentRoute.value);
+
+    const lastMessageBody = computed(() => {
+        const lstmsg = lastMessage.value;
+        switch (lstmsg.type) {
+            case 'GIF':
+                return 'Gif was sent';
+            case 'QUOTE':
+                return lstmsg.body.message;
+            case MessageTypes.SYSTEM:
+                return (lstmsg.body as SystemBody).message;
+            case 'FILE': {
+                if (lstmsg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
+                return 'File has been uploaded';
+            }
+            case 'FILE_SHARE': {
+                if (lstmsg?.body?.isFolder) {
+                    return 'Folder has been shared';
                 }
-            });
+                return 'File has been shared';
+            }
+            case 'DELETE':
+            default:
+                return lstmsg.body;
+        }
+    });
 
-            const unreadMessagesAmount = computed(() => {
-                if (!props.chat || !user) {
-                    return 0;
-                }
+    const unreadMessagesAmount = computed(() => {
+        if (!props.chat || !user) {
+            return 0;
+        }
 
-                const lastReadMessageId = props.chat.read[<string>user.id];
-                const index = props.chat.messages?.findIndex(m => m.id === lastReadMessageId);
-                if (!index || index < 1) {
-                    return 0;
-                }
+        const lastReadMessageId = props.chat.read[<string>user.id];
+        const index = props.chat.messages?.findIndex(m => m.id === lastReadMessageId);
+        if (!index || index < 1) {
+            return 0;
+        }
 
-                return props.chat.messages.length - (index + 1);
-            });
+        return props.chat.messages.length - (index + 1);
+    });
 
-            const blocked = computed(() => {
-                if (!props.chat || props.chat.isGroup) return false;
-                return isBlocked(props.chat.chatId);
-            });
-
-            return {
-                status,
-                newMessages,
-                lastReadByMe,
-                lastMessage,
-                lastMessageBody,
-                timeAgo,
-                router,
-                user,
-                currentRoute,
-                unreadMessagesAmount,
-                blocked,
-            };
-        },
+    const blocked = computed(() => {
+        if (!props.chat || props.chat.isGroup) return false;
+        return isBlocked(props.chat.chatId);
     });
 </script>
 

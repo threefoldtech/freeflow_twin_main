@@ -1,30 +1,25 @@
 <template>
-    <img width="450" :src="src" @load="imageLoaded" class="cursor-pointer" @click="show" />
+    <img :src="src" class="cursor-pointer" width="450" @click="show" @load="imageLoaded" />
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
     import { defineComponent } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { useScrollActions } from '@/store/scrollStore';
     import { setImageSrc } from '@/store/imageStore';
 
-    export default defineComponent({
-        name: 'ImageContent',
-        props: {
-            message: { type: Object, required: true },
-        },
-        setup(props) {
-            const { addScrollEvent } = useScrollActions();
-            const src = calcExternalResourceLink(props.message.body.url);
-            const imageLoaded = () => {
-                addScrollEvent();
-            };
+    interface IProp {
+        message: Object;
+    }
 
-            const show = () => {
-                setImageSrc(src);
-            };
+    const props = defineProps<IProp>();
+    const { addScrollEvent } = useScrollActions();
+    const src = calcExternalResourceLink(props.message.body.url);
+    const imageLoaded = () => {
+        addScrollEvent();
+    };
 
-            return { imageLoaded, show, src };
-        },
-    });
+    const show = () => {
+        setImageSrc(src);
+    };
 </script>

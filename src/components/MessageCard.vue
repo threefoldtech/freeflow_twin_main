@@ -3,7 +3,7 @@
         class="group flex flex-row"
         :class="{
             'mb-2': isLastMessage,
-            'my-message flex-row-reverse ': isMine,
+            'my-message flex-row-reverse md:flex-row lg:flex-row-reverse xl:flex-row ': isMine,
         }"
         v-if="message.type !== MessageTypes.SYSTEM"
         @click="selectedMessageId = message.id"
@@ -18,7 +18,14 @@
             :showOnlineStatus="false"
         />
         <div class="flex-1">
-            <div class="flex flex-row flex-wrap my-message:flex-row-reverse">
+            <div
+                class="
+                    flex flex-row flex-wrap
+                    my-message:flex-row-reverse my-message:md:flex-row
+                    lg:my-message:flex-row-reverse
+                    xl:my-message:flex-row
+                "
+            >
                 <div
                     tabindex="0"
                     class="
@@ -38,7 +45,7 @@
                         'rounded-bl-xl': isLastMessage,
                     }"
                 >
-                    <header class="p-4 pt-2 pb-2 font-bold my-message:bg-accent-300" v-if="isFirstMessage && isGroup">
+                    <header class="p-4 pt-2 pb-2 font-bold" v-if="isFirstMessage && isGroup">
                         {{ message.from }}
                     </header>
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
@@ -121,7 +128,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { computed, defineComponent, nextTick, onMounted } from 'vue';
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -141,100 +148,84 @@
     import { clock } from '@/services/clockService';
     import Time from '@/components/Time.vue';
 
-    export default defineComponent({
-        name: 'MessageCard',
-        components: { Time, MessageContent, AvatarImg },
-        props: {
-            message: Object,
-            chatId: String,
-            isMine: Boolean,
-            isGroup: Boolean,
-            isreadbyme: Boolean,
-            isread: Boolean,
-            isFirstMessage: Boolean,
-            isLastMessage: Boolean,
-        },
-        setup(props) {
-            const { user } = useAuthState();
+    interface IProps {
+        message: object;
+        chatId: string;
+        isMine: boolean;
+        isGroup: boolean;
+        isreadbyme: boolean;
+        isread: boolean;
+        isFirstMessage: boolean;
+        isLastMessage: boolean;
+    }
 
-            const toggleSendForwardMessage = () => {
-                console.log('toggleSendForwardMessage');
-            };
+    const props = defineProps<IProps>();
 
-            const replyMessage = message => {
-                clearMessageAction(props.chatId);
-                //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
-                nextTick(() => {
-                    setMessageAction(props.chatId, message, MessageAction.REPLY);
-                });
-            };
+    const { user } = useAuthState();
 
-            const { addScrollEvent } = useScrollActions();
+    const toggleSendForwardMessage = () => {
+        console.log('toggleSendForwardMessage');
+    };
 
-            onMounted(() => {
-                addScrollEvent();
-            });
+    const replyMessage = message => {
+        clearMessageAction(props.chatId);
+        //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
+        nextTick(() => {
+            setMessageAction(props.chatId, message, MessageAction.REPLY);
+        });
+    };
 
-            const read = () => {
-                const { readMessage } = usechatsActions();
-                readMessage(props.chatId, props.message.id);
-            };
+    const { addScrollEvent } = useScrollActions();
 
-            if (!props.isreadbyme) {
-                read();
-            }
-
-            const deleteMessage = message => {
-                //@todo: show dialog
-                const updatedMessage: Message<StringMessageType> = {
-                    id: message.id,
-                    from: message.from,
-                    to: message.to,
-                    body: 'Message has been deleted',
-                    timeStamp: message.timeStamp,
-                    type: MessageTypes.DELETE,
-                    replies: [],
-                    subject: null,
-                };
-                sendMessageObject(props.chatId, updatedMessage);
-            };
-
-            const deleteReply = (message, reply) => {
-                //@todo: show dialog
-                const updatedMessage: Message<StringMessageType> = {
-                    id: reply.id,
-                    from: reply.from,
-                    to: reply.to,
-                    body: 'Message has been deleted',
-                    timeStamp: message.timeStamp,
-                    type: MessageTypes.DELETE,
-                    replies: [],
-                    subject: message.id,
-                };
-                sendMessageObject(props.chatId, updatedMessage);
-            };
-
-            const editMessage = message => {
-                clearMessageAction(props.chatId);
-                //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
-                nextTick(() => {
-                    setMessageAction(props.chatId, message, MessageAction.EDIT);
-                });
-            };
-
-            return {
-                moment,
-                toggleSendForwardMessage,
-                replyMessage,
-                user,
-                deleteMessage,
-                deleteReply,
-                editMessage,
-                MessageTypes,
-                clock,
-                selectedMessageId,
-            };
-        },
+    onMounted(() => {
+        addScrollEvent();
     });
+
+    const read = () => {
+        const { readMessage } = usechatsActions();
+        readMessage(props.chatId, props.message.id);
+    };
+
+    if (!props.isreadbyme) {
+        read();
+    }
+
+    const deleteMessage = message => {
+        //@todo: show dialog
+        const updatedMessage: Message<StringMessageType> = {
+            id: message.id,
+            from: message.from,
+            to: message.to,
+            body: 'Message has been deleted',
+            timeStamp: message.timeStamp,
+            type: MessageTypes.DELETE,
+            replies: [],
+            subject: null,
+        };
+        sendMessageObject(props.chatId, updatedMessage);
+    };
+
+    const deleteReply = (message, reply) => {
+        //@todo: show dialog
+        const updatedMessage: Message<StringMessageType> = {
+            id: reply.id,
+            from: reply.from,
+            to: reply.to,
+            body: 'Message has been deleted',
+            timeStamp: message.timeStamp,
+            type: MessageTypes.DELETE,
+            replies: [],
+            subject: message.id,
+        };
+        sendMessageObject(props.chatId, updatedMessage);
+    };
+
+    const editMessage = message => {
+        clearMessageAction(props.chatId);
+        //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
+        nextTick(() => {
+            setMessageAction(props.chatId, message, MessageAction.EDIT);
+        });
+    };
 </script>
 <style lang="css" scoped></style>

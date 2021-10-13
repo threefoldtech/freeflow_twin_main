@@ -2,7 +2,6 @@
     <a
         class="px-4 my-2 my-message:bg-accent-200 cursor-pointer text-xs"
         @click="visitFileInMessage(message)"
-        v-if="message.body"
     >
         <p class="my-message:text-icon text-center text-xs mb-1">
             <span v-if="message.body.isFolder">Folder</span>
@@ -12,6 +11,7 @@
         <div class="w-auto h-auto flex flex-row">
             <div
                 class="
+                    flex-shrink-0
                     icon
                     mr-2
                     bg-gray-600
@@ -36,7 +36,7 @@
     </a>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
     import { loginName } from '@/store/authStore';
     import {
         formatBytes,
@@ -53,12 +53,11 @@
 
     import { useRouter } from 'vue-router';
 
-    const props = defineProps({
-        message: {
-            type: Object,
-            required: true,
-        },
-    });
+    interface IProp {
+        message: Object;
+    }
+
+    const props = defineProps<IProp>();
 
     const router = useRouter();
     const visitFileInMessage = (message: Message<FileShareMessageType>) => {

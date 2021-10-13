@@ -14,24 +14,11 @@
     </app-layout>
 </template>
 
-<script lang="ts">
-    import appLayout from '../../layout/AppLayout.vue';
+<script setup lang="ts">
+    import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent } from 'vue';
     import ChatList from '@/components/ChatList.vue';
     import { showAddUserDialog } from '@/services/dialogService';
-
-    export default defineComponent({
-        name: 'Apps',
-        components: {
-            appLayout,
-            ChatList,
-        },
-        setup({}, ctx) {
-            return {
-                showAddUserDialog,
-            };
-        },
-    });
 </script>
 
 <style scoped type="text/css"></style>

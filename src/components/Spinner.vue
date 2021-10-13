@@ -10,16 +10,20 @@
     ></div>
 </template>
 
-<script>
-    export default {
-        name: 'Spinner',
-        props: {
-            xlarge: { required: false, default: false, type: Boolean },
-            large: { required: false, default: false, type: Boolean },
-            small: { required: false, default: false, type: Boolean },
-            xsmall: { required: false, default: false, type: Boolean },
-        },
-    };
+<script setup lang="ts">
+    interface IProps {
+        xlarge?: boolean;
+        large?: boolean;
+        small?: boolean;
+        xsmall?: boolean;
+    }
+
+    withDefaults(defineProps<IProps>(), {
+        xlarge: false,
+        large: false,
+        small: false,
+        xsmall: false,
+    });
 </script>
 
 <style scoped>

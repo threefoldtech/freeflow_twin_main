@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-row my-4 items-center justify-between">
-            <div class="mt-1 mx-2 relative rounded-md shadow-sm" v-if="sharedDir === false">
+            <div class="mt-1 mx-2 relative rounded-md shadow-sm" v-if="!sharedDir">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 </div>
@@ -29,15 +29,15 @@
                 </div>
             </div>
             <div class="flex flex-row items-center">
-                <options></options>
-                <buttons></buttons>
+                <SelectedOptions v-if="!sharedDir || selectedPaths.length > 0"></SelectedOptions>
+                <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
         </div>
-        <breadcrumbs></breadcrumbs>
+        <Breadcrumbs></Breadcrumbs>
     </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
     import {
         selectedPaths,
@@ -144,6 +144,39 @@
             };
         },
     });
+    function debounceSearch(event) {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+            if (searchDirValue.value === '') {
+                searchResults.value = [];
+                return;
+            }
+            searchDir();
+        }, 1);
+    }
+    const onDragEnter = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
+        (e.target as HTMLElement).classList.add('bg-accent-300');
+        (e.target as HTMLElement).classList.add('text-white');
+    };
+    const onDragLeave = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
+        (e.target as HTMLElement).classList.remove('bg-accent-300');
+        (e.target as HTMLElement).classList.remove('text-white');
+    };
+    const onDrop = (e: Event, i: number) => {
+        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
+        let path = '/';
+        if (i > 0) {
+            const parts = currentDirectory.value.split('/');
+            parts.splice(i + 1);
+            path = parts.join('/');
+        }
+        (e.target as HTMLElement).classList.remove('bg-accent-300');
+        (e.target as HTMLElement).classList.remove('text-white');
+        moveFiles(path);
+        selectedPaths.value = [];
+    };
 </script>
 
 <style scoped>

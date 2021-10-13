@@ -1,15 +1,15 @@
 <template>
     <div class="my-2 relative rounded-md shadow-sm">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
         </div>
         <input
-            type="text"
-            @focus="handleInput"
-            @input="handleInput"
             v-model="searchTerm"
             class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
             placeholder="Search"
+            type="text"
+            @focus="handleInput"
+            @input="handleInput"
         />
         <div
             v-if="!!searchTerm"
@@ -22,12 +22,11 @@
     <div class="flex flex-col">
         <div class="-my-2">
             <div class="py-2 align-middle inline-block min-w-full">
-                <div style="max-height: 500px" class="shadow border-b overflow-auto border-gray-200 sm:rounded-lg">
+                <div class="shadow border-b overflow-auto border-gray-200 sm:rounded-lg" style="max-height: 500px">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-100">
                             <tr>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -40,11 +39,11 @@
                                         top-0
                                         z-50
                                     "
+                                    scope="col"
                                 >
                                     Chats
                                 </th>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -57,9 +56,9 @@
                                         top-0
                                         z-50
                                     "
+                                    scope="col"
                                 ></th>
                                 <th
-                                    scope="col"
                                     class="
                                         px-6
                                         py-3
@@ -72,6 +71,7 @@
                                         top-0
                                         z-50
                                     "
+                                    scope="col"
                                 ></th>
                             </tr>
                         </thead>
@@ -104,16 +104,16 @@
                                         "
                                     >
                                         <span
-                                            @click="item.canWrite = false"
-                                            class="p-2 rounded-xl"
                                             :class="{ 'bg-primary text-white': !item.canWrite }"
+                                            class="p-2 rounded-xl"
+                                            @click="item.canWrite = false"
                                         >
                                             Read</span
                                         >
                                         <span
-                                            @click="item.canWrite = true"
-                                            class="p-2 rounded-xl"
                                             :class="{ 'bg-primary text-white': item.canWrite }"
+                                            class="p-2 rounded-xl"
+                                            @click="item.canWrite = true"
                                         >
                                             Write</span
                                         >
@@ -121,13 +121,13 @@
                                 </td>
                                 <td :key="item.isAlreadySent" class="text-center">
                                     <button
-                                        @click="shareFile(item.chatId)"
-                                        class="text-white py-2 px-4 rounded-md justify-self-end bg-primary"
                                         v-if="!item.isAlreadySent"
+                                        class="text-white py-2 px-4 rounded-md justify-self-end bg-primary"
+                                        @click="shareFile(item.chatId)"
                                     >
                                         Share
                                     </button>
-                                    <span class="text-xs" v-else> File has been shared. </span>
+                                    <span v-else class="text-xs"> File has been shared. </span>
                                 </td>
                             </tr>
                         </tbody>
@@ -137,7 +137,7 @@
         </div>
     </div>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
     import { Chat } from '@/types';
     import { selectedPaths, addShare } from '@/store/fileBrowserStore';
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
@@ -146,71 +146,54 @@
     import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SystemMessageTypes, MessageTypes } from '@/types';
-    const { sendMessage } = usechatsActions();
     import { createNotification } from '@/store/notificiationStore';
     import { SearchIcon } from '@heroicons/vue/solid';
-    export default defineComponent({
-        components: { SearchIcon, Toggle, AvatarImg },
-        props: {
-            data: {
-                type: Array,
-                required: true,
-            },
-        },
-        emits: ['update:modelValue', 'clicked'],
 
-        setup(props, { emit }) {
-            const searchTerm = ref('');
-            const chats = ref([]);
-            const alreadySentChatIds = ref(<String[]>[]);
+    interface IProps {
+        data: any[];
+    }
 
-            onBeforeMount(() => {
-                chats.value = props.data.map((item: Chat) => {
-                    return {
-                        name: item.name,
-                        chatId: item.chatId,
-                        canWrite: false,
-                        isAlreadySent: false,
-                    };
-                });
-            });
+    const props = defineProps<IProps>();
+    const emit = defineEmits(['update:modelValue', 'clicked']);
 
-            const reset = () => {
-                emit('update:modelValue', '');
-                searchTerm.value = '';
-            };
+    const { sendMessage } = usechatsActions();
 
-            const handleInput = evt => {
-                emit('update:modelValue', evt.target.value);
-            };
+    const searchTerm = ref('');
+    const chats = ref([]);
+    const alreadySentChatIds = ref(<String[]>[]);
 
-            const searchResults = () => {
-                return chats.value.filter((item: Chat) => {
-                    return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
-                });
-            };
-
-            async function shareFile(chatId) {
-                const size = selectedPaths.value[0].size;
-                const filename = selectedPaths.value[0].fullName;
-                const chat = chats.value.find(chat => chat.chatId == chatId);
-
-                await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
-                chat.isAlreadySent = true;
-                createNotification('Shared File', 'File has been shared with ' + chatId);
-            }
-
-            return {
-                reset,
-                handleInput,
-                searchTerm,
-                searchResults,
-                selectedPaths,
-                shareFile,
-                alreadySentChatIds,
-            };
-        },
+    onBeforeMount(() => {
+        chats.value = props.data.map((item: Chat) => ({
+            name: item.name,
+            chatId: item.chatId,
+            canWrite: false,
+            isAlreadySent: false,
+        }));
     });
+
+    const reset = () => {
+        emit('update:modelValue', '');
+        searchTerm.value = '';
+    };
+
+    const handleInput = evt => {
+        emit('update:modelValue', evt.target.value);
+    };
+
+    const searchResults = () =>
+        chats.value.filter((item: Chat) => {
+            return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
+        });
+
+    async function shareFile(chatId) {
+        const size = selectedPaths.value[0].size;
+        const filename = selectedPaths.value[0].fullName;
+        const chat = chats.value.find(chat => chat.chatId == chatId);
+
+        await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
+        chat.isAlreadySent = true;
+        createNotification('Shared File', 'File has been shared with ' + chatId);
+    }
 </script>
 
 <style scoped>

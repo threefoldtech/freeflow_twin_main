@@ -1,8 +1,8 @@
 <template>
     <a
-        class="px-4 my-2 my-message:bg-accent-200"
-        :href="calcExternalResourceLink(message.body.url)"
         :download="message.body.filename"
+        :href="calcExternalResourceLink(message.body.url)"
+        class="px-4 my-2 my-message:bg-accent-200"
     >
         <div
             class="
@@ -26,19 +26,12 @@
     </a>
 </template>
 
-<script lang="ts">
-    import { defineComponent } from 'vue';
+<script lang="ts" setup>
     import { calcExternalResourceLink } from '@/services/urlService';
 
-    export default defineComponent({
-        name: 'FileContent',
-        props: {
-            message: { type: Object, required: true },
-        },
-        setup(props) {
-            return {
-                calcExternalResourceLink,
-            };
-        },
-    });
+    interface IProp {
+        message: Object;
+    }
+
+    const props = defineProps<IProp>();
 </script>

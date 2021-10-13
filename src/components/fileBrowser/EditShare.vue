@@ -1,15 +1,15 @@
 <template>
     <div class="my-2 relative rounded-md shadow-sm">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <SearchIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+            <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
         </div>
         <input
-            type="text"
-            @focus="handleInput"
-            @input="handleInput"
             v-model="searchTerm"
             class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
             placeholder="Search"
+            type="text"
+            @focus="handleInput"
+            @input="handleInput"
         />
         <div
             v-if="!!searchTerm"
@@ -19,7 +19,7 @@
             <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
         </div>
     </div>
-    <Table v-if="searchResults?.length > 0" :headers="headers" :data="searchResults">
+    <Table v-if="searchResults?.length > 0" :data="searchResults" :headers="headers">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
                 <span v-if="canWrite(data.data)">Write</span>
@@ -36,15 +36,16 @@
     </Table>
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
 </template>
-<script lang="ts">
+<script lang="ts" setup>
     import { Chat, SharedFileInterface } from '@/types';
-    import { selectedPaths, addShare } from '@/store/fileBrowserStore';
+    import { selectedPaths, addShare, PathInfoModel } from '@/store/fileBrowserStore';
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
     import Toggle from '@/components/Toggle.vue';
     import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
     import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SystemMessageTypes, MessageTypes } from '@/types';
+
     const { sendMessage } = usechatsActions();
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
@@ -69,62 +70,44 @@
         },
     ];
 
-    export default defineComponent({
-        components: { SearchIcon, Toggle, AvatarImg, Table },
-        props: {
-            selectedFile: {
-                type: Object,
-                required: true,
-            },
-        },
-        emits: ['update:modelValue', 'clicked'],
+    interface IProps {
+        selectedFile: PathInfoModel;
+    }
 
-        setup(props, { emit }) {
-            const searchTerm = ref('');
-            const currentShare = ref<SharedFileInterface>();
+    const emit = defineEmits(['update:modelValue', 'clicked']);
+    const props = defineProps<IProps>();
+    const searchTerm = ref('');
+    const currentShare = ref<SharedFileInterface>();
 
-            onBeforeMount(async () => {
-                currentShare.value = await getShareByPath(props.selectedFile.path);
-            });
-
-            const reset = () => {
-                emit('update:modelValue', '');
-                searchTerm.value = '';
-            };
-
-            const handleInput = evt => {
-                emit('update:modelValue', evt.target.value);
-            };
-
-            const searchResults = computed(() => {
-                return currentShare.value?.permissions?.filter(item => {
-                    return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
-                });
-            });
-
-            const canWrite = computed(() => {
-                return param => {
-                    return !!param.find(perm => perm == 'w');
-                };
-            });
-
-            const remove = async (data: any) => {
-                removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
-                currentShare.value = await getShareByPath(props.selectedFile.path);
-            };
-
-            return {
-                reset,
-                handleInput,
-                searchTerm,
-                searchResults,
-                selectedPaths,
-                headers,
-                canWrite,
-                remove,
-            };
-        },
+    onBeforeMount(async () => {
+        currentShare.value = await getShareByPath(props.selectedFile.path);
     });
+
+    const reset = () => {
+        emit('update:modelValue', '');
+        searchTerm.value = '';
+    };
+
+    const handleInput = evt => {
+        emit('update:modelValue', evt.target.value);
+    };
+
+    const searchResults = computed(() => {
+        return currentShare.value?.permissions?.filter(item => {
+            return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
+        });
+    });
+
+    const canWrite = computed(() => {
+        return param => {
+            return !!param.find(perm => perm == 'w');
+        };
+    });
+
+    const remove = async (data: any) => {
+        removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
+        currentShare.value = await getShareByPath(props.selectedFile.path);
+    };
 </script>
 
 <style scoped>

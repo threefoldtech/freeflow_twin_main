@@ -1,9 +1,9 @@
 <template>
     <div class="relative" @dragenter="handleDragEnter" @dragover="handleDragOver" @drop="handleDrop">
         <div
-            class="hidden md:flex justify-center items-center absolute top-0 left-0 w-full h-full z-50 p-8"
             v-if="show || showOverlay"
             :class="{ 'bg-accent-200/75': showOverlay }"
+            class="hidden md:flex justify-center items-center absolute top-0 left-0 w-full h-full z-50 p-8"
             @dragleave="handleDragLeave"
         >
             <div
@@ -28,70 +28,59 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent, ref } from 'vue';
+<script lang="ts" setup>
+    import { ref } from 'vue';
 
-    export default defineComponent({
-        props: {
-            show: { type: Boolean },
-        },
-        name: 'FileDropArea',
-        emits: ['send-file'],
-        setup(props, { emit }) {
-            const showOverlay = ref();
+    interface IProps {
+        show: boolean;
+    }
 
-            const highLight = () => {
-                showOverlay.value = true;
-            };
+    const props = defineProps<IProps>();
+    const emit = defineEmits(['send-file']);
+    const showOverlay = ref();
 
-            const unHighLight = () => {
-                showOverlay.value = false;
-            };
+    const highLight = () => {
+        showOverlay.value = true;
+    };
 
-            const dragContainsFiles = e => {
-                const dt = e?.dataTransfer;
-                return dt?.types && (dt.types.indexOf ? dt.types.indexOf('Files') !== -1 : dt.types.contains('Files'));
-            };
+    const unHighLight = () => {
+        showOverlay.value = false;
+    };
 
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+    const dragContainsFiles = e => {
+        const dt = e?.dataTransfer;
+        return dt?.types && (dt.types.indexOf ? dt.types.indexOf('Files') !== -1 : dt.types.contains('Files'));
+    };
 
-            const handleDragEnter = e => {
-                preventDefaults(e);
-                if (!dragContainsFiles(e)) return;
-                highLight();
-            };
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 
-            const handleDragOver = e => {
-                preventDefaults(e);
-                if (!dragContainsFiles(e)) return;
-                highLight();
-            };
+    const handleDragEnter = e => {
+        preventDefaults(e);
+        if (!dragContainsFiles(e)) return;
+        highLight();
+    };
 
-            const handleDragLeave = e => {
-                preventDefaults(e);
-                unHighLight();
-            };
+    const handleDragOver = e => {
+        preventDefaults(e);
+        if (!dragContainsFiles(e)) return;
+        highLight();
+    };
 
-            const handleDrop = e => {
-                preventDefaults(e);
-                unHighLight();
-                const files = e?.dataTransfer?.files;
-                if (!files) return;
-                emit('send-file', Array.from(files));
-            };
+    const handleDragLeave = e => {
+        preventDefaults(e);
+        unHighLight();
+    };
 
-            return {
-                showOverlay,
-                handleDragEnter,
-                handleDrop,
-                handleDragLeave,
-                handleDragOver,
-            };
-        },
-    });
+    const handleDrop = e => {
+        preventDefaults(e);
+        unHighLight();
+        const files = e?.dataTransfer?.files;
+        if (!files) return;
+        emit('send-file', Array.from(files));
+    };
 </script>
 
 <style scoped></style>

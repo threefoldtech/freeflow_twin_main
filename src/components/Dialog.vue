@@ -1,13 +1,12 @@
 <template>
     <transition name="fade">
         <div
-            @keydown.esc="$emit('update-model-value', false)"
-            v-if="modelValue"
-            @click="$emit('update-model-value', false)"
+            v-if="props.modelValue"
             class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
+            @click="$emit('update-model-value', false)"
+            @keydown.esc="$emit('update-model-value', false)"
         >
             <div
-                @click.stop
                 class="
                     form-container
                     z-50
@@ -21,6 +20,7 @@
                     sm:rounded
                     overflow-auto
                 "
+                @click.stop
             >
                 <div class="flex justify-between">
                     <slot name="title" />
@@ -47,7 +47,7 @@
                 <div class="py-2 flex-col">
                     <slot />
                 </div>
-                <div class="flex justify-end mt-2" v-if="!noActions">
+                <div v-if="!noActions" class="flex justify-end mt-2">
                     <button
                         class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                         @click="$emit('update-model-value', false)"
@@ -76,27 +76,20 @@
         </div>
     </transition>
 </template>
-<script lang="ts">
-    import { defineComponent } from 'vue';
-    export default defineComponent({
-        props: {
-            modelValue: {
-                type: Boolean,
-                default: false,
-            },
-            noActions: {
-                type: Boolean,
-                default: false,
-            },
-            okButtonText: {
-                type: String,
-                default: 'Ok',
-            },
-            cancelButtonText: {
-                type: String,
-                default: 'Cancel',
-            },
-        },
-        emits: ['update-model-value'],
+<script lang="ts" setup>
+    defineEmits(['update-model-value']);
+
+    interface IProps {
+        modelValue?: boolean;
+        noActions?: boolean;
+        okButtonText?: string;
+        cancelButtonText?: string;
+    }
+
+    const props = withDefaults(defineProps<IProps>(), {
+        modelValue: false,
+        noActions: false,
+        okButtonText: 'Ok',
+        cancelButtonText: 'Cancel',
     });
 </script>

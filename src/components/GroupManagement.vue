@@ -113,9 +113,8 @@
         </div>
     </Dialog>
 </template>
-<script lang="ts">
+<script setup lang="ts">
     import { computed, ref } from 'vue';
-    import { statusList } from '@/store/statusStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
@@ -123,65 +122,51 @@
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
 
-    export default {
-        name: 'GroupManagementBlock',
-        props: {
-            chat: { required: true },
-        },
-        emits: ['app-call', 'app-block', 'app-delete', 'app-unblock'],
-        components: { AvatarImg, Dialog },
-        setup(props) {
-            const { contacts } = useContactsState();
+    interface IProps {
+        chat: any;
+    }
 
-            const showRemoveUserDialog = ref(false);
-            const toBeRemovedUser = ref();
+    const props = defineProps<IProps>();
 
-            const removeFromGroup = contact => {
-                showRemoveUserDialog.value = true;
-                toBeRemovedUser.value = contact;
-            };
-            const doRemoveFromGroup = () => {
-                const { updateContactsInGroup } = usechatsActions();
-                updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, true);
-                showRemoveUserDialog.value = false;
-                toBeRemovedUser.value = null;
-            };
-            const addToGroup = contact => {
-                const { updateContactsInGroup } = usechatsActions();
-                //@ts-ignore
-                updateContactsInGroup(props.chat.chatId, contact, false);
-            };
-            const filteredContacts = computed(() => {
-                return contacts.filter(
-                    //@ts-ignore
-                    c => !props.chat.contacts.map(x => x.id).includes(c.id)
-                );
-            });
+    defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);
 
-            const iAmAdmin = computed(() => {
-                const { user } = useAuthState();
-                //@ts-ignore
-                return props.chat.adminId == user.id;
-            });
+    const { contacts } = useContactsState();
 
-            const blocked = computed(() => {
-                if (!props.chat || props.chat.isGroup) return false;
-                return isBlocked(props.chat.chatId);
-            });
+    const showRemoveUserDialog = ref(false);
+    const toBeRemovedUser = ref();
 
-            return {
-                status: statusList,
-                removeFromGroup,
-                contacts: filteredContacts,
-                addToGroup,
-                iAmAdmin,
-                blocked,
-                showRemoveUserDialog,
-                toBeRemovedUser,
-                doRemoveFromGroup,
-            };
-        },
+    const removeFromGroup = contact => {
+        showRemoveUserDialog.value = true;
+        toBeRemovedUser.value = contact;
     };
+    const doRemoveFromGroup = () => {
+        const { updateContactsInGroup } = usechatsActions();
+        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, true);
+        showRemoveUserDialog.value = false;
+        toBeRemovedUser.value = null;
+    };
+    const addToGroup = contact => {
+        const { updateContactsInGroup } = usechatsActions();
+        //@ts-ignore
+        updateContactsInGroup(props.chat.chatId, contact, false);
+    };
+    const filteredContacts = computed(() => {
+        return contacts.filter(
+            //@ts-ignore
+            c => !props.chat.contacts.map(x => x.id).includes(c.id)
+        );
+    });
+
+    const iAmAdmin = computed(() => {
+        const { user } = useAuthState();
+        //@ts-ignore
+        return props.chat.adminId == user.id;
+    });
+
+    const blocked = computed(() => {
+        if (!props.chat || props.chat.isGroup) return false;
+        return isBlocked(props.chat.chatId);
+    });
 </script>
 
 <style scoped>

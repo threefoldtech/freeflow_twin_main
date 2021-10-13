@@ -72,7 +72,6 @@ export const allSharedContent = ref<SharedFileInterface[]>([]);
 export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
 
-
 export const sharedItem = ref<PathInfoModel>();
 
 export const currentShare = ref<SharedFileInterface>(undefined);
@@ -254,6 +253,7 @@ export const clearClipboard = () => {
 
 export const searchDir = async () => {
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
+
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
     if (result.data.toString() === 'None') {
         searchResults.value = 'None';
