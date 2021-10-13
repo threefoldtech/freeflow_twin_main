@@ -1,10 +1,9 @@
 <template>
     <a
-        v-if="message.body"
-        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer"
+        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer text-xs"
         @click="visitFileInMessage(message)"
     >
-        <p class="my-message:text-icon text-center">
+        <p class="my-message:text-icon text-center text-xs mb-1">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>
             shared
@@ -17,19 +16,20 @@
                     mr-2
                     bg-gray-600
                     rounded-full
-                    h-12
-                    w-12
+                    h-9
+                    w-9
                     flex
                     justify-center
                     items-center
                     text-white
                     my-message:bg-accent-500
+                    flex-shrink-0
                 "
             >
                 <i class="fas fa-share-alt"></i>
             </div>
             <div class="py-1 flex flex-col">
-                <div class="my-message:text-icon flex-shrink-0">{{ message.body.name }}</div>
+                <div class="my-message:text-icon text-">{{ message.body.name }}</div>
                 <span class="my-message:text-icon opacity-70"> {{ formatBytes(message.body.size, 2) }}</span>
             </div>
         </div>

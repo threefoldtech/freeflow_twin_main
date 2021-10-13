@@ -20,7 +20,7 @@
         >
             <i class="fas fa-file"></i>
         </div>
-        <div class="pt-2 my-message:text-icon">
+        <div class="pt-2 my-message:text-icon text-base">
             {{ message.body.filename }}
         </div>
     </a>

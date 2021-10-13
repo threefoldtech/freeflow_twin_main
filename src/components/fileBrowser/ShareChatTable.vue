@@ -11,6 +11,13 @@
             @focus="handleInput"
             @input="handleInput"
         />
+        <div
+            v-if="!!searchTerm"
+            @click="searchTerm = ''"
+            class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+        >
+            <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+        </div>
     </div>
     <div class="flex flex-col">
         <div class="-my-2">

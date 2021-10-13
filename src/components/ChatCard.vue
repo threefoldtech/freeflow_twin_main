@@ -28,18 +28,18 @@
             />
         </div>
         <div v-if="!collapsed" class="px-2 ml-2 content">
-            <p class="flex">
+            <p class="flex items-center">
                 <span class="font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
                 </span>
-                <span v-if="chat.isGroup" class="font-thin ml-2"> (group)</span>
+                <span v-if="chat.isGroup" class="ml-2 text-xs"> (group)</span>
                 <span v-if="blocked" class="ml-2 text-red-500"> BLOCKED</span>
-                <span v-if="lastMessage" class="font-thin ml-auto">
+                <span v-if="lastMessage" class="text-gray-400 ml-auto text-xs">
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
             <div class="flex overflow-hidden">
-                <div class="flex-0 col-end-13 col-span-2 font-thin overflow-ellipsis overflow-hidden">
+                <div class="flex-0 col-end-13 col-span-2 text-gray-400 overflow-ellipsis overflow-hidden text-xs">
                     {{ lastMessageBody }}
                 </div>
             </div>

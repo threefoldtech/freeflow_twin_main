@@ -50,12 +50,12 @@
         </div>
     </div>
     <div class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1">
-        <h2>Actions</h2>
+        <h3 class="mt-2">Actions</h3>
 
         <div class="flex items-center flex-col w-full">
             <div class="call bg-gray-100 flex items-center rounded-xl w-full m-2" @click="$emit('app-call')">
                 <i class="fas fa-video m-3"></i>
-                <p class="m-3">Join video room</p>
+                <p class="m-3 text-xs">Join video room</p>
             </div>
 
             <div
@@ -64,7 +64,7 @@
                 @click="$emit('app-block')"
             >
                 <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3">Block user</p>
+                <p class="m-3 text-xs">Block user</p>
             </div>
 
             <div
@@ -73,12 +73,12 @@
                 @click="$emit('app-unblock')"
             >
                 <i class="fas fa-plus-circle m-3"></i>
-                <p class="m-3">Unblock user</p>
+                <p class="m-3 text-xs">Unblock user</p>
             </div>
 
             <div class="delete bg-gray-100 flex items-center rounded-xl w-full m-2" @click="$emit('app-delete')">
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3">Delete conversation</p>
+                <p class="m-3 text-xs">Delete conversation</p>
             </div>
         </div>
     </div>

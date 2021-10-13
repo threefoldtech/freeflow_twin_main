@@ -37,7 +37,7 @@
                     >
                         <i class="fas fa-plus"></i>
                     </button>
-                    <h1 class="collapsed-bar:hidden pt-1">Messages</h1>
+                    <h1 class="collapsed-bar:hidden pt-1 text-lg">Messages</h1>
                 </div>
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
                     <button
@@ -105,6 +105,13 @@
                     placeholder="Search"
                     type="text"
                 />
+                <div
+                    v-if="!!searchValue"
+                    @click="searchValue = ''"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+                >
+                    <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
+                </div>
             </div>
             <div v-if="filteredChatRequests.length > 0" class="collapsed-bar:hidden px-2 mt-4">
                 <h2 style="font-size: 1.5em">
