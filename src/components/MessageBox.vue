@@ -1,5 +1,5 @@
 <template>
-    <div ref="messageBox" class="overflow-y-auto" @scroll="handleScroll">
+    <div ref="messageBoxLocal" id="messageBoxEl" class="overflow-y-auto" @scroll="handleScroll">
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
@@ -32,9 +32,9 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, onMounted, onUnmounted, ref } from 'vue';
+    import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
-    import { isFirstMessage, isLastMessage, messageBox, showDivider } from '@/services/messageHelperService';
+    import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
     import { usechatsActions } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
@@ -43,6 +43,13 @@
     interface IProps {
         chat: Chat;
     }
+
+    const messageBoxLocal = ref(null);
+
+    watch(messageBoxLocal, () => {
+        //Refs can't seem to bind to refs in other files in script setup
+        messageBox.value = messageBoxLocal.value;
+    });
 
     const props = defineProps<IProps>();
 
@@ -62,6 +69,7 @@
     });
     const handleScroll = async e => {
         let element = messageBox.value;
+
         const oldScrollHeight = element.scrollHeight;
         if (element.scrollTop < 100) {
             getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {

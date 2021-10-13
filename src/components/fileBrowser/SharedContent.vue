@@ -1,6 +1,8 @@
 <template>
     <div class="h-full overflow-y-auto px-3">
-        <h1 class="p-2">Shared with me:</h1>
+        <h1 class="p-2">
+            Shared with me: <span>{{ currentFolderName }}</span>
+        </h1>
         <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
             <Spinner :xlarge="true" />
         </div>
@@ -220,6 +222,11 @@
     watch(sharedFolderIsloading, () => {});
 
     const router = useRouter();
+
+    const currentFolderName = computed(() => {
+        //@TODO add current folder
+        return '';
+    });
 
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
