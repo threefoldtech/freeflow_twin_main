@@ -5,6 +5,7 @@ export enum AppType {
     Quantum = 'quantum',
     Meetings = 'meetings',
     Kutana = 'kutana',
+    Dashboard = 'dashboard',
 }
 
 export interface AppItemType {

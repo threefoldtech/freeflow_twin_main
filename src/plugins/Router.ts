@@ -18,6 +18,7 @@ import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
 import config from '@/config';
 import { disableSidebar } from '@/services/sidebarService';
+import Dashboard from '@/views/app/Dashboard.vue';
 
 import {
     loadSharedItems,
@@ -171,6 +172,14 @@ const routes: Array<RouteRecordRaw> = [
         component: Forum,
         meta: {
             app: AppType.Forum,
+        },
+    },
+    {
+        name: 'dashboard',
+        path: '/dashboard',
+        component: Dashboard,
+        meta: {
+            app: AppType.Dashboard,
         },
     },
     {
