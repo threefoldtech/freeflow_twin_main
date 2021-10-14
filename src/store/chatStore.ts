@@ -107,7 +107,7 @@ const addChat = (chat: Chat) => {
 
     if (!chat.isGroup) {
         const { user } = useAuthState();
-        const otherContact: Contact = <Contact>chat.contacts.find(c => c.id !== user.id);
+        const otherContact: Contact = <Contact>chat?.contacts?.find(c => c.id !== user.id);
         if (otherContact) {
             startFetchStatusLoop(otherContact);
         }
