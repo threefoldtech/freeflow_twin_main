@@ -23,15 +23,32 @@
         </div>
         <div class="p-4 flex items-center">
             <AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>
-            <p class="ml-4 text-base text-gray-400">Write something about you</p>
+            <input
+                class="ml-4 text-base text-gray-800 p-2 outline-none"
+                value=""
+                placeholder="Write something about you"
+            />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-    import { PhotographIcon, PencilAltIcon, FilmIcon } from '@heroicons/vue/solid';
+    import { PhotographIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
+    import { HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
+    import { ref } from 'vue';
+
+    const actions = ref([
+        {
+            name: 'Like',
+            component: HeartIcon,
+        },
+        {
+            name: 'Comment',
+            component: ChatAltIcon,
+        },
+    ]);
 
     const { user } = useAuthState();
 </script>

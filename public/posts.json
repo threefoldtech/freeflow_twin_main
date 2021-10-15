@@ -1,0 +1,184 @@
+{
+    "version": "https://jsonfeed.org/version/1",
+    "title": "Threefold News",
+    "home_page_url": "https://news.threefoldconnect.jimber.org/",
+    "feed_url": "https://news.threefoldconnect.jimber.org/feed.json",
+    "description": "A blog of the ThreeFold Foundation.",
+    "items": [
+        {
+            "id": "https://news.threefoldconnect.jimber.org/own-cloud-and-three-fold-announce-partnership/",
+            "content_html": "\nBased on their shared commitment to data sovereignty and open alternatives, ownCloud and ThreeFold have agreed to enter into a strategic partnership to advance the decentralization of the consumer cloud. ownCloud is an open-source file sync, share and content collaboration software with more than 200M users worldwide that lets teams work on data easily from anywhere, on any device. ThreeFold is developing a peer-to-peer Internet platform that aims to liberalize what it labels as a centralized and unequally distributed Internet, already live today in 51 countries.\n\n**[Read the full announcement](https://threefold.io/news/post/owncloud_threefold/)** to find out more about the partnership, view a demo of the launching of the ownCloud instance on top of the grid, learn about an upcoming cross-community event, and how to register for the ownCloud-ThreeFold pilot program.\n",
+            "url": "https://news.threefoldconnect.jimber.org/own-cloud-and-three-fold-announce-partnership/",
+            "title": "ownCloud and ThreeFold Announce Partnership",
+            "date_modified": "2021-09-28T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/not-just-a-decentralized-cloud/",
+            "content_html": "\nTypically we’ve been saying that ThreeFold is the only comprehensive #DeCloud out there but maybe it’s time we start saying that **we are actually the substrate for Decentralized Cloud**. Well, maybe we’re both. 😉\n\n📚 Read more **[here](https://forum.threefold.io/t/threefold-is-the-substrate-for-decloud/1295)**.\n\n*What do you think about this positioning? We like it – because, well, it’s true – but we’re curious, as always, to hear from the community.*",
+            "url": "https://news.threefoldconnect.jimber.org/not-just-a-decentralized-cloud/",
+            "title": "Not Just a Decentralized Cloud",
+            "date_modified": "2021-09-24T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/introducing-tf-chain-and-updated-billing/",
+            "content_html": "\n**Introducing TF Chain and an updated (pay-as-you-go) billing model!**\n\nLearn more about why blockchain technology is important within ThreeFold, how the system is operating now, and how things are changing for the better in ThreeFold Grid 3.0.\n\n📚 Full post **[here](https://forum.threefold.io/t/introducing-tf-chain-an-updated-billing-model/1277)**.",
+            "url": "https://news.threefoldconnect.jimber.org/introducing-tf-chain-and-updated-billing/",
+            "title": "Introducing TF Chain and Updated Billing",
+            "date_modified": "2021-09-20T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/how-three-fold-provides-a-secure-it-ecosystem/",
+            "content_html": "\nThis week, **Apple and Google issued critical security updates** due to multiple “zero-day” (read: extremely urgent) vulnerabilities which most likely have already been exploited. And these most recent examples are just the tip of the iceberg.\n\n📚 Learn about the prevalent & growing threat of cyberattacks and **[how ThreeFold provides a secure IT ecosystem](https://forum.threefold.io/t/critical-security-updates-for-apple-and-google-underline-need-for-secure-it-ecosystem/1271)** the world so badly needs.",
+            "url": "https://news.threefoldconnect.jimber.org/how-three-fold-provides-a-secure-it-ecosystem/",
+            "title": "How ThreeFold Provides a Secure IT Ecosystem",
+            "date_modified": "2021-09-17T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/calling-all-grid-3-0-testers/",
+            "content_html": "\n**We are now ready to invite a limited group from our community to test an early release of Grid 3.0!**\n\nIf you’re interested, please read through **[this post](https://forum.threefold.io/t/join-the-grid-3-0-beta-testers-group/1194)** and answer three quick questions for us.\n",
+            "url": "https://news.threefoldconnect.jimber.org/calling-all-grid-3-0-testers/",
+            "title": "Calling All Grid 3.0 Testers",
+            "date_modified": "2021-09-15T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/what-s-possible-on-grid-2/",
+            "content_html": "\nWhile we **work to open testing of Grid 3.0** to our community, questions are coming in around how to get started testing the Grid today.\n\nIn **[this post](https://forum.threefold.io/t/what-you-can-do-on-the-threefold-grid-today/1220)**, Scott outlines **what’s currently available to test on Grid 2**.\n\n*If you’re interested in testing on the ThreeFold Grid, please join [our testing community](https://t.me/threefoldtesting).*",
+            "url": "https://news.threefoldconnect.jimber.org/what-s-possible-on-grid-2/",
+            "title": "What's Possible on Grid 2",
+            "date_modified": "2021-09-09T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/titan-v2-1-shipping-update/",
+            "content_html": "\n🚨 **We have a Titan v2.1 shipping update (action required below)**, in case you missed it in other channels:\n\nFor all orders received before Friday the 10th of September, we plan to ship as follows:\n\n- 🌍 Europe: Last week of September\n- 🌎 USA & Canada: Mid-October\n- 🌏 All Others: End of October\n\n📧 **Please check your inbox** for an email from farming@threefold.tech (sent on September 7) in which we ask for details we need in order to set up your farm and node!\n\n*You can follow [this forum thread](https://forum.threefold.io/t/titan-v2-1-shipping-info/1223) for continued shipping updates or to ask any questions you might have.*",
+            "url": "https://news.threefoldconnect.jimber.org/titan-v2-1-shipping-update/",
+            "title": "Titan v2.1 Shipping Update",
+            "date_modified": "2021-09-08T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/an-interview-with-jimber/",
+            "content_html": "\nRecently, Scott (from the TF Foundation) interviewed Jonas Delrue from Jimber, the team developing P2P solutions like video chat and office workspace, using the Digital Twin platform. Digital Twin is a use case on top of the ThreeFold Grid.\n\n💬 You can find the interview *[here](https://threefold.io/blog/post/interview_with_jimber/)*.\n\nIt’s quite a fascinating discussion and gives insight on the technical hurdles and motivations for developing private, decentralized, and open source alternatives to popular products from major corporations.",
+            "url": "https://news.threefoldconnect.jimber.org/an-interview-with-jimber/",
+            "title": "An Interview with Jimber",
+            "date_modified": "2021-09-03T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/meet-the-planetary-network/",
+            "content_html": "\nMeet **the Planetary Network 🌍 a peer-to-peer end-to-end encrypted global network**, providing universal connectivity between nodes, Grid deployers, and solution users.\n\n📚 Learn more about it **[here](https://forum.threefold.io/t/how-our-planetary-network-works/1210)**.\n\n*Background: While it appears to be a cohesive whole, today’s Internet is actually a rather fragmented and fragile system. It’s overly-complex, and liable to large scale outages, censorship, and surveilance…*",
+            "url": "https://news.threefoldconnect.jimber.org/meet-the-planetary-network/",
+            "title": "Meet the Planetary Network",
+            "date_modified": "2021-09-03T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/three-fold-grid-utilization-plan-part-2/",
+            "content_html": "\n**Today, we’re sharing [part two](https://forum.threefold.io/t/grid-utilization-plan-part-two/1203) of our ThreeFold Grid Utilization Plan.**\n\nIt highlights **some of our main partnerships**, which together can bring **many millions of users** to the grid.\n\n*If you missed part one (TF Grid Solutions), be sure to check it out [here](https://forum.threefold.io/t/grid-utilization-plan-part-one/1157).*",
+            "url": "https://news.threefoldconnect.jimber.org/three-fold-grid-utilization-plan-part-2/",
+            "title": "ThreeFold Grid Utilization Plan – Part 2",
+            "date_modified": "2021-09-02T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/september-1-community-call-recording/",
+            "content_html": "\n📹 Here is **[the recording of yesterday’s community call](https://www.youtube.com/watch?v=mc3-y-jT6r4)**, which focused on updates around farming and ThreeFold Grid 3.0!\n\n*The video is timestamped, so you can move around to the parts which are most relevant or interesting for you.*",
+            "url": "https://news.threefoldconnect.jimber.org/september-1-community-call-recording/",
+            "title": "September 1 Community Call Recording",
+            "date_modified": "2021-09-02T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/a-first-look-at-terraform-on-tf-grid-3-0/",
+            "content_html": "\n**Here’s [a first look at Terraform](https://youtu.be/uPKM1Ta3tvY) on ThreeFold Grid 3.0!**\n\nIn this video, Scott demo’s how easy it is to create, use, and destroy deployments on ThreeFold Grid 3.0 using Terraform.\n\n*Fun fact: A man of many talents, Scott also created the flute audio you hear in the video intro!*",
+            "url": "https://news.threefoldconnect.jimber.org/a-first-look-at-terraform-on-tf-grid-3-0/",
+            "title": "A First Look at Terraform on TF Grid 3.0",
+            "date_modified": "2021-09-01T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/tft-on-1inch-io/",
+            "content_html": "\n**The ThreeFold Token is now available on [1inch.io](https://1inch.io/)!**\n\n*1inch connects many third party DEXes and has its own liquidity pools as well, to provide the best possible pricing for end users. It is an easy entry to the DeFi space.*\n\n🎒 **Learn how to get TFT on the Binance Smart Chain using 1inch [here](https://forum.threefold.io/t/how-to-buy-tft-on-binance-smart-chain-using-1inch-io/1189).**",
+            "url": "https://news.threefoldconnect.jimber.org/tft-on-1inch-io/",
+            "title": "TFT on 1inch.io",
+            "date_modified": "2021-09-01T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/three-fold-grid-3-0-supports-terraform/",
+            "content_html": "\nAn exciting element of our roadmap to ThreeFold Grid 3.0 is **the integration of Terraform into the TF Grid**.\n\n*Terraform is a widely used open-source Infrastructure as Code (IaC) software tool which enables developers to build, change, and version infrastructure in a safe and efficient way.*\n\n📚 **[Read about Terraform](https://forum.threefold.io/t/threefold-grid-3-0-supports-terraform/1184), how it works with the TF Grid, and what it means for grid users.**\n\n*Keep an eye out for the Terraform demo coming tomorrow. We’ll also discuss on the community call!*",
+            "url": "https://news.threefoldconnect.jimber.org/three-fold-grid-3-0-supports-terraform/",
+            "title": "ThreeFold Grid 3.0 Supports Terraform",
+            "date_modified": "2021-08-31T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/september-1-community-call-announcement/",
+            "content_html": "\nWe'll host a **community call this Wednesday** at 5pm CEST to share updates around **farming** and to touch on a few important aspects of **ThreeFold Grid 3.0**.\n\n❗️Here's **[the link](https://meet.jit.si/moderated/d211ee6bc96b7a4e6424955465c94be15837548e64703afc3c65bd92b61c849a) to the call**.\n\n*We hope to see you there! If not, we'll share the recording afterwards.*",
+            "url": "https://news.threefoldconnect.jimber.org/september-1-community-call-announcement/",
+            "title": "September 1 Community Call Announcement",
+            "date_modified": "2021-08-30T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/liquid-receives-120-million-in-debt-financing-from-ftx/",
+            "content_html": "\nRelated to last week's Liquid news:\n\n**Today, Liquid announced “the closing of a US$120,000,000 debt financing” from FTX Trading Ltd, owner and operator of top tier exchange FTX**, and “that they have entered good faith discussions in pursuit of further collaborative opportunities.”\n\nWhile we cannot speculate on what these further collaborative opportunities might be and how they could impact tokens listed on Liquid, it is certainly good news for Liquid to have such support from FTX.\n\nFull coverage **[here](https://forum.threefold.io/t/liquid-exchange-receives-120-000-000-in-debt-financing-from-top-tier-ftx/1159)**.",
+            "url": "https://news.threefoldconnect.jimber.org/liquid-receives-120-million-in-debt-financing-from-ftx/",
+            "title": "Liquid Receives $120 Million in Debt Financing From FTX",
+            "date_modified": "2021-08-26T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/three-fold-grid-utilization-plan-part-1/",
+            "content_html": "\nThe ThreeFold Foundation’s primary goal is to achieve **sustainable and organic growth of the ThreeFold Grid**.\n\nHere’s **[part one](https://forum.threefold.io/t/grid-utilization-plan-part-one/1157) (of two) of our TF Grid Utilization Plan**, which focuses primarily on TF Grid Solutions.\n\n*As always, we’d love to have your feedback. And you can look forward to part two, which will cover some of our key partnerships.*",
+            "url": "https://news.threefoldconnect.jimber.org/three-fold-grid-utilization-plan-part-1/",
+            "title": "ThreeFold Grid Utilization Plan – Part 1",
+            "date_modified": "2021-08-25T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/introducing-the-tft-development-plan/",
+            "content_html": "\nThere have been many questions in the community about **the plan around the ThreeFold Token**.\n\nPlease take a look at **[this post](https://forum.threefold.io/t/tft-development-plan/1149)** and provide your comments, questions, and feedback.\n\n*We hope you see what we see… Now’s the time to buy TFT. If you need some help getting TFT on BSC, please see the forum post [here](https://forum.threefold.io/t/how-to-buy-tft-on-binance-smart-chain-using-pancake-swap-protocol/902). And as always, we’re here to help!*",
+            "url": "https://news.threefoldconnect.jimber.org/introducing-the-tft-development-plan/",
+            "title": "Introducing the TFT Development Plan",
+            "date_modified": "2021-08-23T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/august-18-ama-recap/",
+            "content_html": "\n📹 **For those who are interested in yesterday’s AMA, [here](https://www.youtube.com/watch?v=GrW9rbcnRZU) is the recording.**\n\nWe discussed farming (3.0), the token, ThreeFold Grid use cases, and the roadmap to ThreeFold Grid 3.0. Note the video is timestamped so you can select the questions you most care about.",
+            "url": "https://news.threefoldconnect.jimber.org/august-18-ama-recap/",
+            "title": "August 18 AMA Recap",
+            "date_modified": "2021-08-19T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/liquid-hacked-tft-not-affected/",
+            "content_html": "\nWe wanted to update the community that Liquid, an exchange on which TFT is listed, [shared this morning](https://twitter.com/Liquid_Global/status/1428176357515612165?s=09) that warm wallets on the exchange were compromised in a hack.\n\n**It appears that Stellar-based assets (e.g. TFT) were not stolen.**\n\nPlease take note:\n\n- 🚫 To ensure safety of funds, please do not deposit any crypto assets to your Liquid wallets until further notice.\n- 🚫 Liquid has halted all crypto withdrawals while we assess the impact.\n- ✅ Fiat withdrawals and deposits remain available.\n- ✅ Other services on Liquid, including trading and Liquid Earn, remain available.\n\nYou can find the full incident report [here](https://blog.liquid.com/warm-wallet-incident).\n\nLiquid is investigating and will provide updates as they have them. We’ve also reached out to them directly and will share more as we know. 🙏",
+            "url": "https://news.threefoldconnect.jimber.org/liquid-hacked-tft-not-affected/",
+            "title": "Liquid Hacked, TFT Not Affected",
+            "date_modified": "2021-08-19T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/the-road-to-tf-grid-v3-0/",
+            "content_html": "\n**Today, we are super excited to share [the roadmap](https://circles.threefold.me/project/despiegk-product_tfgrid3_roadmap/kanban) to ThreeFold Grid v3.0!**\n\n**As many of you know, the main focus of ThreeFold these days is to get the grid to version 3.0 and ready for production.**\n\nWithin, you will find various stories within \"swimlanes\" that show where our attention is and where it is going. We will be sure to elaborate more on what it all means – the priorities, progress, and also where we can use your support.\n\nBe sure to look at [the wiki](https://circles.threefold.me/project/despiegk-product_tfgrid3_roadmap/wiki/home) which is tied to our kanban for more context.\n\nPlease feel free to dig in and leave comments or questions on [our forum](https://forum.threefold.io/)!\n\n*PS: The circles tool (see roadmap), which is based on open source Taiga, will be made available as a workload on top of the TF Grid for everyone to use. It’s an amazing tool! We have many circles in which we collaborate internally, with members of the community, and with partner projects (more than 80 people globally) on a day-to-day basis.*",
+            "url": "https://news.threefoldconnect.jimber.org/the-road-to-tf-grid-v3-0/",
+            "title": "The Road to TF Grid v3.0",
+            "date_modified": "2021-08-17T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/we-re-hosting-an-ama-on-august-18th/",
+            "content_html": "\n**Please join us for an Ask Me Anything this Wednesday at 17:00 CEST!**\n\nThis will be a video AMA. We'll answer questions submitted ahead of time in priority, and if there is time at the end, we will open the floor up for live questions.\n\nYou can submit questions until 12:00 CEST (48 hours) on Wednesday via the link below.\n\n- ❓ [Submit your questions](https://forum.threefold.io/t/submit-your-questions-for-the-wednesday-august-18-ask-me-anything-ama/1109)\n- 📹 [Zoom link](https://us02web.zoom.us/j/88516114306)\n\n*If you can’t join, we’ll share the recording afterwards. And we’ll be hosting community AMAs on a bi-weekly basis going forward!*\n\n**Additional Context**\n\n- We've heard you loud and clear lately and we’ve decided to do AMAs on a regular basis with our community to answer all your questions in a more efficient way.\n- We're unable to follow up on chats, hence the forum thread. This is the only solution we’ve found to 1. answer all your questions and 2. keep the team focused on progress.\n",
+            "url": "https://news.threefoldconnect.jimber.org/we-re-hosting-an-ama-on-august-18th/",
+            "title": "We're Hosting an AMA on August 18th",
+            "date_modified": "2021-08-16T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/join-our-team/",
+            "content_html": "\n**We're looking for team members** – with operations and developer roles currently open! Join us on our mission to build a planet-positive and data sovereign Internet owned by the people.\n\n👩‍💻 You can find open positions on our [careers page](https://threefold.io/careers).\n",
+            "url": "https://news.threefoldconnect.jimber.org/join-our-team/",
+            "title": "Join Our Team",
+            "date_modified": "2021-08-09T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/ode-and-three-fold-partnership-announcement/",
+            "content_html": "\nToday, we're pleased to announce a partnership between ThreeFold Tech and [ODE](https://odeinfinity.com), the world's first vertically integrated consumer data ecosystem. ODE is creating a future where enterprises become trusted partners to their digital consumers, offering an application platform that enables privacy for digital consumers, lean data science, and compliance for enterprises. Built on blockchain and AI, ODE Infinity defines a new paradigm for digital engagement for enterprises.\n\nODE recognizes the need for a secure, scalable, and cost-effective global infrastructure platform that complements the key attributes of ODE and furthermore meets the attributes demanded by more and more customers today. Priority attributes include data sovereignty and privacy, true decentralization, no lock-in, scalability, and ultra-security (to name a few).\n\nThreeFold technology and the ThreeFold Grid offers such an infrastructure platform and meets these exact attributes demanded by the customers today. ThreeFold brings a truly decentralized compute and storage network that ensures the privacy and sovereignty of customer data, scalability, cost efficiency, and ultimately a digital infrastructure that is far more sustainable for our planet.\n\n\"The collaboration between ODE and ThreeFold is a tremendous win for enterprises and consumers that are wrestling to find a balance between data privacy, compliance, and business growth to build trust. Our joint offering does exactly that by creating a decentralized data ecosystem that enables enterprises to become trusted partners to their digital consumers. The new world where privacy is by design, usage is by consent, and value realization is unlimited and mutual,\" says ODE CEO Sashi Edupuganti. \"The synergy between ODE and ThreeFold will accelerate the journey toward a more decentralized and democratic way to manage and use consumer data.\"\n\nODE and ThreeFold Tech have now signed a collaborative agreement to deliver solutions that accelerate their collective mission of democratizing data and creating greater data management capabilities for enterprises, and self-determination and sovereignty for all people. We will update as this partnership evolves.\n\n## About ODE\n\nHeadquartered in Tempe, Arizona with employees around the world, ODE (Open Data Economy) was recently recognized as the Top 100 Company in 2021 at Intercon2021, Las Vegas and the Top 30 most innovative companies of 2020 by CIO Bulletin. As a revolutionary startup that is building a more equitable data economy for all, ODE Infinity is the world's first vertically integrated consumer data ecosystem. ODE is creating a future where enterprises become trusted partners to their digital consumers and eases the burden of data management for those enterprises. Their application platform, built on blockchain and AI, enables privacy for digital consumers, lean data science, and compliance for enterprises. ODE Infinity defines a new paradigm for digital engagement for enterprises and consumers, alike.\n\nTo learn more, visit [odeinfinity.com](https://odeinfinity.com).\n\n## About ThreeFold\n\nHeadquartered in Belgium, and with employees worldwide, ThreeFold Tech has developed a decentralized cloud technology aimed to empower a p2p data economy where sovereignty, privacy, and equality are held paramount.\n\nThe ThreeFold Grid (powered by ThreeFold technology) is the largest and most advanced peer-to-peer compute and storage network in the world, which enables individuals and organizations to build and deploy their web2 and web3 applications in a complete decentralized, private, sustainable, and autonomous IT infrastructure through its peer-to-peer cloud capacity and developer tools.\n\nThreeFold technology and the ThreeFold Grid offer a decentralized compute and storage network that ensures the privacy and sovereignty of consumer data, a quantum safe file system, scalability, cost efficiency, and ultimately a digital infrastructure that is sustainable and helps organizations address critical technological challenges.\n\nTo learn more, visit [threefold.io](https://threefold.io).\n",
+            "url": "https://news.threefoldconnect.jimber.org/ode-and-three-fold-partnership-announcement/",
+            "title": "ODE and ThreeFold Partnership Announcement",
+            "date_modified": "2021-08-05T00:00:00.000Z"
+        },
+        {
+            "id": "https://news.threefoldconnect.jimber.org/watch-the-p2-p-file-browser-demo/",
+            "content_html": "\nToday, we're excited to share with you **[a demo of the ultra-secure peer-to-peer file browser (storage) solution](https://www.youtube.com/watch?v=oT_dKuvF6Ng)** that's being built on top of the ThreeFold Grid!\n\nThis is part of a series of demos showcasing a little piece of what we're building at the ThreeFold – private, secure, peer-to-peer alternatives to many of the tools and experiences we all use today.\n\n*Last week, we shared a demo of the self-hosted video solution, which you can find if you scroll through our previous announcements.*\n\nSee you next time! 👋\n",
+            "url": "https://news.threefoldconnect.jimber.org/watch-the-p2-p-file-browser-demo/",
+            "title": "Watch the P2P File Browser Demo",
+            "date_modified": "2021-07-29T00:00:00.000Z"
+        }
+    ]
+}
