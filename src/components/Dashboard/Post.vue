@@ -71,13 +71,12 @@
                                     "
                                 >
                                     <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div class="relative grid gap-8 bg-white p-7 lg:grid-cols-2">
+                                        <div class="relative grid gap-8 bg-white p-6">
                                             <a
                                                 v-for="item in solutions"
                                                 :key="item.name"
                                                 :href="item.href"
                                                 class="
-                                                    flex
                                                     items-center
                                                     p-2
                                                     -m-3
@@ -92,56 +91,11 @@
                                                     focus-visible:ring-opacity-50
                                                 "
                                             >
-                                                <div
-                                                    class="
-                                                        flex
-                                                        items-center
-                                                        justify-center
-                                                        flex-shrink-0
-                                                        w-10
-                                                        h-10
-                                                        text-white
-                                                        sm:h-12 sm:w-12
-                                                    "
-                                                >
-                                                    <div v-html="item.icon"></div>
-                                                </div>
-                                                <div class="ml-4">
+                                                <div class="">
                                                     <p class="text-sm font-medium text-gray-900">
                                                         {{ item.name }}
                                                     </p>
-                                                    <p class="text-sm text-gray-500">
-                                                        {{ item.description }}
-                                                    </p>
                                                 </div>
-                                            </a>
-                                        </div>
-                                        <div class="p-4 bg-gray-50">
-                                            <a
-                                                href="##"
-                                                class="
-                                                    flow-root
-                                                    px-2
-                                                    py-2
-                                                    transition
-                                                    duration-150
-                                                    ease-in-out
-                                                    rounded-md
-                                                    hover:bg-gray-100
-                                                    focus:outline-none
-                                                    focus-visible:ring
-                                                    focus-visible:ring-orange-500
-                                                    focus-visible:ring-opacity-50
-                                                "
-                                            >
-                                                <span class="flex items-center">
-                                                    <span class="text-sm font-medium text-gray-900">
-                                                        Documentation
-                                                    </span>
-                                                </span>
-                                                <span class="block text-sm text-gray-500">
-                                                    Start integrating products and tools
-                                                </span>
                                             </a>
                                         </div>
                                     </div>
@@ -152,13 +106,13 @@
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <p v-html="props.item.content_html.replace(/<[^>]*>?/gm, '')"></p>
+                <p v-html="props.item.content_html"></p>
                 <div class="my-6">
                     <img src="/placeholder.png" class="w-full h-auto" />
                 </div>
             </div>
             <div>
-                <div class="flex items-center justify-start">
+                <div class="flex items-center w-full">
                     <div class="flex -space-x-2 overflow-hidden">
                         <img
                             class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
@@ -182,11 +136,12 @@
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
                         </p>
-                        <p class="text-gray-600">and {{ props.item.comments - 2 }} other liked this</p>
+                        <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
                     </div>
-                    <div class="flex">
-                        <p class="text-gray-600 justify-self-end">{{ props.item.comments }} Comments</p>
-                    </div>
+
+                    <p class="text-gray-600 mr-0 ml-auto cursor-pointer">
+                        {{ Math.abs(props.item.comments) }} Comments
+                    </p>
                 </div>
             </div>
         </div>
@@ -242,7 +197,7 @@
 
     const solutions = [
         {
-            name: 'Insights',
+            name: 'Send private message',
             description: 'Measure actions your users take',
             href: '##',
             icon: `
@@ -278,7 +233,7 @@
           `,
         },
         {
-            name: 'Automations',
+            name: 'Share with a friend',
             description: 'Create your own targeted content',
             href: '##',
             icon: `
