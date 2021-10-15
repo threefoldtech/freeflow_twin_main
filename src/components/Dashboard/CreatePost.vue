@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded">
+    <div class="z-50 bg-white rounded">
         <TabGroup>
             <TabList class="flex items-stretch h-12">
                 <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
@@ -56,6 +56,7 @@
             </TabPanels>
         </TabGroup>
     </div>
+    <div v-if="open" @click="open = false" class="inset-0 z-40 bg-gray-300 w-full h-full fixed"></div>
 </template>
 
 <script setup lang="ts">
@@ -65,6 +66,8 @@
     import { useAuthState } from '@/store/authStore';
     import { ref } from 'vue';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+
+    const open = ref(false);
 
     const actions = ref([
         {

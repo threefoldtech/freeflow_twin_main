@@ -106,10 +106,7 @@
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <p v-html="props.item.content_html"></p>
-                <div class="my-6">
-                    <img src="/placeholder.png" class="w-full h-auto" />
-                </div>
+                <p class="mb-8" v-html="renderMarkdown(item.content_html)"></p>
             </div>
             <div>
                 <div class="flex items-center w-full">
@@ -136,7 +133,9 @@
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
                         </p>
-                        <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
+                        <p class="text-gray-600">
+                            and {{ Math.abs(props.item.comments - 2) + localLike ? 1 : 0 }} other liked this
+                        </p>
                     </div>
 
                     <p class="text-gray-600 mr-0 ml-auto cursor-pointer">
@@ -146,23 +145,52 @@
             </div>
         </div>
         <div class="border-t-2 flex space-x-8 p-4">
-            <div class="flex items-center cursor-pointer" v-for="action in actions" :key="action.name">
-                <component :is="action.component" class="w-6 text-gray-500 mr-3" />
-                <p class="text-gray-500">{{ action.name }}</p>
+            <div
+                class="flex items-center cursor-pointer"
+                v-for="action in actions"
+                :key="action.name"
+                @click="executeAction(action.name)"
+            >
+                <component
+                    :is="localLike ? action.active : action.component"
+                    class="w-6 text-gray-500 mr-3"
+                    :class="{ 'text-red-500': localLike && action.name === 'Like' }"
+                />
+                <p class="text-gray-500">
+                    {{ localLike ? (action.active_text ? action?.active_text : action.name) : action.name }}
+                </p>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { PhotographIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
+    import {
+        PhotographIcon,
+        PencilAltIcon,
+        FilmIcon,
+        DotsVerticalIcon,
+        HeartIcon as HeartIconSolid,
+    } from '@heroicons/vue/solid';
     import { HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import moment from 'moment';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
     import { ChevronDownIcon } from '@heroicons/vue/solid';
+
+    import MarkdownIt from 'markdown-it';
+
+    const md = new MarkdownIt({
+        html: true,
+        linkify: true,
+        typographer: true,
+    });
+
+    const renderMarkdown = content => {
+        return md.render(content);
+    };
 
     interface IProps {
         item: {
@@ -178,20 +206,30 @@
         };
     }
 
+    const props = defineProps<IProps>();
+
+    const localLike = ref(false);
+
+    const executeAction = (name: string) => {
+        if (name !== 'Like') return;
+        localLike.value = !localLike.value;
+    };
+
     const timeAgo = time => {
         return moment(time).fromNow();
     };
-
-    const props = defineProps<IProps>();
 
     const actions = ref([
         {
             name: 'Like',
             component: HeartIcon,
+            active: HeartIconSolid,
+            active_text: 'Liked',
         },
         {
             name: 'Comment',
             component: ChatAltIcon,
+            active: ChatAltIcon,
         },
     ]);
 

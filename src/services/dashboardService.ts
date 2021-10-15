@@ -21,7 +21,7 @@ const addLikesAndComments = async () => {
         return {
             ...post,
             likes: Math.floor(Math.random() * 39) + 4,
-            comments: Math.floor(Math.random() * 10),
+            comments: Math.floor(Math.random() * 10) + 3,
             persons: [names[Math.floor(Math.random() * names.length)], names[Math.floor(Math.random() * names.length)]],
             author: names[Math.floor(Math.random() * names.length)],
         };
