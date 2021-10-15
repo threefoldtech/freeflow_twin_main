@@ -15,14 +15,34 @@
             </TabList>
             <TabPanels>
                 <TabPanel>
-                    <div class="p-4 flex items-center">
+                    <div class="p-4 flex items-start h-48">
                         <AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>
-                        <input
-                            class="ml-4 text-base text-gray-800 p-2 outline-none"
-                            value=""
+                        <textarea
+                            class="ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full"
                             placeholder="Write something about you"
-                        /></div
-                ></TabPanel>
+                        />
+                    </div>
+
+                    <div class="border-t-2 p-4 block">
+                        <div
+                            class="
+                                bg-gray-300
+                                px-4
+                                py-2
+                                rounded-full
+                                flex
+                                items-center
+                                w-28
+                                cursor-pointer
+                                hover:bg-gray-200
+                            "
+                        >
+                            <CameraIcon class="text-gray-600 w-6 h-6" /><span class="ml-2 font-medium text-gray-600"
+                                >Media</span
+                            >
+                        </div>
+                    </div>
+                </TabPanel>
                 <TabPanel>
                     <div class="p-4 flex items-center justify-center h-32">
                         <p class="font-medium">Coming soon</p>
@@ -40,7 +60,7 @@
 
 <script setup lang="ts">
     import { PhotographIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
-    import { HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
+    import { CameraIcon, HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { ref } from 'vue';
