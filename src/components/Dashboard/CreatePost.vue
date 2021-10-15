@@ -1,11 +1,11 @@
 <template>
     <div
-        @click="createPostModalStatus = !createPostModalStatus"
-        class="z-50 bg-white rounded"
+        @click="createPostModalStatus = true"
+        class="z-50 bg-white rounded-lg relative"
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
-            <TabList class="flex items-stretch h-12">
+            <TabList class="flex items-stretch h-12 rounded-t-lg">
                 <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
                     <div
                         class="px-8 font-medium flex flex-row items-center cursor-pointer"
@@ -45,7 +45,7 @@
                             >
                         </div>
                     </div>
-                    <div @click.stop v-if="createPostModalStatus" class="bg-gray-200 px-4 py-4 border-t-2">
+                    <div @click.stop v-if="createPostModalStatus" class="bg-gray-200 px-4 py-4 border-t-2 rounded-b-lg">
                         <button
                             class="
                                 w-full
@@ -75,6 +75,11 @@
             </TabPanels>
         </TabGroup>
     </div>
+    <div
+        @click="createPostModalStatus = false"
+        v-if="createPostModalStatus"
+        class="w-full h-full inset-0 fixed z-40 bg-black bg-opacity-25"
+    ></div>
 </template>
 
 <script setup lang="ts">
