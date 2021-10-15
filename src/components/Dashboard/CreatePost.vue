@@ -1,5 +1,9 @@
 <template>
-    <div class="z-50 bg-white rounded">
+    <div
+        @click="createPostModalStatus = !createPostModalStatus"
+        class="z-50 bg-white rounded"
+        :class="{ 'drop-shadow-lg': createPostModalStatus }"
+    >
         <TabGroup>
             <TabList class="flex items-stretch h-12">
                 <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
@@ -22,7 +26,6 @@
                             placeholder="Write something about you"
                         />
                     </div>
-
                     <div class="border-t-2 p-4 block">
                         <div
                             class="
@@ -42,6 +45,22 @@
                             >
                         </div>
                     </div>
+                    <div @click.stop v-if="createPostModalStatus" class="bg-gray-200 px-4 py-4 border-t-2">
+                        <button
+                            class="
+                                w-full
+                                py-2
+                                bg-primary
+                                text-white
+                                font-semibold
+                                rounded
+                                hover:bg-accent-800
+                                duration-100
+                            "
+                        >
+                            Publish
+                        </button>
+                    </div>
                 </TabPanel>
                 <TabPanel>
                     <div class="p-4 flex items-center justify-center h-32">
@@ -56,7 +75,6 @@
             </TabPanels>
         </TabGroup>
     </div>
-    <div v-if="open" @click="open = false" class="inset-0 z-40 bg-gray-300 w-full h-full fixed"></div>
 </template>
 
 <script setup lang="ts">
@@ -65,9 +83,8 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { ref } from 'vue';
+    import { createPostModalStatus } from '@/services/dashboardService';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
-
-    const open = ref(false);
 
     const actions = ref([
         {

@@ -5,6 +5,7 @@
             <Post :item="item" v-for="(item, idx) in posts" :key="idx" />
         </div>
     </Applayout>
+    <div v-if="createPostModalStatus" class="fixed inset-0 w-full h-full bg-black z-40 bg-opacity-50"></div>
 </template>
 
 <script setup lang="ts">
@@ -12,11 +13,10 @@
     import CreatePost from '@/components/Dashboard/CreatePost.vue';
     import Post from '@/components/Dashboard/Post.vue';
     import { onBeforeMount, ref } from 'vue';
-    import { fetchPosts, posts } from '@/services/dashboardService';
+    import { fetchPosts, posts, createPostModalStatus } from '@/services/dashboardService';
 
     onBeforeMount(async () => {
         await fetchPosts();
-        console.log(posts.value);
     });
 </script>
 
