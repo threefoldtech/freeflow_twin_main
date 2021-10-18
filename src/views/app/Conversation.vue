@@ -209,9 +209,8 @@
                     <div class="max-w-full w-full p-4 pt-8">
                         <div
                             class="
-                                bg-white
-                                p-2
-                                pb-6
+                                bg-accent-600
+                                pb-4
                                 w-full
                                 relative
                                 rounded-lg
@@ -226,7 +225,18 @@
                             <div class="place-items-center grid relative">
                                 <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" class="-mt-7" />
                             </div>
-                            <h2 class="my-3 break-all text-center w-full overflow-y-auto max-h-28 text-lg">
+                            <h2
+                                class="
+                                    mt-4
+                                    break-all
+                                    text-center
+                                    w-full
+                                    overflow-y-auto
+                                    max-h-28
+                                    text-lg text-white
+                                    font-semibold
+                                "
+                            >
                                 {{ chat.name }}
                             </h2>
                             <p

@@ -1,11 +1,14 @@
 <template>
     <div
         v-if="chat.isGroup"
-        class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
+        class="bg-white p-4 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
     >
-        <h2>Members</h2>
-        <div v-for="contact in chat.contacts" :key="contact.id + chat.contacts.length" class="w-full">
-            <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2">
+        <h2 class="text-gray-800 font-medium mb-6 mt-2">Members</h2>
+        <div v-for="(contact, idx) in chat.contacts" :key="contact.id + chat.contacts.length" class="w-full">
+            <div
+                class="chatcard relative grid grid-cols-12 py-3 border-2"
+                :class="{ 'bg-gray-200': idx % 2 === 0, 'bg-gray-50': idx % 2 !== 0 }"
+            >
                 <div class="md:col-span-2 col-span-2 place-items-center grid relative">
                     <AvatarImg :id="contact.id" small />
                 </div>
@@ -23,23 +26,55 @@
                 </div>
             </div>
         </div>
-
-        <div
-            v-if="iAmAdmin"
-            class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl"
-        >
-            <h2 class="text-center">Add new members</h2>
-            <div class="h-full">
+        <div v-if="iAmAdmin" class="mt-6 w-full">
+            <h2 class="text-center mb-4 text-gray-800 font-medium">Add new members</h2>
+            <div class="mt-5 mb-2 border-2 py-1 px-2 flex justify-between items-center rounded-md relative w-full">
+                <input
+                    class="
+                        flex-grow
+                        outline-none
+                        ring-o
+                        text-gray-600
+                        focus:outline-none focus:ring-0 focus:text-gray-600
+                        border-none
+                        text-xs
+                    "
+                    type="text"
+                    placeholder="Search users..."
+                    v-model="searchInput"
+                />
+                <XIcon
+                    :class="[{ 'text-gray-400': searchInput.length >= 1, 'text-gray-200': searchInput.length < 1 }]"
+                    class="w-6 h-6 cursor-pointer hover:text-gray-400 transition duration-100"
+                    @click="searchInput = ''"
+                />
+            </div>
+            <div class="flex flex-col max-h-52 relative overflow-auto my-2">
                 <div v-if="!contacts.length">
                     <p class="text-gray-300 text-center py-4">Not able to add any contacts to this group</p>
                 </div>
-                <div v-for="(contact, i) in contacts" :key="i" class="grid grid-cols-12 rounded-lg mb-2 py-2">
-                    <div class="col-span-2 place-items-center grid">
+                <div
+                    v-for="(contact, i) in filteredMembers"
+                    :key="i"
+                    class="grid grid-cols-12 border-2 py-2 w-full px-4"
+                    :class="{ 'bg-gray-200': i % 2 === 0, 'bg-gray-50': i % 2 !== 0 }"
+                >
+                    <div class="col-span-2 place-items-center grid rounded-full border flex-shrink-0 w-10 h-10">
                         <AvatarImg :id="contact.id" small />
                     </div>
-                    <div class="col-span-8 pl-4 flex-col justify-center overflow-hidden overflow-ellipsis w-full">
+                    <p
+                        class="
+                            col-span-8
+                            pl-4
+                            flex-col
+                            justify-center
+                            overflow-hidden overflow-ellipsis
+                            w-full
+                            font-semibold
+                        "
+                    >
                         {{ contact.id }}
-                    </div>
+                    </p>
                     <div class="col-span-2 place-items-center grid">
                         <button class="h-12 rounded-full" @click="addToGroup(contact)">
                             <i class="fas fa-plus"></i>
@@ -114,8 +149,9 @@
     </Dialog>
 </template>
 <script setup lang="ts">
-    import { computed, ref } from 'vue';
+    import { computed, ref, watch, onMounted } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { XIcon } from '@heroicons/vue/solid';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
@@ -130,10 +166,33 @@
 
     defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);
 
+    const searchInput = ref<string>('');
+
+    watch(searchInput, () => {});
+
     const { contacts } = useContactsState();
+
+    const filteredMembers = computed(() => {
+        return contacts.filter(item => {
+            return item.id.toLowerCase().includes(searchInput.value.toLowerCase());
+        });
+    });
 
     const showRemoveUserDialog = ref(false);
     const toBeRemovedUser = ref();
+
+    onMounted(() => {
+        //Calculating already existent objects
+        console.log(props.chat.contacts);
+        const computed = contacts.map(contact => {
+            for (const i of props.chat.contacts) {
+                if (contact.id === i.id && contact.location === i.location) {
+                    return contact;
+                }
+            }
+        });
+        console.log(computed);
+    });
 
     const removeFromGroup = contact => {
         showRemoveUserDialog.value = true;
