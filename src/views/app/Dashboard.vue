@@ -5,7 +5,6 @@
             <Post :item="item" v-for="(item, idx) in posts" :key="idx" />
         </div>
     </Applayout>
-    <div v-if="createPostModalStatus" class="fixed inset-0 w-full h-full bg-black z-40 bg-opacity-50"></div>
 </template>
 
 <script setup lang="ts">

@@ -133,9 +133,7 @@
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
                         </p>
-                        <p class="text-gray-600">
-                            and {{ Math.abs(props.item.comments - 2) + localLike ? 1 : 0 }} other liked this
-                        </p>
+                        <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
                     </div>
 
                     <p class="text-gray-600 mr-0 ml-auto cursor-pointer">
