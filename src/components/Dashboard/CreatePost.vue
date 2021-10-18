@@ -5,7 +5,7 @@
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
-            <TabList class="flex items-stretch h-12 rounded-t-lg">
+            <TabList class="flex items-stretch h-12 rounded-t-lg relative">
                 <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
                     <div
                         class="px-8 font-medium flex flex-row items-center cursor-pointer"
@@ -15,7 +15,14 @@
                         <p>{{ tab.name }}</p>
                     </div>
                 </Tab>
-                <div class="h-full bg-gray-200 flex-grow self-stretch"></div>
+                <div class="h-full bg-gray-200 flex-grow self-stretch flex items-center justify-end pr-4">
+                    <XIcon
+                        @click.stop
+                        v-if="createPostModalStatus"
+                        @click="createPostModalStatus = false"
+                        class="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition duration-100"
+                    />
+                </div>
             </TabList>
             <TabPanels>
                 <TabPanel>
@@ -83,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-    import { PhotographIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
+    import { PhotographIcon, XIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
     import { CameraIcon, HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
