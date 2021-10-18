@@ -140,7 +140,7 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                        'bg-gray-100': isSelected(item),
+                                        'bg-gray-300': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     draggable="true"
