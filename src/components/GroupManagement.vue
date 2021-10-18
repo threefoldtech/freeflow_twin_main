@@ -50,7 +50,7 @@
                 />
             </div>
             <div class="flex flex-col max-h-52 relative overflow-auto my-2">
-                <div v-if="!contacts.length">
+                <div v-if="!filteredMembers.length">
                     <p class="text-gray-300 text-center py-4">Not able to add any contacts to this group</p>
                 </div>
                 <div
