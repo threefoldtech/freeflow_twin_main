@@ -79,6 +79,11 @@
 
     const apps: Array<AppItemType> = [
         {
+            name: AppType.Dashboard,
+            icon: '/flow.svg',
+            enabled: true,
+        },
+        {
             name: AppType.Whisper,
             icon: '/whisper.svg',
             enabled: true,
