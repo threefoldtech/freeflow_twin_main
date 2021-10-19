@@ -187,7 +187,7 @@
                         'flex ': showSideBar,
                         hidden: !showSideBar,
                     }"
-                    class="h-full flex-1 xl:flex-initial flex-col overflow-y-auto md:w-[400px]"
+                    class="min-h-screen flex-1 xl:flex-initial flex-col overflow-y-hidden md:w-[400px]"
                 >
                     <div class="bg-white h-14 xl:hidden flex justify-end items-center">
                         <button
@@ -238,14 +238,20 @@
                                 >
                                     {{ chat.name }}
                                 </h2>
-                                <p class="text-gray-500">{{ chat.contacts.length }} members</p>
+                                <p v-if="chat.isGroup" class="text-gray-500">{{ chat.contacts.length }} members</p>
+                                <p
+                                    v-if="!chat.isGroup"
+                                    class="
+                                        break-all
+                                        w-full
+                                        overflow-y-auto
+                                        font-medium
+                                        text-center text-gray-400 text-sm
+                                    "
+                                >
+                                    {{ status?.status || 'No status found' }}
+                                </p>
                             </div>
-                            <p
-                                v-if="!chat.isGroup"
-                                class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
-                            >
-                                {{ status?.status || 'No status found' }}
-                            </p>
                         </div>
                         <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
                         <group-management
