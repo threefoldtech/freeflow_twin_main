@@ -15,6 +15,7 @@ import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
 import { isArray } from 'lodash';
+import * as console from 'console';
 
 declare const Buffer;
 export enum FileType {
@@ -163,7 +164,7 @@ export const downloadFiles = async () => {
             const result = await Api.downloadFile(f.path);
             if (result.status !== 200 && result.status !== 201) throw new Error('Could not download file');
             let itemName = f.fullName;
-            if (f.isDirectory) itemName += ".zip";
+            if (f.isDirectory) itemName += '.zip';
             fileDownload(result.data, itemName);
             selectedPaths.value = [];
         })
@@ -579,7 +580,7 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
-export const getFullFolderSkeleton = async () => { };
+export const getFullFolderSkeleton = async () => {};
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
@@ -695,6 +696,7 @@ export const fetchBasedOnRoute = async () => {
         if (sharedFolderIsloading.value) {
             startTimer(5000);
         }
+
         //Fetching items
         const items = await getSharedFolderContent(parent.owner, parent.id, '/');
         //If there is something wrong with downloading the folder, return to shared with me.
@@ -762,7 +764,9 @@ export const fetchBasedOnRoute = async () => {
     }
 };
 
-export const loadSharedItems = async () => {
+export const sharedWithMeCurrentFolder = ref<string>('');
+
+export const loadSharedItems = () => {
     sharedBreadcrumbs.value = [];
 
     //https://bertmeeuws.digitaltwin.jimbertesting.be/quantum/shared/:sharedId/:path
@@ -787,6 +791,9 @@ export const loadSharedItems = async () => {
             });
         }
     }
+
+    sharedWithMeCurrentFolder.value = sharedBreadcrumbs.value[sharedBreadcrumbs.value.length - 1];
+    //sharedBreadcrumbs.value[sharedBreadcrumbs.value.length - 1]
 };
 
 export const goIntoSharedFolder = async (share: SharedFileInterface) => {

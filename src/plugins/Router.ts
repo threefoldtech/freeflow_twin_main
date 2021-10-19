@@ -241,7 +241,7 @@ router.afterEach(async (to, from) => {
     if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
         sharedFolderIsloading.value = true;
         await fetchBasedOnRoute();
-        await loadSharedItems();
+        loadSharedItems();
     } else {
         sharedFolderIsloading.value = false;
         showSharedFolderErrorModal.value = false;

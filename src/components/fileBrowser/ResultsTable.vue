@@ -158,16 +158,19 @@
                             </tr>
                         </tbody>
                     </table>
+                    <!-- GRID -->
+                    <!-- Local filebrowser -->
                     <ul
                         v-else
                         class="
                             grid grid-cols-2
-                            gap-x-4 gap-y-8
-                            sm:grid-cols-3 sm:gap-x-6
-                            lg:grid-cols-4
-                            xl:gap-x-8
+                            gap-x-2 gap-y-4
+                            sm:grid-cols-4 sm:gap-x-4
+                            lg:grid-cols-6
+                            xl:grid-cols-8
+                            2xl:grid-cols-10
+                            xl:gap-x-6
                             mt-4
-                            mx-2
                         "
                         role="list"
                     >
@@ -204,10 +207,11 @@
                                 class="
                                     group
                                     w-full
-                                    aspect-w-10 aspect-h-7
+                                    aspect-w-12 aspect-h-4
                                     rounded-lg
-                                    bg-gray-200
-                                    hover:bg-gray-300
+                                    bg-white
+                                    border-2
+                                    hover:bg-gray-200
                                     transition
                                     duration:200
                                     focus-within:ring-2
@@ -221,21 +225,20 @@
                                 "
                                 @click="handleSelect(item)"
                             >
-                                <div class="flex justify-center items-center cursor-pointer">
+                                <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i
                                         :key="item.name"
                                         :class="getIcon(item) + ' ' + getIconColor(item)"
-                                        class="fa-2x"
+                                        class="fa-lg"
                                     ></i>
-                                    <button class="absolute inset-0 focus:outline-none" type="button">
-                                        <span class="sr-only">View details for {{ item.name }}</span>
-                                    </button>
+                                    <p class="ml-4 text-sm font-medium text-gray-900 truncate pointer-events-none">
+                                        {{ item.name
+                                        }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
+                                    </p>
                                 </div>
                             </div>
-                            <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
-                                {{ item.name }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
-                            </p>
-                            <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+
+                            <p class="hidden text-sm font-medium text-gray-500 pointer-events-none">
                                 {{ getFileLastModified(item) }}
                             </p>
                         </li>
