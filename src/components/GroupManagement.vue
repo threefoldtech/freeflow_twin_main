@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center mb-6 mt-4 mx-4">
             <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
             <UserAddIcon
-                v-if="iAmAdmin"
+                v-if="isAdmin"
                 class="text-gray-600 w-5 h-5 cursor-pointer hover:text-gray-800 transition duration-75"
                 @click="openAddUserToGroup = true"
             />
@@ -21,7 +21,7 @@
                     </p>
                 </div>
                 <div class="btns col-span-2">
-                    <button v-if="iAmAdmin" @click="removeFromGroup(contact)">
+                    <button v-if="isAdmin" @click="removeFromGroup(contact)">
                         <i class="fas fa-times text-red-500"></i>
                     </button>
                 </div>
@@ -63,7 +63,7 @@
     </div>
     <!-- ADD USER TO GROUP MODAL -->
     <div
-        v-if="iAmAdmin && openAddUserToGroup"
+        v-if="isAdmin && openAddUserToGroup"
         @click="openAddUserToGroup = false"
         class="w-full h-full inset-0 absolute bg-black bg-opacity-25 z-50 flex justify-center items-center"
     >
@@ -198,8 +198,6 @@
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);
 
-    watch(searchInput, () => {});
-
     const { contacts } = useContactsState();
 
     const filteredMembers = computed(() => {
@@ -213,7 +211,6 @@
 
     onMounted(() => {
         //Calculating already existent objects
-        console.log(props.chat.contacts);
         const computed = contacts.map(contact => {
             for (const i of props.chat.contacts) {
                 if (contact.id === i.id && contact.location === i.location) {
@@ -221,7 +218,6 @@
                 }
             }
         });
-        console.log(computed);
     });
 
     const removeFromGroup = contact => {
@@ -246,7 +242,7 @@
         );
     });
 
-    const iAmAdmin = computed(() => {
+    const isAdmin = computed(() => {
         const { user } = useAuthState();
         //@ts-ignore
         return props.chat.adminId == user.id;

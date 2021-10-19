@@ -543,7 +543,7 @@
         updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
     };
 
-    const iAmAdmin = computed(() => {
+    const isAdmin = computed(() => {
         const { user } = useAuthState();
         //@ts-ignore
         console.log(chat.value.adminId);
