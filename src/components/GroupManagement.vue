@@ -1,14 +1,15 @@
 <template>
-    <div
-        v-if="chat.isGroup"
-        class="bg-white p-4 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
-    >
-        <h2 class="text-gray-800 font-medium mb-6 mt-2">Members</h2>
+    <div v-if="chat.isGroup" class="bg-whitew-full relative rounded-lg mb-4 md:grid grid-cols-1">
+        <div class="flex justify-between items-center mb-6 mt-4 mx-4">
+            <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
+            <UserAddIcon
+                v-if="iAmAdmin"
+                class="text-gray-600 w-5 h-5 cursor-pointer hover:text-gray-800 transition duration-75"
+                @click="openAddUserToGroup = true"
+            />
+        </div>
         <div v-for="(contact, idx) in chat.contacts" :key="contact.id + chat.contacts.length" class="w-full">
-            <div
-                class="chatcard relative grid grid-cols-12 py-3 border-2"
-                :class="{ 'bg-gray-200': idx % 2 === 0, 'bg-gray-50': idx % 2 !== 0 }"
-            >
+            <div class="chatcard relative grid grid-cols-12 py-3">
                 <div class="md:col-span-2 col-span-2 place-items-center grid relative">
                     <AvatarImg :id="contact.id" small />
                 </div>
@@ -26,8 +27,66 @@
                 </div>
             </div>
         </div>
-        <div v-if="iAmAdmin" class="mt-6 w-full">
-            <h2 class="text-center mb-4 text-gray-800 font-medium">Add new members</h2>
+        <div id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
+    </div>
+    <div class="bg-white p-2 w-full h-full">
+        <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
+        <div class="flex items-center flex-col w-full">
+            <div class="call bg-gray-100 flex items-center rounded w-full m-2" @click="$emit('app-call')">
+                <i class="fas fa-video m-3"></i>
+                <p class="m-3 text-xs">Join video room</p>
+            </div>
+            <div
+                v-if="!chat.isGroup && !blocked"
+                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
+                @click="$emit('app-block')"
+            >
+                <i class="fas fa-minus-circle m-3"></i>
+                <p class="m-3 text-xs">Block user</p>
+            </div>
+
+            <div
+                v-if="!chat.isGroup && blocked"
+                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
+                @click="$emit('app-unblock')"
+            >
+                <i class="fas fa-plus-circle m-3"></i>
+                <p class="m-3 text-xs">Unblock user</p>
+            </div>
+
+            <div class="delete bg-gray-100 flex items-center rounded w-full m-2" @click="$emit('app-delete')">
+                <i class="fas fa-trash m-3"></i>
+                <p class="m-3 text-xs">Delete conversation</p>
+            </div>
+        </div>
+    </div>
+    <!-- ADD USER TO GROUP MODAL -->
+    <div
+        v-if="iAmAdmin && openAddUserToGroup"
+        @click="openAddUserToGroup = false"
+        class="w-full h-full inset-0 absolute bg-black bg-opacity-25 z-50 flex justify-center items-center"
+    >
+        <div
+            @click.stop
+            class="w-full bg-white w-full h-full p-4 md:h-3/5 md:w-5/6 lg:md:w-3/6 xl:w-4/6 2xl:w-2/6 overflow-hidden"
+        >
+            <div class="flex items-center relative">
+                <h2 class="text-gray-800 text-lg font-medium text-left">Add new members to the group</h2>
+                <XIcon
+                    @click="openAddUserToGroup = false"
+                    class="
+                        w-6
+                        h-6
+                        cursor-pointer
+                        text-gray-500
+                        hover:text-gray-600
+                        transition
+                        duration-75
+                        absolute
+                        right-2
+                    "
+                />
+            </div>
             <div class="mt-5 mb-2 border-2 py-1 px-2 flex justify-between items-center rounded-md relative w-full">
                 <input
                     class="
@@ -49,15 +108,15 @@
                     @click="searchInput = ''"
                 />
             </div>
-            <div class="flex flex-col max-h-52 relative overflow-auto my-2">
+            <div class="flex flex-col relative overflow-auto my-2">
                 <div v-if="!filteredMembers.length">
-                    <p class="text-gray-300 text-center py-4">Not able to add any contacts to this group</p>
+                    <p class="text-gray-400 text-center py-4">Not able to add any contacts to this group</p>
                 </div>
                 <div
                     v-for="(contact, i) in filteredMembers"
                     :key="i"
-                    class="grid grid-cols-12 border-2 py-2 w-full px-4"
-                    :class="{ 'bg-gray-200': i % 2 === 0, 'bg-gray-50': i % 2 !== 0 }"
+                    class="grid grid-cols-12 py-2 w-full px-4"
+                    :class="{ 'bg-gray-100': i % 2 === 0, 'bg-gray-50': i % 2 !== 0 }"
                 >
                     <div class="col-span-2 place-items-center grid rounded-full border flex-shrink-0 w-10 h-10">
                         <AvatarImg :id="contact.id" small />
@@ -81,39 +140,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1">
-        <h3 class="mt-2">Actions</h3>
-
-        <div class="flex items-center flex-col w-full">
-            <div class="call bg-gray-100 flex items-center rounded-xl w-full m-2" @click="$emit('app-call')">
-                <i class="fas fa-video m-3"></i>
-                <p class="m-3 text-xs">Join video room</p>
-            </div>
-
-            <div
-                v-if="!chat.isGroup && !blocked"
-                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
-                @click="$emit('app-block')"
-            >
-                <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3 text-xs">Block user</p>
-            </div>
-
-            <div
-                v-if="!chat.isGroup && blocked"
-                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
-                @click="$emit('app-unblock')"
-            >
-                <i class="fas fa-plus-circle m-3"></i>
-                <p class="m-3 text-xs">Unblock user</p>
-            </div>
-
-            <div class="delete bg-gray-100 flex items-center rounded-xl w-full m-2" @click="$emit('app-delete')">
-                <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete conversation</p>
             </div>
         </div>
     </div>
@@ -151,12 +177,12 @@
 <script setup lang="ts">
     import { computed, ref, watch, onMounted } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { XIcon } from '@heroicons/vue/solid';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
+    import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
 
     interface IProps {
         chat: any;
@@ -167,6 +193,7 @@
     defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);
 
     const searchInput = ref<string>('');
+    const openAddUserToGroup = ref<boolean>(false);
 
     watch(searchInput, () => {});
 

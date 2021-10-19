@@ -206,39 +206,40 @@
                             <div class="h-full flex items-center justify-center"><i class="fa fa-times"></i></div>
                         </button>
                     </div>
-                    <div class="max-w-full w-full p-4 pt-8">
-                        <div
-                            class="
-                                bg-accent-600
-                                pb-4
-                                w-full
-                                relative
-                                rounded-lg
-                                mb-4
-                                mt-0
-                                md:grid
-                                place-items-center
-                                grid-cols-1
-                                md:px-4
-                            "
-                        >
-                            <div class="place-items-center grid relative">
-                                <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" class="-mt-7" />
-                            </div>
-                            <h2
+                    <div class="max-w-full w-full bg-white border">
+                        <div class="bg-white pb-4 w-full mb-4 p-6 flex min-h-64 justify-start relative">
+                            <XIcon
                                 class="
-                                    mt-4
-                                    break-all
-                                    text-center
-                                    w-full
-                                    overflow-y-auto
-                                    max-h-28
-                                    text-lg text-white
-                                    font-semibold
+                                    w-5
+                                    h-5
+                                    absolute
+                                    right-5
+                                    top-5
+                                    text-gray-500
+                                    cursor-pointer
+                                    hover:text-gray-700
+                                    transition
+                                    duration-100
                                 "
-                            >
-                                {{ chat.name }}
-                            </h2>
+                                @click="disableSidebar"
+                            />
+                            <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
+                            <div class="ml-6">
+                                <h2
+                                    class="
+                                        break-all
+                                        w-full
+                                        overflow-y-auto
+                                        max-h-28
+                                        text-lg text-white
+                                        font-semibold
+                                        text-gray-800
+                                    "
+                                >
+                                    {{ chat.name }}
+                                </h2>
+                                <p class="text-gray-500">{{ chat.contacts.length }} members</p>
+                            </div>
                             <p
                                 v-if="!chat.isGroup"
                                 class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
@@ -246,6 +247,7 @@
                                 {{ status?.status || 'No status found' }}
                             </p>
                         </div>
+                        <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
                         <group-management
                             :chat="chat"
                             @app-call="popupMeeting"
@@ -329,6 +331,7 @@
     import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
+    import { XIcon } from '@heroicons/vue/outline';
 
     const route = useRoute();
     let selectedId = ref(<string>route.params.id);
