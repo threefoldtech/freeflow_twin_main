@@ -220,6 +220,8 @@
                                     hover:text-gray-700
                                     transition
                                     duration-100
+                                    hidden
+                                    xl:inline
                                 "
                                 @click="disableSidebar"
                             />
