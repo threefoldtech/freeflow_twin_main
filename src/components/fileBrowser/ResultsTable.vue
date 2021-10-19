@@ -175,12 +175,12 @@
                         role="list"
                     >
                         <p
-                            v-if="searchResults?.length === 0"
+                            v-if="searchResults === 'None'"
                             class="
                                 px-6
                                 py-4
                                 whitespace-nowrap
-                                col-span-4
+                                col-span-12
                                 text-base
                                 font-medium
                                 text-center text-gray-800
@@ -196,20 +196,22 @@
                             v-for="item in searchResults"
                             v-if="searchResults !== 'None'"
                             :key="item.fullName"
+                            :title="item.fullName"
                             class="relative"
                             draggable="true"
-                            @click="handleItemClick(item)"
+                            @click="handleSelect(item)"
+                            @dblclick="handleItemClick(item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
                             @drop="() => onDrop(item)"
                         >
                             <div
+                                :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
                                 class="
                                     group
                                     w-full
                                     aspect-w-12 aspect-h-4
                                     rounded-lg
-                                    bg-white
                                     border-2
                                     hover:bg-gray-200
                                     transition
@@ -223,7 +225,6 @@
                                     justify-center
                                     items-center
                                 "
-                                @click="handleSelect(item)"
                             >
                                 <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i
@@ -275,6 +276,8 @@
     import { useRouter } from 'vue-router';
 
     const router = useRouter();
+
+    /*
     const handleItemClick = (item: PathInfoModel) => {
         if (item.isDirectory) {
             goToFileDirectory(item);
@@ -282,8 +285,14 @@
         }
         itemAction(item, router);
     };
+     */
+    const handleItemClick = (item: PathInfoModel) => {
+        itemAction(item, router);
+    };
+
     const isSelected = (item: PathInfoModel) => {
-        return selectedPaths.value.includes(item);
+        if (!selectedPaths.value.includes(item)) return false;
+        else return true;
     };
     const handleAllSelect = (val: any) => {
         if (val.target.checked) {
@@ -293,6 +302,7 @@
         deselectAll();
     };
     const handleSelect = (item: PathInfoModel) => {
+        window.console.log(selectedPaths.value);
         if (!selectedPaths.value.includes(item)) {
             selectItem(item);
             return;

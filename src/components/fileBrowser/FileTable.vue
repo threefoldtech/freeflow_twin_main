@@ -207,7 +207,7 @@
                                     px-6
                                     py-4
                                     whitespace-nowrap
-                                    col-span-4
+                                    col-span-12
                                     text-base
                                     font-medium
                                     text-center text-gray-800
@@ -219,14 +219,14 @@
                                 No items in this folder
                                 <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
                             </p>
-                            <li v-if="currentDirectory === '/'">
+                            <li v-if="currentDirectory === '/'" title="Shared folder">
                                 <div
                                     class="
                                         group
                                         w-full
                                         aspect-w-12 aspect-h-4
-                                        bg-white
                                         border-2
+                                        bg-white
                                         rounded-md
                                         hover:bg-gray-200
                                         transition
@@ -264,20 +264,22 @@
                             <li
                                 v-for="item in sortContent()"
                                 :key="item.fullName"
+                                :title="item.fullName"
                                 class="relative"
                                 draggable="true"
-                                @click="handleItemClick(item)"
+                                @click="handleSelect(item)"
+                                @dblclick="handleItemClick(item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
                             >
                                 <div
+                                    :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
                                     class="
                                         group
                                         w-full
                                         aspect-w-12 aspect-h-4
                                         rounded-lg
-                                        bg-white
                                         border-2
                                         hover:bg-gray-200
                                         transition
@@ -291,7 +293,6 @@
                                         justify-center
                                         items-center
                                     "
-                                    @click="handleSelect(item)"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i

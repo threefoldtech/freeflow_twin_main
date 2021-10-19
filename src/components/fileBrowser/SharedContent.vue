@@ -120,17 +120,16 @@
                                     px-6
                                     py-4
                                     whitespace-nowrap
-                                    col-span-4
+                                    col-span-12
                                     text-base
                                     font-medium
-                                    bg-gray-200
                                     text-center text-gray-800
                                 "
                                 v-if="sharedContent.length === 0"
                             >
                                 Nothing has been shared with you yet!
                             </p>
-                            <li v-for="item in sharedContent" :key="item.name" class="relative">
+                            <li v-for="item in sharedContent" :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
                                         group
