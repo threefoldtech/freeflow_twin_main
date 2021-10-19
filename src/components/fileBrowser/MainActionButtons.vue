@@ -146,6 +146,10 @@
         newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
     };
 
+    watch(showCreateFolderDialog, () => {
+        manualContactAdd.value = '';
+    });
+
     const updateCreateFolderDialog = (val: boolean) => {
         createFolderErrors.value = [];
         if (!val) {
