@@ -140,7 +140,7 @@
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
                                     :class="{
-                                        'bg-gray-100': isSelected(item),
+                                        'bg-gray-300': isSelected(item),
                                     }"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     draggable="true"
@@ -185,14 +185,18 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <!-- GRID -->
+                        <!-- Local filebrowser -->
                         <ul
                             v-else
                             class="
                                 grid grid-cols-2
-                                gap-x-4 gap-y-8
-                                sm:grid-cols-3 sm:gap-x-6
-                                lg:grid-cols-4
-                                xl:gap-x-8
+                                gap-x-2 gap-y-4
+                                sm:grid-cols-4 sm:gap-x-4
+                                lg:grid-cols-6
+                                xl:grid-cols-8
+                                2xl:grid-cols-10
+                                xl:gap-x-6
                                 mt-4
                             "
                             role="list"
@@ -203,7 +207,7 @@
                                     px-6
                                     py-4
                                     whitespace-nowrap
-                                    col-span-4
+                                    col-span-12
                                     text-base
                                     font-medium
                                     text-center text-gray-800
@@ -215,15 +219,16 @@
                                 No items in this folder
                                 <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
                             </p>
-                            <li v-if="currentDirectory === '/'">
+                            <li v-if="currentDirectory === '/'" title="Shared folder">
                                 <div
                                     class="
                                         group
                                         w-full
-                                        aspect-w-10 aspect-h-7
-                                        rounded-lg
-                                        bg-gray-200
-                                        hover:bg-gray-300
+                                        aspect-w-12 aspect-h-4
+                                        border-2
+                                        bg-white
+                                        rounded-md
+                                        hover:bg-gray-200
                                         transition
                                         duration:200
                                         focus-within:ring-2
@@ -232,50 +237,51 @@
                                         focus-within:ring-indigo-500
                                         overflow-hidden
                                         flex
-                                        justify-center
+                                        justify-start
                                         items-center
                                     "
                                     @click="goToShared()"
                                 >
-                                    <div class="flex justify-center items-center cursor-pointer">
-                                        <li class="relative"></li>
-                                        <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
+                                    <div class="flex justify-start items-center cursor-pointer px-2">
+                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
                                         <p
                                             class="
-                                                mt-2
                                                 block
                                                 text-sm
                                                 font-medium
                                                 text-gray-900
                                                 truncate
                                                 pointer-events-none
+                                                ml-4
                                             "
-                                        ></p>
+                                        >
+                                            Shared with me
+                                        </p>
                                         <button class="absolute inset-0 focus:outline-none" type="button"></button>
                                     </div>
                                 </div>
-                                <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
-                                    Shared with me
-                                </p>
                             </li>
                             <li
                                 v-for="item in sortContent()"
                                 :key="item.fullName"
+                                :title="item.fullName"
                                 class="relative"
                                 draggable="true"
-                                @click="handleItemClick(item)"
+                                @click="handleSelect(item)"
+                                @dblclick="handleItemClick(item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
                             >
                                 <div
+                                    :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
                                     class="
                                         group
                                         w-full
-                                        aspect-w-10 aspect-h-7
+                                        aspect-w-12 aspect-h-4
                                         rounded-lg
-                                        bg-gray-200
-                                        hover:bg-gray-300
+                                        border-2
+                                        hover:bg-gray-200
                                         transition
                                         duration:200
                                         focus-within:ring-2
@@ -287,24 +293,30 @@
                                         justify-center
                                         items-center
                                     "
-                                    @click="handleSelect(item)"
                                 >
-                                    <div class="flex justify-center items-center cursor-pointer">
+                                    <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
                                             :key="item.name"
                                             :class="getIcon(item) + ' ' + getIconColor(item)"
-                                            class="fa-2x"
+                                            class="fa-lg"
                                         ></i>
-                                        <button class="absolute inset-0 focus:outline-none" type="button">
-                                            <span class="sr-only">View details for {{ item.name }}</span>
-                                        </button>
+                                        <p
+                                            class="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                                truncate
+                                                pointer-events-none
+                                                ml-4
+                                            "
+                                        >
+                                            {{ item.name
+                                            }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
+                                        </p>
                                     </div>
                                 </div>
-                                <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
-                                    {{ item.name
-                                    }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
-                                </p>
-                                <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+                                <p class="hidden block text-sm font-medium text-gray-500 pointer-events-none">
                                     {{ getFileLastModified(item) }}
                                 </p>
                             </li>
