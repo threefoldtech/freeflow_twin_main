@@ -85,22 +85,6 @@
     };
 
     const parts = computed(() => {
-        /*
-            const address = String(atob(router.currentRoute.value.params.folder));
-            console.log(address.split('/'));
-            console.log(address.split('/')[address.split('/').length - 1]);
-            const currentEntity = address.split('/')[address.split('/').length - 1];
-
-            const extension = checkIfPathHasExtension(currentEntity);
-
-            if (getFileType(extension) !== FileType.Unknown) {
-                return currentDirectory.value.split('/').slice(-1);
-            }
-
-    */
-
-        //console.log();
-
         return currentDirectory.value.split('/');
     });
 
