@@ -1,5 +1,5 @@
 import { reactive } from '@vue/reactivity';
-import { readonly, ref, toRefs } from 'vue';
+import { nextTick, readonly, ref, toRefs } from 'vue';
 import axios from 'axios';
 import moment from 'moment';
 import {
@@ -84,6 +84,22 @@ const retrievechats = async () => {
         });
         sortChats();
         isLoading.value = false;
+    });
+};
+
+export const editMessage = (chatId, message) => {
+    clearMessageAction(chatId);
+    //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
+    nextTick(() => {
+        setMessageAction(chatId, message, MessageAction.EDIT);
+    });
+};
+
+export const replyMessage = (chatId, message) => {
+    clearMessageAction(chatId);
+    //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
+    nextTick(() => {
+        setMessageAction(chatId, message, MessageAction.REPLY);
     });
 };
 
@@ -472,6 +488,15 @@ export const usechatsState = () => {
     };
 };
 
+export const draftMessage = (chatId, message: Message<MessageBodyType>) =>{
+    getChat(chatId).draft = message;
+    axios.post(`${config.baseUrl}api/updateDraft`, {
+        params: {
+            'draftMessage': message
+        }
+    })
+}
+
 export const usechatsActions = () => {
     return {
         addChat,
@@ -488,6 +513,7 @@ export const usechatsActions = () => {
         updateChat,
         getNewMessages,
         getChatInfo,
+        draftMessage,
     };
 };
 

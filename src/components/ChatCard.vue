@@ -39,7 +39,17 @@
                 </span>
             </p>
             <div class="flex overflow-hidden">
-                <div class="flex-0 col-end-13 col-span-2 text-gray-400 overflow-ellipsis overflow-hidden text-xs">
+                <div v-if="getDraftMessage().length > 0" class="flex-0 col-end-13 col-span-2 overflow-ellipsis overflow-hidden text-xs">
+                    <div class="space-x-1 ...">
+                        <div class="inline-block ... text-red-500">[Draft]:</div>
+                        <div class="inline-block ... text-gray-400">{{ getDraftMessage() }}</div>
+                    </div>
+                </div>
+
+                <div
+                    v-else
+                    class="flex-0 col-end-13 col-span-2 text-gray-400 overflow-ellipsis overflow-hidden text-xs"
+                >
                     {{ lastMessageBody }}
                 </div>
             </div>
@@ -48,112 +58,119 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, ref } from 'vue';
-    import { findLastIndex } from 'lodash';
-    import { useAuthState } from '@/store/authStore';
-    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, SystemBody } from '@/types';
-    import moment from 'moment';
-    import { statusList } from '@/store/statusStore';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { useRouter } from 'vue-router';
-    import { isBlocked } from '@/store/blockStore';
+import { computed, defineComponent, ref } from 'vue';
+import { findLastIndex } from 'lodash';
+import { useAuthState } from '@/store/authStore';
+import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, SystemBody } from '@/types';
+import moment from 'moment';
+import { statusList } from '@/store/statusStore';
+import AvatarImg from '@/components/AvatarImg.vue';
+import { useRouter } from 'vue-router';
+import { isBlocked } from '@/store/blockStore';
+import { MessageAction } from '@/store/chatStore';
 
-    interface IProps {
-        chat: Chat;
-        collapsed: Boolean;
+interface IProps {
+    chat: Chat;
+    collapsed: Boolean;
+}
+
+const props = defineProps<IProps>();
+const emits = defineEmits(['selectChat']);
+const { user } = useAuthState();
+
+const lastReadByMe = computed(() => {
+    let lastReadMessage = props.chat.read[<string>user.id];
+    return findLastIndex(props.chat.messages, (message: Message<MessageBodyType>) => lastReadMessage === message.id);
+});
+const lastMessage = computed(() => {
+    return props.chat && props.chat.messages && props.chat.messages.length
+        ? props.chat.messages[props.chat.messages.length - 1]
+        : 'No messages yet';
+});
+const newMessages = computed(() => {
+    return props.chat.messages.length - lastReadByMe.value - 1;
+});
+const timeAgo = time => {
+    return moment(time).fromNow();
+};
+
+const status = computed(() => {
+    return statusList[props.chat.chatId];
+});
+
+const getDraftMessage = () => {
+    if(props.chat?.draft?.action === MessageAction.EDIT) return props.chat.draft.body.body.message;
+    if(props.chat?.draft?.action === MessageAction.REPLY) return  props.chat.draft.body.message;
+    if(props.chat?.draft) return props.chat.draft.body;
+    return "";
+}
+
+
+
+const router = useRouter();
+const currentRoute = computed(() => router.currentRoute.value);
+
+const lastMessageBody = computed(() => {
+    const lstmsg = lastMessage.value;
+    switch (lstmsg.type) {
+        case 'GIF':
+            return 'Gif was sent';
+        case 'QUOTE':
+            return lstmsg.body.message;
+        case MessageTypes.SYSTEM:
+            return (lstmsg.body as SystemBody).message;
+        case 'FILE': {
+            if (lstmsg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
+            return 'File has been uploaded';
+        }
+        case 'FILE_SHARE': {
+            if (lstmsg?.body?.isFolder) {
+                return 'Folder has been shared';
+            }
+            return 'File has been shared';
+        }
+        case 'DELETE':
+        default:
+            return lstmsg.body;
+    }
+});
+
+const unreadMessagesAmount = computed(() => {
+    if (!props.chat || !user) {
+        return 0;
     }
 
-    const props = defineProps<IProps>();
-    const emits = defineEmits(['selectChat']);
-    const { user } = useAuthState();
+    const lastReadMessageId = props.chat.read[<string>user.id];
+    const index = props.chat.messages?.findIndex(m => m.id === lastReadMessageId);
+    if (!index || index < 1) {
+        return 0;
+    }
 
-    const lastReadByMe = computed(() => {
-        let lastReadMessage = props.chat.read[<string>user.id];
-        return findLastIndex(
-            props.chat.messages,
-            (message: Message<MessageBodyType>) => lastReadMessage === message.id
-        );
-    });
-    const lastMessage = computed(() => {
-        return props.chat && props.chat.messages && props.chat.messages.length
-            ? props.chat.messages[props.chat.messages.length - 1]
-            : 'No messages yet';
-    });
-    const newMessages = computed(() => {
-        return props.chat.messages.length - lastReadByMe.value - 1;
-    });
-    const timeAgo = time => {
-        return moment(time).fromNow();
-    };
+    return props.chat.messages.length - (index + 1);
+});
 
-    const status = computed(() => {
-        return statusList[props.chat.chatId];
-    });
-
-    const router = useRouter();
-    const currentRoute = computed(() => router.currentRoute.value);
-
-    const lastMessageBody = computed(() => {
-        const lstmsg = lastMessage.value;
-        switch (lstmsg.type) {
-            case 'GIF':
-                return 'Gif was sent';
-            case 'QUOTE':
-                return lstmsg.body.message;
-            case MessageTypes.SYSTEM:
-                return (lstmsg.body as SystemBody).message;
-            case 'FILE': {
-                if (lstmsg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
-                return 'File has been uploaded';
-            }
-            case 'FILE_SHARE': {
-                if (lstmsg?.body?.isFolder) {
-                    return 'Folder has been shared';
-                }
-                return 'File has been shared';
-            }
-            case 'DELETE':
-            default:
-                return lstmsg.body;
-        }
-    });
-
-    const unreadMessagesAmount = computed(() => {
-        if (!props.chat || !user) {
-            return 0;
-        }
-
-        const lastReadMessageId = props.chat.read[<string>user.id];
-        const index = props.chat.messages?.findIndex(m => m.id === lastReadMessageId);
-        if (!index || index < 1) {
-            return 0;
-        }
-
-        return props.chat.messages.length - (index + 1);
-    });
-
-    const blocked = computed(() => {
-        if (!props.chat || props.chat.isGroup) return false;
-        return isBlocked(props.chat.chatId);
-    });
+const blocked = computed(() => {
+    if (!props.chat || props.chat.isGroup) return false;
+    return isBlocked(props.chat.chatId);
+});
 </script>
 
 <style scoped>
-    .content {
-        width: calc(100% - 4rem);
-    }
+.content {
+    width: calc(100% - 4rem);
+}
 
-    .name {
-        max-width: calc(100% - 150px);
-        box-sizing: border-box;
-    }
+.name {
+    max-width: calc(100% - 150px);
+    box-sizing: border-box;
+}
 
-    .chatcard {
-        box-sizing: border-box;
-        width: 100%;
-    }
+.chatcard {
+    box-sizing: border-box;
+    width: 100%;
+}
 
-    .chatcard:hover {
-        background-color: lightgray;
-    }
+.chatcard:hover {
+    background-color: lightgray;
+}
 </style>
