@@ -71,18 +71,6 @@
         sharedBreadcrumbs,
         sharedDir,
     } from '@/store/fileBrowserStore';
-    import { useRouter } from 'vue-router';
-
-    const router = useRouter();
-
-    const checkIfPathHasExtension = (path: string) => {
-        console.log(path);
-        return path.substring(path.lastIndexOf('.') + 1, path.length) || path;
-    };
-
-    const isFolder = fileType => {
-        return [FileType.Unknown].some(x => x === fileType);
-    };
 
     const parts = computed(() => {
         return currentDirectory.value.split('/');
