@@ -1,6 +1,6 @@
 <template>
     <nav>
-        <div class="flex flex-col h-full items-center mx-2">
+        <div class="flex flex-col h-full items-center">
             <div class="mb-4 grid text-center text-white cursor-pointer">
                 <div
                     class="h-20 w-20 rounded-full grid place-items-center mb-1"
