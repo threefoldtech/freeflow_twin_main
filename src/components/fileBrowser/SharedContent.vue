@@ -1,7 +1,7 @@
 <template>
     <div class="h-full overflow-y-auto px-3">
         <h1 class="p-2">
-            Shared with me: <span>{{ currentFolderName }}</span>
+            Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>
         </h1>
         <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
             <Spinner :xlarge="true" />
@@ -99,16 +99,19 @@
                                 </tr>
                             </tbody>
                         </table>
-
+                        <!-- GRID -->
+                        <!-- SHARED -->
                         <ul
                             role="list"
                             v-else
                             class="
                                 grid grid-cols-2
-                                gap-x-4 gap-y-8
-                                sm:grid-cols-3 sm:gap-x-6
-                                lg:grid-cols-4
-                                xl:gap-x-8
+                                gap-x-2 gap-y-4
+                                sm:grid-cols-4 sm:gap-x-4
+                                lg:grid-cols-6
+                                xl:grid-cols-8
+                                2xl:grid-cols-10
+                                xl:gap-x-6
                                 mt-4
                             "
                         >
@@ -117,25 +120,25 @@
                                     px-6
                                     py-4
                                     whitespace-nowrap
-                                    col-span-4
+                                    col-span-12
                                     text-base
                                     font-medium
-                                    bg-gray-200
                                     text-center text-gray-800
                                 "
                                 v-if="sharedContent.length === 0"
                             >
                                 Nothing has been shared with you yet!
                             </p>
-                            <li v-for="item in sharedContent" :key="item.name" class="relative">
+                            <li v-for="item in sharedContent" :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
                                         group
                                         w-full
-                                        aspect-w-10 aspect-h-7
-                                        rounded-lg
-                                        bg-gray-200
-                                        hover:bg-gray-300
+                                        aspect-w-12 aspect-h-4
+                                        bg-white
+                                        border-2
+                                        rounded-md
+                                        hover:bg-gray-200
                                         transition
                                         duration:200
                                         focus-within:ring-2
@@ -144,30 +147,37 @@
                                         focus-within:ring-indigo-500
                                         overflow-hidden
                                         flex
-                                        justify-center
+                                        justify-start
                                         items-center
                                     "
                                     @click="goTo(item)"
                                 >
-                                    <div class="flex justify-center items-center cursor-pointer">
+                                    <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
                                             :key="item.name"
-                                            class="fa-2x"
+                                            class="fa-lg"
                                             :class="
                                                 getIconDirty(item.isFolder, getFileType(getExtension(item.name))) +
                                                 ' ' +
                                                 getIconColorDirty(item.isFolder, getFileType(getExtension(item.name)))
                                             "
                                         ></i>
-                                        <button type="button" class="absolute inset-0 focus:outline-none">
-                                            <span class="sr-only">View details for {{ item.name }}</span>
-                                        </button>
+                                        <p
+                                            class="
+                                                block
+                                                ml-4
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                                truncate
+                                                pointer-events-none
+                                            "
+                                        >
+                                            {{ item.name }}
+                                        </p>
                                     </div>
                                 </div>
-                                <p class="mt-2 block text-sm font-medium text-gray-900 truncate pointer-events-none">
-                                    {{ item.name }}
-                                </p>
-                                <p class="block text-sm font-medium text-gray-500 pointer-events-none">
+                                <p class="hidden block text-sm font-medium text-gray-500 pointer-events-none">
                                     From: {{ item.owner.id }}
                                     <br />
                                     {{ formatBytes(item.size, 2) }}
@@ -207,6 +217,9 @@
         sharedFolderIsloading,
         fileBrowserTypeView,
         View,
+        allSharedContent,
+        loadSharedItems,
+        sharedWithMeCurrentFolder,
     } from '@/store/fileBrowserStore';
     import { SharedFileInterface } from '@/types';
     import { defineComponent } from '@vue/runtime-core';
@@ -225,6 +238,7 @@
 
     const currentFolderName = computed(() => {
         //@TODO add current folder
+
         return '';
     });
 
