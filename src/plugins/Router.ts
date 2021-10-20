@@ -1,4 +1,4 @@
-import { currentDirectory, sharedContent, sharedBreadcrumbs } from './../store/fileBrowserStore';
+import { currentDirectory, sharedContent, sharedBreadcrumbs, selectedPaths } from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
@@ -238,10 +238,11 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach(async (to, from) => {
     //If file takes too long to load, if you switch page you still get the error modal. Now it doesn't
     stopTimer();
+    selectedPaths.value = [];
     if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
         sharedFolderIsloading.value = true;
         await fetchBasedOnRoute();
-        await loadSharedItems();
+        loadSharedItems();
     } else {
         sharedFolderIsloading.value = false;
         showSharedFolderErrorModal.value = false;
