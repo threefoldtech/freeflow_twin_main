@@ -163,7 +163,7 @@ export const downloadFiles = async () => {
             const result = await Api.downloadFile(f.path);
             if (result.status !== 200 && result.status !== 201) throw new Error('Could not download file');
             let itemName = f.fullName;
-            if (f.isDirectory) itemName += ".zip";
+            if (f.isDirectory) itemName += '.zip';
             fileDownload(result.data, itemName);
             selectedPaths.value = [];
         })
@@ -579,7 +579,7 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
-export const getFullFolderSkeleton = async () => { };
+export const getFullFolderSkeleton = async () => {};
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
@@ -763,6 +763,7 @@ export const fetchBasedOnRoute = async () => {
 };
 
 export const loadSharedItems = async () => {
+    //Creating breadcrumbs for sharedFolders
     sharedBreadcrumbs.value = [];
 
     //https://bertmeeuws.digitaltwin.jimbertesting.be/quantum/shared/:sharedId/:path

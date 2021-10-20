@@ -1,8 +1,5 @@
 <template>
-    <a
-        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer text-xs"
-        @click="visitFileInMessage(message)"
-    >
+    <a class="px-4 my-2 my-message:bg-accent-200 cursor-pointer text-xs" @click="visitFileInMessage(message)">
         <p class="my-message:text-icon text-center text-xs mb-1">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>
@@ -63,37 +60,21 @@
     const visitFileInMessage = (message: Message<FileShareMessageType>) => {
         sharedItem.value = message.body;
 
-        /* if (message.from === loginName) {
-            router.push({
-                name: AppType.Quantum,
-                params: {
-                    path: btoa(message.body.path),
-                    editFileShare: 'true',
-                },
-            });
-            return;
-        } */
+        console.log(message.body.path);
 
         if (message.from === loginName) {
             router.push({
                 name: 'quantumFolder',
                 params: {
-                    folder: btoa(message.body.path),
+                    folder: message.body.isFolder
+                        ? btoa(message.body.path)
+                        : btoa(message.body.path.split('/').slice(0, -1).join('/')),
                     editFileShare: 'true',
                 },
             });
             return;
         }
         currentDirectory.value = '';
-        console.log(message);
-
-        // router.push({
-        //     name: 'sharedWithMeItem',
-        //     params: {
-        //         sharedWithMe: 'true',
-        //         sharedId: message.body.id,
-        //     },
-        // });
 
         goTo(message.body);
         sharedDir.value = true;

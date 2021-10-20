@@ -13,7 +13,9 @@
     >
       <i class='fas fa-arrow-up text-white'></i>
     </div>-->
+
         <div class="flex-1 mr-4">
+            <!-- Local breadcrumbs -->
             <div v-if="!sharedDir">
                 <template v-for="(item, i) in parts">
                     <span v-if="i !== 0 && item">
@@ -33,6 +35,7 @@
                     </span>
                 </template>
             </div>
+            <!-- Shared breadcrumbs -->
             <div v-if="sharedDir">
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
                     <span v-if="i !== 0 && breadcrumb">
@@ -54,22 +57,52 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import { computed } from 'vue';
     import {
-        selectedPaths,
+        clickBreadcrumb,
         currentDirectory,
-        goToHome,
+        FileType,
+        getFileType,
         goToAPreviousDirectory,
-        goBack,
+        goToHome,
         isDraggingFiles,
         moveFiles,
+        selectedPaths,
         sharedBreadcrumbs,
         sharedDir,
-        clickBreadcrumb,
     } from '@/store/fileBrowserStore';
-    import { createNotification } from '@/store/notificiationStore';
+    import { useRouter } from 'vue-router';
 
-    const parts = computed(() => currentDirectory.value.split('/'));
+    const router = useRouter();
+
+    const checkIfPathHasExtension = (path: string) => {
+        console.log(path);
+        return path.substring(path.lastIndexOf('.') + 1, path.length) || path;
+    };
+
+    const isFolder = fileType => {
+        return [FileType.Unknown].some(x => x === fileType);
+    };
+
+    const parts = computed(() => {
+        /*
+            const address = String(atob(router.currentRoute.value.params.folder));
+            console.log(address.split('/'));
+            console.log(address.split('/')[address.split('/').length - 1]);
+            const currentEntity = address.split('/')[address.split('/').length - 1];
+
+            const extension = checkIfPathHasExtension(currentEntity);
+
+            if (getFileType(extension) !== FileType.Unknown) {
+                return currentDirectory.value.split('/').slice(-1);
+            }
+
+    */
+
+        //console.log();
+
+        return currentDirectory.value.split('/');
+    });
 
     const onDragEnter = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
