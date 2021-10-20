@@ -302,7 +302,6 @@
         deselectAll();
     };
     const handleSelect = (item: PathInfoModel) => {
-        window.console.log(selectedPaths.value);
         if (!selectedPaths.value.includes(item)) {
             selectItem(item);
             return;
