@@ -60,7 +60,16 @@
     const visitFileInMessage = (message: Message<FileShareMessageType>) => {
         sharedItem.value = message.body;
 
-        console.log(message.body.path);
+        if (
+            message.body.path.split('/')[0] === '' &&
+            message.body.path.split('/').length === 2 &&
+            !message.body.isFolder &&
+            message.from === loginName
+        ) {
+            //File is located in root folder
+            router.push({ name: 'quantum' });
+            return;
+        }
 
         if (message.from === loginName) {
             router.push({
@@ -68,7 +77,8 @@
                 params: {
                     folder: message.body.isFolder
                         ? btoa(message.body.path)
-                        : btoa(message.body.path.split('/').slice(0, -1).join('/')),
+                        : //Redirecting to folder of the file
+                          btoa(message.body.path.split('/').slice(0, -1).join('/')),
                     editFileShare: 'true',
                 },
             });
