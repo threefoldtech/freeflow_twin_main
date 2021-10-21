@@ -76,7 +76,7 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="item in searchResults()" :key="item">
+                            <tr v-for="item in searchResults" :key="item.id">
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex">
                                         <div class="flex-shrink-0 h-10 w-10">
@@ -119,15 +119,19 @@
                                         >
                                     </div>
                                 </td>
-                                <td :key="item.isAlreadySent" class="text-center">
+
+                                <td class="text-center">
                                     <button
-                                        v-if="!item.isAlreadySent"
+                                        v-if="!item.isAlreadySent && !item.loading"
                                         class="text-white py-2 px-4 rounded-md justify-self-end bg-primary"
                                         @click="shareFile(item.chatId)"
                                     >
                                         Share
                                     </button>
-                                    <span v-else class="text-xs"> File has been shared. </span>
+                                    <div v-if="item.loading" class="py-2 px-4">
+                                        <Spinner small />
+                                    </div>
+                                    <span v-if="item.isAlreadySent" class="text-xs"> File has been shared.</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -139,6 +143,7 @@
 </template>
 <script lang="ts" setup>
     import { Chat } from '@/types';
+    import Spinner from '@/components/Spinner.vue';
     import { selectedPaths, addShare } from '@/store/fileBrowserStore';
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
     import Toggle from '@/components/Toggle.vue';
@@ -168,6 +173,7 @@
             chatId: item.chatId,
             canWrite: false,
             isAlreadySent: false,
+            loading: false,
         }));
     });
 
@@ -180,18 +186,20 @@
         emit('update:modelValue', evt.target.value);
     };
 
-    const searchResults = () =>
+    const searchResults = computed(() =>
         chats.value.filter((item: Chat) => {
             return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
-        });
+        })
+    );
 
     async function shareFile(chatId) {
         const size = selectedPaths.value[0].size;
         const filename = selectedPaths.value[0].fullName;
         const chat = chats.value.find(chat => chat.chatId == chatId);
-
+        chat.loading = true;
         await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
         chat.isAlreadySent = true;
+        chat.loading = false;
         createNotification('Shared File', 'File has been shared with ' + chatId);
     }
 </script>
