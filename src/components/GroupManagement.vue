@@ -29,6 +29,36 @@
         </div>
         <div id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
     </div>
+    <div v-if="sidebarFileList?.length !== 0" class="p-2">
+        <h3 class="mt-2 ml-2 text-base text-left mb-4">Files</h3>
+        <ul class="space-y-2">
+            <li
+                class="
+                    flex
+                    items-center
+                    rounded
+                    justify-start
+                    w-full
+                    py-2
+                    px-4
+                    cursor-pointer
+                    hover:bg-gray-100
+                    rounded
+                    transition
+                    duration-100
+                "
+                v-for="file in sidebarFileList"
+            >
+                <a :href="calcExternalResourceLink(file.body.url)" class="block outline-none border-none"
+                    ><i :class="getIconDirty(false, getFileType(file.fileType))" class="fa-lg"></i>
+                    <span class="ml-2 font-normal text-gray-800" :title="moment(file.timeStamp).fromNow()">{{
+                        truncate(file)
+                    }}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
     <div class="bg-white p-2 w-full h-full flex flex-col justify-start">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
         <div class="flex items-center flex-col w-full">
@@ -38,7 +68,7 @@
             </div>
             <div
                 v-if="!chat.isGroup && !blocked"
-                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
+                class="block bg-gray-100 flex items-center rounded w-full m-2"
                 @click="$emit('app-block')"
             >
                 <i class="fas fa-minus-circle m-3"></i>
@@ -47,7 +77,7 @@
 
             <div
                 v-if="!chat.isGroup && blocked"
-                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
+                class="block bg-gray-100 flex items-center rounded w-full m-2"
                 @click="$emit('app-unblock')"
             >
                 <i class="fas fa-plus-circle m-3"></i>
@@ -186,9 +216,13 @@
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
+    import { getIconColor, getIcon, getFileType, getIconDirty } from '@/store/fileBrowserStore';
+    import { calcExternalResourceLink } from '@/services/urlService';
+    import moment from 'moment';
 
     interface IProps {
         chat: any;
+        sidebarFileList: any[];
     }
 
     const props = defineProps<IProps>();
@@ -209,7 +243,14 @@
     const showRemoveUserDialog = ref(false);
     const toBeRemovedUser = ref();
 
+    const truncate = ({ body, extension }) => {
+        return body.filename?.length < 30
+            ? body.filename
+            : `${body?.filename?.slice(0, 15)}...${body?.filename?.slice(-15)}`;
+    };
+
     onMounted(() => {
+        console.log(props.sidebarFileList);
         //Calculating already existent objects
         const computed = contacts.map(contact => {
             for (const i of props.chat.contacts) {
@@ -254,17 +295,4 @@
     });
 </script>
 
-<style scoped>
-    .call,
-    .block,
-    .delete {
-        border: 2px solid transparent;
-    }
-
-    .call:hover,
-    .block:hover,
-    .delete:hover {
-        border: 2px solid black;
-        cursor: pointer;
-    }
-</style>
+<style scoped></style>

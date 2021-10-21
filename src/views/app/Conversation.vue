@@ -258,6 +258,7 @@
                         <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
                         <group-management
                             :chat="chat"
+                            :sidebarFileList="getListFilesChat"
                             @app-call="popupMeeting"
                             @app-block="blockChat"
                             @app-unblock="unBlockChat"
@@ -340,6 +341,7 @@
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon } from '@heroicons/vue/outline';
+    import { FileType } from '@/store/fileBrowserStore';
 
     const route = useRoute();
     let selectedId = ref(<string>route.params.id);
@@ -400,6 +402,18 @@
 
     const chat = computed(() => {
         return chats.value.find(c => c.chatId == selectedId.value);
+    });
+
+    const getExtension = filename => {
+        return filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
+    };
+
+    const getListFilesChat = computed(() => {
+        //Show list of files in the sidebar
+        const files = chat.value.messages.filter(el => el.type === MessageTypes.FILE);
+        return files.map(item => {
+            return { ...item, fileType: getExtension(item.body.filename) };
+        });
     });
 
     const getChatStatus = computed(() => {
