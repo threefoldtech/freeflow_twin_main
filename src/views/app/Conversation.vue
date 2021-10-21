@@ -560,7 +560,7 @@
     const isAdmin = computed(() => {
         const { user } = useAuthState();
         //@ts-ignore
-        console.log(chat.value.adminId);
+
         return chat.value.adminId == user.id;
     });
 

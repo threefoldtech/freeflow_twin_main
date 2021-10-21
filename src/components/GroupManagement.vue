@@ -250,7 +250,6 @@
     };
 
     onMounted(() => {
-        console.log(props.sidebarFileList);
         //Calculating already existent objects
         const computed = contacts.map(contact => {
             for (const i of props.chat.contacts) {

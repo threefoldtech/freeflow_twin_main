@@ -15,7 +15,6 @@ import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
 import { isArray } from 'lodash';
-import * as console from 'console';
 
 declare const Buffer;
 export enum FileType {
