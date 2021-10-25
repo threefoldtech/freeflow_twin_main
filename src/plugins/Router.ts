@@ -129,6 +129,25 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {},
             },
             {
+                path: 'received',
+                name: 'filesReceivedInChat',
+                component: FileBrowser,
+                meta: {},
+                children: [
+                    {
+                        component: FileBrowser,
+                        ///quantum/shared/:sharedId
+                        name: 'filesReceivedInChat',
+                        path: ':chatId',
+                        meta: {
+                            root_parent: 'quantum',
+                            sharedFolder: false,
+                        },
+                    },
+                ]
+            },
+
+            {
                 path: 'shared',
                 name: 'sharedWithMe',
                 component: FileBrowser,
@@ -240,7 +259,6 @@ router.afterEach(async (to, from) => {
     stopTimer();
     selectedPaths.value = [];
     if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
-        sharedFolderIsloading.value = true;
         await fetchBasedOnRoute();
         loadSharedItems();
     } else {

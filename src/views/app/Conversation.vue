@@ -309,287 +309,284 @@
 </template>
 
 <script setup lang="ts">
-    import { useScrollActions, useScrollState } from '@/store/scrollStore';
+import { useScrollActions, useScrollState } from '@/store/scrollStore';
 
-    import AppLayout from '../../layout/AppLayout.vue';
-    import moment from 'moment';
-    import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
-    import { useContactsState } from '@/store/contactStore';
+import AppLayout from '../../layout/AppLayout.vue';
+import moment from 'moment';
+import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
+import { useContactsState } from '@/store/contactStore';
 
-    import { each } from 'lodash';
-    import { statusList } from '@/store/statusStore';
-    import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
-    import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
-    import { useAuthState } from '@/store/authStore';
-    import { popupCenter } from '@/services/popupService';
-    import MessageCard from '@/components/MessageCard.vue';
-    import ChatList from '@/components/ChatList.vue';
-    import ChatInput from '@/components/ChatInput.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import GroupManagement from '@/components/GroupManagement.vue';
-    import Dialog from '@/components/Dialog.vue';
-    import * as crypto from 'crypto-js';
-    import { useIntersectionObserver } from '@/lib/intersectionObserver';
-    import { useRoute, useRouter } from 'vue-router';
-    import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
-    import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
-    import MessageBox from '@/components/MessageBox.vue';
-    import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
-    import Button from '@/components/Button.vue';
+import { each } from 'lodash';
+import { statusList } from '@/store/statusStore';
+import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
+import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
+import { useAuthState } from '@/store/authStore';
+import { popupCenter } from '@/services/popupService';
+import MessageCard from '@/components/MessageCard.vue';
+import ChatList from '@/components/ChatList.vue';
+import ChatInput from '@/components/ChatInput.vue';
+import AvatarImg from '@/components/AvatarImg.vue';
+import GroupManagement from '@/components/GroupManagement.vue';
+import Dialog from '@/components/Dialog.vue';
+import * as crypto from 'crypto-js';
+import { useIntersectionObserver } from '@/lib/intersectionObserver';
+import { useRoute, useRouter } from 'vue-router';
+import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
+import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
+import MessageBox from '@/components/MessageBox.vue';
+import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
+import Button from '@/components/Button.vue';
 
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
-    import FileDropArea from '@/components/FileDropArea.vue';
-    import TimeContent from '@/components/TimeContent.vue';
-    import { XIcon } from '@heroicons/vue/outline';
-    import { FileType } from '@/store/fileBrowserStore';
+import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+import FileDropArea from '@/components/FileDropArea.vue';
+import TimeContent from '@/components/TimeContent.vue';
+import { XIcon } from '@heroicons/vue/outline';
+import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
 
-    const route = useRoute();
-    let selectedId = ref(<string>route.params.id);
-    watch(
-        () => route.params.id,
-        id => {
-            selectedId.value = <string>id;
-            scrollToBottom(true);
+const route = useRoute();
+let selectedId = ref(<string>route.params.id);
+watch(
+    () => route.params.id,
+    id => {
+        selectedId.value = <string>id;
+        scrollToBottom(true);
+    }
+);
+
+const { retrievechats, sendFile } = usechatsActions();
+onBeforeMount(retrievechats);
+
+const { contacts } = useContactsState();
+const { chats } = usechatsState();
+const { sendMessage } = usechatsActions();
+const { user } = useAuthState();
+const m = val => moment(val);
+const showMenu = ref(false);
+const file = ref();
+const router = useRouter();
+let showDialog = ref(false);
+let showDeleteDialog = ref(false);
+let showInfo = ref(false);
+const showRemoveUserDialog = ref(false);
+const toBeRemovedUser = ref();
+
+const truncate = (value, limit = 20) => {
+    if (value.length > limit) {
+        value = value.substring(0, limit - 3) + '...';
+    }
+    return value;
+};
+
+const getMessagesSortedByUser = computed(() => {
+    let chatBlockIndex = 0;
+
+    return chat.value.messages.reduce((acc: any, message) => {
+        if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
+            acc[chatBlockIndex].messages.push(message);
+            return acc;
+        } else {
+            chatBlockIndex++;
         }
+
+        acc[chatBlockIndex] = {
+            user: <string>message.from,
+            messages: [],
+        };
+        acc[chatBlockIndex].messages.push(message);
+
+        return acc;
+    }, {});
+});
+
+const message = ref('');
+
+const chat = computed(() => {
+    return chats.value.find(c => c.chatId == selectedId.value);
+});
+
+const getExtension = filename => {
+    return filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
+};
+
+const getListFilesChat = computed(() => {
+    //Show list of files in the sidebar
+    return getFilesInChat(chat.value);
+});
+
+const getChatStatus = computed(() => {
+    if (!chat.value) {
+        return;
+    }
+
+    if (chat.value.isGroup) {
+        let message = `${chat.value.contacts.length} members`;
+        const onlineMembers = chat.value.contacts
+            .filter(c => c.id != user.id)
+            .map(c => ({
+                ...c,
+                isOnline: statusList[<string>c.id]?.isOnline ?? false,
+            })).length;
+
+        if (onlineMembers > 0) {
+            message += `, ${onlineMembers} online`;
+        }
+
+        return {
+            message: message,
+            lastSeen: undefined,
+        };
+    }
+
+    const status = statusList[<string>chat.value.chatId];
+    let lastSeen: string | undefined = undefined;
+    lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
+    lastSeen = lastSeen?.slice(0, -3);
+    return {
+        message: status?.isOnline ? 'Online' : 'Offline',
+        lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
+    };
+});
+
+const popupMeeting = () => {
+    // @ts-ignore
+    // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+    const str: string = chat.value.isGroup
+        ? chat.value.chatId
+        : chat.value.contacts
+              .map(c => c.id)
+              .sort()
+              .join();
+
+    const id = crypto.SHA1(str);
+    sendMessage(
+        chat.value.chatId,
+        {
+            type: SystemMessageTypes.JOINED_VIDEOROOM,
+            message: `${user.id} joined the video chat`,
+            id: id.toString(),
+        } as JoinedVideoRoomBody,
+        MessageTypes.SYSTEM
     );
 
-    const { retrievechats, sendFile } = usechatsActions();
-    onBeforeMount(retrievechats);
+    popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
+};
 
-    const { contacts } = useContactsState();
-    const { chats } = usechatsState();
-    const { sendMessage } = usechatsActions();
-    const { user } = useAuthState();
-    const m = val => moment(val);
-    const showMenu = ref(false);
-    const file = ref();
-    const router = useRouter();
-    let showDialog = ref(false);
-    let showDeleteDialog = ref(false);
-    let showInfo = ref(false);
-    const showRemoveUserDialog = ref(false);
-    const toBeRemovedUser = ref();
+const deleteChat = () => {
+    showDeleteDialog.value = true;
+};
+const infoChat = () => {
+    showInfo.value = true;
+};
+const doDeleteChat = () => {
+    sendRemoveChat(chat.value.chatId);
+    router.push({ name: 'whisper' });
+};
 
-    const truncate = (value, limit = 20) => {
-        if (value.length > limit) {
-            value = value.substring(0, limit - 3) + '...';
-        }
-        return value;
-    };
+const blockChat = () => {
+    showDialog.value = true;
+};
+const doBlockChat = () => {
+    showDialog.value = false;
+    sendBlockChat(chat.value.chatId);
+    router.push({ name: 'whisper' });
+};
 
-    const getMessagesSortedByUser = computed(() => {
-        let chatBlockIndex = 0;
+const unBlockChat = async () => {
+    await deleteBlockedEntry(chat.value.chatId);
+};
 
-        return chat.value.messages.reduce((acc: any, message) => {
-            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
-                acc[chatBlockIndex].messages.push(message);
-                return acc;
-            } else {
-                chatBlockIndex++;
-            }
-
-            acc[chatBlockIndex] = {
-                user: <string>message.from,
-                messages: [],
-            };
-            acc[chatBlockIndex].messages.push(message);
-
-            return acc;
-        }, {});
-    });
-
-    const message = ref('');
-
-    const chat = computed(() => {
-        return chats.value.find(c => c.chatId == selectedId.value);
-    });
-
-    const getExtension = filename => {
-        return filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
-    };
-
-    const getListFilesChat = computed(() => {
-        //Show list of files in the sidebar
-        const files = chat.value.messages.filter(el => el.type === MessageTypes.FILE);
-        return files.map(item => {
-            return { ...item, fileType: getExtension(item.body.filename) };
-        });
-    });
-
-    const getChatStatus = computed(() => {
-        if (!chat.value) {
+const reads = computed(() => {
+    const preReads = {};
+    each(chat.value.read, (val: string, key: string) => {
+        if (key === user.id) {
             return;
         }
-
-        if (chat.value.isGroup) {
-            let message = `${chat.value.contacts.length} members`;
-            const onlineMembers = chat.value.contacts
-                .filter(c => c.id != user.id)
-                .map(c => ({
-                    ...c,
-                    isOnline: statusList[<string>c.id]?.isOnline ?? false,
-                })).length;
-
-            if (onlineMembers > 0) {
-                message += `, ${onlineMembers} online`;
-            }
-
-            return {
-                message: message,
-                lastSeen: undefined,
-            };
-        }
-
-        const status = statusList[<string>chat.value.chatId];
-        let lastSeen: string | undefined = undefined;
-        lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
-        lastSeen = lastSeen?.slice(0, -3);
-        return {
-            message: status?.isOnline ? 'Online' : 'Offline',
-            lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
-        };
+        preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
     });
+    return preReads;
+});
 
-    const popupMeeting = () => {
-        // @ts-ignore
-        // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
-        const str: string = chat.value.isGroup
-            ? chat.value.chatId
-            : chat.value.contacts
-                  .map(c => c.id)
-                  .sort()
-                  .join();
+const viewAnchor = ref(null);
 
-        const id = crypto.SHA1(str);
-        sendMessage(
-            chat.value.chatId,
-            {
-                type: SystemMessageTypes.JOINED_VIDEOROOM,
-                message: `${user.id} joined the video chat`,
-                id: id.toString(),
-            } as JoinedVideoRoomBody,
-            MessageTypes.SYSTEM
-        );
+const { isIntersecting } = useIntersectionObserver(viewAnchor);
 
-        popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
-    };
+const scrollToBottom = (force = false) => {
+    if (!force && !isIntersecting.value) return;
 
-    const deleteChat = () => {
-        showDeleteDialog.value = true;
-    };
-    const infoChat = () => {
-        showInfo.value = true;
-    };
-    const doDeleteChat = () => {
-        sendRemoveChat(chat.value.chatId);
-        router.push({ name: 'whisper' });
-    };
-
-    const blockChat = () => {
-        showDialog.value = true;
-    };
-    const doBlockChat = () => {
-        showDialog.value = false;
-        sendBlockChat(chat.value.chatId);
-        router.push({ name: 'whisper' });
-    };
-
-    const unBlockChat = async () => {
-        await deleteBlockedEntry(chat.value.chatId);
-    };
-
-    const reads = computed(() => {
-        const preReads = {};
-        each(chat.value.read, (val: string, key: string) => {
-            if (key === user.id) {
-                return;
-            }
-            preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
-        });
-        return preReads;
+    nextTick(() => {
+        scrollMessageBoxToBottom();
     });
+};
 
-    const viewAnchor = ref(null);
-
-    const { isIntersecting } = useIntersectionObserver(viewAnchor);
-
-    const scrollToBottom = (force = false) => {
-        if (!force && !isIntersecting.value) return;
-
-        nextTick(() => {
-            scrollMessageBoxToBottom();
-        });
-    };
-
-    onMounted(() => {
-        nextTick(() => {
-            scrollToBottom(true);
-        });
+onMounted(() => {
+    nextTick(() => {
+        scrollToBottom(true);
     });
+});
 
-    const status = computed(() => {
-        return statusList[selectedId.value];
+const status = computed(() => {
+    return statusList[selectedId.value];
+});
+
+const { scrollEvents } = useScrollState();
+const { shiftScrollEvent } = useScrollActions();
+
+watch(scrollEvents, () => {
+    if (!scrollEvents || scrollEvents.length === 0) return;
+    nextTick(() => {
+        scrollToBottom(scrollEvents[0]);
+        shiftScrollEvent();
     });
+});
 
-    const { scrollEvents } = useScrollState();
-    const { shiftScrollEvent } = useScrollActions();
+const blocked = computed(() => {
+    if (!chat.value || chat.value.isGroup) return false;
+    return isBlocked(<string>chat.value.chatId);
+});
 
-    watch(scrollEvents, () => {
-        if (!scrollEvents || scrollEvents.length === 0) return;
-        nextTick(() => {
-            scrollToBottom(scrollEvents[0]);
-            shiftScrollEvent();
-        });
-    });
+const removeFromGroup = contact => {
+    showRemoveUserDialog.value = true;
+    toBeRemovedUser.value = contact;
+};
+const doRemoveFromGroup = () => {
+    const { updateContactsInGroup } = usechatsActions();
+    //@ts-ignore
+    updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
+};
 
-    const blocked = computed(() => {
-        if (!chat.value || chat.value.isGroup) return false;
-        return isBlocked(<string>chat.value.chatId);
-    });
+const isAdmin = computed(() => {
+    const { user } = useAuthState();
+    //@ts-ignore
 
-    const removeFromGroup = contact => {
-        showRemoveUserDialog.value = true;
-        toBeRemovedUser.value = contact;
-    };
-    const doRemoveFromGroup = () => {
-        const { updateContactsInGroup } = usechatsActions();
+    return chat.value.adminId == user.id;
+});
+
+let activeItem = ref('edit');
+const isActive = menuItem => {
+    return activeItem.value === menuItem;
+};
+
+const setActive = menuItem => {
+    activeItem.value = menuItem;
+};
+
+const addToGroup = contact => {
+    const { updateContactsInGroup } = usechatsActions();
+    //@ts-ignore
+    updateContactsInGroup(chat.value.chatId, contact, false);
+};
+const filteredContacts = computed(() => {
+    return contacts.filter(
         //@ts-ignore
-        updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
-    };
+        c => !chat.value.contacts.map(x => x.id).includes(c.id)
+    );
+});
 
-    const isAdmin = computed(() => {
-        const { user } = useAuthState();
-        //@ts-ignore
-
-        return chat.value.adminId == user.id;
-    });
-
-    let activeItem = ref('edit');
-    const isActive = menuItem => {
-        return activeItem.value === menuItem;
-    };
-
-    const setActive = menuItem => {
-        activeItem.value = menuItem;
-    };
-
-    const addToGroup = contact => {
-        const { updateContactsInGroup } = usechatsActions();
-        //@ts-ignore
-        updateContactsInGroup(chat.value.chatId, contact, false);
-    };
-    const filteredContacts = computed(() => {
-        return contacts.filter(
-            //@ts-ignore
-            c => !chat.value.contacts.map(x => x.id).includes(c.id)
-        );
-    });
-
-    const showSideBar = getShowSideBar();
+const showSideBar = getShowSideBar();
 </script>
 
 <style scoped type="text/css">
-    a.active {
-        background: #e5e7eb;
-    }
+a.active {
+    background: #e5e7eb;
+}
 </style>

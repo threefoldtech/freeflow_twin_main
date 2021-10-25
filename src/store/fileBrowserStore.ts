@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
 import { getShareWithId } from '@/services/fileBrowserService';
@@ -8,13 +8,14 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { ContactInterface, DtId, FileShareMessageType, SharedFileInterface } from '@/types';
+import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
 import { isArray } from 'lodash';
+import { usechatsActions, usechatsState } from './chatStore';
 
 declare const Buffer;
 export enum FileType {
@@ -67,7 +68,10 @@ export const isDraggingFiles = ref<boolean>(false);
 export const selectedAction = ref<Action>(Action.COPY);
 export const sharedDir = ref(false);
 export const sharedContent = ref<SharedFileInterface[]>([]);
+export const areFilesInChatReceived = ref(false);
+export const chatFiles = ref<File[]>();
 export const allSharedContent = ref<SharedFileInterface[]>([]);
+export const chatsWithFiles = ref<Chat[]>();
 
 export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
@@ -76,6 +80,7 @@ export const sharedItem = ref<PathInfoModel>();
 
 export const currentShare = ref<SharedFileInterface>(undefined);
 export const selectedTab = ref(0);
+const { user } = useAuthState();
 
 watch([currentDirectory], () => {
     updateContent();
@@ -126,6 +131,10 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
     );
 };
 
+const { chats } = usechatsState();
+
+
+
 export const goToShared = async () => {
     sharedDir.value = true;
     selectedPaths.value = [];
@@ -137,6 +146,62 @@ export const goToShared = async () => {
     });
     await getSharedContent();
 };
+
+export const goToFilesInChat = async (received: boolean, chat?: Chat) => {
+    sharedDir.value = false;
+    selectedPaths.value = [];
+    searchResults.value = [];
+    searchDirValue.value = '';
+    chatsWithFiles.value = [];
+    chatFiles.value = [];
+
+    if (chat) {
+        router.push({
+            name: 'filesReceivedInChat',
+            params: {
+                chatId: String(chat.chatId),
+            }
+        })
+        chatFiles.value = chatFilesReceived(chat, received);
+        return;
+    }
+    router.push({
+        name: 'filesReceivedInChat',
+        params: {
+            received: String(received)
+        }
+    })
+
+
+    chatsWithFiles.value = getchatsWithFiles(received);
+}
+
+export const getFilesInChat = (chat) => {
+    const files = chat.messages.filter((el: { type: MessageTypes; }) => el.type === MessageTypes.FILE);
+    return files.map((item: { body: { filename: any; }; }) => {
+        return { ...item, fileType: getExtension(item.body.filename) };
+    });
+}
+
+export const chatFilesReceived = (chat: Chat, received: boolean) => {
+    const route = router.currentRoute.value;
+
+
+
+
+
+
+    const currentChatFiles = getFilesInChat(chat);
+
+    return received ? currentChatFiles.filter(el => el.from !== user.id) : currentChatFiles.filter(el => el.from === user.id)
+
+}
+
+export const getchatsWithFiles = (received: boolean) => {
+    return chats.value.filter(chat => chatFilesReceived(chat, received).length > 0);
+}
+
+
 
 export const uploadFile = async (file: File, path = currentDirectory.value) => {
     const result = await Api.uploadFile(path, file);
@@ -579,13 +644,15 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
-export const getFullFolderSkeleton = async () => {};
+export const getFullFolderSkeleton = async () => { };
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
     sharedContent.value = result.data;
     allSharedContent.value = result.data;
 };
+
+
 
 export const sharedBreadcrumbs = ref([]);
 
@@ -678,9 +745,15 @@ export const fetchBasedOnRoute = async () => {
 
     if (route.name === 'sharedWithMe') {
         resetSharedFolder();
-
         sharedFolderIsloading.value = false;
 
+        return;
+    }
+    if (route.name === 'filesReceivedInChat') {
+        resetSharedFolder();
+        sharedFolderIsloading.value = false;
+        allSharedContent.value = [];
+        sharedContent.value = [];
         return;
     }
 
@@ -839,6 +912,7 @@ export const goTo = async (item: SharedFileInterface) => {
     window.open(url.href, '_blank');
 };
 
+
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
     return await Api.addShare(userId, path, filename, size, writable);
 };
@@ -864,7 +938,7 @@ export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: s
 };
 
 export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
-    const { user } = useAuthState();
+
     let params = { shareId: shareId, token: token };
     const locationApiEndpoint = `/api/browse/files/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';
