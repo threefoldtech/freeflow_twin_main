@@ -147,7 +147,6 @@ const showEmoji = ref(false);
 
 const { addScrollEvent } = useScrollActions();
 
-console.log("from backend", props.chat)
 
 
 if (props.chat.draft) {
