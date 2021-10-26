@@ -279,7 +279,6 @@
                                     {{ formatBytes(item.size, 2) }}
                                 </p>
                             </li>
-
                             <li v-for="item in chatsWithFiles" :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
@@ -325,6 +324,8 @@
                                             "
                                         >
                                             {{ item.name }}
+
+                                            {{ $route }}
                                         </p>
                                     </div>
                                 </div>
@@ -398,76 +399,76 @@
 </template>
 
 <script setup lang="ts">
-import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-import { calcExternalResourceLink } from '@/services/urlService';
-import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
-import {
-    FileType,
-    formatBytes,
-    getExtension,
-    getFileType,
-    getIcon,
-    getIconColor,
-    getFileSize,
-    getIconColorDirty,
-    getIconDirty,
-    getSharedContent,
-    getSharedFolderContent,
-    goIntoSharedFolder,
-    parseJwt,
-    PathInfoModel,
-    selectedPaths,
-    sharedContent,
-    goTo,
-    sharedBreadcrumbs,
-    clickBreadcrumb,
-    sharedFolderIsloading,
-    fileBrowserTypeView,
-    View,
-    allSharedContent,
-    loadSharedItems,
-    sharedWithMeCurrentFolder,
-    chatsWithFiles,
-    goToChatFiles,
-    chatFilesReceived,
-    goToFilesInChat,
-    chatFiles,
-} from '@/store/fileBrowserStore';
-import { SharedFileInterface } from '@/types';
-import { cloneVNode, defineComponent } from '@vue/runtime-core';
-import { onBeforeMount, watch, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import Spinner from '@/components/Spinner.vue';
-import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
+    import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
+    import { calcExternalResourceLink } from '@/services/urlService';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+    import {
+        FileType,
+        formatBytes,
+        getExtension,
+        getFileType,
+        getIcon,
+        getIconColor,
+        getFileSize,
+        getIconColorDirty,
+        getIconDirty,
+        getSharedContent,
+        getSharedFolderContent,
+        goIntoSharedFolder,
+        parseJwt,
+        PathInfoModel,
+        selectedPaths,
+        sharedContent,
+        goTo,
+        sharedBreadcrumbs,
+        clickBreadcrumb,
+        sharedFolderIsloading,
+        fileBrowserTypeView,
+        View,
+        allSharedContent,
+        loadSharedItems,
+        sharedWithMeCurrentFolder,
+        chatsWithFiles,
+        goToChatFiles,
+        chatFilesReceived,
+        goToFilesInChat,
+        chatFiles,
+    } from '@/store/fileBrowserStore';
+    import { SharedFileInterface } from '@/types';
+    import { cloneVNode, defineComponent } from '@vue/runtime-core';
+    import { onBeforeMount, watch, computed } from 'vue';
+    import { useRoute, useRouter } from 'vue-router';
+    import Spinner from '@/components/Spinner.vue';
+    import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
 
-onBeforeMount(async () => {
-    sharedBreadcrumbs.value = [];
-});
+    onBeforeMount(async () => {
+        sharedBreadcrumbs.value = [];
+    });
 
-watch(sharedFolderIsloading, () => {});
+    watch(sharedFolderIsloading, () => {});
 
-const router = useRouter();
-const route = useRoute();
+    const router = useRouter();
+    const route = useRoute();
 
-const currentFolderName = computed(() => {
-    //@TODO add current folder
+    const currentFolderName = computed(() => {
+        //@TODO add current folder
 
-    return '';
-});
+        return '';
+    });
 
-const truncate = name => {
-    return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
-};
+    const truncate = name => {
+        return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+    };
 
-//const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
+    //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
 
-const epochToDate = epoch => {
-    let d = new Date(epoch).toLocaleDateString();
+    const epochToDate = epoch => {
+        let d = new Date(epoch).toLocaleDateString();
 
-    return d === '1/20/1980' ? 'Never' : d;
-};
+        return d === '1/20/1980' ? 'Never' : d;
+    };
 
-const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
+    const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
 </script>
 
 <style scoped></style>

@@ -1,4 +1,12 @@
-import { currentDirectory, sharedContent, sharedBreadcrumbs, selectedPaths } from './../store/fileBrowserStore';
+import {
+    currentDirectory,
+    sharedContent,
+    sharedBreadcrumbs,
+    selectedPaths,
+    goToFilesInChat,
+    chatsWithFiles,
+    fetchSharedInChatFiles,
+} from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
@@ -29,9 +37,15 @@ import {
     loadLocalFolder,
     updateContent,
     stopTimer,
+    goToFilesInChat,
+    getchatsWithFiles,
+    loadFilesReceivedNested,
 } from '@/store/fileBrowserStore';
+import { usechatsActions } from '@/store/chatStore';
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
+
+const { retrievechats } = usechatsActions();
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -129,24 +143,43 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {},
             },
             {
-                path: 'received',
-                name: 'filesReceivedInChat',
+                path: 'sent',
+                name: 'filesSentInChat',
                 component: FileBrowser,
-                meta: {},
+                meta: { sharedFolder: true },
                 children: [
                     {
                         component: FileBrowser,
                         ///quantum/shared/:sharedId
-                        name: 'filesReceivedInChat',
+                        name: 'filesSentInChatNested',
                         path: ':chatId',
                         meta: {
                             root_parent: 'quantum',
-                            sharedFolder: false,
+                            sharedFolder: true,
                         },
                     },
-                ]
+                ],
             },
-
+            {
+                path: 'received',
+                name: 'filesReceivedInChat',
+                component: FileBrowser,
+                meta: {
+                    sharedFolder: true,
+                },
+                children: [
+                    {
+                        component: FileBrowser,
+                        ///quantum/shared/:sharedId
+                        name: 'filesReceivedInChatNested',
+                        path: ':chatId',
+                        meta: {
+                            root_parent: 'quantum',
+                            sharedFolder: true,
+                        },
+                    },
+                ],
+            },
             {
                 path: 'shared',
                 name: 'sharedWithMe',
@@ -272,6 +305,19 @@ router.afterEach(async (to, from) => {
         sharedDir.value = true;
     }
     if (to.name === 'sharedWithMe') {
+    }
+    if (to.name === 'filesReceivedInChat') {
+        await retrievechats();
+        fetchSharedInChatFiles(true);
+        console.log(chatsWithFiles.value);
+    }
+    if (to.name === 'filesSentInChat') {
+        await retrievechats();
+        fetchSharedInChatFiles(false);
+        console.log(chatsWithFiles.value);
+    }
+    if (to.name === 'filesReceivedInChatNested') {
+        await loadFilesReceivedNested();
     }
     if (to.name === 'quantum') {
         sharedDir.value = false;

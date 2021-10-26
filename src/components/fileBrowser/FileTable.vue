@@ -314,7 +314,7 @@
                                         justify-start
                                         items-center
                                     "
-                                    @click="goToFilesInChat((received = true))"
+                                    @click="goToFilesInChat(true)"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
                                         <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
@@ -356,7 +356,7 @@
                                         justify-start
                                         items-center
                                     "
-                                    @click="goToFilesInChat((received = false))"
+                                    @click="goToFilesInChat(false)"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
                                         <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
@@ -445,151 +445,151 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
-import {
-    currentDirectory,
-    currentDirectoryContent,
-    itemAction,
-    PathInfoModel,
-    selectItem,
-    deselectAll,
-    selectAll,
-    selectedPaths,
-    deselectItem,
-    sortContent,
-    sortAction,
-    currentSort,
-    currentSortDir,
-    getFileLastModified,
-    getFileExtension,
-    getFileSize,
-    getIconColor,
-    getIcon,
-    uploadFiles,
-    equals,
-    moveFiles,
-    isDraggingFiles,
-    sharedDir,
-    sharedContent,
-    getSharedContent,
-    searchResults,
-    searchDirValue,
-    currentShare,
-    goToShared,
-    fileBrowserTypeView,
-    goToFilesInChat,
-} from '@/store/fileBrowserStore';
-import { useRouter } from 'vue-router';
-import FileDropArea from '@/components/FileDropArea.vue';
-import { useSocketActions } from '@/store/socketStore';
-import { useAuthState } from '@/store/authStore';
+    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+    import {
+        currentDirectory,
+        currentDirectoryContent,
+        itemAction,
+        PathInfoModel,
+        selectItem,
+        deselectAll,
+        selectAll,
+        selectedPaths,
+        deselectItem,
+        sortContent,
+        sortAction,
+        currentSort,
+        currentSortDir,
+        getFileLastModified,
+        getFileExtension,
+        getFileSize,
+        getIconColor,
+        getIcon,
+        uploadFiles,
+        equals,
+        moveFiles,
+        isDraggingFiles,
+        sharedDir,
+        sharedContent,
+        getSharedContent,
+        searchResults,
+        searchDirValue,
+        currentShare,
+        goToShared,
+        fileBrowserTypeView,
+        goToFilesInChat,
+    } from '@/store/fileBrowserStore';
+    import { useRouter } from 'vue-router';
+    import FileDropArea from '@/components/FileDropArea.vue';
+    import { useSocketActions } from '@/store/socketStore';
+    import { useAuthState } from '@/store/authStore';
 
-const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
-const hiddenItems = ref<HTMLDivElement>();
-const ghostImage = ref<HTMLDivElement>();
-const dragOverItem = ref<PathInfoModel>();
-let tempCounter = 0;
-const router = useRouter();
-const { user } = useAuthState();
-onBeforeMount(() => {
-    const { initializeSocket } = useSocketActions();
-    initializeSocket(user.id.toString());
-});
+    const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
+    const hiddenItems = ref<HTMLDivElement>();
+    const ghostImage = ref<HTMLDivElement>();
+    const dragOverItem = ref<PathInfoModel>();
+    let tempCounter = 0;
+    const router = useRouter();
+    const { user } = useAuthState();
+    onBeforeMount(() => {
+        const { initializeSocket } = useSocketActions();
+        initializeSocket(user.id.toString());
+    });
 
-const handleSelect = (item: PathInfoModel) => {
-    if (!selectedPaths.value.includes(item)) selectItem(item);
-    else deselectItem(item);
-};
+    const handleSelect = (item: PathInfoModel) => {
+        if (!selectedPaths.value.includes(item)) selectItem(item);
+        else deselectItem(item);
+    };
 
-const isSelected = (item: PathInfoModel) => {
-    if (!selectedPaths.value.includes(item)) return false;
-    else return true;
-};
+    const isSelected = (item: PathInfoModel) => {
+        if (!selectedPaths.value.includes(item)) return false;
+        else return true;
+    };
 
-const handleAllSelect = (val: any) => {
-    if (val.target.checked) selectAll();
-    else deselectAll();
-};
+    const handleAllSelect = (val: any) => {
+        if (val.target.checked) selectAll();
+        else deselectAll();
+    };
 
-const handleItemClick = (item: PathInfoModel) => {
-    itemAction(item, router);
-};
+    const handleItemClick = (item: PathInfoModel) => {
+        itemAction(item, router);
+    };
 
-const onDragStart = (event, item) => {
-    isDraggingFiles.value = true;
-    if (!selectedPaths.value.includes(item)) selectItem(item);
-    event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
-};
+    const onDragStart = (event, item) => {
+        isDraggingFiles.value = true;
+        if (!selectedPaths.value.includes(item)) selectItem(item);
+        event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
+    };
 
-const onDragOver = (event: Event, item: PathInfoModel) => {
-    dragOverItem.value = item;
-};
+    const onDragOver = (event: Event, item: PathInfoModel) => {
+        dragOverItem.value = item;
+    };
 
-const canBeDropped = (item: PathInfoModel) => {
-    return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
-};
+    const canBeDropped = (item: PathInfoModel) => {
+        return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
+    };
 
-const onDragLeaveParent = () => {
-    tempCounter--;
-    if (tempCounter === 0) dragOverItem.value = undefined;
-};
+    const onDragLeaveParent = () => {
+        tempCounter--;
+        if (tempCounter === 0) dragOverItem.value = undefined;
+    };
 
-const onDragEnterParent = () => {
-    tempCounter++;
-};
+    const onDragEnterParent = () => {
+        tempCounter++;
+    };
 
-const highlight = (item: PathInfoModel) => {
-    return equals(item, dragOverItem.value) && canBeDropped(item);
-};
+    const highlight = (item: PathInfoModel) => {
+        return equals(item, dragOverItem.value) && canBeDropped(item);
+    };
 
-const onDrop = (item: PathInfoModel) => {
-    tempCounter = 0;
-    if (!canBeDropped(item)) return;
-    dragOverItem.value = undefined;
-    moveFiles(
-        item.path,
-        selectedPaths.value.map(x => x.path)
-    );
-    selectedPaths.value = [];
-};
+    const onDrop = (item: PathInfoModel) => {
+        tempCounter = 0;
+        if (!canBeDropped(item)) return;
+        dragOverItem.value = undefined;
+        moveFiles(
+            item.path,
+            selectedPaths.value.map(x => x.path)
+        );
+        selectedPaths.value = [];
+    };
 
-const onDragEnd = () => {
-    isDraggingFiles.value = false;
-};
+    const onDragEnd = () => {
+        isDraggingFiles.value = false;
+    };
 
-const goBack = () => {
-    router.go(-1);
-};
+    const goBack = () => {
+        router.go(-1);
+    };
 </script>
 
 <style scoped>
-th.active .arrow {
-    opacity: 1;
-}
+    th.active .arrow {
+        opacity: 1;
+    }
 
-.arrow {
-    display: inline-block;
-    vertical-align: middle;
-    width: 0;
-    height: 0;
-    margin-left: 5px;
-    opacity: 0;
-}
+    .arrow {
+        display: inline-block;
+        vertical-align: middle;
+        width: 0;
+        height: 0;
+        margin-left: 5px;
+        opacity: 0;
+    }
 
-.arrow.asc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 4px solid #1f0f5b;
-}
+    .arrow.asc {
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 4px solid #1f0f5b;
+    }
 
-.arrow.desc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid #1f0f5b;
-}
+    .arrow.desc {
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 4px solid #1f0f5b;
+    }
 
-.hiddenItems {
-    z-index: -20;
-}
+    .hiddenItems {
+        z-index: -20;
+    }
 </style>

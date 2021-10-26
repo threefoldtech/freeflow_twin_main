@@ -17,6 +17,8 @@ import { AppType } from '@/types/apps';
 import { isArray } from 'lodash';
 import { usechatsActions, usechatsState } from './chatStore';
 
+const { retrievechats } = usechatsActions();
+
 declare const Buffer;
 export enum FileType {
     Unknown,
@@ -133,8 +135,6 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
 
 const { chats } = usechatsState();
 
-
-
 export const goToShared = async () => {
     sharedDir.value = true;
     selectedPaths.value = [];
@@ -147,61 +147,76 @@ export const goToShared = async () => {
     await getSharedContent();
 };
 
-export const goToFilesInChat = async (received: boolean, chat?: Chat) => {
-    sharedDir.value = false;
+const resetForFilesReceivedInChat = () => {
     selectedPaths.value = [];
     searchResults.value = [];
     searchDirValue.value = '';
     chatsWithFiles.value = [];
     chatFiles.value = [];
+};
 
+export const goToFilesInChat = async (received: boolean, chat?: Chat) => {
     if (chat) {
         router.push({
-            name: 'filesReceivedInChat',
+            name: 'filesReceivedInChatNested',
             params: {
                 chatId: String(chat.chatId),
-            }
-        })
+            },
+        });
         chatFiles.value = chatFilesReceived(chat, received);
         return;
     }
+    resetForFilesReceivedInChat();
     router.push({
-        name: 'filesReceivedInChat',
-        params: {
-            received: String(received)
-        }
-    })
-
+        name: received ? 'filesReceivedInChat' : 'filesSentInChat',
+    });
 
     chatsWithFiles.value = getchatsWithFiles(received);
-}
+};
 
-export const getFilesInChat = (chat) => {
-    const files = chat.messages.filter((el: { type: MessageTypes; }) => el.type === MessageTypes.FILE);
-    return files.map((item: { body: { filename: any; }; }) => {
+export const loadFilesReceivedNested = async () => {
+    const chatId = router.currentRoute.value.params?.chatId;
+    if (!chatId) {
+        router.push({ name: 'filesReceivedInChat' });
+    }
+    await retrievechats();
+    const chat = chatsWithFiles.value.find(item => item.chatId === chatId);
+    console.log(chatsWithFiles.value);
+    if (!chat) {
+        router.push({ name: 'filesReceivedInChat' });
+        return;
+    }
+    chatFiles.value = chatFilesReceived(chat, true);
+    sharedFolderIsloading.value = false;
+    console.log(chatFiles.value);
+};
+
+export const fetchSharedInChatFiles = received => {
+    resetForFilesReceivedInChat();
+    sharedDir.value = true;
+    chatsWithFiles.value = getchatsWithFiles(false);
+};
+
+export const getFilesInChat = chat => {
+    const files = chat.messages.filter((el: { type: MessageTypes }) => el.type === MessageTypes.FILE);
+    return files.map((item: { body: { filename: any } }) => {
         return { ...item, fileType: getExtension(item.body.filename) };
     });
-}
+};
 
 export const chatFilesReceived = (chat: Chat, received: boolean) => {
     const route = router.currentRoute.value;
 
-
-
-
-
-
     const currentChatFiles = getFilesInChat(chat);
 
-    return received ? currentChatFiles.filter(el => el.from !== user.id) : currentChatFiles.filter(el => el.from === user.id)
-
-}
+    return received
+        ? currentChatFiles.filter(el => el.from !== user.id)
+        : currentChatFiles.filter(el => el.from === user.id);
+};
 
 export const getchatsWithFiles = (received: boolean) => {
     return chats.value.filter(chat => chatFilesReceived(chat, received).length > 0);
-}
-
-
+};
 
 export const uploadFile = async (file: File, path = currentDirectory.value) => {
     const result = await Api.uploadFile(path, file);
@@ -644,15 +659,13 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
     }
 };
 
-export const getFullFolderSkeleton = async () => { };
+export const getFullFolderSkeleton = async () => {};
 
 export const getSharedContent = async () => {
     const result = await Api.getShared('SharedWithMe');
     sharedContent.value = result.data;
     allSharedContent.value = result.data;
 };
-
-
 
 export const sharedBreadcrumbs = ref([]);
 
@@ -754,6 +767,7 @@ export const fetchBasedOnRoute = async () => {
         sharedFolderIsloading.value = false;
         allSharedContent.value = [];
         sharedContent.value = [];
+        console.log('fetch based on route');
         return;
     }
 
@@ -912,7 +926,6 @@ export const goTo = async (item: SharedFileInterface) => {
     window.open(url.href, '_blank');
 };
 
-
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
     return await Api.addShare(userId, path, filename, size, writable);
 };
@@ -938,7 +951,6 @@ export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: s
 };
 
 export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
-
     let params = { shareId: shareId, token: token };
     const locationApiEndpoint = `/api/browse/files/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';
