@@ -22,7 +22,7 @@
                     <span
                         v-if="item || i === 0"
                         :title="item"
-                        class="cursor-pointer text-base p-2 rounded-md"
+                        class="cursor-pointer text-md p-2 rounded-md"
                         @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
                         @dragenter="event => onDragEnter(event, i)"
                         @dragleave="event => onDragLeave(event, i)"
@@ -33,7 +33,8 @@
                     </span>
                 </template>
             </div>
-            <div v-if="sharedDir">
+            <div v-if="sharedDir && !isQuantumChatFiles">
+                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
                     <span v-if="i !== 0 && breadcrumb">
                         <i class="fas fa-chevron-right"></i>
@@ -42,7 +43,7 @@
                         v-if="breadcrumb || idx === 0"
                         :key="idx"
                         :title="breadcrumb.name"
-                        class="cursor-pointer text-base p-2 rounded-md"
+                        class="cursor-pointer text-md p-2 rounded-md"
                         @click="clickBreadcrumb(breadcrumb, sharedBreadcrumbs, idx)"
                     >
                         {{ idx === 0 ? 'Shared with me' : truncate(breadcrumb.name) }}
