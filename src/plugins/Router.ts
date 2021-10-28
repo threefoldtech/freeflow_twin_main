@@ -321,12 +321,12 @@ router.afterEach(async (to, from) => {
         await retrievechats();
         isQuantumChatFiles.value = true
         fetchSharedInChatFiles(true);
-        chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/sent'})
+        chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/received'})
     }
     if (to.name === 'filesSentInChat') {
         chatFilesBreadcrumbs.value = []
         isQuantumChatFiles.value = true
-        chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/received'})
+        chatFilesBreadcrumbs.value.push({name: 'Sent files in chat', path: '/quantum/sent'})
         await retrievechats();
         fetchSharedInChatFiles(false);
     }

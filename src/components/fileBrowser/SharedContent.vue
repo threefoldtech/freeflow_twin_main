@@ -58,7 +58,6 @@
                                     <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
                                     <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
-
                                 <tr
                                     v-for="item in chatFiles"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
@@ -91,7 +90,7 @@
                                                 class="block outline-none border-none"
                                             >
                                                 <div class="flex flex-col items-start py-1">
-                                                    <span class="text-md hover:underline cursor-pointer">
+                                                    <span class="text-md hover:underline cursor-pointer font-normal">
                                                         {{ truncate(item.body.filename) }}
                                                     </span>
                                                 </div>
@@ -268,7 +267,7 @@
                                                 class="block outline-none border-none"
                                             >
                                                 <div class="flex flex-col items-start py-1">
-                                                    <span class="text-md hover:underline cursor-pointer">
+                                                    <span class="text-md hover:underline cursor-pointer font-normal">
                                                         {{ item.body.filename }}
                                                     </span>
                                                 </div>
