@@ -118,23 +118,13 @@
                                             <div class="mr-3 w-7 text-center">
                                                 <i
                                                     :key="item.name"
-                                                    class="fa-2x"
-                                                    :class="
-                                                        getIconDirty(
-                                                            item.isFolder,
-                                                            getFileType(getExtension(item.name))
-                                                        ) +
-                                                        ' ' +
-                                                        getIconColorDirty(
-                                                            item.isFolder,
-                                                            getFileType(getExtension(item.name))
-                                                        )
-                                                    "
+                                                    :class="{'text-gray-600 fa-2x fas fa-users': item.isGroup, 'text-gray-600 fa-2x fas fa-user': !item.isGroup}
+"
                                                 ></i>
                                             </div>
                                             <div class="flex flex-col items-start py-1">
-                                                <span class="text-md hover:underline cursor-pointer">
-                                                    {{ item.chatId }}
+                                                <span class="text-md hover:underline cursor-pointer ml-3">
+                                                    {{ item.chatId }} <span class='text-gray-600' v-if='item.isGroup'>(Group)</span>
                                                 </span>
                                             </div>
                                         </div>
@@ -147,6 +137,7 @@
                                 </tr>
                                 <tr
                                     v-for="item in sharedContent"
+                                    v-if='!isQuantumChatFiles'
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     :class="{
                                         'bg-gray-100': isSelected(item),
@@ -307,12 +298,7 @@
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
                                             :key="item.name"
-                                            class="fa-lg"
-                                            :class="
-                                                getIconDirty(item.isFolder, getFileType(getExtension(item.name))) +
-                                                ' ' +
-                                                getIconColorDirty(item.isFolder, getFileType(getExtension(item.name)))
-                                            "
+                                            :class="{'text-gray-600 fa-lg fas fa-users': item.isGroup, 'text-gray-600 fa-lg fas fa-user': !item.isGroup}"
                                         ></i>
                                         <p
                                             class="
@@ -324,7 +310,7 @@
                                                 pointer-events-none
                                             "
                                         >
-                                            {{ item.name }}
+                                            {{ item.name }} <span class='text-gray-600' v-if='item.isGroup'>(Group)</span>
                                         </p>
                                     </div>
                                 </div>
@@ -334,7 +320,7 @@
                                     {{ formatBytes(item.size, 2) }}
                                 </p>
                             </li>
-                            <li v-for="item in sharedContent" :key="item.name" :title="item.name" class="relative">
+                            <li v-for="item in sharedContent" v-if='!isQuantumChatFiles' :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
                                         group
