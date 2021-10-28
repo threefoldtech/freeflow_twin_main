@@ -129,7 +129,7 @@
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer"> Shared with me </span>
+                                            <span class="hover:underline cursor-pointer">Shared with me </span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
@@ -139,12 +139,12 @@
                                 <!-- Files received in chat -->
                                 <tr v-if="currentDirectory === '/'">
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
-                                    <td class="px-6 py-4 whitespace-nowrap" @click="goToFilesInChat((received = true))">
+                                    <td class="px-6 py-4 whitespace-nowrap" @click="router.push({name: 'filesReceivedInChat'})">
                                         <div class="flex flex-row items-center text-md">
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer"> Files received in chat </span>
+                                            <span class="hover:underline cursor-pointer">Files received in chat </span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
@@ -155,13 +155,13 @@
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap"
-                                        @click="goToFilesInChat((received = false))"
+                                        @click="router.push({name: 'filesSentInChat'})"
                                     >
                                         <div class="flex flex-row items-center text-md">
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer"> Files sent in chat </span>
+                                            <span class="hover:underline cursor-pointer">Files sent in chat </span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>

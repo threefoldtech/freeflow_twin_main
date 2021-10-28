@@ -5,7 +5,7 @@ import {
     selectedPaths,
     goToFilesInChat,
     chatsWithFiles,
-    fetchSharedInChatFiles,
+    fetchSharedInChatFiles, chatFilesBreadcrumbs, isQuantumChatFiles,
 } from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
@@ -40,6 +40,7 @@ import {
     goToFilesInChat,
     getchatsWithFiles,
     loadFilesReceivedNested,
+    isQuantumChatFiles
 } from '@/store/fileBrowserStore';
 import { usechatsActions } from '@/store/chatStore';
 
@@ -146,7 +147,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: 'sent',
                 name: 'filesSentInChat',
                 component: FileBrowser,
-                meta: { sharedFolder: true },
+                meta: { sharedFolder: true,received : false, chatFiles: true },
                 children: [
                     {
                         component: FileBrowser,
@@ -156,8 +157,11 @@ const routes: Array<RouteRecordRaw> = [
                         meta: {
                             root_parent: 'quantum',
                             sharedFolder: true,
-                        },
+                            received: false,
+                            chatFiles: true
+                        }
                     },
+
                 ],
             },
             {
@@ -166,6 +170,8 @@ const routes: Array<RouteRecordRaw> = [
                 component: FileBrowser,
                 meta: {
                     sharedFolder: true,
+                    received: true,
+                    chatFiles: true
                 },
                 children: [
                     {
@@ -176,6 +182,8 @@ const routes: Array<RouteRecordRaw> = [
                         meta: {
                             root_parent: 'quantum',
                             sharedFolder: true,
+                            received: true,
+                            chatFiles: true
                         },
                     },
                 ],
@@ -290,7 +298,9 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach(async (to, from) => {
     //If file takes too long to load, if you switch page you still get the error modal. Now it doesn't
     stopTimer();
+    chatsWithFiles.value = [];
     selectedPaths.value = [];
+    isQuantumChatFiles.value = false
     if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
         await fetchBasedOnRoute();
         loadSharedItems();
@@ -307,16 +317,22 @@ router.afterEach(async (to, from) => {
     if (to.name === 'sharedWithMe') {
     }
     if (to.name === 'filesReceivedInChat') {
+        chatFilesBreadcrumbs.value = []
         await retrievechats();
+        isQuantumChatFiles.value = true
         fetchSharedInChatFiles(true);
-        console.log(chatsWithFiles.value);
+        chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/sent'})
     }
     if (to.name === 'filesSentInChat') {
+        chatFilesBreadcrumbs.value = []
+        isQuantumChatFiles.value = true
+        chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/received'})
         await retrievechats();
         fetchSharedInChatFiles(false);
-        console.log(chatsWithFiles.value);
     }
-    if (to.name === 'filesReceivedInChatNested') {
+    if (to.name === 'filesReceivedInChatNested' || to.name === 'filesSentInChatNested') {
+        chatFilesBreadcrumbs.value = []
+        isQuantumChatFiles.value = true
         await loadFilesReceivedNested();
     }
     if (to.name === 'quantum') {

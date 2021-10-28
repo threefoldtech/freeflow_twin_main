@@ -17,7 +17,7 @@ import { AppType } from '@/types/apps';
 import { isArray } from 'lodash';
 import { usechatsActions, usechatsState } from './chatStore';
 
-const { retrievechats } = usechatsActions();
+
 
 declare const Buffer;
 export enum FileType {
@@ -77,8 +77,10 @@ export const chatsWithFiles = ref<Chat[]>();
 
 export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
+export const chatFilesBreadcrumbs = ref([])
 
 export const sharedItem = ref<PathInfoModel>();
+export const isQuantumChatFiles = ref<boolean>(false)
 
 export const currentShare = ref<SharedFileInterface>(undefined);
 export const selectedTab = ref(0);
@@ -155,17 +157,27 @@ const resetForFilesReceivedInChat = () => {
     chatFiles.value = [];
 };
 
-export const goToFilesInChat = async (received: boolean, chat?: Chat) => {
+
+
+export const goToFilesInChat = async (chat?: Chat) => {
+    sharedFolderIsloading.value = true;
+    const received = router.currentRoute.value.meta.received as boolean;
+
+
     if (chat) {
+
         router.push({
-            name: 'filesReceivedInChatNested',
+            name: received ? 'filesReceivedInChatNested' : 'filesSentInChatNested',
             params: {
                 chatId: String(chat.chatId),
             },
         });
-        chatFiles.value = chatFilesReceived(chat, received);
+        chatFiles.value = await chatFilesReceived(chat, received);
+        sharedFolderIsloading.value = false;
+        chatFilesBreadcrumbs.value.push({name: chat.chatId})
         return;
     }
+
     resetForFilesReceivedInChat();
     router.push({
         name: received ? 'filesReceivedInChat' : 'filesSentInChat',
@@ -174,27 +186,39 @@ export const goToFilesInChat = async (received: boolean, chat?: Chat) => {
     chatsWithFiles.value = getchatsWithFiles(received);
 };
 
+
+
 export const loadFilesReceivedNested = async () => {
+    const { retrievechats } = usechatsActions();
+    const {chats} = usechatsState()
     const chatId = router.currentRoute.value.params?.chatId;
+    const received = router.currentRoute.value.meta.received as boolean;
     if (!chatId) {
-        router.push({ name: 'filesReceivedInChat' });
-    }
-    await retrievechats();
-    const chat = chatsWithFiles.value.find(item => item.chatId === chatId);
-    console.log(chatsWithFiles.value);
-    if (!chat) {
-        router.push({ name: 'filesReceivedInChat' });
+        router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
+        sharedFolderIsloading.value = false;
         return;
     }
-    chatFiles.value = chatFilesReceived(chat, true);
+
+    await retrievechats();
+    const chat = chats.value.find(item => item.chatId === chatId);
+    if (!chat) {
+        router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
+        sharedFolderIsloading.value = false;
+        return;
+    }
+    chatFilesBreadcrumbs.value.push({name: received ? 'Received files in chat' : 'Sent files in chat', path: received ? '/quantum/received' : '/quantum/sent'})
+    chatFilesBreadcrumbs.value.push({name: chatId, path: router.currentRoute.value.path})
+
+
+    chatFiles.value = chatFilesReceived(chat, received);
     sharedFolderIsloading.value = false;
-    console.log(chatFiles.value);
 };
 
 export const fetchSharedInChatFiles = received => {
     resetForFilesReceivedInChat();
     sharedDir.value = true;
-    chatsWithFiles.value = getchatsWithFiles(false);
+    chatsWithFiles.value = getchatsWithFiles(received);
+    sharedFolderIsloading.value = false;
 };
 
 export const getFilesInChat = chat => {
@@ -208,6 +232,8 @@ export const chatFilesReceived = (chat: Chat, received: boolean) => {
     const route = router.currentRoute.value;
 
     const currentChatFiles = getFilesInChat(chat);
+
+
 
     return received
         ? currentChatFiles.filter(el => el.from !== user.id)
@@ -767,7 +793,7 @@ export const fetchBasedOnRoute = async () => {
         sharedFolderIsloading.value = false;
         allSharedContent.value = [];
         sharedContent.value = [];
-        console.log('fetch based on route');
+
         return;
     }
 

@@ -49,11 +49,23 @@
                     </span>
                 </template>
             </div>
+            <div v-if='isQuantumChatFiles'>
+                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
+                <i class="fas fa-chevron-right"></i>
+                <template v-for="(breadcrumb, idx) in chatFilesBreadcrumbs" :key='idx'>
+                    <span v-if="idx !== 0 && breadcrumb">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span class='mx-2 cursor-pointer' @click='router.push({path: breadcrumb.path})'>
+                        {{breadcrumb.name}}
+                    </span>
+                </template>
+            </div>
         </div>
     </div>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts" setup >
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
     import {
         selectedPaths,
@@ -65,9 +77,14 @@
         moveFiles,
         sharedBreadcrumbs,
         sharedDir,
+        chatFilesBreadcrumbs,
         clickBreadcrumb,
+        isQuantumChatFiles
     } from '@/store/fileBrowserStore';
+    import {useRouter} from 'vue-router';
     import { createNotification } from '@/store/notificiationStore';
+
+    const router = useRouter()
 
     const parts = computed(() => currentDirectory.value.split('/'));
 

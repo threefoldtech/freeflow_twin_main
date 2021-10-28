@@ -1,6 +1,6 @@
 <template>
     <div class="h-full overflow-y-auto px-3">
-        <h1 class="p-2">
+        <h1 v-if='!isQuantumChatFiles' class="p-2">
             Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>
         </h1>
 
@@ -49,12 +49,16 @@
                                     </th>
                                 </tr>
                             </thead>
-
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-if="sharedContent.length === 0">
+                                <tr v-if="chatsWithFiles?.length === 0 && router.currentRoute.name === 'filesReceivedInChat' || router.currentRoute.name === 'filesReceivedInChat'">
                                     <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
                                     <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
+                                <tr v-if="chatFiles?.length === 0 && router.currentRoute.name === 'filesReceivedInChatNested' || router.currentRoute.name === 'filesSentInChatNested'">
+                                    <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
+                                    <td class="px-6 py-4 whitespace-nowrap"></td>
+                                </tr>
+
                                 <tr
                                     v-for="item in chatFiles"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
@@ -107,7 +111,7 @@
                                     :class="{
                                         'bg-gray-100': isSelected(item),
                                     }"
-                                    @click="goToFilesInChat((received = route.params.received === 'true'), item)"
+                                    @click="goToFilesInChat(item)"
                                     :key="item.name"
                                 >
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -215,11 +219,10 @@
                                     font-medium
                                     text-center text-gray-800
                                 "
-                                v-if="sharedContent.length === 0"
+                                v-if="chatFiles?.length === 0"
                             >
                                 Nothing has been shared with you yet!
                             </p>
-
                             <li v-for="item in chatFiles" :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
@@ -300,7 +303,7 @@
                                         justify-start
                                         items-center
                                     "
-                                    @click="goToFilesInChat((received = route.params.received === 'true'), item)"
+                                    @click="goToFilesInChat(item)"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
@@ -317,15 +320,12 @@
                                                 block
                                                 ml-4
                                                 text-sm
-                                                font-medium
                                                 text-gray-900
                                                 truncate
                                                 pointer-events-none
                                             "
                                         >
                                             {{ item.name }}
-
-                                            {{ $route }}
                                         </p>
                                     </div>
                                 </div>
@@ -335,7 +335,6 @@
                                     {{ formatBytes(item.size, 2) }}
                                 </p>
                             </li>
-
                             <li v-for="item in sharedContent" :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
@@ -432,6 +431,7 @@
         goToChatFiles,
         chatFilesReceived,
         goToFilesInChat,
+        isQuantumChatFiles,
         chatFiles,
     } from '@/store/fileBrowserStore';
     import { SharedFileInterface } from '@/types';
