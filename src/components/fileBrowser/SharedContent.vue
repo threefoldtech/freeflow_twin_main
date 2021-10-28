@@ -12,7 +12,6 @@
                 <div class="py-2 align-middle inline-block min-w-full">
                     <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                        <pre>{{JSON.stringify($route.meta, null,2)}}</pre>
                         <table
                             v-if="fileBrowserTypeView === 'LIST'"
                             class="min-w-full divide-y divide-gray-200 shadow"
@@ -200,6 +199,8 @@
                                 mt-4
                             "
                         >
+                            chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles"
+
                             <p
                                 class="
                                     px-6
@@ -210,10 +211,27 @@
                                     font-medium
                                     text-center text-gray-800
                                 "
-                                v-if="chatFiles?.length === 0"
+                                v-if="chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles"
                             >
                                 Nothing has been shared with you yet!
                             </p>
+
+
+                            <p
+                                class="
+                                    px-6
+                                    py-4
+                                    whitespace-nowrap
+                                    col-span-12
+                                    text-base
+                                    font-medium
+                                    text-center text-gray-800
+                                "
+                                v-if="chatsWithFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatsWithFiles && !$route.meta.chatFilesNested"
+                            >
+                                Nothing has been shared with you yet!
+                            </p>
+
                             <li v-for="item in chatFiles" :key="item.name" :title="item.name" class="relative">
                                 <div
                                     class="
