@@ -147,7 +147,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: 'sent',
                 name: 'filesSentInChat',
                 component: FileBrowser,
-                meta: { sharedFolder: true,received : false, chatFiles: true },
+                meta: { sharedFolder: true,received : false, chatFiles: true, chatsWithFiles: true },
                 children: [
                     {
                         component: FileBrowser,
@@ -158,7 +158,8 @@ const routes: Array<RouteRecordRaw> = [
                             root_parent: 'quantum',
                             sharedFolder: true,
                             received: false,
-                            chatFiles: true
+                            chatFiles: true,
+                            chatFilesNested: true
                         }
                     },
 
@@ -171,7 +172,8 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     sharedFolder: true,
                     received: true,
-                    chatFiles: true
+                    chatFiles: true,
+                    chatsWithFiles: true
                 },
                 children: [
                     {
@@ -183,7 +185,8 @@ const routes: Array<RouteRecordRaw> = [
                             root_parent: 'quantum',
                             sharedFolder: true,
                             received: true,
-                            chatFiles: true
+                            chatFiles: true,
+                            chatFilesNested: true
                         },
                     },
                 ],

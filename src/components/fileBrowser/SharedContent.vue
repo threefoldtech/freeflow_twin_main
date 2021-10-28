@@ -12,6 +12,7 @@
                 <div class="py-2 align-middle inline-block min-w-full">
                     <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                        <pre>{{JSON.stringify($route.meta, null,2)}}</pre>
                         <table
                             v-if="fileBrowserTypeView === 'LIST'"
                             class="min-w-full divide-y divide-gray-200 shadow"
@@ -50,11 +51,11 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-if="chatsWithFiles?.length === 0 && router.currentRoute.name === 'filesReceivedInChat' || router.currentRoute.name === 'filesReceivedInChat'">
+                                <tr v-if="chatsWithFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatsWithFiles && !$route.meta.chatFilesNested">
                                     <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
                                     <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
-                                <tr v-if="chatFiles?.length === 0 && router.currentRoute.name === 'filesReceivedInChatNested' || router.currentRoute.name === 'filesSentInChatNested'">
+                                <tr v-if="chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles">
                                     <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
                                     <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
