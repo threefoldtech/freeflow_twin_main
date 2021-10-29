@@ -147,6 +147,14 @@ export const removeChat = chatId => {
 
 const addGroupchat = (name: string, contacts: Contact[]) => {
     const { user } = useAuthState();
+
+    const contactInGroup = contacts.map(contact => {
+        if(user.id !== contact.id)
+            return contact.id
+    }).filter(x => {
+        return x !== undefined;
+    })
+
     const newGroupchat: GroupChat = {
         isGroup: true,
         chatId: uuidv4(),
@@ -156,7 +164,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    message: `${user.id} has created and invited you to ${name}`,
+                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(', ')}`,
                 } as SystemBody,
                 timeStamp: new Date(),
                 id: uuidv4(),
