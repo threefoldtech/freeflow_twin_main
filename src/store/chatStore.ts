@@ -151,7 +151,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     const contactInGroup = contacts.map(contact => {
         if(user.id !== contact.id)
             return contact.id
-    }).filter(function(x) {
+    }).filter(x => {
         return x !== undefined;
     })
 
