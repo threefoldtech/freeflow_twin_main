@@ -84,6 +84,7 @@
         noActions?: boolean;
         okButtonText?: string;
         cancelButtonText?: string;
+        noActions?: boolean;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
