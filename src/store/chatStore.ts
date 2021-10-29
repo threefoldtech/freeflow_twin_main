@@ -367,10 +367,21 @@ export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => 
     sendSocketMessage(chatId, message, isEdit);
 };
 
+const delay = (delayInms) => {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(2);
+        }, delayInms);
+    });
+}
+
+export const imageUpload = ref([]);
+
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
     const { user } = useAuthState();
     const id = uuidv4();
-    var formData = new FormData();
+    let formData = new FormData();
+    console.log(selectedFile)
     if (!isBlob) {
         formData.append('file', selectedFile);
     } else {
@@ -392,6 +403,8 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     };
 
     addMessage(chatId, msgToSend);
+    await delay(5000);
+    console.log("5 seconds over")
 
     try {
         await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {

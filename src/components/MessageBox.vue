@@ -9,7 +9,6 @@
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
-
                 <MessageCard
                     :key="`${message.id}-${i <= lastRead}`"
                     :chatId="chat.chatId"
