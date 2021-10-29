@@ -6,10 +6,12 @@
                     <div class="flex items-center">
                         <div class="relative mr-4">
                             <!--<AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>-->
-                            <img src='threefold_logo.png' class="w-12 h-12" />
+                            <img src="/threefold_logo.png" class="w-12 h-12" />
                         </div>
                         <div>
-                            <p class="text-base font-medium cursor-pointer" @click='showComingSoonToUhuru = true'>Threefold</p>
+                            <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
+                                Threefold
+                            </p>
                             <p class="text-xs text-gray-400">{{ timeAgo(props.item.date_modified) }}</p>
                         </div>
                     </div>
@@ -77,7 +79,7 @@
                                                 v-for="item in solutions"
                                                 :key="item.name"
                                                 :href="item.href"
-                                                @click='showComingSoonToUhuru = true'
+                                                @click="showComingSoonToUhuru = true"
                                                 class="
                                                     items-center
                                                     p-2
@@ -93,7 +95,6 @@
                                                     focus-visible:ring-opacity-50
                                                 "
                                             >
-
                                                 <div class="">
                                                     <p class="text-sm font-medium text-gray-900">
                                                         {{ item.name }}
@@ -139,19 +140,23 @@
                         <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
                     </div>
 
-                    <p @click='showComingSoonToUhuru = true' class="text-gray-600 mr-0 ml-auto cursor-pointer">
+                    <p @click="showComingSoonToUhuru = true" class="text-gray-600 mr-0 ml-auto cursor-pointer">
                         {{ Math.abs(props.item.comments) }} Comments
                     </p>
                 </div>
             </div>
         </div>
-             <div class="border-t-2 flex space-x-8 p-4">
+        <div class="border-t-2 flex space-x-8 p-4">
             <div
                 class="flex items-center cursor-pointer"
                 v-for="action in actions"
                 :key="action.name"
-
-                @click="() => {action.name === 'Comment' ? showComingSoonToUhuru = true : ''; localLike = !localLike}"
+                @click="
+                    () => {
+                        action.name === 'Comment' ? (showComingSoonToUhuru = true) : '';
+                        localLike = !localLike;
+                    }
+                "
             >
                 <component
                     :is="localLike ? action.active : action.component"
@@ -233,7 +238,6 @@
             name: 'Comment',
             component: ChatAltIcon,
             active: ChatAltIcon,
-
         },
     ]);
 
