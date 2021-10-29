@@ -163,9 +163,7 @@ export const goToFilesInChat = async (chat?: Chat) => {
     sharedFolderIsloading.value = true;
     const received = router.currentRoute.value.meta.received as boolean;
 
-
     if (chat) {
-
         router.push({
             name: received ? 'filesReceivedInChatNested' : 'filesSentInChatNested',
             params: {
@@ -199,6 +197,7 @@ export const loadFilesReceivedNested = async () => {
         return;
     }
 
+
     await retrievechats();
     const chat = chats.value.find(item => item.chatId === chatId);
     if (!chat) {
@@ -208,9 +207,8 @@ export const loadFilesReceivedNested = async () => {
     }
     chatFilesBreadcrumbs.value.push({name: received ? 'Received files in chat' : 'Sent files in chat', path: received ? '/quantum/received' : '/quantum/sent'})
     chatFilesBreadcrumbs.value.push({name: chatId, path: router.currentRoute.value.path})
-
-
     chatFiles.value = chatFilesReceived(chat, received);
+    chatsWithFiles.value = []
     sharedFolderIsloading.value = false;
 };
 
@@ -767,10 +765,12 @@ export const fetchBasedOnRoute = async () => {
     const route = router.currentRoute.value;
     //Starting lazy loader animation
     sharedFolderIsloading.value = true;
+    if(route.name === 'filesReceivedInChatNested' || route.name === 'filesSentInChatNested'){
+        return;
+    }
 
     if (route.name === 'quantum') {
         await getSharedContent();
-
         sharedFolderIsloading.value = false;
         return;
     }
@@ -783,17 +783,9 @@ export const fetchBasedOnRoute = async () => {
     if (route.name === 'sharedWithMe') {
         resetSharedFolder();
         sharedFolderIsloading.value = false;
-
         return;
     }
-    if (route.name === 'filesReceivedInChat') {
-        resetSharedFolder();
-        sharedFolderIsloading.value = false;
-        allSharedContent.value = [];
-        sharedContent.value = [];
 
-        return;
-    }
 
     if (route.name === 'sharedWithMeItem') {
         const parent = allSharedContent.value.find(x => x.id === route.params.sharedId);

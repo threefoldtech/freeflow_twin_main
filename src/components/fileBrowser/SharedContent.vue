@@ -58,7 +58,9 @@
                                     <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
                                     <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
+                                <!-- CHAT FILES -->
                                 <tr
+                                    v-if='isQuantumChatFiles'
                                     v-for="item in chatFiles"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     :class="{
@@ -103,9 +105,10 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <!-- //chatFilesReceived(item, true) -->
+                                <!-- CHATS WITH FILES -->
                                 <tr
                                     v-for="item in chatsWithFiles"
+                                    v-if='isQuantumChatFiles'
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     :class="{
                                         'bg-gray-100': isSelected(item),
@@ -199,8 +202,6 @@
                                 mt-4
                             "
                         >
-                            chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles"
-
                             <p
                                 class="
                                     px-6
@@ -215,8 +216,6 @@
                             >
                                 Nothing has been shared with you yet!
                             </p>
-
-
                             <p
                                 class="
                                     px-6

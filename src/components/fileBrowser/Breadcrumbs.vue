@@ -13,8 +13,8 @@
     >
       <i class='fas fa-arrow-up text-white'></i>
     </div>-->
-        <div class="flex-1 mr-4">
-            <div v-if="!sharedDir">
+            <div class="flex-1 mr-4">
+            <div v-if="!sharedDir && !isQuantumChatFiles">
                 <template v-for="(item, i) in parts">
                     <span v-if="i !== 0 && item">
                         <i class="fas fa-chevron-right"></i>
@@ -33,6 +33,7 @@
                     </span>
                 </template>
             </div>
+            <!-- SHARED BREADCRUMBS -->
             <div v-if="sharedDir && !isQuantumChatFiles">
                 <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
@@ -50,6 +51,7 @@
                     </span>
                 </template>
             </div>
+            <!-- CHAT FILES BREADCRUMBS -->
             <div v-if='isQuantumChatFiles'>
                 <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
                 <i class="fas fa-chevron-right"></i>

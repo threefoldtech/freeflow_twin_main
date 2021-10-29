@@ -303,9 +303,10 @@ router.afterEach(async (to, from) => {
     stopTimer();
     chatsWithFiles.value = [];
     selectedPaths.value = [];
-    isQuantumChatFiles.value = false
+    isQuantumChatFiles.value = false;
     if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
         await fetchBasedOnRoute();
+
         loadSharedItems();
     } else {
         sharedFolderIsloading.value = false;
@@ -313,8 +314,9 @@ router.afterEach(async (to, from) => {
     }
     if (to.name === 'quantumFolder') {
         loadLocalFolder();
+
     }
-    if (to.meta.sharedFolder) {
+    if (to.meta.sharedFolder ) {
         sharedDir.value = true;
     }
     if (to.name === 'sharedWithMe') {
@@ -336,11 +338,12 @@ router.afterEach(async (to, from) => {
     if (to.name === 'filesReceivedInChatNested' || to.name === 'filesSentInChatNested') {
         chatFilesBreadcrumbs.value = []
         isQuantumChatFiles.value = true
-        await loadFilesReceivedNested();
+       await loadFilesReceivedNested();
     }
     if (to.name === 'quantum') {
         sharedDir.value = false;
         currentDirectory.value = '/';
+
     }
 });
 
