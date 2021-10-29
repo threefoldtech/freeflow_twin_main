@@ -164,7 +164,6 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    //message: `${user.id} has created and invited you to ${name}`,
                     message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(', ')}`,
                 } as SystemBody,
                 timeStamp: new Date(),
