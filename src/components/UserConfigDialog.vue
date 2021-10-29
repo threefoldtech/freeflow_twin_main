@@ -272,7 +272,7 @@
     };
 
     const saveNewAvatar = async () => {
-        const blob = await (await fetch(cropper.value.getCroppedCanvas().toDataURL(file.value.type))).blob();
+        const blob = await (await fetch(cropper.value?.getCroppedCanvas().toDataURL(file.value.type))).blob();
         const tempFile = new File([blob], 'avatar', {
             type: file.value.type,
         });
