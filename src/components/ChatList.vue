@@ -157,7 +157,7 @@
 
         <Dialog
             :modelValue="showAddUserDialog"
-            noActions
+            :noActions='true'
             @closeDialog="sendUpdate(false)"
             @update-model-value="sendUpdate"
         >
@@ -238,7 +238,7 @@
     });
 
     const sendUpdate = newVal => {
-        console.log('update it');
+
         showAddUserDialog.value = newVal;
     };
 </script>
