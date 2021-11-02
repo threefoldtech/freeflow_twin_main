@@ -367,21 +367,22 @@ export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => 
     sendSocketMessage(chatId, message, isEdit);
 };
 
-const delay = (delayInms) => {
+const delay = delayInms => {
     return new Promise(resolve => {
         setTimeout(() => {
             resolve(2);
         }, delayInms);
     });
-}
+};
 
 export const imageUpload = ref([]);
+export const imageUploadQueue = ref([]);
 
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
     const { user } = useAuthState();
     const id = uuidv4();
     let formData = new FormData();
-    console.log(selectedFile)
+
     if (!isBlob) {
         formData.append('file', selectedFile);
     } else {
@@ -403,13 +404,29 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     };
 
     addMessage(chatId, msgToSend);
-    await delay(5000);
-    console.log("5 seconds over")
+    //await delay(5000);
+    //console.log('5 seconds over');
 
     try {
+        const uuid = uuidv4();
+        console.log(selectedFile);
+        imageUploadQueue.value.push({ id: uuid, data: selectedFile, time: new Date(), loaded: 0 });
+        console.log(imageUploadQueue.value);
+        //Math.round((loaded / total) * 100)
         await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: ({ loaded: progress, total }) => {
+                imageUploadQueue.value = imageUploadQueue.value.map(item => {
+                    if (item.id === uuid) {
+                        return {
+                            ...item,
+                            loaded: progress,
+                        };
+                    }
+                    return item;
+                });
             },
         });
         console.log('File uploaded.');
@@ -501,14 +518,14 @@ export const usechatsState = () => {
     };
 };
 
-export const draftMessage = (chatId, message: Message<MessageBodyType>) =>{
+export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
     getChat(chatId).draft = message;
     axios.post(`${config.baseUrl}api/updateDraft`, {
         params: {
-            'draftMessage': message
-        }
-    })
-}
+            draftMessage: message,
+        },
+    });
+};
 
 export const usechatsActions = () => {
     return {
