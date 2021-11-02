@@ -46,8 +46,8 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SystemMessageTypes, MessageTypes } from '@/types';
 
-    const { sendMessage,  } = usechatsActions();
-    const {chats} = usechatsState();
+    const { sendMessage } = usechatsActions();
+    const { chats } = usechatsState();
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
     import { isObject } from 'lodash';
@@ -81,24 +81,23 @@
     const currentShare = ref<SharedFileInterface>();
 
     onBeforeMount(async () => {
-       currentShare.value = await getShareByPath(props.selectedFile.path);
-       currentShare.value.permissions = currentShare.value.permissions.map(item => {
+        currentShare.value = await getShareByPath(props.selectedFile.path);
+        currentShare.value.permissions = currentShare.value.permissions.map(item => {
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.chatId;
-            })
-            if(chat.isGroup){
+            });
+            if (chat.isGroup) {
                 //Groups chatId's are UUID
                 return {
                     ...item,
-                    name: chat.name
-                }
+                    name: chat.name,
+                };
             }
-            return{
+            return {
                 ...item,
-                name: item.chatId
-            }
-
-        })
+                name: item.chatId,
+            };
+        });
     });
 
     const reset = () => {
@@ -111,8 +110,8 @@
     };
 
     const searchResults = computed(() => {
-               return currentShare.value?.permissions?.filter(item => {
-               return item?.name?.toLowerCase().includes(searchTerm.value.toLowerCase());
+        return currentShare.value?.permissions?.filter(item => {
+            return item?.name?.toLowerCase().includes(searchTerm.value.toLowerCase());
         });
     });
 
