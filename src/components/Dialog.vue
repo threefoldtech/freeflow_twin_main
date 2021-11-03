@@ -83,7 +83,7 @@
         modelValue?: boolean;
         okButtonText?: string;
         cancelButtonText?: string;
-        noActions?: boolean;
+        noActions: boolean;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
