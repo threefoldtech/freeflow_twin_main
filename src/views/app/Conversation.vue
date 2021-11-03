@@ -457,7 +457,8 @@
             MessageTypes.SYSTEM
         );
 
-        popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
+        popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
+
     };
 
     const deleteChat = () => {
