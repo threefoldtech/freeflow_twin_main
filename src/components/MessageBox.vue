@@ -91,7 +91,7 @@
     };
     const { addScrollEvent } = useScrollActions();
     onMounted(() => {
-
+        //TODO make this more effecient
         setTimeout(() => { scroll() }, 100);
     });
 
