@@ -36,6 +36,7 @@
         goIntoSharedFolder,
         goTo,
         fetchBasedOnRoute,
+        sharedItemFromChat,
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
@@ -54,11 +55,17 @@
         }
 
         if (!sharedDir.value) {
-            if (route.params.editFileShare === 'true') {
+            if (route.params.editFileShare === 'true' || sharedItemFromChat.value) {
                 selectItem(sharedItem.value);
                 selectedTab.value = 1;
                 showShareDialog.value = true;
                 await updateContent(currentDirectory.value);
+                sharedItem.value = null;
+                sharedItemFromChat.value = false;
+                sharedDir.value = false;
+                searchResults.value = [];
+                searchDirValue.value = '';
+                return;
             }
 
             if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';

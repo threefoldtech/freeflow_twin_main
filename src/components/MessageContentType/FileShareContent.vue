@@ -44,11 +44,15 @@
         goIntoSharedFolder,
         sharedItem,
         sharedFolderIsloading,
+        selectedTab,
+        selectedPaths,
+        sharedItemFromChat,
     } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
     import { AppType } from '@/types/apps';
 
     import { useRouter } from 'vue-router';
+    import { showShareDialog } from '@/services/dialogService';
 
     interface IProp {
         message: Object;
@@ -68,6 +72,10 @@
         ) {
             //File is located in root folder
             router.push({ name: 'quantum' });
+            selectedTab.value = 1;
+            showShareDialog.value = true;
+            selectedPaths.value[0] = message;
+            sharedItemFromChat.value = true;
             return;
         }
 
