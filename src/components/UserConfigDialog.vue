@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" noActions>
+    <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" :noActions='true'>
         <template v-slot:title>
             <h1>Profile settings</h1>
         </template>
@@ -156,7 +156,7 @@
                 </ul>
             </div>
         </div>
-        <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" noActions>
+        <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" :noActions='true'>
             <template v-slot:title>
                 <h1>Avatar</h1>
             </template>
@@ -180,9 +180,9 @@
                         @click="cancelNewAvatar"
                         class="rounded-md border border-gray-400 mr-2 px-4 py-2 justify-self-end"
                     >
-                        CANCEL
+                        Cancel
                     </button>
-                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary">SAVE</button>
+                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary">Save image</button>
                 </div>
             </div>
         </Dialog>

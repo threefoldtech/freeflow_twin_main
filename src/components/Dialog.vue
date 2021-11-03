@@ -81,15 +81,14 @@
 
     interface IProps {
         modelValue?: boolean;
-        noActions?: boolean;
         okButtonText?: string;
         cancelButtonText?: string;
-        noActions?: boolean;
+        noActions: boolean;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
         modelValue: false,
-        noActions: false,
+        noActions: true,
         okButtonText: 'Ok',
         cancelButtonText: 'Cancel',
     });

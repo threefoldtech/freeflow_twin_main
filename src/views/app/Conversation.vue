@@ -268,7 +268,7 @@
             </div>
         </template>
     </appLayout>
-    <Dialog v-model="showDialog" class="max-w-10" noActions @update-model-value="showDialog = false">
+    <Dialog v-model="showDialog" class="max-w-10" :noActions='true' @update-model-value="showDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Blocking</h1>
         </template>
@@ -285,7 +285,7 @@
             </button>
         </div>
     </Dialog>
-    <Dialog v-model="showDeleteDialog" class="max-w-10" noActions @update-model-value="showDeleteDialog = false">
+    <Dialog v-model="showDeleteDialog" class="max-w-10" :noActions='true' @update-model-value="showDeleteDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Deleting Conversation</h1>
         </template>

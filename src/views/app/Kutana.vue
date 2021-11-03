@@ -23,7 +23,7 @@
 
     function browse() {
         iframeUrl.value = `https://kutana.uhuru.me/`;
-        console.log(iframeUrl.value);
+
     }
 </script>
 
