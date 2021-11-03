@@ -409,10 +409,13 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     //await delay(5000);
     //console.log('5 seconds over');
 
+    const arr = new Uint8Array(await selectedFile.arrayBuffer());
+    const blob = new Blob([arr], {'type': 'image/png'})
+
     try {
         const uuid = uuidv4();
         console.log(selectedFile);
-        imageUploadQueue.value.push({ id: uuid, data: selectedFile, time: new Date(), loaded: 0 });
+        imageUploadQueue.value.push({ id: uuid, data: window.URL.createObjectURL(blob), time: new Date(), loaded: 0 });
         console.log(imageUploadQueue.value);
         //Math.round((loaded / total) * 100)
         await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
