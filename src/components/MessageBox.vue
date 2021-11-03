@@ -27,7 +27,7 @@
             <div>
                 <div v-for="image in imageUploadQueue" class="bg-black rounded w-40 h-20 bg-opacity-75">
                     <span>{{ Math.round((image.loaded / image.data.total) * 100) }}%</span>
-                    <img :src="getImageUrl(image.data)" />
+                    <!--<img :src="getImageUrl(image.data)" />-->
                 </div>
             </div>
             <slot name="viewAnchor" />
@@ -60,8 +60,7 @@
     const props = defineProps<IProps>();
 
     const getImageUrl = computed(data => {
-        console.log(data instanceof Blob);
-        return window.URL.createObjectURL(data);
+        ///return window.URL.createObjectURL(data);
     });
 
     const { getChatInfo, getNewMessages } = usechatsActions();

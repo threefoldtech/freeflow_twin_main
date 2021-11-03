@@ -383,6 +383,8 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     const id = uuidv4();
     let formData = new FormData();
 
+    console.log(selectedFile instanceof Blob)
+
     if (!isBlob) {
         formData.append('file', selectedFile);
     } else {
@@ -423,6 +425,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                         return {
                             ...item,
                             loaded: progress,
+                            total: total
                         };
                     }
                     return item;
