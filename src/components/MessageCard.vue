@@ -63,13 +63,13 @@
                 >
                     <span
                         class="reply text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
-                        @click="editMessage(message)"
+                        @click="editMessage(props.chatId, message)"
                         v-if="message.type === MessageTypes.STRING || message.type === MessageTypes.QUOTE"
                     >
                         <i class="fa fa-pen"></i>
                         <span class="text-gray-600 pl-2">Edit</span>
                     </span>
-                    <span class="reply text-xs pr-4 cursor-pointer hover:underline" @click="replyMessage(message)">
+                    <span class="reply text-xs pr-4 cursor-pointer hover:underline" @click="replyMessage(props.chatId, message)">
                         <i class="fa fa-reply"></i>
                         <span class="text-gray-600 pl-2"> Reply</span>
                     </span>
@@ -143,6 +143,8 @@
         setMessageAction,
         usechatsActions,
         selectedMessageId,
+        editMessage,
+        replyMessage,
     } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import { clock } from '@/services/clockService';
@@ -167,13 +169,6 @@
         console.log('toggleSendForwardMessage');
     };
 
-    const replyMessage = message => {
-        clearMessageAction(props.chatId);
-        //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
-        nextTick(() => {
-            setMessageAction(props.chatId, message, MessageAction.REPLY);
-        });
-    };
 
     const { addScrollEvent } = useScrollActions();
 
@@ -220,12 +215,5 @@
         sendMessageObject(props.chatId, updatedMessage);
     };
 
-    const editMessage = message => {
-        clearMessageAction(props.chatId);
-        //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
-        nextTick(() => {
-            setMessageAction(props.chatId, message, MessageAction.EDIT);
-        });
-    };
 </script>
 <style lang="css" scoped></style>

@@ -47,6 +47,7 @@
     import { SystemMessageTypes, MessageTypes } from '@/types';
 
     const { sendMessage } = usechatsActions();
+    const { chats } = usechatsState();
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
     import { isObject } from 'lodash';
@@ -56,7 +57,7 @@
 
     const headers: IHeader<TEntry>[] = [
         {
-            key: 'chatId',
+            key: 'name',
             displayName: 'Chat',
             enableSorting: true,
         },
@@ -81,6 +82,22 @@
 
     onBeforeMount(async () => {
         currentShare.value = await getShareByPath(props.selectedFile.path);
+        currentShare.value.permissions = currentShare.value.permissions.map(item => {
+            const chat = chats.value.find(chat => {
+                return chat.chatId === item.chatId;
+            });
+            if (chat.isGroup) {
+                //Groups chatId's are UUID
+                return {
+                    ...item,
+                    name: chat.name,
+                };
+            }
+            return {
+                ...item,
+                name: item.chatId,
+            };
+        });
     });
 
     const reset = () => {
@@ -94,7 +111,7 @@
 
     const searchResults = computed(() => {
         return currentShare.value?.permissions?.filter(item => {
-            return item.chatId.toLowerCase().includes(searchTerm.value.toLowerCase());
+            return item?.name?.toLowerCase().includes(searchTerm.value.toLowerCase());
         });
     });
 

@@ -80,7 +80,11 @@ export const accessDenied = ref(false);
 export const chatFilesBreadcrumbs = ref([])
 
 export const sharedItem = ref<PathInfoModel>();
+
 export const isQuantumChatFiles = ref<boolean>(false)
+
+export const sharedItemFromChat = ref<any>();
+
 
 export const currentShare = ref<SharedFileInterface>(undefined);
 export const selectedTab = ref(0);

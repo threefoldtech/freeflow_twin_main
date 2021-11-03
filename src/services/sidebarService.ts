@@ -1,5 +1,13 @@
 import { readonly, ref } from 'vue';
-export const showSideBar = ref(false);
+
+const getDefaultStatusSidebar = () => {
+    const width = document.documentElement.clientWidth;
+    if (width < 1024) return false;
+
+    return true;
+};
+
+export const showSideBar = ref(getDefaultStatusSidebar());
 
 export const getShowSideBar = () => readonly(showSideBar);
 export const toggleSideBar = () => {

@@ -1,3 +1,5 @@
+import { MessageAction } from "@/store/chatStore";
+
 export interface User extends Contact {
     image: string;
     email: string;
@@ -33,6 +35,7 @@ export interface Message<T> {
     subject: Id | null;
     replies: Message<MessageBodyType>[];
     updated?: Date;
+    action?: MessageAction;
 }
 
 export interface MessageBodyType {}
@@ -61,6 +64,7 @@ export interface Chat {
     name: string;
     isGroup: boolean;
     adminId: Id;
+    draft: Message<MessageBodyType>
 }
 export interface PersonChat extends Chat {}
 
@@ -146,6 +150,7 @@ export enum SharePermission {
 export interface SharePermissionInterface {
     chatId: string | undefined;
     types: SharePermission[];
+    name?: string;
 }
 
 export interface ContactInterface {

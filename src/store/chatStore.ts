@@ -1,5 +1,5 @@
 import { reactive } from '@vue/reactivity';
-import { readonly, ref, toRefs } from 'vue';
+import { nextTick, readonly, ref, toRefs } from 'vue';
 import axios from 'axios';
 import moment from 'moment';
 import {
@@ -87,6 +87,22 @@ const retrievechats = async () => {
     });
 };
 
+export const editMessage = (chatId, message) => {
+    clearMessageAction(chatId);
+    //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
+    nextTick(() => {
+        setMessageAction(chatId, message, MessageAction.EDIT);
+    });
+};
+
+export const replyMessage = (chatId, message) => {
+    clearMessageAction(chatId);
+    //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
+    nextTick(() => {
+        setMessageAction(chatId, message, MessageAction.REPLY);
+    });
+};
+
 const getChat = chatId => state.chats.find(x => x.chatId === chatId);
 const setChatHasMoreMessages = (chatId: string, hasMore: boolean): void => {
     state.chatInfo[chatId] = {
@@ -107,7 +123,7 @@ const addChat = (chat: Chat) => {
 
     if (!chat.isGroup) {
         const { user } = useAuthState();
-        const otherContact: Contact = <Contact>chat.contacts.find(c => c.id !== user.id);
+        const otherContact: Contact = <Contact>chat?.contacts?.find(c => c.id !== user.id);
         if (otherContact) {
             startFetchStatusLoop(otherContact);
         }
@@ -131,6 +147,14 @@ export const removeChat = chatId => {
 
 const addGroupchat = (name: string, contacts: Contact[]) => {
     const { user } = useAuthState();
+
+    const contactInGroup = contacts.map(contact => {
+        if(user.id !== contact.id)
+            return contact.id
+    }).filter(x => {
+        return x !== undefined;
+    })
+
     const newGroupchat: GroupChat = {
         isGroup: true,
         chatId: uuidv4(),
@@ -140,7 +164,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    message: `${user.id} has created and invited you to ${name}`,
+                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(', ')}`,
                 } as SystemBody,
                 timeStamp: new Date(),
                 id: uuidv4(),
@@ -472,6 +496,15 @@ export const usechatsState = () => {
     };
 };
 
+export const draftMessage = (chatId, message: Message<MessageBodyType>) =>{
+    getChat(chatId).draft = message;
+    axios.post(`${config.baseUrl}api/updateDraft`, {
+        params: {
+            'draftMessage': message
+        }
+    })
+}
+
 export const usechatsActions = () => {
     return {
         addChat,
@@ -488,6 +521,7 @@ export const usechatsActions = () => {
         updateChat,
         getNewMessages,
         getChatInfo,
+        draftMessage,
     };
 };
 

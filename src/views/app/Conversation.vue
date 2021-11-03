@@ -163,7 +163,7 @@
                                 ></div>
                             </template>
                         </MessageBox>
-                        <ChatInput v-if="!blocked" :selectedid="chat.chatId" @messageSend="scrollToBottom(true)" />
+                        <ChatInput v-if="!blocked" :chat="chat" @messageSend="scrollToBottom(true)" />
                     </FileDropArea>
                 </div>
                 <div v-else class="grid h-full w-full place-items-center">
