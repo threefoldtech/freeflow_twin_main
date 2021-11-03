@@ -32,7 +32,7 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
+    import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
     import { usechatsActions } from '@/store/chatStore';
@@ -46,14 +46,15 @@
 
     const messageBoxLocal = ref(null);
 
-    messageBoxLocal.scrollTop = messageBoxLocal.scrollHeight;
+    const scroll = () => {
+        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
+    }
+
 
     watch(messageBoxLocal, () => {
         //Refs can't seem to bind to refs in other files in script setup
         messageBox.value = messageBoxLocal.value;
-
     });
-
 
 
     const props = defineProps<IProps>();
@@ -80,7 +81,7 @@
             getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
                 if (!newMessagesLoaded) return;
 
-                element.scrollTo({
+                messageBoxLocal.value.scrollTo({
                     top: element.scrollHeight - oldScrollHeight + element.scrollTop,
                     behavior: 'auto',
                 });
@@ -90,11 +91,11 @@
     };
     const { addScrollEvent } = useScrollActions();
     onMounted(() => {
-        addScrollEvent(true);
-        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
-        console.log(messageBoxLocal.value)
-        messageBoxLocal.value.scrollIntoView({behavior: 'smooth'})
+
+        setTimeout(() => { scroll() }, 100);
     });
+
+    onUpdated(() => scroll())
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';
