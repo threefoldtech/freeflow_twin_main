@@ -13,7 +13,7 @@
             <i class="fas fa-plus"></i> Upload File(s)
         </button>
     </div>
-    <Dialog :model-value="showCreateFolderDialog" @update-model-value="val => updateCreateFolderDialog(val)">
+    <Dialog :model-value="showCreateFolderDialog" :noActions='false' @update-model-value="val => updateCreateFolderDialog(val)">
         <template v-slot:title>
             <h1>Create folder</h1>
         </template>
@@ -48,7 +48,7 @@
         </div>
     </Dialog>
 
-    <Dialog :model-value="showCreateFileDialog" @update-model-value="val => updateCreateFileDialog(val)">
+    <Dialog :model-value="showCreateFileDialog" :noActions='false' @update-model-value="val => updateCreateFileDialog(val)">
         <template v-slot:title>
             <h1>Add files</h1>
         </template>
