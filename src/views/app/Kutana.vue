@@ -22,7 +22,7 @@
     });
 
     function browse() {
-        iframeUrl.value = `https://freeflowconnect.threefold.me/`;
+        iframeUrl.value = `https://kutana.uhuru.me/`;
         console.log(iframeUrl.value);
     }
 </script>
