@@ -46,10 +46,15 @@
 
     const messageBoxLocal = ref(null);
 
+    messageBoxLocal.scrollTop = messageBoxLocal.scrollHeight;
+
     watch(messageBoxLocal, () => {
         //Refs can't seem to bind to refs in other files in script setup
         messageBox.value = messageBoxLocal.value;
+
     });
+
+
 
     const props = defineProps<IProps>();
 
@@ -81,10 +86,14 @@
                 });
             });
         }
+
     };
     const { addScrollEvent } = useScrollActions();
     onMounted(() => {
         addScrollEvent(true);
+        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
+        console.log(messageBoxLocal.value)
+        messageBoxLocal.value.scrollIntoView({behavior: 'smooth'})
     });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
