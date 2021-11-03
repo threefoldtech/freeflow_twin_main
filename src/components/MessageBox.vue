@@ -24,10 +24,10 @@
             </div>
             <pre>{{ JSON.stringify(imageUploadQueue, null, 2) }}</pre>
 
-            <div>
+            <div class='w-full overflow-auto'>
                 <div v-for="image in imageUploadQueue" class="bg-black rounded w-40 h-20 bg-opacity-75">
-                    <span>{{getPercent(image)}}%</span>
-                    <img :src="image.data" />
+                    <span class='block font-semibold text-lg text-white z-4'>{{getPercent(image)}}%</span>
+                    <img class='z-2' :src="image.data" />
                 </div>
             </div>
             <slot name="viewAnchor" />
@@ -59,8 +59,9 @@
 
     const props = defineProps<IProps>();
 
-    const getPercent = computed((image) => {
-        return Math.round((image.loaded / image.data.total) * 100)
+    const getPercent = ((image) => {
+        console.log(Math.round((image.loaded / image.total) * 100))
+        return Math.round((image.loaded / image.total) * 100)
     })
 
     const { getChatInfo, getNewMessages } = usechatsActions();
