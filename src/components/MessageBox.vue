@@ -5,7 +5,7 @@
                 <Spinner />
                 <span>Loading more messages</span>
             </div>
-            <div v-for="(message, i) in chat.messages">
+            <div  v-for="(message, i) in chat.messages">
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
@@ -22,12 +22,16 @@
                     @copy="copyMessage($event, message)"
                 />
             </div>
-            <div class='flex flex-row overflow-x-auto'>
-                <div  v-for="(image,idx) in imageUploadQueue" :key='idx'   class="bg-black rounded w-40 h-20 relative overflow-hidden flex justify-center items-center pointer-events-none mr-2">
+            <div v-if='imageUploadQueue.length >= 1' class='flex flex-row overflow-x-auto relative w-full overflow-y-hidden h-24 whitespace-no-wrap '>
+                <div  class='flex flex-row absolute left-0 top-0'>
+                <div  v-for="(image,idx) in imageUploadQueue" :key='idx'  class="bg-black rounded w-40 h-20 relative overflow-hidden flex justify-center items-center pointer-events-none mr-2 mb-2">
                     <div class='z-40 absolute' :title='image.title' >
+                        <p class='text-white font-medium loading'>Uploading</p>
                         <p class='font-semibold text-lg text-white text-center'>{{getPercent(image)}}%</p>
                     </div>
-                    <img class='opacity-75 z-2 w-40 h-20 object-cover' :alt='image.title' :src="image.data" />
+                    <img v-if='image.type' class='opacity-75 z-2 w-40 h-20 object-cover' :alt='image.title' :src="image.data" />
+                    <div v-else class='w-full h-full bg-gray-200 opacity-75 z-2'></div>
+                </div>
                 </div>
             </div>
             <slot name="viewAnchor" />
@@ -64,12 +68,13 @@
         if (percent === 100){
             setTimeout(() => {
                 imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id)
-                messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
+                //messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
+                window.URL.revokeObjectURL(image.data)
             },200)
         }
         return !isNaN(percent) ? percent : 0
-
     })
+
 
 
 
@@ -141,4 +146,29 @@
     const { user } = useAuthState();
     const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
 </script>
-<style scoped type="text/css"></style>
+<style scoped type="text/css">
+    .loading:after {
+        content: ' .';
+        animation: dots 1s steps(5, end) infinite;
+    }
+
+    @keyframes dots {
+        0%, 20% {
+            color: rgba(0,0,0,0);
+            text-shadow:
+                .25em 0 0 rgba(0,0,0,0),
+                .5em 0 0 rgba(0,0,0,0);}
+        40% {
+            color: white;
+            text-shadow:
+                .25em 0 0 rgba(0,0,0,0),
+                .5em 0 0 rgba(0,0,0,0);}
+        60% {
+            text-shadow:
+                .25em 0 0 white,
+                .5em 0 0 rgba(0,0,0,0);}
+        80%, 100% {
+            text-shadow:
+                .25em 0 0 white,
+                .5em 0 0 white;}}
+</style>
