@@ -1,5 +1,5 @@
 <template>
-    <div ref="messageBoxLocal" class="overflow-y-auto" @scroll="handleScroll">
+    <div ref="messageBoxLocal" class="overflow-y-auto overflow-x-hidden" @scroll="handleScroll">
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
@@ -22,20 +22,25 @@
                     @copy="copyMessage($event, message)"
                 />
             </div>
-            <div v-if='imageUploadQueue.length >= 1' class='flex flex-row overflow-x-auto relative w-full overflow-y-hidden h-24 whitespace-no-wrap '>
+            <slot name="viewAnchor" />
+            <pre>{{JSON.stringify(imageUploadQueue, null ,2)}}</pre>
+        </div>
+            <div  v-if='imageUploadQueue.length >= 1'  class='flex flex-row overflow-x-auto relative w-full overflow-y-hidden h-60 whitespace-no-wrap '>
                 <div  class='flex flex-row absolute left-0 top-0'>
-                <div  v-for="(image,idx) in imageUploadQueue" :key='idx'  class="bg-black rounded w-40 h-20 relative overflow-hidden flex justify-center items-center pointer-events-none mr-2 mb-2">
-                    <div class='z-40 absolute' :title='image.title' >
-                        <p class='text-white font-medium loading'>Uploading</p>
-                        <p class='font-semibold text-lg text-white text-center'>{{getPercent(image)}}%</p>
+                    <div  v-for="(image,idx) in imageUploadQueue" :key='idx'  class="bg-black rounded w-40 h-50 relative overflow-hidden flex justify-center items-center  mr-2 mb-2">
+                        <div @click="cancelUpload(image)" class='z-40 absolute flex flex-col items-center justify-center' :title='image.title' >
+                            <svg v-if='!image.error' class="spinnerAnimation mb-4" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+                                <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+                            </svg>
+                            <p v-if='image.retry' @click='retry(image)' class='text-white font-semibold cursor-pointer mt-4'>Try again</p>
+                            <p v-if='!image.error' class='text-white font-medium loading mt-4'>Uploading</p>
+                            <p v-if='image.error' class='text-white font-medium mt-4 text-center'>{{image.error_message}}</p>
+                            <p v-if='!image.error'  class='font-semibold text-lg text-white text-center'>{{getPercent(image)}}%</p>
+                        </div>
+                        <img v-if="image.isImage" class='opacity-75 z-2 w-40 h-60 object-cover' :alt='image.title' :src="image.data" />
                     </div>
-                    <img v-if='image.type' class='opacity-75 z-2 w-40 h-20 object-cover' :alt='image.title' :src="image.data" />
-                    <div v-else class='w-full h-full bg-gray-200 opacity-75 z-2'></div>
-                </div>
                 </div>
             </div>
-            <slot name="viewAnchor" />
-        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -63,20 +68,26 @@
 
     const props = defineProps<IProps>();
 
+    const retry = (image) => {
+
+    }
+
+    const cancelUpload = (image) => {
+        image.cancelToken.cancel('Operation canceled by the user.')
+        imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id)
+    }
+
     const getPercent = ((image) => {
         const percent = Math.round((image?.loaded / image?.total) * 100)
         if (percent === 100){
             setTimeout(() => {
                 imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id)
-                //messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
+                messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
                 window.URL.revokeObjectURL(image.data)
             },200)
         }
         return !isNaN(percent) ? percent : 0
     })
-
-
-
 
     const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
@@ -171,4 +182,52 @@
             text-shadow:
                 .25em 0 0 white,
                 .5em 0 0 white;}}
+
+    .spinnerAnimation {
+        animation: rotator 1.4s linear infinite;
+    }
+    @keyframes rotator {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(270deg);
+        }
+    }
+    .path {
+        stroke-dasharray: 187;
+        stroke-dashoffset: 0;
+        transform-origin: center;
+        animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
+    }
+    @keyframes colors {
+        0% {
+            stroke: white;
+        }
+        25% {
+            stroke: #E3E3E3;
+        }
+        50% {
+            stroke: white;
+        }
+        75% {
+            stroke: #E3E3E3;
+        }
+        100% {
+            stroke: white;
+        }
+    }
+    @keyframes dash {
+        0% {
+            stroke-dashoffset: 187;
+        }
+        50% {
+            stroke-dashoffset: 46.75;
+            transform: rotate(135deg);
+        }
+        100% {
+            stroke-dashoffset: 187;
+            transform: rotate(450deg);
+        }
+    }
 </style>
