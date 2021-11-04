@@ -23,22 +23,23 @@
                 />
             </div>
             <slot name="viewAnchor" />
-            <pre>{{JSON.stringify(imageUploadQueue, null ,2)}}</pre>
+
         </div>
             <div  v-if='imageUploadQueue.length >= 1'  class='flex flex-row overflow-x-auto relative w-full overflow-y-hidden h-60 whitespace-no-wrap '>
-                <div  class='flex flex-row absolute left-0 top-0'>
-                    <div  v-for="(image,idx) in imageUploadQueue" :key='idx'  class="bg-black rounded w-40 h-50 relative overflow-hidden flex justify-center items-center  mr-2 mb-2">
+                <div  class='flex flex-row absolute left-0 top-0 h-full'>
+                    <div  v-for="(image,idx) in imageUploadQueue" :key='idx'  class="bg-gray-300 rounded w-40 h-50 relative overflow-hidden flex justify-center items-center  mr-2 mb-2">
                         <div @click="cancelUpload(image)" class='z-40 absolute flex flex-col items-center justify-center' :title='image.title' >
                             <svg v-if='!image.error' class="spinnerAnimation mb-4" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
                                 <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
                             </svg>
                             <p v-if='image.retry' @click='retry(image)' class='text-white font-semibold cursor-pointer mt-4'>Try again</p>
                             <p v-if='!image.error' class='text-white font-medium loading mt-4'>Uploading</p>
-                            <p v-if='image.error' class='text-white font-medium mt-4 text-center'>{{image.error_message}}</p>
+                            <p v-if='image.error' class='font-medium mt-4 text-center' :class='{"text-white": image.isImage,
+                            "text-gray-800": !image.isImage}'>{{image.error_message}}</p>
                             <p v-if='!image.error'  class='font-semibold text-lg text-white text-center'>{{getPercent(image)}}%</p>
                         </div>
                         <img v-if="image.isImage" class='opacity-75 z-2 w-40 h-60 object-cover' :alt='image.title' :src="image.data" />
-                    </div>
+                        </div>
                 </div>
             </div>
     </div>
