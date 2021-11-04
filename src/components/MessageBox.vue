@@ -22,12 +22,12 @@
                     @copy="copyMessage($event, message)"
                 />
             </div>
-            <pre>{{ JSON.stringify(imageUploadQueue, null, 2) }}</pre>
-
-            <div class='w-full overflow-auto'>
-                <div v-for="image in imageUploadQueue" class="bg-black rounded w-40 h-20 bg-opacity-75">
-                    <span class='block font-semibold text-lg text-white z-4'>{{getPercent(image)}}%</span>
-                    <img class='z-2' :src="image.data" />
+            <div class='flex flex-row overflow-x-auto'>
+                <div  v-for="(image,idx) in imageUploadQueue" :key='idx'   class="bg-black rounded w-40 h-20 relative overflow-hidden flex justify-center items-center pointer-events-none mr-2">
+                    <div class='z-40 absolute' :title='image.title' >
+                        <p class='font-semibold text-lg text-white text-center'>{{getPercent(image)}}%</p>
+                    </div>
+                    <img class='opacity-75 z-2 w-40 h-20 object-cover' :alt='image.title' :src="image.data" />
                 </div>
             </div>
             <slot name="viewAnchor" />
@@ -60,9 +60,18 @@
     const props = defineProps<IProps>();
 
     const getPercent = ((image) => {
-        console.log(Math.round((image.loaded / image.total) * 100))
-        return Math.round((image.loaded / image.total) * 100)
+        const percent = Math.round((image?.loaded / image?.total) * 100)
+        if (percent === 100){
+            setTimeout(() => {
+                imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id)
+                messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
+            },200)
+        }
+        return !isNaN(percent) ? percent : 0
+
     })
+
+
 
     const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
@@ -95,7 +104,11 @@
     };
     const { addScrollEvent } = useScrollActions();
     onMounted(() => {
-        addScrollEvent(true);
+        //addScrollEvent(true);
+
+        setTimeout(() => {
+            messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
+        }, 500)
     });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
