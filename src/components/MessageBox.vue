@@ -5,7 +5,7 @@
                 <Spinner />
                 <span>Loading more messages</span>
             </div>
-            <div  v-for="(message, i) in chat.messages">
+            <div v-for="(message, i) in chat.messages">
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
@@ -23,25 +23,97 @@
                 />
             </div>
             <slot name="viewAnchor" />
-
         </div>
-            <div  v-if='imageUploadQueue.length >= 1'  class='flex flex-row overflow-x-auto relative w-full overflow-y-hidden h-60 whitespace-no-wrap '>
-                <div  class='flex flex-row absolute left-0 top-0 h-full'>
-                    <div  v-for="(image,idx) in imageUploadQueue" :key='idx'  class="bg-gray-300 rounded w-40 h-50 relative overflow-hidden flex justify-center items-center  mr-2 mb-2">
-                        <div @click="cancelUpload(image)" class='z-40 absolute flex flex-col items-center justify-center' :title='image.title' >
-                            <svg v-if='!image.error' class="spinnerAnimation mb-4" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-                                <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
-                            </svg>
-                            <p v-if='image.retry' @click='retry(image)' class='text-white font-semibold cursor-pointer mt-4'>Try again</p>
-                            <p v-if='!image.error' class='text-white font-medium loading mt-4'>Uploading</p>
-                            <p v-if='image.error' class='font-medium mt-4 text-center' :class='{"text-white": image.isImage,
-                            "text-gray-800": !image.isImage}'>{{image.error_message}}</p>
-                            <p v-if='!image.error'  class='font-semibold text-lg text-white text-center'>{{getPercent(image)}}%</p>
-                        </div>
-                        <img v-if="image.isImage" class='opacity-75 z-2 w-40 h-60 object-cover' :alt='image.title' :src="image.data" />
-                        </div>
+        <div
+            v-if="imageUploadQueue.length >= 1"
+            class="flex flex-row overflow-x-auto relative w-full h-64 whitespace-no-wrap"
+        >
+            <div class="flex flex-row absolute left-0 top-0 h-full">
+                <div
+                    v-for="(image, idx) in imageUploadQueue"
+                    :key="idx"
+                    class="
+                        hover:shadow-lg
+                        transition
+                        duration-300
+                        bg-gray-200
+                        rounded
+                        w-40
+                        h-50
+                        relative
+                        flex
+                        justify-center
+                        items-center
+                        mr-2
+                        mb-2
+                        mt-4
+                        group
+                    "
+                >
+                    <XCircleIcon
+                        class="
+                            invisible
+                            w-8
+                            h-8
+                            absolute
+                            -right-4
+                            -top-4
+                            text-gray-600
+                            group-hover:visible
+                            cursor-pointer
+                            hover:text-accent-800
+                            z-50
+                        "
+                        @click="cancelUpload(image)"
+                    />
+                    <div class="z-40 absolute flex flex-col items-center justify-center" :title="image.title">
+                        <svg
+                            v-if="!image.error"
+                            class="spinnerAnimation mb-4"
+                            width="65px"
+                            height="65px"
+                            viewBox="0 0 66 66"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <circle
+                                class="path"
+                                fill="none"
+                                stroke-width="6"
+                                stroke-linecap="round"
+                                cx="33"
+                                cy="33"
+                                r="30"
+                            ></circle>
+                        </svg>
+                        <ExclamationIcon v-if="image.error" class="w-8 h-8 text-gray-800" />
+                        <p
+                            v-if="image.retry"
+                            @click="retry(image)"
+                            class="text-white font-semibold cursor-pointer mt-4"
+                        >
+                            Try again
+                        </p>
+                        <p v-if="!image.error" class="text-white font-medium loading mt-4">Uploading</p>
+                        <p
+                            v-if="image.error"
+                            class="font-medium mt-4 text-center"
+                            :class="{ 'text-white': image.isImage, 'text-gray-800 font-semibold': !image.isImage }"
+                        >
+                            {{ image.error_message }}
+                        </p>
+                        <p v-if="!image.error" class="font-semibold text-lg text-white text-center">
+                            {{ getPercent(image) }}%
+                        </p>
+                    </div>
+                    <img
+                        v-if="image.isImage"
+                        class="opacity-75 z-2 w-40 h-60 object-cover"
+                        :alt="image.title"
+                        :src="image.data"
+                    />
                 </div>
             </div>
+        </div>
     </div>
 </template>
 <script setup lang="ts">
@@ -55,6 +127,7 @@
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
     import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
+    import { XCircleIcon, ExclamationIcon } from '@heroicons/vue/solid';
 
     interface IProps {
         chat: Chat;
@@ -69,26 +142,24 @@
 
     const props = defineProps<IProps>();
 
-    const retry = (image) => {
+    const retry = image => {};
 
-    }
+    const cancelUpload = image => {
+        image.cancelToken.cancel('Operation canceled by the user.');
+        imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id);
+    };
 
-    const cancelUpload = (image) => {
-        image.cancelToken.cancel('Operation canceled by the user.')
-        imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id)
-    }
-
-    const getPercent = ((image) => {
-        const percent = Math.round((image?.loaded / image?.total) * 100)
-        if (percent === 100){
+    const getPercent = image => {
+        const percent = Math.round((image?.loaded / image?.total) * 100);
+        if (percent === 100) {
             setTimeout(() => {
-                imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id)
-                messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
-                window.URL.revokeObjectURL(image.data)
-            },200)
+                imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id);
+                messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
+                window.URL.revokeObjectURL(image.data);
+            }, 200);
         }
-        return !isNaN(percent) ? percent : 0
-    })
+        return !isNaN(percent) ? percent : 0;
+    };
 
     const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
@@ -124,8 +195,8 @@
         //addScrollEvent(true);
 
         setTimeout(() => {
-            messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
-        }, 500)
+            messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
+        }, 500);
     });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
@@ -165,24 +236,23 @@
     }
 
     @keyframes dots {
-        0%, 20% {
-            color: rgba(0,0,0,0);
-            text-shadow:
-                .25em 0 0 rgba(0,0,0,0),
-                .5em 0 0 rgba(0,0,0,0);}
+        0%,
+        20% {
+            color: rgba(0, 0, 0, 0);
+            text-shadow: 0.25em 0 0 rgba(0, 0, 0, 0), 0.5em 0 0 rgba(0, 0, 0, 0);
+        }
         40% {
             color: white;
-            text-shadow:
-                .25em 0 0 rgba(0,0,0,0),
-                .5em 0 0 rgba(0,0,0,0);}
+            text-shadow: 0.25em 0 0 rgba(0, 0, 0, 0), 0.5em 0 0 rgba(0, 0, 0, 0);
+        }
         60% {
-            text-shadow:
-                .25em 0 0 white,
-                .5em 0 0 rgba(0,0,0,0);}
-        80%, 100% {
-            text-shadow:
-                .25em 0 0 white,
-                .5em 0 0 white;}}
+            text-shadow: 0.25em 0 0 white, 0.5em 0 0 rgba(0, 0, 0, 0);
+        }
+        80%,
+        100% {
+            text-shadow: 0.25em 0 0 white, 0.5em 0 0 white;
+        }
+    }
 
     .spinnerAnimation {
         animation: rotator 1.4s linear infinite;
@@ -206,13 +276,13 @@
             stroke: white;
         }
         25% {
-            stroke: #E3E3E3;
+            stroke: #e3e3e3;
         }
         50% {
             stroke: white;
         }
         75% {
-            stroke: #E3E3E3;
+            stroke: #e3e3e3;
         }
         100% {
             stroke: white;

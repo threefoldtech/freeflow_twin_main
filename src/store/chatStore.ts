@@ -1,6 +1,7 @@
 import { reactive } from '@vue/reactivity';
 import { nextTick, readonly, ref, toRefs } from 'vue';
 import axios, { CancelToken, CancelTokenSource } from 'axios';
+import * as rax from 'retry-axios';
 import moment from 'moment';
 import {
     Chat,
@@ -383,7 +384,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     const id = uuidv4();
     let formData = new FormData();
 
-    console.log(selectedFile instanceof Blob)
+    console.log(selectedFile instanceof Blob);
 
     if (!isBlob) {
         formData.append('file', selectedFile);
@@ -405,15 +406,12 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
         subject: null,
     };
 
-    console.log(selectedFile.type)
-
     //addMessage(chatId, msgToSend);
     //await delay(5000);
     //console.log('5 seconds over');
 
     const arr = new Uint8Array(await selectedFile.arrayBuffer());
-    const blob = new Blob([arr], {'type': 'image/png'})
-
+    const blob = new Blob([arr], { type: 'image/png' });
 
     const uuid = uuidv4();
 
@@ -421,8 +419,35 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     const source = CancelToken.source();
 
     try {
-        imageUploadQueue.value.push({ id: uuid, cancelToken: source, error: false, retry: false, error_message: '',type: selectedFile.type, isImage: selectedFile.type.includes('image'),title: selectedFile.name,data: window.URL.createObjectURL(blob), time: new Date(), loaded: 0, total: selectedFile.total });
-        await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
+        imageUploadQueue.value.push({
+            id: uuid,
+            cancelToken: source,
+            error: false,
+            retry: false,
+            error_message: '',
+            type: selectedFile.type,
+            isImage: selectedFile.type.includes('image'),
+            title: selectedFile.name,
+            data: window.URL.createObjectURL(blob),
+            time: new Date(),
+            loaded: 0,
+            total: selectedFile.total,
+        });
+        const myAxiosInstance = axios.create();
+        myAxiosInstance.defaults.raxConfig = {
+            instance: myAxiosInstance,
+        };
+        const interceptorId = rax.attach(myAxiosInstance);
+        //const res = await myAxiosInstance.get('https://test.local');
+        await myAxiosInstance.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
+            raxConfig: {
+                retry: 3,
+                noResponseRetries: 2,
+                onRetryAttempt: err => {
+                    const cfg = rax.getConfig(err);
+                    console.log(`Retry attempt #${cfg.currentRetryAttempt}`);
+                },
+            },
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -433,7 +458,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                         return {
                             ...item,
                             loaded: progress,
-                            total: total
+                            total: total,
                         };
                     }
                     return item;
@@ -445,22 +470,22 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
         let errorBody = '';
         if (e.message == 'Request failed with status code 413') {
             errorBody = 'ERROR: File exceeds 100MB limit!';
-            console.log(errorBody)
+            console.log(errorBody);
             imageUploadQueue.value = imageUploadQueue.value.map(el => {
-                if(uuid === el.id){
+                if (uuid === el.id) {
                     return { ...el, error_message: 'File exceeds 100MB limit!', error: true };
                 }
                 return el;
-            })
+            });
         } else {
             errorBody = 'ERROR: File failed to send!';
-            console.log(errorBody)
+            console.log(errorBody);
             imageUploadQueue.value = imageUploadQueue.value.map(el => {
-                if(uuid === el.id){
+                if (uuid === el.id) {
                     return { ...el, error_message: 'File failed to send', error: true, retry: true };
                 }
                 return el;
-            })
+            });
         }
 
         const failedMsg = {
