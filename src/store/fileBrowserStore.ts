@@ -657,7 +657,6 @@ export const showSharedFolderErrorModal = ref(false);
 
 export const loadLocalFolder = () => {
     const folderId = atob(<string>router.currentRoute.value.params.folder);
-
     currentDirectory.value = folderId.split('.').shift();
 };
 
