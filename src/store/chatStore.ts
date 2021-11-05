@@ -418,6 +418,12 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
+    const myAxiosInstance = axios.create();
+    myAxiosInstance.defaults.raxConfig = {
+        instance: myAxiosInstance,
+    };
+    const interceptorId = rax.attach(myAxiosInstance);
+
     try {
         imageUploadQueue.value.push({
             id: uuid,
@@ -433,17 +439,12 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             loaded: 0,
             total: selectedFile.total,
         });
-        const myAxiosInstance = axios.create();
-        myAxiosInstance.defaults.raxConfig = {
-            instance: myAxiosInstance,
-        };
-        const interceptorId = rax.attach(myAxiosInstance);
+
         //const res = await myAxiosInstance.get('https://test.local');
         await myAxiosInstance.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
             raxConfig: {
-                retry: 3,
-                noResponseRetries: 2,
                 onRetryAttempt: err => {
+                    console.log('RETRYING');
                     const cfg = rax.getConfig(err);
                     console.log(`Retry attempt #${cfg.currentRetryAttempt}`);
                 },
@@ -469,11 +470,12 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     } catch (e) {
         let errorBody = '';
         if (e.message == 'Request failed with status code 413') {
-            errorBody = 'ERROR: File exceeds 100MB limit!';
+            //!TODO Upload limit
+            errorBody = 'ERROR: File exceeds 20MB limit!';
             console.log(errorBody);
             imageUploadQueue.value = imageUploadQueue.value.map(el => {
                 if (uuid === el.id) {
-                    return { ...el, error_message: 'File exceeds 100MB limit!', error: true };
+                    return { ...el, error_message: 'File exceeds 20MB limit!', error: true };
                 }
                 return el;
             });
