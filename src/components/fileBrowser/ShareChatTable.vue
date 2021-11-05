@@ -144,7 +144,7 @@
 <script lang="ts" setup>
     import { Chat } from '@/types';
     import Spinner from '@/components/Spinner.vue';
-    import { selectedPaths, addShare } from '@/store/fileBrowserStore';
+    import { selectedPaths, addShare, PathInfoModel } from '@/store/fileBrowserStore';
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
     import Toggle from '@/components/Toggle.vue';
     import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
@@ -156,6 +156,7 @@
 
     interface IProps {
         data: any[];
+        selectedFile?: PathInfoModel;
     }
 
     const props = defineProps<IProps>();
@@ -193,11 +194,16 @@
     );
 
     async function shareFile(chatId) {
-        const size = selectedPaths.value[0].size;
-        const filename = selectedPaths.value[0].fullName;
-        const chat = chats.value.find(chat => chat.chatId == chatId);
+        const size = selectedPaths?.value[0]?.size ? selectedPaths?.value[0]?.size : props?.selectedFile?.size;
+        const filename = selectedPaths?.value[0]?.fullName
+            ? selectedPaths?.value[0]?.fullName
+            : props?.selectedFile?.name;
+        const chat = chats?.value.find(chat => chat?.chatId == chatId)
+            ? chats?.value.find(chat => chat?.chatId == chatId)
+            : chats?.value.find(chat => chat?.chatId == props.selectedFile?.id);
+        const path = selectedPaths.value[0]?.path ? selectedPaths.value[0]?.path : props.selectedFile.path;
         chat.loading = true;
-        await addShare(chatId, selectedPaths.value[0].path, filename, size, chat.canWrite);
+        await addShare(chatId, path, filename, size, chat.canWrite);
         chat.isAlreadySent = true;
         chat.loading = false;
         createNotification('Shared File', 'File has been shared with ' + chatId);

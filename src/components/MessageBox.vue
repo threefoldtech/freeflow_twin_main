@@ -1,5 +1,30 @@
 <template>
     <div ref="messageBoxLocal" class="overflow-y-auto" @scroll="handleScroll">
+        <Dialog :modelValue="showShareDialog" @update-model-value="showShareDialog = false" :noActions="true">
+            <template v-slot:title>
+                <h1 class="text-center">
+                    Edit permissions for <span>{{ selectedEditFile.body.isFolder ? 'folder ' : 'file ' }}</span>
+                    <span class="text-accent-800 font-semibold">{{ selectedEditFile.body.name }}</span>
+                </h1>
+            </template>
+            <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2 mt-4" :key="selectedTab">
+                <div class="flex-grow" v-for="(tab, index) in tabs" :key="`${tab}-${index}`">
+                    <button
+                        @click="selectedTab = index"
+                        class="w-full p-2 rounded-xl"
+                        :class="{ 'bg-primary text-white': index == selectedTab }"
+                    >
+                        {{ tab }}
+                    </button>
+                </div>
+            </div>
+            <ShareChatTable
+                v-if="selectedEditFile && selectedTab === 0"
+                :selectedFile="selectedEditFile.body"
+                :data="chats"
+            ></ShareChatTable>
+            <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
+        </Dialog>
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
@@ -21,6 +46,7 @@
                     :isreadbyme="i <= lastReadByMe"
                     :message="message"
                     @copy="copyMessage($event, message)"
+                    @openEditShare="editFileSharePermission"
                 />
             </div>
 
@@ -35,29 +61,45 @@
     import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
-    import { usechatsActions } from '@/store/chatStore';
+    import { usechatsActions, usechatsState } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
     import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
+    import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
+    import Dialog from '@/components/Dialog.vue';
+    import EditShare from '@/components/fileBrowser/EditShare.vue';
+    import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
 
     interface IProps {
         chat: Chat;
     }
 
+    const { chats } = usechatsState();
+
+    const tabs = ['Create shares', 'Edit permissions'];
+
     const messageBoxLocal = ref(null);
+    const selectedTab = ref<number>(1);
 
     const scroll = () => {
-        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight
-    }
-
+        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
+    };
 
     watch(messageBoxLocal, () => {
         //Refs can't seem to bind to refs in other files in script setup
         messageBox.value = messageBoxLocal.value;
     });
 
-
     const props = defineProps<IProps>();
+
+    const showShareDialog = ref<boolean>(false);
+
+    const selectedEditFile = ref<any>(null);
+
+    const editFileSharePermission = file => {
+        selectedEditFile.value = file;
+        showShareDialog.value = true;
+    };
 
     const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
@@ -87,15 +129,16 @@
                 });
             });
         }
-
     };
     const { addScrollEvent } = useScrollActions();
     onMounted(() => {
         //TODO make this more effecient
-        setTimeout(() => { scroll() }, 100);
+        setTimeout(() => {
+            scroll();
+        }, 100);
     });
 
-    onUpdated(() => scroll())
+    onUpdated(() => scroll());
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';
@@ -119,7 +162,7 @@
             default:
                 return;
         }
-        console.log(`COPY: ${data}`);
+        //console.log(`COPY: ${data}`);
         event.clipboardData.setData('text/plain', data);
         event.preventDefault();
     };
