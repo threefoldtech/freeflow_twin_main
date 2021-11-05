@@ -72,7 +72,6 @@
     });
 
     onMounted(async () => {
-        console.log(route.params);
         const path = atob(<string>route.params.path);
         const shareId = <string>route.params.shareId;
         let location;
