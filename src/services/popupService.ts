@@ -1,4 +1,4 @@
-export const popupCenter = (url: string, title: string, w: number, h: number) => {
+export const popupCenter = (url: string, title: string, w: number, h: number, blank:boolean =false) => {
     const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
     const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
     const width = window.innerWidth
@@ -16,7 +16,7 @@ export const popupCenter = (url: string, title: string, w: number, h: number) =>
     const top = (height - h) / 2 / systemZoom + dualScreenTop;
     const newWindow = window.open(
         url,
-        title,
+        blank ? '_blank' : '',
         `
       scrollbars=yes,
       width=${w / systemZoom},
@@ -25,6 +25,7 @@ export const popupCenter = (url: string, title: string, w: number, h: number) =>
       left=${left}
       `
     );
+    newWindow.document.title = title;
     if (newWindow) newWindow.focus();
     return newWindow;
 };
