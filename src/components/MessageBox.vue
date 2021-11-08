@@ -25,16 +25,15 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
-        <div class="relative w-full mt-8 px-4">
-            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
-                <Spinner />
-                <span>Loading more messages</span>
+        <div class="relative w-full px-4" :class="{'mt-8':chatInfo.isLoading}">
+            <div  v-if='chatInfo.isLoading'  class="flex flex-col justify-center items-center w-full ">
+                <Spinner class='mb-6' />
+                <span class='text-gray-600 text-xs'>Loading more messages</span>
             </div>
             <div v-for="(message, i) in chat.messages">
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
-
                 <MessageCard
                     :key="`${message.id}-${i <= lastRead}`"
                     :chatId="chat.chatId"
@@ -47,6 +46,7 @@
                     :message="message"
                     @copy="copyMessage($event, message)"
                     @openEditShare="editFileSharePermission"
+
                 />
             </div>
 
@@ -58,7 +58,7 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
+    import { computed, onMounted, onUnmounted, onUpdated, ref, watch, nextTick } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
     import { usechatsActions, usechatsState } from '@/store/chatStore';
@@ -75,25 +75,11 @@
     }
 
     const { chats } = usechatsState();
-
     const tabs = ['Create shares', 'Edit permissions'];
-
     const messageBoxLocal = ref(null);
     const selectedTab = ref<number>(1);
-
-    const scroll = () => {
-        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
-    };
-
-    watch(messageBoxLocal, () => {
-        //Refs can't seem to bind to refs in other files in script setup
-        messageBox.value = messageBoxLocal.value;
-    });
-
     const props = defineProps<IProps>();
-
     const showShareDialog = ref<boolean>(false);
-
     const selectedEditFile = ref<any>(null);
 
     const editFileSharePermission = file => {
@@ -106,7 +92,6 @@
         let id = <string>user.id;
         //@ts-ignore
         const { [id]: _, ...read } = props.chat.read;
-
         const reads = Object.values(read);
 
         return findLastIndex(props.chat.messages, message => reads.includes(<string>message.id));
@@ -116,13 +101,11 @@
         return findLastIndex(props.chat.messages, message => props.chat.read[<string>user.id] === message.id);
     });
     const handleScroll = async e => {
-        let element = messageBox.value;
-
+        let element = messageBoxLocal.value;
         const oldScrollHeight = element.scrollHeight;
-        if (element.scrollTop < 100) {
+             if (element.scrollTop < 20) {
             getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
                 if (!newMessagesLoaded) return;
-
                 messageBoxLocal.value.scrollTo({
                     top: element.scrollHeight - oldScrollHeight + element.scrollTop,
                     behavior: 'auto',
@@ -130,15 +113,11 @@
             });
         }
     };
-    const { addScrollEvent } = useScrollActions();
-    onMounted(() => {
-        //TODO make this more effecient
-        setTimeout(() => {
-            scroll();
-        }, 100);
-    });
 
-    onUpdated(() => scroll());
+    onMounted(() => {
+        messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
+        localStorage.setItem('lastOpenedChat', props.chat.chatId.toString())
+    });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';
