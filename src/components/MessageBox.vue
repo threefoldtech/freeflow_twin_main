@@ -116,6 +116,7 @@
 
     onMounted(() => {
         messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
+        localStorage.setItem('lastOpenedChat', props.chat.chatId.toString())
     });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {

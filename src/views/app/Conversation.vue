@@ -399,7 +399,9 @@
     const message = ref('');
 
     const chat = computed(() => {
-        return chats.value.find(c => c.chatId == selectedId.value);
+        const chat = chats.value.find(c => c.chatId == selectedId.value)
+        if(!chat) router.push({name: 'whisper'})
+        return chat;
     });
 
     const getChatStatus = computed(() => {
@@ -511,6 +513,7 @@
         nextTick(() => {
             scrollToBottom(true);
         });
+
     });
 
     const status = computed(() => {
