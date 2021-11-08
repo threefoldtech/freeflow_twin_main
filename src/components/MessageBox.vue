@@ -24,11 +24,12 @@
             </div>
             <slot name="viewAnchor" />
         </div>
+
         <div
             v-if="imageUploadQueue.length >= 1"
             class="flex flex-row overflow-x-auto relative w-full h-64 whitespace-no-wrap"
         >
-            <div class="flex flex-row absolute left-0 top-0 h-full">
+            <div class="flex flex-row absolute left-4 top-0 h-full">
                 <div
                     v-for="(image, idx) in imageUploadQueue"
                     :key="idx"
@@ -48,6 +49,7 @@
                         mb-2
                         mt-4
                         group
+
                     "
                 >
                     <XCircleIcon
@@ -63,6 +65,7 @@
                             cursor-pointer
                             hover:text-accent-800
                             z-50
+                            drop-shadow-md
                         "
                         @click="cancelUpload(image)"
                     />
@@ -85,29 +88,29 @@
                                 r="30"
                             ></circle>
                         </svg>
-                        <ExclamationIcon v-if="image.error" class="w-8 h-8 text-gray-800" />
+                        <ExclamationIcon v-if="image.error" class="w-8 h-8 text-white drop-shadow-md"  />
                         <p
                             v-if="image.retry"
                             @click="retry(image)"
-                            class="text-white font-semibold cursor-pointer mt-4"
+                            class="hidden text-white font-semibold cursor-pointer mt-4 drop-shadow-md"
                         >
                             Try again
                         </p>
-                        <p v-if="!image.error" class="text-white font-medium loading mt-4">Uploading</p>
+                        <p v-if="!image.error" class="text-white font-medium loading mt-4 drop-shadow-md">Uploading</p>
                         <p
                             v-if="image.error"
                             class="font-medium mt-4 text-center"
-                            :class="{ 'text-white': image.isImage, 'text-gray-800 font-semibold': !image.isImage }"
+                            :class="{ 'text-white': image.isImage, 'text-white font-semibold drop-shadow-md': !image.isImage }"
                         >
                             {{ image.error_message }}
                         </p>
-                        <p v-if="!image.error" class="font-semibold text-lg text-white text-center">
+                        <p v-if="!image.error" class="font-semibold text-lg text-white text-center drop-shadow-md">
                             {{ getPercent(image) }}%
                         </p>
                     </div>
                     <img
                         v-if="image.isImage"
-                        class="opacity-75 z-2 w-40 h-60 object-cover"
+                        class="opacity-75 z-2 w-40 h-60 object-cover rounded"
                         :alt="image.title"
                         :src="image.data"
                     />

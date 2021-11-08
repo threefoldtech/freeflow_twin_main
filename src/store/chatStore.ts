@@ -381,10 +381,7 @@ export const imageUploadQueue = ref([]);
 
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
     const { user } = useAuthState();
-    const id = uuidv4();
     let formData = new FormData();
-
-    console.log(selectedFile instanceof Blob);
 
     if (!isBlob) {
         formData.append('file', selectedFile);
@@ -395,6 +392,8 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     if (isRecording) formData.append('type', FileTypes.RECORDING);
     else formData.append('type', FileTypes.OTHER);
 
+
+    /*
     const msgToSend: Message<Object> = {
         id,
         body: 'Uploading file in progress ...',
@@ -407,8 +406,9 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     };
 
     //addMessage(chatId, msgToSend);
-    //await delay(5000);
-    //console.log('5 seconds over');
+
+    */
+
 
     const arr = new Uint8Array(await selectedFile.arrayBuffer());
     const blob = new Blob([arr], { type: 'image/png' });
@@ -440,11 +440,9 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             total: selectedFile.total,
         });
 
-        //const res = await myAxiosInstance.get('https://test.local');
-        await myAxiosInstance.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
+        await myAxiosInstance.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
             raxConfig: {
                 onRetryAttempt: err => {
-                    console.log('RETRYING');
                     const cfg = rax.getConfig(err);
                     console.log(`Retry attempt #${cfg.currentRetryAttempt}`);
                 },
@@ -466,13 +464,11 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                 });
             },
         });
-        console.log('File uploaded.');
-    } catch (e) {
+            } catch (e) {
         let errorBody = '';
         if (e.message == 'Request failed with status code 413') {
             //!TODO Upload limit
             errorBody = 'ERROR: File exceeds 20MB limit!';
-            console.log(errorBody);
             imageUploadQueue.value = imageUploadQueue.value.map(el => {
                 if (uuid === el.id) {
                     return { ...el, error_message: 'File exceeds 20MB limit!', error: true };
@@ -481,7 +477,6 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             });
         } else {
             errorBody = 'ERROR: File failed to send!';
-            console.log(errorBody);
             imageUploadQueue.value = imageUploadQueue.value.map(el => {
                 if (uuid === el.id) {
                     return { ...el, error_message: 'File failed to send', error: true, retry: true };
@@ -489,13 +484,14 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                 return el;
             });
         }
-
+        /*
         const failedMsg = {
             ...msgToSend,
             body: errorBody,
             type: 'STRING',
         };
         //addMessage(chatId, failedMsg);
+        */
     }
 };
 
