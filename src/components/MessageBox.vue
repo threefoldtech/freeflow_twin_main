@@ -25,10 +25,10 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
-        <div class="relative w-full mt-8 px-4">
-            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
-                <Spinner />
-                <span>Loading more messages</span>
+        <div class="relative w-full px-4" :class="{'mt-8':chatInfo.isLoading}">
+            <div  v-if='chatInfo.isLoading'  class="flex flex-col justify-center items-center w-full ">
+                <Spinner class='mb-6' />
+                <span class='text-gray-600 text-xs'>Loading more messages</span>
             </div>
             <div v-for="(message, i) in chat.messages">
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
@@ -103,8 +103,7 @@
     const handleScroll = async e => {
         let element = messageBoxLocal.value;
         const oldScrollHeight = element.scrollHeight;
-        console.log(oldScrollHeight)
-        if (element.scrollTop < 100) {
+             if (element.scrollTop < 20) {
             getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
                 if (!newMessagesLoaded) return;
                 messageBoxLocal.value.scrollTo({
@@ -117,7 +116,6 @@
 
     onMounted(() => {
         messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
-
     });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
