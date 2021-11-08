@@ -66,7 +66,7 @@
         <Dialog
             :modelValue="showDeleteDialog"
             @update-model-value="showDeleteDialog = false"
-            noActions
+            :noActions='true'
             class="max-w-10"
         >
             <template v-slot:title class="center">
@@ -94,7 +94,7 @@
                 </button>
             </div>
         </Dialog>
-        <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" noActions>
+        <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" :noActions='true'>
             <template v-slot:title class="center">
                 <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
@@ -146,7 +146,7 @@
                 </button>
             </div>
         </Dialog>
-        <Dialog :modelValue="showShareDialog" @update-model-value="resetShareDialog" noActions>
+        <Dialog :modelValue="showShareDialog" @update-model-value="resetShareDialog" :noActions='true'>
             <template v-slot:title>
                 <h1 class="text-center">Share files</h1>
             </template>

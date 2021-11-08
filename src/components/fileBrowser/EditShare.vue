@@ -81,6 +81,10 @@
     const currentShare = ref<SharedFileInterface>();
 
     onBeforeMount(async () => {
+        await renderPermissionsData();
+    });
+
+    const renderPermissionsData = async () => {
         currentShare.value = await getShareByPath(props.selectedFile.path);
         currentShare.value.permissions = currentShare.value.permissions.map(item => {
             const chat = chats.value.find(chat => {
@@ -98,7 +102,7 @@
                 name: item.chatId,
             };
         });
-    });
+    };
 
     const reset = () => {
         emit('update:modelValue', '');
@@ -123,7 +127,7 @@
 
     const remove = async (data: any) => {
         removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
-        currentShare.value = await getShareByPath(props.selectedFile.path);
+        renderPermissionsData();
     };
 </script>
 

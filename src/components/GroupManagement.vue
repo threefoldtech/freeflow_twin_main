@@ -179,7 +179,7 @@
     <Dialog
         v-model="showRemoveUserDialog"
         class="max-w-10"
-        noActions
+        :noActions='true'
         @update-model-value="
             showRemoveUserDialog = false;
             toBeRemovedUser = null;
