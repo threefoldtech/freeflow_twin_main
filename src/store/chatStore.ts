@@ -222,6 +222,7 @@ function getMessage(chat: Chat, id) {
             message = found;
             return true;
         });
+
     }
 
     return message;
@@ -460,30 +461,33 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             },
         });
             } catch (e) {
-
-        let errorBody = '';
-        if (e.message == 'Request failed with status code 413') {
-            //!TODO Upload limit
-            errorBody = 'ERROR: File exceeds 20MB limit!';
-            imageUploadQueue.value = imageUploadQueue.value.map(el => {
-                if (uuid === el.id) {
-                    return { ...el, error_message: 'File exceeds 20MB limit!', error: true };
-                }
-                return el;
-            });
-        } else {
-
-            errorBody = 'ERROR: File failed to send!';
-            imageUploadQueue.value = imageUploadQueue.value.map(el => {
-                if (uuid === el.id) {
-                    return { ...el, error_message: 'File failed to send', error: true, retry: true };
-                }
-                return el;
-            });
-
-        }
+        sendFileCatch(e,uuid)
     }
 };
+
+const sendFileCatch = (e,uuid) => {
+    let errorBody = '';
+    if (e.message == 'Request failed with status code 413') {
+        //!TODO Upload limit
+        errorBody = 'ERROR: File exceeds 20MB limit!';
+        imageUploadQueue.value = imageUploadQueue.value.map(el => {
+            if (uuid === el.id) {
+                return { ...el, error_message: 'File exceeds 20MB limit!', error: true };
+            }
+            return el;
+        });
+    } else {
+
+        errorBody = 'ERROR: File failed to send!';
+        imageUploadQueue.value = imageUploadQueue.value.map(el => {
+            if (uuid === el.id) {
+                return { ...el, error_message: 'File failed to send', error: true, retry: true };
+            }
+            return el;
+        });
+
+    }
+}
 
 export const retrySendFile = async (file) => {
     if(!file) return;
@@ -539,25 +543,7 @@ export const retrySendFile = async (file) => {
             },
         });
     } catch (e) {
-        let errorBody = '';
-        if (e.message == 'Request failed with status code 413') {
-            //!TODO Upload limit
-            errorBody = 'ERROR: File exceeds 20MB limit!';
-            imageUploadQueue.value = imageUploadQueue.value.map(el => {
-                if (uuid === el.id) {
-                    return { ...el, error_message: 'File exceeds 20MB limit!', error: true };
-                }
-                return el;
-            });
-        } else {
-            errorBody = 'ERROR: File failed to send!';
-            imageUploadQueue.value = imageUploadQueue.value.map(el => {
-                if (uuid === el.id) {
-                    return { ...el, error_message: 'File failed to send', error: true, retry: true };
-                }
-                return el;
-            });
-        }
+        sendFileCatch(e, uuid)
     }
 }
 
