@@ -16,6 +16,7 @@
                     h-screen
                     sm:h-auto sm:w-10/12
                     xl:w-3/5
+                    2xl:w-2/5
                     max-w-full
                     sm:rounded
                     overflow-auto
@@ -81,14 +82,14 @@
 
     interface IProps {
         modelValue?: boolean;
-        noActions?: boolean;
         okButtonText?: string;
         cancelButtonText?: string;
+        noActions: boolean;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
         modelValue: false,
-        noActions: false,
+        noActions: true,
         okButtonText: 'Ok',
         cancelButtonText: 'Cancel',
     });

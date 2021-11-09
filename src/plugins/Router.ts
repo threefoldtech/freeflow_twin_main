@@ -222,16 +222,13 @@ router.beforeEach(async (to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
-
     //Starts the browser if the user navigates to /glass as first page
     if (to.name === 'glass') {
         setHasBrowserBeenStartedOnce();
     }
-
     if (to.name === 'sharedWithMe') {
         sharedDir.value = true;
     }
-
     next();
 });
 
@@ -258,6 +255,13 @@ router.afterEach(async (to, from) => {
     if (to.name === 'quantum') {
         sharedDir.value = false;
         currentDirectory.value = '/';
+    }
+    if(to.name === 'whisper'){
+        const lastChat = localStorage.getItem('lastOpenedChat');
+        if(!lastChat) return;
+        router.push({name: 'single', params: {
+            id: lastChat
+        }})
     }
 });
 

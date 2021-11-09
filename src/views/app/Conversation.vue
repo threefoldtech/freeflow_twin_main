@@ -268,7 +268,7 @@
             </div>
         </template>
     </appLayout>
-    <Dialog v-model="showDialog" class="max-w-10" noActions @update-model-value="showDialog = false">
+    <Dialog v-model="showDialog" class="max-w-10" :noActions='true' @update-model-value="showDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Blocking</h1>
         </template>
@@ -285,7 +285,7 @@
             </button>
         </div>
     </Dialog>
-    <Dialog v-model="showDeleteDialog" class="max-w-10" noActions @update-model-value="showDeleteDialog = false">
+    <Dialog v-model="showDeleteDialog" class="max-w-10" :noActions='true' @update-model-value="showDeleteDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Deleting Conversation</h1>
         </template>
@@ -402,7 +402,9 @@
     const message = ref('');
 
     const chat = computed(() => {
-        return chats.value.find(c => c.chatId == selectedId.value);
+        const chat = chats.value.find(c => c.chatId == selectedId.value)
+        if(!chat) router.push({name: 'whisper'})
+        return chat;
     });
 
     const getChatStatus = computed(() => {
@@ -460,7 +462,7 @@
             MessageTypes.SYSTEM
         );
 
-        popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
+        popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
     };
 
     const deleteChat = () => {
@@ -514,6 +516,7 @@
         nextTick(() => {
             scrollToBottom(true);
         });
+
     });
 
     const status = computed(() => {

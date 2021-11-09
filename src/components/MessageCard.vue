@@ -69,7 +69,11 @@
                         <i class="fa fa-pen"></i>
                         <span class="text-gray-600 pl-2">Edit</span>
                     </span>
-                    <span class="reply text-xs pr-4 cursor-pointer hover:underline" @click="replyMessage(props.chatId, message)">
+
+                    <span
+                        class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        @click="replyMessage(props.chatId, message)"
+                    >
                         <i class="fa fa-reply"></i>
                         <span class="text-gray-600 pl-2"> Reply</span>
                     </span>
@@ -80,6 +84,14 @@
                     >
                         <i class="fa fa-trash"></i>
                         <span class="text-gray-600 pl-2">Delete</span>
+                    </span>
+                    <span
+                        class="reply text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        @click="$emit('openEditShare', props.message)"
+                        v-if="message.type === MessageTypes.FILE_SHARE"
+                    >
+                        <i class="fa fa-pen"></i>
+                        <span class="text-gray-600 pl-2">Edit permissions</span>
                     </span>
                     <div class="pr-4 text-gray-600 date inline-block text-xs">
                         <!--<span v-if="message.updated" class="mr-4">edited</span>-->
@@ -163,12 +175,13 @@
 
     const props = defineProps<IProps>();
 
+    const emit = defineEmits(['openEditShare']);
+
     const { user } = useAuthState();
 
     const toggleSendForwardMessage = () => {
         console.log('toggleSendForwardMessage');
     };
-
 
     const { addScrollEvent } = useScrollActions();
 
@@ -214,6 +227,5 @@
         };
         sendMessageObject(props.chatId, updatedMessage);
     };
-
 </script>
 <style lang="css" scoped></style>

@@ -22,8 +22,8 @@
     });
 
     function browse() {
-        iframeUrl.value = `https://freeflowconnect.threefold.me/`;
-        console.log(iframeUrl.value);
+        iframeUrl.value = `https://kutana.uhuru.me/`;
+
     }
 </script>
 

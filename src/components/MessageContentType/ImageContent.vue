@@ -1,5 +1,5 @@
 <template>
-    <img :src="src" class="cursor-pointer" width="450" @click="show" @load="imageLoaded" />
+    <img :src="src" class="cursor-pointer h-64 object-contain" @click="show" @load="imageLoaded" />
 </template>
 
 <script lang="ts" setup>

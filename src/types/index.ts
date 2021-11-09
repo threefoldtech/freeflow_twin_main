@@ -150,6 +150,7 @@ export enum SharePermission {
 export interface SharePermissionInterface {
     chatId: string | undefined;
     types: SharePermission[];
+    name?: string;
 }
 
 export interface ContactInterface {

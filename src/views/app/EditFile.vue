@@ -6,7 +6,12 @@
         <div v-if="isLoading">
             <Spinner />
         </div>
-
+        <div v-else-if="showUserOfflineMessage" class="text-center">
+            <h1 class="mb-2">Unable to fetch the file. File owner seems to be offline.</h1>
+        </div>
+        <div v-else-if="accessDenied" class="text-center">
+            <h1 class="mb-2">Your file permissions were revoked.</h1>
+        </div>
         <div v-else-if="fileType == FileType.Video">
             <video controls>
                 <source :src="readUrl" />
@@ -14,12 +19,6 @@
         </div>
         <div v-else-if="fileType == FileType.Image">
             <img class="object-contain" :src="readUrl" />
-        </div>
-        <div v-else-if="showUserOfflineMessage" class="text-center">
-            <h1 class="mb-2">Unable to fetch the file. File owner seems to be offline.</h1>
-        </div>
-        <div v-else-if="accessDenied" class="text-center">
-            <h1 class="mb-2">Your file permissions were revoked.</h1>
         </div>
         <div v-else class="text-center">
             <h1 class="mb-2">Sorry, we are not able to display the file</h1>

@@ -35,6 +35,7 @@
                     </div>
                     <div class="border-t-2 p-4 block">
                         <div
+                            @click='showComingSoonToUhuru = true'
                             class="
                                 bg-gray-300
                                 px-4
@@ -64,10 +65,11 @@
                                 hover:bg-accent-800
                                 duration-100
                             "
+                            @click='showComingSoonToUhuru = true'
                         >
                             Publish
                         </button>
-                    </div>
+                        </div>
                 </TabPanel>
                 <TabPanel>
                     <div class="p-4 flex items-center justify-center h-32">
@@ -95,7 +97,7 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { ref } from 'vue';
-    import { createPostModalStatus } from '@/services/dashboardService';
+    import { showComingSoonToUhuru,createPostModalStatus  } from '@/services/dashboardService';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 
     const actions = ref([

@@ -44,21 +44,40 @@
         goIntoSharedFolder,
         sharedItem,
         sharedFolderIsloading,
+        selectedTab,
+        selectedPaths,
+        sharedItemFromChat,
     } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
     import { AppType } from '@/types/apps';
 
+    import { ref } from 'vue';
     import { useRouter } from 'vue-router';
+    import { showShareDialog } from '@/services/dialogService';
 
     interface IProp {
         message: Object;
     }
 
     const props = defineProps<IProp>();
+    const sharedFileOptions = ref<boolean>(true);
 
     const router = useRouter();
     const visitFileInMessage = (message: Message<FileShareMessageType>) => {
         sharedItem.value = message.body;
+
+        if (!sharedItem.value.isFolder && message.from === loginName) {
+            //Only office
+            const url = router.resolve({
+                name: 'editfile',
+                params: {
+                    path: btoa(sharedItem.value.path),
+                    shareId: '',
+                },
+            });
+            window.open(url.href, '_blank');
+            return;
+        }
 
         if (
             message.body.path.split('/')[0] === '' &&
@@ -68,6 +87,10 @@
         ) {
             //File is located in root folder
             router.push({ name: 'quantum' });
+            selectedTab.value = 1;
+            showShareDialog.value = true;
+            selectedPaths.value[0] = message;
+            sharedItemFromChat.value = true;
             return;
         }
 
@@ -85,7 +108,6 @@
             return;
         }
         currentDirectory.value = '';
-
         goTo(message.body);
         sharedDir.value = true;
     };
