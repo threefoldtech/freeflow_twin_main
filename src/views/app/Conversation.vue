@@ -112,7 +112,7 @@
                         >
                             <div class="py-2 pl-4 flex-1">
                                 <p class="font-bold font overflow-hidden overflow-ellipsis w-80">
-                                    {{ chat.name }}
+                                  {{ chat.name }} <span v-if='!online' class='font-normal text-xs text-red-600'>You appear to be offline</span>
                                 </p>
                                 <p v-if="!blocked" class="font-thin">
                                     {{ getChatStatus.message }}
@@ -340,6 +340,9 @@
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon } from '@heroicons/vue/outline';
+    import { useOnline } from '@vueuse/core'
+
+    const online = useOnline()
 
     const route = useRoute();
     let selectedId = ref(<string>route.params.id);

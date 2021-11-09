@@ -24,7 +24,7 @@
             </div>
             <slot name="viewAnchor" />
         </div>
-
+    <pre>{{JSON.stringify(imageUploadQueue, null, 2)}}</pre>
         <div
             v-if="imageUploadQueue.length >= 1"
             class="flex flex-row overflow-x-auto relative w-full h-64 whitespace-no-wrap"
@@ -90,9 +90,9 @@
                         </svg>
                         <ExclamationIcon v-if="image.error" class="w-8 h-8 text-white drop-shadow-md"  />
                         <p
-                            v-if="image.retry"
+
                             @click="retry(image)"
-                            class="hidden text-white font-semibold cursor-pointer mt-4 drop-shadow-md"
+                            class="text-white font-semibold cursor-pointer mt-4 drop-shadow-md"
                         >
                             Try again
                         </p>
@@ -126,7 +126,7 @@
     import { computed, onMounted, onUnmounted, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
-    import { imageUploadQueue, usechatsActions } from '@/store/chatStore';
+    import { imageUploadQueue, usechatsActions, retrySendFile } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
     import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
@@ -145,7 +145,10 @@
 
     const props = defineProps<IProps>();
 
-    const retry = image => {};
+    const retry = (file) =>{
+        file.cancelToken.cancel('Operation canceled by the user.');
+        retrySendFile(file)
+    }
 
     const cancelUpload = image => {
         image.cancelToken.cancel('Operation canceled by the user.');
