@@ -460,6 +460,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             },
         });
             } catch (e) {
+
         let errorBody = '';
         if (e.message == 'Request failed with status code 413') {
             //!TODO Upload limit
@@ -471,6 +472,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                 return el;
             });
         } else {
+
             errorBody = 'ERROR: File failed to send!';
             imageUploadQueue.value = imageUploadQueue.value.map(el => {
                 if (uuid === el.id) {
@@ -478,6 +480,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                 }
                 return el;
             });
+
         }
     }
 };
@@ -511,7 +514,7 @@ export const retrySendFile = async (file) => {
             return el
         })
 
-        console.log(imageUploadQueue.value)
+
         await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
@@ -519,7 +522,7 @@ export const retrySendFile = async (file) => {
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
                 imageUploadQueue.value = imageUploadQueue.value.map(item => {
-                    console.log(progress)
+
                     if (item.id === uuid) {
                        return {
                             ...item,

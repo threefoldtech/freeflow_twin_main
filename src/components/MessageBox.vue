@@ -51,8 +51,7 @@
             </div>
             <slot name="viewAnchor" />
         </div>
-    <pre>{{JSON.stringify(imageUploadQueue, null, 2)}}</pre>
-        <div
+           <div
             v-if="imageUploadQueue.length >= 1"
             class="flex flex-row overflow-x-auto relative w-full h-64 whitespace-no-wrap"
         >
@@ -117,7 +116,7 @@
                         </svg>
                         <ExclamationIcon v-if="image.error" class="w-8 h-8 text-white drop-shadow-md"  />
                         <p
-
+                            v-if='image.retry'
                             @click="retry(image)"
                             class="text-white font-semibold cursor-pointer mt-4 drop-shadow-md"
                         >
@@ -153,9 +152,8 @@
     import { computed, onMounted, onUnmounted, onUpdated, ref, watch, nextTick } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
-    import { imageUploadQueue, usechatsActions, retrySendFile } from '@/store/chatStore';
+    import { imageUploadQueue, usechatsActions, retrySendFile, usechatsState } from '@/store/chatStore';
     import { XCircleIcon, ExclamationIcon } from '@heroicons/vue/solid';
-    import { usechatsActions, usechatsState } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
     import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
