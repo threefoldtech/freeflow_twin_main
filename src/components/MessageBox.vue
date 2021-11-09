@@ -102,7 +102,7 @@
     });
     const handleScroll = async e => {
         let element = messageBoxLocal.value;
-        const oldScrollHeight = element.scrollHeight;
+        const oldScrollHeight = element?.scrollHeight;
              if (element.scrollTop < 20) {
             getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
                 if (!newMessagesLoaded) return;
