@@ -437,8 +437,11 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
 
 const catchErrorsSendFile = (e,uuid) => {
     const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+    if(e.message === 'Operation canceled by the user.') return;
+
     if (e.message == 'Request failed with status code 413') {
         //!TODO Upload limit
+
         //errorBody = 'ERROR: File exceeds 20MB limit!';
         imageUploadQueue.value.splice(i, 1, {
             ...imageUploadQueue.value[i],
@@ -447,13 +450,13 @@ const catchErrorsSendFile = (e,uuid) => {
         })
         return;
     }
-    //errorBody = 'ERROR: File failed to send!';
-    imageUploadQueue.value.splice(i, 1, {
-        ...imageUploadQueue.value[i],
-        error_message: 'File failed to send.',
-        error: true,
-        retry: true
-    })
+        //errorBody = 'ERROR: File failed to send!';
+        imageUploadQueue.value.splice(i, 1, {
+            ...imageUploadQueue.value[i],
+            error_message: 'File failed to send.',
+            error: true,
+            retry: true
+        })
 }
 
 

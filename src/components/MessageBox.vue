@@ -186,8 +186,11 @@
     }
 
     const cancelUpload = image => {
+        console.log(image)
         image.cancelToken.cancel('Operation canceled by the user.');
         imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id);
+        window.URL.revokeObjectURL(image.data);
+        console.log(imageUploadQueue.value)
     };
 
     const getPercent = image => {
