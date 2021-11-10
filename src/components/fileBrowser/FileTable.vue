@@ -129,7 +129,39 @@
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer"> Shared with me </span>
+                                            <span class="hover:underline cursor-pointer">Shared with me </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                </tr>
+                                <!-- Files received in chat -->
+                                <tr v-if="currentDirectory === '/'">
+                                    <td class="px-6 py-4 whitespace-nowrap hidden"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap" @click="router.push({name: 'filesReceivedInChat'})">
+                                        <div class="flex flex-row items-center text-md">
+                                            <div class="mr-3 w-7 text-center">
+                                                <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
+                                            </div>
+                                            <span class="hover:underline cursor-pointer">Files received in chat </span>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
+                                </tr>
+                                <tr v-if="currentDirectory === '/'">
+                                    <td class="px-6 py-4 whitespace-nowrap hidden"></td>
+                                    <td
+                                        class="px-6 py-4 whitespace-nowrap"
+                                        @click="router.push({name: 'filesSentInChat'})"
+                                    >
+                                        <div class="flex flex-row items-center text-md">
+                                            <div class="mr-3 w-7 text-center">
+                                                <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
+                                            </div>
+                                            <span class="hover:underline cursor-pointer">Files sent in chat </span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
@@ -261,6 +293,90 @@
                                     </div>
                                 </div>
                             </li>
+                            <li v-if="currentDirectory === '/'" title="Shared folder">
+                                <div
+                                    class="
+                                        group
+                                        w-full
+                                        aspect-w-12 aspect-h-4
+                                        border-2
+                                        bg-white
+                                        rounded-md
+                                        hover:bg-gray-200
+                                        transition
+                                        duration:200
+                                        focus-within:ring-2
+                                        focus-within:ring-offset-2
+                                        focus-within:ring-offset-gray-100
+                                        focus-within:ring-indigo-500
+                                        overflow-hidden
+                                        flex
+                                        justify-start
+                                        items-center
+                                    "
+                                    @click="goToFilesInChat(true)"
+                                >
+                                    <div class="flex justify-start items-center cursor-pointer px-2">
+                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
+                                        <p
+                                            class="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                                truncate
+                                                pointer-events-none
+                                                ml-4
+                                            "
+                                        >
+                                            Files received in chat
+                                        </p>
+                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
+                                    </div>
+                                </div>
+                            </li>
+                            <li v-if="currentDirectory === '/'" title="Shared folder">
+                                <div
+                                    class="
+                                        group
+                                        w-full
+                                        aspect-w-12 aspect-h-4
+                                        border-2
+                                        bg-white
+                                        rounded-md
+                                        hover:bg-gray-200
+                                        transition
+                                        duration:200
+                                        focus-within:ring-2
+                                        focus-within:ring-offset-2
+                                        focus-within:ring-offset-gray-100
+                                        focus-within:ring-indigo-500
+                                        overflow-hidden
+                                        flex
+                                        justify-start
+                                        items-center
+                                    "
+                                    @click="goToFilesInChat(false)"
+                                >
+                                    <div class="flex justify-start items-center cursor-pointer px-2">
+                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
+                                        <p
+                                            class="
+                                                block
+                                                text-sm
+                                                font-medium
+                                                text-gray-900
+                                                truncate
+                                                pointer-events-none
+                                                ml-4
+                                            "
+                                        >
+                                            Files sent in chat
+                                        </p>
+                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
+                                    </div>
+                                </div>
+                            </li>
                             <li
                                 v-for="item in sortContent()"
                                 :key="item.fullName"
@@ -362,6 +478,7 @@
         currentShare,
         goToShared,
         fileBrowserTypeView,
+        goToFilesInChat,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';

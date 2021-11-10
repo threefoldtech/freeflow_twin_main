@@ -14,9 +14,9 @@
       <i class='fas fa-arrow-up text-white'></i>
     </div>-->
 
-        <div class="flex-1 mr-4">
-            <!-- Local breadcrumbs -->
-            <div v-if="!sharedDir">
+            <div class="flex-1 mr-4">
+            <div v-if="!sharedDir && !isQuantumChatFiles">
+
                 <template v-for="(item, i) in parts">
                     <span v-if="i !== 0 && item">
                         <i class="fas fa-chevron-right"></i>
@@ -24,7 +24,7 @@
                     <span
                         v-if="item || i === 0"
                         :title="item"
-                        class="cursor-pointer text-base p-2 rounded-md"
+                        class="cursor-pointer text-md p-2 rounded-md"
                         @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
                         @dragenter="event => onDragEnter(event, i)"
                         @dragleave="event => onDragLeave(event, i)"
@@ -35,8 +35,11 @@
                     </span>
                 </template>
             </div>
-            <!-- Shared breadcrumbs -->
-            <div v-if="sharedDir">
+
+            <!-- SHARED BREADCRUMBS -->
+            <div v-if="sharedDir && !isQuantumChatFiles">
+                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
+
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
                     <span v-if="i !== 0 && breadcrumb">
                         <i class="fas fa-chevron-right"></i>
@@ -45,10 +48,23 @@
                         v-if="breadcrumb || idx === 0"
                         :key="idx"
                         :title="breadcrumb.name"
-                        class="cursor-pointer text-base p-2 rounded-md"
+                        class="cursor-pointer text-md p-2 rounded-md"
                         @click="clickBreadcrumb(breadcrumb, sharedBreadcrumbs, idx)"
                     >
                         {{ idx === 0 ? 'Shared with me' : truncate(breadcrumb.name) }}
+                    </span>
+                </template>
+            </div>
+            <!-- CHAT FILES BREADCRUMBS -->
+            <div v-if='isQuantumChatFiles'>
+                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
+                <i class="fas fa-chevron-right"></i>
+                <template v-for="(breadcrumb, idx) in chatFilesBreadcrumbs" :key='idx'>
+                    <span v-if="idx !== 0 && breadcrumb">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                    <span class='mx-2 cursor-pointer' @click='router.push({path: breadcrumb.path})'>
+                        {{breadcrumb.name}}
                     </span>
                 </template>
             </div>
@@ -56,8 +72,10 @@
     </div>
 </template>
 
-<script lang="ts" setup>
-    import { computed } from 'vue';
+
+<script lang="ts" setup >
+    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+
     import {
         clickBreadcrumb,
         currentDirectory,
@@ -70,11 +88,16 @@
         selectedPaths,
         sharedBreadcrumbs,
         sharedDir,
+        chatFilesBreadcrumbs,
+        isQuantumChatFiles
     } from '@/store/fileBrowserStore';
+    import {useRouter} from 'vue-router';
+    import { createNotification } from '@/store/notificiationStore';
 
-    const parts = computed(() => {
-        return currentDirectory.value.split('/');
-    });
+    const router = useRouter()
+
+    const parts = computed(() => currentDirectory.value.split('/'));
+
 
     const onDragEnter = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
