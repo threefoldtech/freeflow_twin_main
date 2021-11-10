@@ -376,14 +376,6 @@ export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => 
     sendSocketMessage(chatId, message, isEdit);
 };
 
-const delay = delayInms => {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve(2);
-        }, delayInms);
-    });
-};
-
 export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
@@ -400,27 +392,9 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     if (isRecording) formData.append('type', FileTypes.RECORDING);
     else formData.append('type', FileTypes.OTHER);
 
-
-    /*
-    const msgToSend: Message<Object> = {
-        id,
-        body: 'Uploading file in progress ...',
-        from: user.id,
-        to: chatId,
-        timeStamp: new Date(),
-        type: 'MESSAGE',
-        replies: [],
-        subject: null,
-    };
-    addMessage(chatId, msgToSend);
-    */
-
-
     const arr = new Uint8Array(await selectedFile.arrayBuffer());
     const blob = new Blob([arr], { type: 'image/png' });
-
     const uuid = uuidv4();
-
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
@@ -448,49 +422,44 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             },
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
-                imageUploadQueue.value = imageUploadQueue.value.map(item => {
-                    if (item.id === uuid) {
-                        return {
-                            ...item,
-                            loaded: progress,
-                            total: total,
-                        };
-                    }
-                    return item;
-                });
+                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                imageUploadQueue.value.splice(i, 1, {
+                    ...imageUploadQueue.value[i],
+                    loaded: progress,
+                    total: total,
+                })
             },
         });
             } catch (e) {
-        sendFileCatch(e,uuid)
+        catchErrorsSendFile(e,uuid)
     }
 };
 
-const sendFileCatch = (e,uuid) => {
-    let errorBody = '';
+const catchErrorsSendFile = (e,uuid) => {
+    const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
     if (e.message == 'Request failed with status code 413') {
         //!TODO Upload limit
-        errorBody = 'ERROR: File exceeds 20MB limit!';
-        imageUploadQueue.value = imageUploadQueue.value.map(el => {
-            if (uuid === el.id) {
-                return { ...el, error_message: 'File exceeds 20MB limit!', error: true };
-            }
-            return el;
-        });
-    } else {
-
-        errorBody = 'ERROR: File failed to send!';
-        imageUploadQueue.value = imageUploadQueue.value.map(el => {
-            if (uuid === el.id) {
-                return { ...el, error_message: 'File failed to send', error: true, retry: true };
-            }
-            return el;
-        });
-
+        //errorBody = 'ERROR: File exceeds 20MB limit!';
+        imageUploadQueue.value.splice(i, 1, {
+            ...imageUploadQueue.value[i],
+            error_message: 'File exceeds 20MB limit!',
+            error: true
+        })
+        return;
     }
+    //errorBody = 'ERROR: File failed to send!';
+    imageUploadQueue.value.splice(i, 1, {
+        ...imageUploadQueue.value[i],
+        error_message: 'File failed to send.',
+        error: true,
+        retry: true
+    })
 }
 
+
+
 export const retrySendFile = async (file) => {
-    if(!file) return;
+    //When a upload fails in chat and you retry
 
     const {id:uuid, chatId, selectedFile} = file
 
@@ -498,26 +467,19 @@ export const retrySendFile = async (file) => {
 
     formData.append('file', selectedFile);
 
-    //When a upload fails in chat and you retry
     const CancelToken = axios.CancelToken;
     const source = CancelToken.source();
 
-
     try {
-        imageUploadQueue.value.map(el => {
-            if(el.id === uuid){
-                return {
-                    ...el,
-                    error_message: '',
-                    loaded: 0,
-                    retry: false,
-                    error: false,
-                    cancelToken: source
-                }
-            }
-            return el
+        const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+        imageUploadQueue.value.splice(i, 1, {
+            ...imageUploadQueue.value[i],
+            error_message: '',
+            loaded: 0,
+            retry: false,
+            error: false,
+            cancelToken: source
         })
-
 
         await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
             headers: {
@@ -525,29 +487,20 @@ export const retrySendFile = async (file) => {
             },
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
-                imageUploadQueue.value = imageUploadQueue.value.map(item => {
-
-                    if (item.id === uuid) {
-                       return {
-                            ...item,
-                            loaded: progress,
-                            total: total,
-                            retry: false,
-                           error: false,
-                           error_message: ""
-                        };
-
-                    }
-                    return item;
-                });
+                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                imageUploadQueue.value.splice(i, 1, {
+                    ...imageUploadQueue.value[i],
+                    loaded: progress,
+                    total: total,
+                    retry: false,
+                    error: false,
+                    error_message: ""})
             },
         });
     } catch (e) {
-        sendFileCatch(e, uuid)
+        catchErrorsSendFile(e, uuid)
     }
 }
-
-
 
 const setLastMessage = (chatId: string, message: Message<String>) => {
     if (!state.chats) return;
