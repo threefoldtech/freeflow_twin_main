@@ -88,9 +88,7 @@
         selectedPaths,
         sharedBreadcrumbs,
         sharedDir,
-
         chatFilesBreadcrumbs,
-        clickBreadcrumb,
         isQuantumChatFiles
     } from '@/store/fileBrowserStore';
     import {useRouter} from 'vue-router';

@@ -289,11 +289,9 @@ router.beforeEach(async (to, from, next) => {
     if (to.name === 'glass') {
         setHasBrowserBeenStartedOnce();
     }
-
     if (to.name === 'sharedWithMe') {
         sharedDir.value = true;
     }
-
     next();
 });
 
@@ -343,6 +341,13 @@ router.afterEach(async (to, from) => {
         sharedDir.value = false;
         currentDirectory.value = '/';
 
+    }
+    if(to.name === 'whisper'){
+        const lastChat = localStorage.getItem('lastOpenedChat');
+        if(!lastChat) return;
+        router.push({name: 'single', params: {
+            id: lastChat
+        }})
     }
 });
 

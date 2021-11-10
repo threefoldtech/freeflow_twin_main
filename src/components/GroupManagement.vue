@@ -31,7 +31,7 @@
     </div>
     <div v-if="sidebarFileList?.length !== 0" class="p-2">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Files</h3>
-        <ul class="space-y-2">
+        <ul class="space-y-2 max-h-64 overflow-y-auto">
             <li
                 class="
                     flex
@@ -62,29 +62,30 @@
     <div class="bg-white p-2 w-full h-full flex flex-col justify-start">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
         <div class="flex items-center flex-col w-full">
-            <div class="call bg-gray-100 flex items-center rounded w-full m-2" @click="$emit('app-call')">
+            <div class="call bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-call')">
                 <i class="fas fa-video m-3"></i>
                 <p class="m-3 text-xs">Join video room</p>
+
             </div>
             <div
                 v-if="!chat.isGroup && !blocked"
-                class="block bg-gray-100 flex items-center rounded w-full m-2"
+                class="block bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
                 @click="$emit('app-block')"
             >
                 <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3 text-xs">Block user</p>
+                <p class="m-3 text-xs ">Block user</p>
             </div>
 
             <div
                 v-if="!chat.isGroup && blocked"
-                class="block bg-gray-100 flex items-center rounded w-full m-2"
+                class="block bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
                 @click="$emit('app-unblock')"
             >
                 <i class="fas fa-plus-circle m-3"></i>
                 <p class="m-3 text-xs">Unblock user</p>
             </div>
 
-            <div class="delete bg-gray-100 flex items-center rounded w-full m-2" @click="$emit('app-delete')">
+            <div class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-delete')">
                 <i class="fas fa-trash m-3"></i>
                 <p class="m-3 text-xs">Delete conversation</p>
             </div>

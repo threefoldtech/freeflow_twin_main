@@ -36,7 +36,7 @@
         goIntoSharedFolder,
         goTo,
         fetchBasedOnRoute,
-        isQuantumChatFiles
+        isQuantumChatFiles,
         sharedItemFromChat,
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';

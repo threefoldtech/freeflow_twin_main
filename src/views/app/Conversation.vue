@@ -310,12 +310,10 @@
 
 <script setup lang="ts">
 import { useScrollActions, useScrollState } from '@/store/scrollStore';
-
 import AppLayout from '../../layout/AppLayout.vue';
 import moment from 'moment';
 import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
 import { useContactsState } from '@/store/contactStore';
-
 import { each } from 'lodash';
 import { statusList } from '@/store/statusStore';
 import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
@@ -344,7 +342,20 @@ import { XIcon } from '@heroicons/vue/outline';
 import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
 
 const route = useRoute();
-let selectedId = ref(<string>route.params.id);
+const selectedId = ref(<string>route.params.id);
+
+const viewAnchor = ref(null);
+
+const { isIntersecting } = useIntersectionObserver(viewAnchor);
+
+const scrollToBottom = (force = false) => {
+    if (!force && !isIntersecting.value) return;
+
+    nextTick(() => {
+        scrollMessageBoxToBottom();
+    });
+};
+
 watch(
     () => route.params.id,
     id => {
@@ -377,25 +388,32 @@ const truncate = (value, limit = 20) => {
     return value;
 };
 
-const getMessagesSortedByUser = computed(() => {
-    let chatBlockIndex = 0;
-
-    return chat.value.messages.reduce((acc: any, message) => {
-        if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
+ const getMessagesSortedByUser = computed(() => {
+        let chatBlockIndex = 0;
+        return chat.value.messages.reduce((acc: any, message) => {
+            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
+                acc[chatBlockIndex].messages.push(message);
+                return acc;
+            } else {
+                chatBlockIndex++;
+            }
+            acc[chatBlockIndex] = {
+                user: <string>message.from,
+                messages: [],
+            };
             acc[chatBlockIndex].messages.push(message);
             return acc;
-        } else {
-            chatBlockIndex++;
-        }
+        }, {});
+    });
 
-        acc[chatBlockIndex] = {
-            user: <string>message.from,
-            messages: [],
-        };
-        acc[chatBlockIndex].messages.push(message);
-        return acc;
-    }, {});
-});
+const message = ref('');
+
+ const chat = computed(() => {
+        const chat = chats.value.find(c => c.chatId == selectedId.value)
+        if(!chat) router.push({name: 'whisper'})
+        return chat;
+    });
+
 
 
     const popupMeeting = () => {
@@ -404,9 +422,9 @@ const getMessagesSortedByUser = computed(() => {
         const str: string = chat.value.isGroup
             ? chat.value.chatId
             : chat.value.contacts
-                  .map(c => c.id)
-                  .sort()
-                  .join();
+                .map(c => c.id)
+                .sort()
+                .join();
 
         const id = crypto.SHA1(str);
         sendMessage(
@@ -420,14 +438,8 @@ const getMessagesSortedByUser = computed(() => {
         );
 
         popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
-    };
+    }
 
-
-const message = ref('');
-
-const chat = computed(() => {
-    return chats.value.find(c => c.chatId == selectedId.value);
-});
 
 const getExtension = filename => {
     return filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
@@ -472,30 +484,6 @@ const getChatStatus = computed(() => {
     };
 });
 
-const popupMeeting = () => {
-    // @ts-ignore
-    // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
-    const str: string = chat.value.isGroup
-        ? chat.value.chatId
-        : chat.value.contacts
-              .map(c => c.id)
-              .sort()
-              .join();
-
-    const id = crypto.SHA1(str);
-    sendMessage(
-        chat.value.chatId,
-        {
-            type: SystemMessageTypes.JOINED_VIDEOROOM,
-            message: `${user.id} joined the video chat`,
-            id: id.toString(),
-        } as JoinedVideoRoomBody,
-        MessageTypes.SYSTEM
-    );
-
-    popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
-};
-
 const deleteChat = () => {
     showDeleteDialog.value = true;
 };
@@ -521,27 +509,15 @@ const unBlockChat = async () => {
 };
 
 const reads = computed(() => {
-    const preReads = {};
-    each(chat.value.read, (val: string, key: string) => {
-        if (key === user.id) {
-            return;
-        }
-        preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
-    });
-    return preReads;
+            const preReads = {};
+            each(chat.value.read, (val: string, key: string) => {
+                if (key === user.id) {
+                    return;
+                }
+                preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
+            });
+            return preReads;
 });
-
-const viewAnchor = ref(null);
-
-const { isIntersecting } = useIntersectionObserver(viewAnchor);
-
-const scrollToBottom = (force = false) => {
-    if (!force && !isIntersecting.value) return;
-
-    nextTick(() => {
-        scrollMessageBoxToBottom();
-    });
-};
 
 onMounted(() => {
     nextTick(() => {
@@ -586,7 +562,8 @@ const isAdmin = computed(() => {
     return chat.value.adminId == user.id;
 });
 
-let activeItem = ref('edit');
+const activeItem = ref('edit');
+
 const isActive = menuItem => {
     return activeItem.value === menuItem;
 };
@@ -608,6 +585,7 @@ const filteredContacts = computed(() => {
 });
 
 const showSideBar = getShowSideBar();
+
 </script>
 
 <style scoped type="text/css">
