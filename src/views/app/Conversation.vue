@@ -269,7 +269,7 @@
             </div>
         </template>
     </appLayout>
-    <Dialog v-model="showDialog" class="max-w-10" :noActions='true' @update-model-value="showDialog = false">
+    <Dialog v-model="showDialog" class="max-w-10" :noActions="true" @update-model-value="showDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Blocking</h1>
         </template>
@@ -286,7 +286,12 @@
             </button>
         </div>
     </Dialog>
-    <Dialog v-model="showDeleteDialog" class="max-w-10" :noActions='true' @update-model-value="showDeleteDialog = false">
+    <Dialog
+        v-model="showDeleteDialog"
+        class="max-w-10"
+        :noActions="true"
+        @update-model-value="showDeleteDialog = false"
+    >
         <template v-slot:title class="center">
             <h1 class="text-center">Deleting Conversation</h1>
         </template>
@@ -388,58 +393,55 @@ const truncate = (value, limit = 20) => {
     return value;
 };
 
- const getMessagesSortedByUser = computed(() => {
-        let chatBlockIndex = 0;
-        return chat.value.messages.reduce((acc: any, message) => {
-            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
-                acc[chatBlockIndex].messages.push(message);
-                return acc;
-            } else {
-                chatBlockIndex++;
-            }
-            acc[chatBlockIndex] = {
-                user: <string>message.from,
-                messages: [],
-            };
+const getMessagesSortedByUser = computed(() => {
+    let chatBlockIndex = 0;
+    return chat.value.messages.reduce((acc: any, message) => {
+        if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
             acc[chatBlockIndex].messages.push(message);
             return acc;
-        }, {});
-    });
+        } else {
+            chatBlockIndex++;
+        }
+        acc[chatBlockIndex] = {
+            user: <string>message.from,
+            messages: [],
+        };
+        acc[chatBlockIndex].messages.push(message);
+        return acc;
+    }, {});
+});
 
 const message = ref('');
 
- const chat = computed(() => {
-        const chat = chats.value.find(c => c.chatId == selectedId.value)
-        if(!chat) router.push({name: 'whisper'})
-        return chat;
-    });
+const chat = computed(() => {
+    const chat = chats.value.find(c => c.chatId == selectedId.value);
+    if (!chat) router.push({ name: 'whisper' });
+    return chat;
+});
 
+const popupMeeting = () => {
+    // @ts-ignore
+    // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+    const str: string = chat.value.isGroup
+        ? chat.value.chatId
+        : chat.value.contacts
+              .map(c => c.id)
+              .sort()
+              .join();
 
+    const id = crypto.SHA1(str);
+    sendMessage(
+        chat.value.chatId,
+        {
+            type: SystemMessageTypes.JOINED_VIDEOROOM,
+            message: `${user.id} joined the video chat`,
+            id: id.toString(),
+        } as JoinedVideoRoomBody,
+        MessageTypes.SYSTEM
+    );
 
-    const popupMeeting = () => {
-        // @ts-ignore
-        // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
-        const str: string = chat.value.isGroup
-            ? chat.value.chatId
-            : chat.value.contacts
-                .map(c => c.id)
-                .sort()
-                .join();
-
-        const id = crypto.SHA1(str);
-        sendMessage(
-            chat.value.chatId,
-            {
-                type: SystemMessageTypes.JOINED_VIDEOROOM,
-                message: `${user.id} joined the video chat`,
-                id: id.toString(),
-            } as JoinedVideoRoomBody,
-            MessageTypes.SYSTEM
-        );
-
-        popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
-    }
-
+    popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
+};
 
 const getExtension = filename => {
     return filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
@@ -492,6 +494,7 @@ const infoChat = () => {
 };
 const doDeleteChat = () => {
     sendRemoveChat(chat.value.chatId);
+    localStorage.removeItem('lastOpenedChat');
     router.push({ name: 'whisper' });
 };
 
@@ -501,6 +504,7 @@ const blockChat = () => {
 const doBlockChat = () => {
     showDialog.value = false;
     sendBlockChat(chat.value.chatId);
+    localStorage.removeItem('lastOpenedChat');
     router.push({ name: 'whisper' });
 };
 
@@ -509,14 +513,14 @@ const unBlockChat = async () => {
 };
 
 const reads = computed(() => {
-            const preReads = {};
-            each(chat.value.read, (val: string, key: string) => {
-                if (key === user.id) {
-                    return;
-                }
-                preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
-            });
-            return preReads;
+    const preReads = {};
+    each(chat.value.read, (val: string, key: string) => {
+        if (key === user.id) {
+            return;
+        }
+        preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
+    });
+    return preReads;
 });
 
 onMounted(() => {
@@ -585,7 +589,6 @@ const filteredContacts = computed(() => {
 });
 
 const showSideBar = getShowSideBar();
-
 </script>
 
 <style scoped type="text/css">
