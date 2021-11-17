@@ -1,8 +1,9 @@
 <template>
+    <!-- :href="calcExternalResourceLink(message.body.url)" -->
     <a
         :download="message.body.filename"
-        :href="calcExternalResourceLink(message.body.url)"
         class="px-4 my-2 my-message:bg-accent-200"
+        @click="downloadAttachmentToQuantum(message)"
     >
         <div
             class="
@@ -27,11 +28,17 @@
 </template>
 
 <script lang="ts" setup>
-    import { calcExternalResourceLink } from '@/services/urlService';
+import { downloadAttachment } from '@/services/fileBrowserService';
+import { calcExternalResourceLink } from '@/services/urlService';
+import { FileShareMessageType, Message, MessageBodyType } from '@/types';
 
-    interface IProp {
-        message: Object;
-    }
+interface IProp {
+    message: Object;
+}
 
-    const props = defineProps<IProp>();
+const props = defineProps<IProp>();
+
+const downloadAttachmentToQuantum = (message: Message<MessageBodyType>) => {
+    downloadAttachment(message);
+};
 </script>
