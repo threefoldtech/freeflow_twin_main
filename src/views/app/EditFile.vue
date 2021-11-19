@@ -29,10 +29,10 @@
 </template>
 
 <script setup lang="ts">
-const generateUrl = (protocol: 'http' | 'https', owner: string, path: string, token: string) => {
+const generateUrl = (protocol: 'http' | 'https', owner: string, path: string, token: string, attachment: boolean = false) => {
     path = encodeURIComponent(path);
     token = encodeURIComponent(token);
-    return `${protocol}://${owner}/api/browse/internal/files?path=${path}&token=${token}`;
+    return `${protocol}://${owner}/api/browse/internal/files?path=${path}&token=${token}&attachment=${attachment}`;
 };
 import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -106,26 +106,31 @@ onMounted(async () => {
     } else {
         fileAccesDetails = (await getFileInfo(path, attachments)).data;
         //@todo find better way to get name
-        location = await myYggdrasilAddress();
+
+      location = await myYggdrasilAddress();
         readUrl.value = generateUrl(
             'https',
             window.location.hostname,
             fileAccesDetails.path,
-            fileAccesDetails.readToken
+            fileAccesDetails.readToken,
+            attachments
         );
+
     }
 
     fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
     if (isSupportedInDocumentServer.value) {
-        documentServerconfig = generateDocumentserverConfig(
+      documentServerconfig = generateDocumentserverConfig(
             location,
             fileAccesDetails.path,
             fileAccesDetails.key,
             fileAccesDetails.readToken,
             fileAccesDetails.writeToken,
             getExtension(fileAccesDetails.fullName),
-            fileAccesDetails.extension
+            fileAccesDetails.extension,
+            attachments
         );
+
         get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
             //@ts-ignore
             new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
@@ -158,7 +163,7 @@ onMounted(async () => {
             'https',
             window.location.hostname,
             fileAccesDetails.path,
-            fileAccesDetails.readToken
+            fileAccesDetails.readToken,
         );
         isLoading.value = false;
         return;
@@ -172,12 +177,16 @@ const generateDocumentserverConfig = (
     readToken: string,
     writeToken: string | undefined,
     extension: string,
-    fileName: string
+    fileName: string,
+    isAttachement: boolean = false
 ) => {
-    const readUrl = generateUrl('http', `[${location}]`, path, readToken);
+    const readUrl = generateUrl('http', `[${location}]`, path, readToken, isAttachement);
+
     const writeUrl = generateUrl('http', `[${location}]`, path, writeToken);
     //@todo find better way to get name
     const myName = window.location.host.split('.')[0];
+
+
     return {
         document: {
             fileType: extension,

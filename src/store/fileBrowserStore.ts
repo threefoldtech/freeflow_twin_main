@@ -478,7 +478,6 @@ export const itemAction = async (item: PathInfoModel, path = currentDirectory.va
         return;
     }
 
-
     const result = router.resolve({ name: 'editfile', params: { path: btoa(item.path), attachments: String(savedAttachments.value) } });
 
 
