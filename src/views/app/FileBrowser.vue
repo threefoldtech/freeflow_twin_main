@@ -64,11 +64,11 @@ onBeforeMount(async () => {
             sharedDir.value = false;
             searchResults.value = [];
             searchDirValue.value = '';
+
             return;
         }
-
         if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
-        await updateContent(currentDirectory.value);
+        //if(route.name !== 'savedAttachments') await updateContent(currentDirectory.value);
         sharedDir.value = false;
         searchResults.value = [];
         searchDirValue.value = '';

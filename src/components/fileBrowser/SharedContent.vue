@@ -1,5 +1,4 @@
 <template>
-    SHARED CONTENT
     <div class="h-full overflow-y-auto px-3">
         <h1 v-if="!isQuantumChatFiles" class="p-2">
             Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>

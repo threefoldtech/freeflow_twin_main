@@ -14,7 +14,7 @@ import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
-import { isArray } from 'lodash';
+import {create, isArray} from 'lodash';
 import { usechatsActions, usechatsState } from './chatStore';
 
 
@@ -79,6 +79,7 @@ export const chatsWithAttachments = ref<String[]>();
 export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
 export const chatFilesBreadcrumbs = ref([])
+export const savedAttachmentsBreadcrumbs = ref([])
 
 export const sharedItem = ref<PathInfoModel>();
 export const isQuantumChatFiles = ref<boolean>(false);
@@ -124,7 +125,9 @@ export const updateAttachments = async (path = currentDirectory.value) => {
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     // attachments.value = result.data.map(createModel);
+
     currentDirectoryContent.value = result.data.map(createModel)
+
     savedAttachments.value = true;
     return result
 };
@@ -474,6 +477,12 @@ export const deselectAll = () => {
 };
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
+    if(savedAttachments && router.currentRoute.value.name === 'savedAttachments'){
+        router.push({name: 'savedAttachmentsFromChat', params: {
+                chatId: item.name
+        }})
+        return;
+    }
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;
