@@ -106,6 +106,7 @@ onMounted(async () => {
     } else {
         fileAccesDetails = (await getFileInfo(path, attachments)).data;
         //@todo find better way to get name
+      console.log(fileAccesDetails)
 
       location = await myYggdrasilAddress();
         readUrl.value = generateUrl(

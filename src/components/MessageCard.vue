@@ -75,7 +75,7 @@
                         @click="replyMessage(props.chatId, message)"
                     >
                         <i class="fa fa-reply"></i>
-                        <span class="text-gray-600 pl-2"> Reply</span>
+                        <span class="text-gray-600 pl-2">Reply</span>
                     </span>
                     <span
                         class="delete text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
@@ -92,6 +92,14 @@
                     >
                         <i class="fa fa-pen"></i>
                         <span class="text-gray-600 pl-2">Edit permissions</span>
+                    </span>
+                    <span
+                        v-if="message.type === MessageTypes.FILE"
+                      class="reply text-xs pr-4 cursor-pointer hover:underline"
+                      @click="downloadAttachmentToQuantum(message)"
+                  >
+                        <i class="fa fa-reply"></i>
+                        <span class="text-gray-600 pl-2">Download</span>
                     </span>
                     <div class="pr-4 text-gray-600 date inline-block text-xs">
                         <!--<span v-if="message.updated" class="mr-4">edited</span>-->
@@ -161,6 +169,9 @@
     import { useScrollActions } from '@/store/scrollStore';
     import { clock } from '@/services/clockService';
     import Time from '@/components/Time.vue';
+    import { downloadAttachment } from '@/services/fileBrowserService';
+
+
 
     interface IProps {
         message: object;
@@ -226,6 +237,10 @@
             subject: message.id,
         };
         sendMessageObject(props.chatId, updatedMessage);
+    };
+
+    const downloadAttachmentToQuantum = (message: Message<MessageBodyType>) => {
+      downloadAttachment(message);
     };
 </script>
 <style lang="css" scoped></style>

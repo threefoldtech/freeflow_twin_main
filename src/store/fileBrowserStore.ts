@@ -110,22 +110,23 @@ export const getFile = async (fullPath: string): Promise<FullPathInfoModel> => {
 
 export const updateContent = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path);
+
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     currentDirectoryContent.value = result.data.map(createModel);
 
     savedAttachments.value = false;
+
 };
 
 export const updateAttachments = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path, true);
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-
     // attachments.value = result.data.map(createModel);
     currentDirectoryContent.value = result.data.map(createModel)
     savedAttachments.value = true;
-
+    return result
 };
 
 export const createDirectory = async (name: string, path = currentDirectory.value) => {
@@ -477,9 +478,7 @@ export const itemAction = async (item: PathInfoModel, path = currentDirectory.va
         goToFolderInCurrentDirectory(item);
         return;
     }
-
     const result = router.resolve({ name: 'editfile', params: { path: btoa(item.path), attachments: String(savedAttachments.value) } });
-
 
     window.open(result.href, '_blank', 'noreferrer');
 };
