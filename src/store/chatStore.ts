@@ -497,6 +497,12 @@ export const usechatsState = () => {
 };
 
 export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
+    // getChat(chatId).draft = message;
+    // axios.post(`${config.baseUrl}api/updateDraft`, {
+    //     params: {
+    //         'draftMessage': message
+    //     }
+    // })
     sendDraftMessage(message)
 }
 

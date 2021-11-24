@@ -39,6 +39,7 @@ const initializeSocket = (username: string) => {
         addUserToBlockList(chatId);
     });
     state.socket.on('message', message => {
+        console.log("message in websocket client ", message)
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
@@ -74,6 +75,7 @@ const initializeSocket = (username: string) => {
     state.socket.on('shares_updated', share => {
         //@todo implement this
     });
+
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
@@ -119,7 +121,16 @@ export const useSocketState = () => {
 };
 
 export const sendDraftMessage = async (message: MessageBodyType) => {
-    state.socket.emit('draft_message', message)
+    // state.socket.emit('draft_message', function (response) {
+    //     console.log(response);
+    // });
+    state.socket.emit("draft_message", { property: message }, function (data) {
+        // if (data.error)
+        // console.log('Something went wrong on the server');
+
+        // if (data.ok)
+        // console.log('Event was processed successfully');
+    });
 }
 
 interface State {
