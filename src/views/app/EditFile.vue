@@ -132,7 +132,7 @@ onMounted(async () => {
             fileAccesDetails.extension,
             attachments
         );
-      alert(JSON.stringify(documentServerconfig, null, 2))
+      //alert(JSON.stringify(documentServerconfig, null, 2))
 
       console.log(await axios.get(documentServerconfig.document.url.replace('http', 'https')))
 
