@@ -1,4 +1,4 @@
-import { Id, Message } from '@/types';
+import { Id, Message, MessageBodyType } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
@@ -117,6 +117,10 @@ export const useSocketState = () => {
         ...toRefs(state),
     };
 };
+
+export const sendDraftMessage = async (message: MessageBodyType) => {
+    state.socket.emit('draft_message', message)
+}
 
 interface State {
     socket: any;

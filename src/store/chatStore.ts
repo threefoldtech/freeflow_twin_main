@@ -15,7 +15,7 @@ import {
     SystemBody,
     SystemMessageTypes,
 } from '../types';
-import { useSocketActions } from './socketStore';
+import { sendDraftMessage, useSocketActions } from './socketStore';
 import { useAuthState } from './authStore';
 import config from '@/config';
 import { uuidv4 } from '@/common';
@@ -149,7 +149,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     const { user } = useAuthState();
 
     const contactInGroup = contacts.map(contact => {
-        if(user.id !== contact.id)
+        if (user.id !== contact.id)
             return contact.id
     }).filter(x => {
         return x !== undefined;
@@ -496,13 +496,8 @@ export const usechatsState = () => {
     };
 };
 
-export const draftMessage = (chatId, message: Message<MessageBodyType>) =>{
-    getChat(chatId).draft = message;
-    axios.post(`${config.baseUrl}api/updateDraft`, {
-        params: {
-            'draftMessage': message
-        }
-    })
+export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
+    sendDraftMessage(message)
 }
 
 export const usechatsActions = () => {
