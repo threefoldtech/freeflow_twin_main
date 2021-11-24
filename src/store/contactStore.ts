@@ -9,6 +9,7 @@ import { Chat } from '../types';
 import { usechatsActions, usechatsState } from './chatStore';
 import { useAuthState } from './authStore';
 import { Message, PersonChat, DtId } from '../types/index';
+import { sendAddContact } from './socketStore';
 
 // const state = reactive<State>({
 //     contacts:[]
@@ -50,14 +51,16 @@ const addContact = (username: DtId, location, dontCheck = false) => {
         replies: [],
         subject: null,
     };
-    const chatname: String = username;
-    axios
-        .post(`${config.baseUrl}api/contacts`, {
-            id: username,
-            location,
-            message: addMessage,
-        })
-        .then(res => {});
+    // const chatname: String = username;
+    // axios
+    //     .post(`${config.baseUrl}api/contacts`, {
+    //         id: username,
+    //         location,
+    //         message: addMessage,
+    //     })
+    //     .then(res => { });
+
+    sendAddContact(username, location, addMessage);
 };
 
 const calculateContacts = () => {

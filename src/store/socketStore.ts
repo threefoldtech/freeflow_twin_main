@@ -1,4 +1,4 @@
-import { Id, Message, MessageBodyType } from '@/types';
+import { DtId, Id, Message, MessageBodyType, SystemBody } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
@@ -130,6 +130,17 @@ export const sendDraftMessage = async (message: MessageBodyType) => {
 
         // if (data.ok)
         // console.log('Event was processed successfully');
+    });
+}
+
+export const sendAddContact = async (username: DtId, location: string, addMessage: Message<SystemBody>) => {
+    state.socket.emit("add_contact", { "username": username, "location": location, "addMessage": addMessage }, function (data) {
+        if (data.error)
+            console.log('Something went wrong on the server');
+
+        if (data.ok)
+            console.log('Event was processed successfully');
+
     });
 }
 
