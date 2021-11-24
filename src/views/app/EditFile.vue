@@ -121,6 +121,7 @@ onMounted(async () => {
 
     fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
     if (isSupportedInDocumentServer.value) {
+
       documentServerconfig = generateDocumentserverConfig(
             location,
             fileAccesDetails.path,
@@ -131,8 +132,11 @@ onMounted(async () => {
             fileAccesDetails.extension,
             attachments
         );
+      alert(JSON.stringify(documentServerconfig, null, 2))
 
-        get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+      console.log(await axios.get(documentServerconfig.document.url.replace('http', 'https')))
+
+       get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
             //@ts-ignore
             new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
         });
@@ -183,7 +187,10 @@ const generateDocumentserverConfig = (
 ) => {
     const readUrl = generateUrl('http', `[${location}]`, path, readToken, isAttachement);
 
+
     const writeUrl = generateUrl('http', `[${location}]`, path, writeToken);
+
+
     //@todo find better way to get name
     const myName = window.location.host.split('.')[0];
 

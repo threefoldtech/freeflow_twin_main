@@ -2,7 +2,7 @@
     <!-- :href="calcExternalResourceLink(message.body.url)" -->
     <a
         :download="message.body.filename"
-        class="px-4 my-2 my-message:bg-accent-200"
+        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer"
         @click="openSharedFile(message)"
     >
         <div
