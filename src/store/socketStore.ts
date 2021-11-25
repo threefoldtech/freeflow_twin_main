@@ -134,6 +134,7 @@ export const sendDraftMessage = async (message: MessageBodyType) => {
 }
 
 export const sendAddContact = async (username: DtId, location: string, addMessage: Message<SystemBody>) => {
+    console.log("send add contact")
     state.socket.emit("add_contact", { "username": username, "location": location, "addMessage": addMessage }, function (data) {
         if (data.error)
             console.log('Something went wrong on the server');

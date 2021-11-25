@@ -51,15 +51,7 @@ const addContact = (username: DtId, location, dontCheck = false) => {
         replies: [],
         subject: null,
     };
-    // const chatname: String = username;
-    // axios
-    //     .post(`${config.baseUrl}api/contacts`, {
-    //         id: username,
-    //         location,
-    //         message: addMessage,
-    //     })
-    //     .then(res => { });
-
+    const chatname: String = username;
     sendAddContact(username, location, addMessage);
 };
 
