@@ -106,7 +106,7 @@ onMounted(async () => {
     } else {
         fileAccesDetails = (await getFileInfo(path, attachments)).data;
         //@todo find better way to get name
-      console.log(fileAccesDetails)
+
 
       location = await myYggdrasilAddress();
         readUrl.value = generateUrl(
@@ -132,9 +132,6 @@ onMounted(async () => {
             fileAccesDetails.extension,
             attachments
         );
-      //alert(JSON.stringify(documentServerconfig, null, 2))
-
-      console.log(await axios.get(documentServerconfig.document.url.replace('http', 'https')))
 
        get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
             //@ts-ignore
