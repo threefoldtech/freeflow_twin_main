@@ -266,7 +266,7 @@
                                 No items in this folder
                                 <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
                             </p>
-                            <li v-if="currentDirectory === '/'" title="Shared folder">
+                            <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
                                     class="
                                         group
@@ -308,7 +308,7 @@
                                     </div>
                                 </div>
                             </li>
-                            <li v-if="currentDirectory === '/'" title="Shared folder">
+                            <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
                                     class="
                                         group
@@ -345,48 +345,6 @@
                                             "
                                         >
                                             Downloaded attachments
-                                        </p>
-                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li v-if="currentDirectory === '/'" title="Shared folder">
-                                <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
-                                    @click="goToFilesInChat(false)"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-2">
-                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
-                                        <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
-                                        >
-                                            Files sent in chat
                                         </p>
                                         <button class="absolute inset-0 focus:outline-none" type="button"></button>
                                     </div>
@@ -496,7 +454,7 @@ import {
     goToFilesInChat,
     savedAttachments,
 } from '@/store/fileBrowserStore';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import FileDropArea from '@/components/FileDropArea.vue';
 import { useSocketActions } from '@/store/socketStore';
 import { useAuthState } from '@/store/authStore';
@@ -507,6 +465,7 @@ const ghostImage = ref<HTMLDivElement>();
 const dragOverItem = ref<PathInfoModel>();
 let tempCounter = 0;
 const router = useRouter();
+const route = useRoute();
 const { user } = useAuthState();
 onBeforeMount(() => {
     const { initializeSocket } = useSocketActions();

@@ -216,9 +216,6 @@
                                 mt-4
                             "
                         >
-                            chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested &&
-                            !$route.meta.chatsWithFiles"
-
                             <p
                                 class="
                                     px-6
