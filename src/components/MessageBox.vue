@@ -25,6 +25,20 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
+      <v-contextmenu ref="contextmenu-message">
+        <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY;
+                                  }">Edit message</v-contextmenu-item>
+        <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
+                                  }">Delete</v-contextmenu-item>
+        <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE
+                                  }">Reply</v-contextmenu-item>
+        </v-contextmenu>
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
@@ -47,6 +61,8 @@
                     :message="message"
                     @copy="copyMessage($event, message)"
                     @openEditShare="editFileSharePermission"
+                    @mousedown.right="setCurrentRightClickedItem(message)"
+                    v-contextmenu:contextmenu-message
                 />
             </div>
 
@@ -69,6 +85,13 @@
     import Dialog from '@/components/Dialog.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
+    import {
+      currentRightClickedItem,
+      rightClickItemAction,
+      triggerWatchOnRightClickItem,
+      RIGHT_CLICK_ACTIONS_MESSAGE,
+      RIGHT_CLICK_TYPE
+    } from '@/store/contextmenuStore'
 
     interface IProps {
         chat: Chat;
@@ -77,6 +100,8 @@
     const { chats } = usechatsState();
 
     const tabs = ['Create shares', 'Edit permissions'];
+
+
 
     const messageBoxLocal = ref(null);
     const selectedTab = ref<number>(1);
@@ -95,6 +120,14 @@
     const showShareDialog = ref<boolean>(false);
 
     const selectedEditFile = ref<any>(null);
+
+    const setCurrentRightClickedItem = (item) => {
+      console.log(item)
+      currentRightClickedItem.value = {
+        type: RIGHT_CLICK_TYPE.MESSAGE,
+        data: item
+      }
+    }
 
     const editFileSharePermission = file => {
         selectedEditFile.value = file;

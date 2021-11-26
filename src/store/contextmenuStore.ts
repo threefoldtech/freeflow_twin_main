@@ -7,6 +7,12 @@ export enum RIGHT_CLICK_ACTIONS  {
     SHARE = "SHARE"
 }
 
+export enum RIGHT_CLICK_ACTIONS_MESSAGE {
+    REPLY = "REPLY",
+    EDIT = "EDIT",
+    DELETE = "DELETE"
+}
+
 export enum RIGHT_CLICK_TYPE {
     MESSAGE = "MESSAGE",
     LOCAL_FILE = "LOCAL_FILE"
@@ -18,6 +24,6 @@ interface ICurrentRightClickItem {
 }
 
 export const currentRightClickedItem = ref<ICurrentRightClickItem | null>(null)
-export const rightClickItemAction = ref<RIGHT_CLICK_ACTIONS | null>(null)
+export const rightClickItemAction = ref<RIGHT_CLICK_ACTIONS_MESSAGE | RIGHT_CLICK_ACTIONS | null>(null)
 export const triggerWatchOnRightClickItem = ref<boolean>(false)
 

@@ -56,7 +56,6 @@
                         <i class="fas fa-check text-gray-400" v-else></i>
                     </div>
                 </div>
-
                 <div
                     class="group-hover:flex pb-4 pl-4 md:hidden mt-auto xl:sticky xl:bottom-0"
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
@@ -100,12 +99,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="flex flex-col mb-4 ml-4 border-l-2 pl-2" v-if="message.replies?.length > 0">
                 <div class="text-gray-400 self-start">Replies:</div>
                 <div v-for="reply in message.replies" :key="reply.id" class="card flex mb-1">
                     <AvatarImg class="mr-2" small :id="reply.from" :showOnlineStatus="false" />
-
                     <div
                         class="flex rounded-xl overflow-hidden"
                         :class="{
@@ -141,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, nextTick, onMounted } from 'vue';
+import {computed, defineComponent, nextTick, onMounted, watch} from 'vue';
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
@@ -161,6 +158,14 @@
     import { useScrollActions } from '@/store/scrollStore';
     import { clock } from '@/services/clockService';
     import Time from '@/components/Time.vue';
+import {
+  currentRightClickedItem, RIGHT_CLICK_ACTIONS, RIGHT_CLICK_ACTIONS_MESSAGE,
+  RIGHT_CLICK_TYPE,
+  rightClickItemAction,
+  triggerWatchOnRightClickItem
+} from "@/store/contextmenuStore";
+import {downloadFiles, selectedPaths} from "@/store/fileBrowserStore";
+import {showShareDialog} from "@/services/dialogService";
 
     interface IProps {
         message: object;
@@ -178,6 +183,25 @@
     const emit = defineEmits(['openEditShare']);
 
     const { user } = useAuthState();
+
+    watch(triggerWatchOnRightClickItem,async () => {
+      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE){
+        switch(rightClickItemAction.value){
+          case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
+            console.log("REPLY")
+            break;
+          case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
+            console.log("EDIT")
+            break;
+          case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
+            console.log("DELETE")
+            break;
+          default:
+            break;
+        }
+      }
+      return;
+    }, {deep: true})
 
     const toggleSendForwardMessage = () => {
         console.log('toggleSendForwardMessage');

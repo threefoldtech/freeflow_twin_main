@@ -86,7 +86,7 @@
 
     const renderPermissionsData = async () => {
         currentShare.value = await getShareByPath(props.selectedFile.path);
-        currentShare.value.permissions = currentShare.value.permissions.map(item => {
+        currentShare.value.permissions = currentShare.value?.permissions?.map(item => {
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.chatId;
             });
@@ -114,7 +114,7 @@
     };
 
     const searchResults = computed(() => {
-        return currentShare.value?.permissions?.filter(item => {
+        return currentShare?.value?.permissions?.filter(item => {
             return item?.name?.toLowerCase().includes(searchTerm.value.toLowerCase());
         });
     });
