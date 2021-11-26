@@ -62,4 +62,15 @@
     myYggdrasilAddress().then(v => (location.value = v));
 </script>
 
-<style></style>
+<style>
+.v-contextmenu{
+
+}
+.v-contextmenu-inner{
+
+}
+.v-contextmenu-item{
+}
+.v-contextmenu-item--hover{
+}
+</style>

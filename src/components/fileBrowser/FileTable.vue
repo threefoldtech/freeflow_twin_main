@@ -136,6 +136,24 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
+                                <v-contextmenu ref="contextmenu-filebrowser-item-local">
+                                  <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.SHARE;
+                                  }">Share</v-contextmenu-item>
+                                  <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.DOWNLOAD;
+                                  }">Download</v-contextmenu-item>
+                                  <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.RENAME
+                                  }">Rename</v-contextmenu-item>
+                                  <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.DELETE
+                                  }">Delete</v-contextmenu-item>
+                                </v-contextmenu>
                                 <tr
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
@@ -148,6 +166,8 @@
                                     @dragover="event => onDragOver(event, item)"
                                     @dragstart="event => onDragStart(event, item)"
                                     @drop="() => onDrop(item)"
+                                    @mousedown.right="setCurrentRightClickedItem(item)"
+                                    v-contextmenu:contextmenu-filebrowser-item-local
                                 >
                                     <td class="px-6 py-4 whitespace-nowrap hidden">
                                         <input
@@ -329,56 +349,65 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
-    import {
-        currentDirectory,
-        currentDirectoryContent,
-        itemAction,
-        PathInfoModel,
-        selectItem,
-        deselectAll,
-        selectAll,
-        selectedPaths,
-        deselectItem,
-        sortContent,
-        sortAction,
-        currentSort,
-        currentSortDir,
-        getFileLastModified,
-        getFileExtension,
-        getFileSize,
-        getIconColor,
-        getIcon,
-        uploadFiles,
-        equals,
-        moveFiles,
-        isDraggingFiles,
-        sharedDir,
-        sharedContent,
-        getSharedContent,
-        searchResults,
-        searchDirValue,
-        currentShare,
-        goToShared,
-        fileBrowserTypeView,
-    } from '@/store/fileBrowserStore';
-    import { useRouter } from 'vue-router';
-    import FileDropArea from '@/components/FileDropArea.vue';
-    import { useSocketActions } from '@/store/socketStore';
-    import { useAuthState } from '@/store/authStore';
+import {computed, onBeforeMount, ref} from 'vue';
+import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+import {
+  currentDirectory,
+  currentDirectoryContent,
+  currentSort,
+  currentSortDir,
+  deselectAll,
+  deselectItem,
+  equals,
+  fileBrowserTypeView,
+  getFileExtension,
+  getFileLastModified,
+  getFileSize,
+  getIcon,
+  getIconColor,
+  goToShared,
+  isDraggingFiles,
+  itemAction,
+  moveFiles,
+  PathInfoModel,
+  selectAll,
+  selectedPaths,
+  selectItem,
+  sortAction,
+  sortContent,
+  uploadFiles,
+} from '@/store/fileBrowserStore';
+import {useRouter} from 'vue-router';
+import FileDropArea from '@/components/FileDropArea.vue';
+import {useSocketActions} from '@/store/socketStore';
+import {useAuthState} from '@/store/authStore';
+import {
+  currentRightClickedItem,
+  rightClickItemAction,
+  triggerWatchOnRightClickItem,
+  RIGHT_CLICK_ACTIONS,
+  RIGHT_CLICK_TYPE
+} from '@/store/contextmenuStore'
 
-    const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
+const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
     const ghostImage = ref<HTMLDivElement>();
     const dragOverItem = ref<PathInfoModel>();
     let tempCounter = 0;
     const router = useRouter();
     const { user } = useAuthState();
+
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
     });
+
+    const setCurrentRightClickedItem = (item) => {
+      currentRightClickedItem.value = {
+        type: RIGHT_CLICK_TYPE.LOCAL_FILE,
+        data: item
+      }
+    }
 
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) selectItem(item);

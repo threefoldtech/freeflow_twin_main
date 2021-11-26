@@ -168,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import {computed, defineComponent, onBeforeMount, onMounted, ref, watch} from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -199,11 +199,48 @@
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
     import { showShareDialog } from '@/services/dialogService';
+import {
+  currentRightClickedItem,
+  RIGHT_CLICK_ACTIONS,
+  RIGHT_CLICK_TYPE,
+  rightClickItemAction, triggerWatchOnRightClickItem
+} from '@/store/contextmenuStore'
 
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
 
     const tabs = ['Create shares', 'Edit shares'];
+
+    watch(triggerWatchOnRightClickItem,async () => {
+      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE){
+        selectedPaths.value.push(currentRightClickedItem.value.data)
+        switch(rightClickItemAction.value){
+          case RIGHT_CLICK_ACTIONS.DELETE:
+            showDeleteDialog.value = true;
+            console.log("DELETE")
+            break;
+          case RIGHT_CLICK_ACTIONS.RENAME:
+            showRenameDialog.value = true;
+            newName.value = currentRightClickedItem.value.data.name
+            console.log("RENAME")
+            break;
+          case RIGHT_CLICK_ACTIONS.DOWNLOAD:
+            await downloadFiles()
+            break;
+          case RIGHT_CLICK_ACTIONS.SHARE:
+            showShareDialog.value = true;
+            console.log("SHARE")
+            break;
+          default:
+            break;
+        }
+      }
+      return;
+    }, {deep: true})
+
+    onMounted(() => {
+      console.log("Selected options mounted")
+    })
 
     let debounce;
     const showDeleteDialog = ref(false);
