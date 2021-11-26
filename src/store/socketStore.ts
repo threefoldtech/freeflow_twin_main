@@ -75,6 +75,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('shares_updated', share => {
         //@todo implement this
     });
+    state.socket.on('status', share => {
+        console.log("getting avatar")
+    });
 
 };
 
@@ -124,12 +127,13 @@ export const sendDraftMessage = async (message: MessageBodyType) => {
     // state.socket.emit('draft_message', function (response) {
     //     console.log(response);
     // });
-    state.socket.emit("draft_message", { property: message }, function (data) {
-        // if (data.error)
-        // console.log('Something went wrong on the server');
+    state.socket.emit("get_avatar", { property: message }, function (data) {
+        console.log("data from backend", data)
+        if (data.error)
+            console.log('Something went wrong on the server');
 
-        // if (data.ok)
-        // console.log('Event was processed successfully');
+        if (data.ok)
+            console.log('Event was processed successfully');
     });
 }
 

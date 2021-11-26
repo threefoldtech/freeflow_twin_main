@@ -7,6 +7,10 @@ export const getMyStatus = async () => {
     return res.data.status;
 };
 
+export const sendGetMyStatus = async () => {
+
+}
+
 const authState = reactive<AuthState>({
     user: {
         id: window.location.host.split('.')[0].replace('localhost:8080', 'localhost:3000'),

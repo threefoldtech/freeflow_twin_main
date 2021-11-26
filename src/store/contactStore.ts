@@ -11,30 +11,6 @@ import { useAuthState } from './authStore';
 import { Message, PersonChat, DtId } from '../types/index';
 import { sendAddContact } from './socketStore';
 
-// const state = reactive<State>({
-//     contacts:[]
-// });
-
-// const retrieveContacts = async () => {
-//     return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
-//         const contacts = response.data
-//         console.log(`here are the contacts`, contacts)
-
-//         state.contacts = contacts;
-//     })
-
-// }
-
-// const contactIsHealthy = (location) => {
-//     let isAvailable = false
-//     axios.get(`https://${location}.digitaltwin.jimbertesting.be/api/healthcheck`).then( (res) => {
-//         console.log(res)
-//         isAvailable = true
-//     }).catch( res => {
-//         isAvailable = false
-//     })
-//     return isAvailable
-// }
 
 const addContact = (username: DtId, location, dontCheck = false) => {
     const { user } = useAuthState();
@@ -79,6 +55,3 @@ export const useContactsActions = () => {
     };
 };
 
-// interface State {
-//     contacts: Contact[]
-// }
