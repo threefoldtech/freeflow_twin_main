@@ -53,8 +53,16 @@ interface ICurrentRightClickItem {
 export const currentRightClickedItem = ref<ICurrentRightClickItem | null>(null)
 export const rightClickItemAction = ref<RIGHT_CLICK_ACTIONS | null>(null)
 export const triggerWatchOnRightClickItem = ref<boolean>(false)
+export const openBlockDialogFromOtherFile = ref<boolean>(false)
+export const openDeleteDialogFromOtherFile = ref<boolean>(false)
+
+
+//This is so used to rerender a component
+export const conversationComponentRerender = ref<number>(0)
+
 
 export const setCurrentRightClickedItem = (item, type: RIGHT_CLICK_TYPE) => {
+    triggerWatchOnRightClickItem.value = !triggerWatchOnRightClickItem;
     currentRightClickedItem.value = {
         type: type,
         data: item

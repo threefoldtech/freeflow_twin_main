@@ -1,4 +1,6 @@
 <template>
+  <p class="hidden">{{JSON.stringify(openBlockDialogFromOtherFile)}}</p>
+  <div :key="conversationComponentRerender" class="h-full w-full">
     <appLayout>
         <template v-slot:top>
             <div v-if="chat" :class="{ 'group-chat': chat?.isGroup }" class="w-full flex md:px-4 text-white">
@@ -19,7 +21,7 @@
             <div v-else>Loading</div>
         </template>
         <template v-slot:actions>
-            <div :class="{ 'group-chat': chat?.isGroup }">
+            <div  :class="{ 'group-chat': chat?.isGroup }">
                 <div class="relative">
                     <button class="text-lg text-white md:hidden" @click="showMenu = true">
                         <i class="fas fa-ellipsis-v"></i>
@@ -305,6 +307,7 @@
             </button>
         </div>
     </Dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -340,6 +343,12 @@
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon } from '@heroicons/vue/outline';
+    import {
+      openBlockDialogFromOtherFile,
+      openDeleteDialogFromOtherFile,
+      rightClickItemAction, triggerWatchOnRightClickItem,
+      conversationComponentRerender
+    } from "@/store/contextmenuStore";
 
     const route = useRoute();
     let selectedId = ref(<string>route.params.id);
@@ -362,9 +371,9 @@
     const showMenu = ref(false);
     const file = ref();
     const router = useRouter();
-    let showDialog = ref(false);
-    let showDeleteDialog = ref(false);
-    let showInfo = ref(false);
+    const showDialog = ref(false);
+    const showDeleteDialog = ref(false);
+    const showInfo = ref(false);
     const showRemoveUserDialog = ref(false);
     const toBeRemovedUser = ref();
 
@@ -395,6 +404,7 @@
             return acc;
         }, {});
     });
+
 
     const message = ref('');
 
@@ -511,7 +521,19 @@
         nextTick(() => {
             scrollToBottom(true);
         });
+      if(openBlockDialogFromOtherFile.value) showDialog.value = true;
+      if(openDeleteDialogFromOtherFile.value) showDeleteDialog.value = true
+      openDeleteDialogFromOtherFile.value = false;
+      openBlockDialogFromOtherFile.value = false;
     });
+
+    onUpdated(() => {
+      //For when component is already mounted
+      if(openBlockDialogFromOtherFile.value) showDialog.value = true;
+      if(openDeleteDialogFromOtherFile.value) showDeleteDialog.value = true;
+      openDeleteDialogFromOtherFile.value = false;
+      openBlockDialogFromOtherFile.value = false;
+    })
 
     const status = computed(() => {
         return statusList[selectedId.value];

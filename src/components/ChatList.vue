@@ -210,8 +210,12 @@
       triggerWatchOnRightClickItem,
       RIGHT_CLICK_ACTIONS_CHAT_CARD,
       rightClickItemAction,
-      currentRightClickedItem, RIGHT_CLICK_TYPE,
-      setCurrentRightClickedItem, RIGHT_CLICK_ACTIONS_MESSAGE
+      currentRightClickedItem,
+      RIGHT_CLICK_TYPE,
+      setCurrentRightClickedItem,
+      RIGHT_CLICK_ACTIONS_MESSAGE,
+      openBlockDialogFromOtherFile,
+      openDeleteDialogFromOtherFile, conversationComponentRerender
     } from '@/store/contextmenuStore'
 
     const props = defineProps<{ modelValue?: boolean }>();
@@ -237,22 +241,30 @@
 
 
     watch(triggerWatchOnRightClickItem,async () => {
-      console.log(currentRightClickedItem.value)
       if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.CHAT_CARD){
         switch(rightClickItemAction.value){
           case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
               router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
             break;
           case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
-
+            openBlockDialogFromOtherFile.value = true
+              if(router.currentRoute.name === 'single'){
+                conversationComponentRerender.value = conversationComponentRerender.value++
+              }
+            await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
             break;
           case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
-
+            openDeleteDialogFromOtherFile.value = true;
+            if(router.currentRoute.name === 'single'){
+              conversationComponentRerender.value = conversationComponentRerender.value++
+            }
+            await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
             break;
           default:
             break;
         }
       }
+      rightClickItemAction.value = null;
       return;
     }, {deep: true})
 
