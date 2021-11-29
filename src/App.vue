@@ -72,5 +72,6 @@
 .v-contextmenu-item{
 }
 .v-contextmenu-item--hover{
+  background-color: #2e266f !important;
 }
 </style>

@@ -201,7 +201,7 @@ import {computed, defineComponent, onBeforeMount, onMounted, ref, watch} from 'v
     import { showShareDialog } from '@/services/dialogService';
 import {
   currentRightClickedItem,
-  RIGHT_CLICK_ACTIONS,
+  RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
   RIGHT_CLICK_TYPE,
   rightClickItemAction, triggerWatchOnRightClickItem
 } from '@/store/contextmenuStore'
@@ -215,19 +215,19 @@ import {
       if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE){
         selectedPaths.value.push(currentRightClickedItem.value.data)
         switch(rightClickItemAction.value){
-          case RIGHT_CLICK_ACTIONS.DELETE:
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
             showDeleteDialog.value = true;
             console.log("DELETE")
             break;
-          case RIGHT_CLICK_ACTIONS.RENAME:
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
             showRenameDialog.value = true;
             newName.value = currentRightClickedItem.value.data.name
             console.log("RENAME")
             break;
-          case RIGHT_CLICK_ACTIONS.DOWNLOAD:
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
             await downloadFiles()
             break;
-          case RIGHT_CLICK_ACTIONS.SHARE:
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
             showShareDialog.value = true;
             console.log("SHARE")
             break;
@@ -239,7 +239,6 @@ import {
     }, {deep: true})
 
     onMounted(() => {
-      console.log("Selected options mounted")
     })
 
     let debounce;

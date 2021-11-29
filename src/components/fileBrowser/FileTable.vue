@@ -139,19 +139,19 @@
                                 <v-contextmenu ref="contextmenu-filebrowser-item-local">
                                   <v-contextmenu-item @click="() => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.SHARE;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
                                   }">Share</v-contextmenu-item>
                                   <v-contextmenu-item @click="() => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.DOWNLOAD;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
                                   }">Download</v-contextmenu-item>
                                   <v-contextmenu-item @click="() => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.RENAME
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME
                                   }">Rename</v-contextmenu-item>
                                   <v-contextmenu-item @click="() => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS.DELETE
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE
                                   }">Delete</v-contextmenu-item>
                                 </v-contextmenu>
                                 <tr
@@ -385,7 +385,7 @@ import {
   currentRightClickedItem,
   rightClickItemAction,
   triggerWatchOnRightClickItem,
-  RIGHT_CLICK_ACTIONS,
+  RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
   RIGHT_CLICK_TYPE
 } from '@/store/contextmenuStore'
 

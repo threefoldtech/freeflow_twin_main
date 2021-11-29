@@ -71,6 +71,7 @@
 
                     <span
                         class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        v-if="message.type !== 'DELETE'"
                         @click="replyMessage(props.chatId, message)"
                     >
                         <i class="fa fa-reply"></i>
@@ -185,16 +186,17 @@ import {showShareDialog} from "@/services/dialogService";
     const { user } = useAuthState();
 
     watch(triggerWatchOnRightClickItem,async () => {
-      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE){
+      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE && currentRightClickedItem.value.data.id === props.message.id){
         switch(rightClickItemAction.value){
           case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
-            console.log("REPLY")
+            console.log(currentRightClickedItem.value.data)
+            replyMessage(props.chatId, props.message)
             break;
           case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
-            console.log("EDIT")
+            editMessage(props.chatId, props.message)
             break;
           case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
-            console.log("DELETE")
+            deleteMessage(props.message)
             break;
           default:
             break;

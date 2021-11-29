@@ -25,18 +25,18 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
-      <v-contextmenu ref="contextmenu-message">
-        <v-contextmenu-item @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY;
-                                  }">Edit message</v-contextmenu-item>
-        <v-contextmenu-item @click="() => {
+      <v-contextmenu v-if="currentRightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
+        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id" @click="() => {
                            triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
                            rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
+                                  }">Edit message</v-contextmenu-item>
+        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id" @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE;
                                   }">Delete</v-contextmenu-item>
         <v-contextmenu-item @click="() => {
                            triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY
                                   }">Reply</v-contextmenu-item>
         </v-contextmenu>
         <div class="relative w-full mt-8 px-4">
@@ -98,10 +98,10 @@
     }
 
     const { chats } = usechatsState();
+    const { user } = useAuthState();
+
 
     const tabs = ['Create shares', 'Edit permissions'];
-
-
 
     const messageBoxLocal = ref(null);
     const selectedTab = ref<number>(1);
@@ -122,7 +122,6 @@
     const selectedEditFile = ref<any>(null);
 
     const setCurrentRightClickedItem = (item) => {
-      console.log(item)
       currentRightClickedItem.value = {
         type: RIGHT_CLICK_TYPE.MESSAGE,
         data: item
@@ -200,7 +199,7 @@
         event.preventDefault();
     };
 
-    const { user } = useAuthState();
+
     const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
 </script>
 <style scoped type="text/css"></style>
