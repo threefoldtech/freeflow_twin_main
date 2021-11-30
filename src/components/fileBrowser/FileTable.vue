@@ -389,8 +389,8 @@ import {
   rightClickItemAction,
   triggerWatchOnRightClickItem,
   RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
-  RIGHT_CLICK_TYPE
-} from '@/store/contextmenuStore'
+  RIGHT_CLICK_TYPE,
+  } from '@/store/contextmenuStore'
 
 const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
