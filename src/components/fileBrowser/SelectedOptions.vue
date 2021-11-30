@@ -219,19 +219,16 @@ import {
         switch(rightClickItemAction.value){
           case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
             showDeleteDialog.value = true;
-            console.log("DELETE")
             break;
           case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
             showRenameDialog.value = true;
             newName.value = currentRightClickedItem.value.data.name
-            console.log("RENAME")
             break;
           case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
             await downloadFiles()
             break;
           case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
             showShareDialog.value = true;
-            console.log("SHARE")
             break;
           default:
             break;
