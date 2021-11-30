@@ -527,6 +527,7 @@
       openBlockDialogFromOtherFile.value = false;
     });
 
+
     onUpdated(() => {
       //For when component is already mounted
       if(openBlockDialogFromOtherFile.value) showDialog.value = true;

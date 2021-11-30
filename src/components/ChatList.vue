@@ -248,14 +248,14 @@
             break;
           case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
             openBlockDialogFromOtherFile.value = true
-              if(router.currentRoute.name === 'single'){
+              if(router.currentRoute.value.name === 'single'){
                 conversationComponentRerender.value = conversationComponentRerender.value++
               }
             await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
             break;
           case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
             openDeleteDialogFromOtherFile.value = true;
-            if(router.currentRoute.name === 'single'){
+            if(router.currentRoute.value.name === 'single'){
               conversationComponentRerender.value = conversationComponentRerender.value++
             }
             await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})

@@ -1,4 +1,22 @@
 <template>
+  <v-contextmenu ref="contextmenu-filebrowser-item-local">
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
+                                  }">Share</v-contextmenu-item>
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
+                                  }">Download</v-contextmenu-item>
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME
+                                  }">Rename</v-contextmenu-item>
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE
+                                  }">Delete</v-contextmenu-item>
+  </v-contextmenu>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="py-2 px-4 align-middle inline-block min-w-full">
@@ -136,24 +154,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <v-contextmenu ref="contextmenu-filebrowser-item-local">
-                                  <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
-                                  }">Share</v-contextmenu-item>
-                                  <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
-                                  }">Download</v-contextmenu-item>
-                                  <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME
-                                  }">Rename</v-contextmenu-item>
-                                  <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE
-                                  }">Delete</v-contextmenu-item>
-                                </v-contextmenu>
+
                                 <tr
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
@@ -292,6 +293,8 @@
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
+                                @mousedown.right="setCurrentRightClickedItem(item)"
+                                v-contextmenu:contextmenu-filebrowser-item-local
                             >
                                 <div
                                     :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"

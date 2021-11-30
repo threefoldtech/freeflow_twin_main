@@ -213,7 +213,9 @@ import {
 
     watch(triggerWatchOnRightClickItem,async () => {
       if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE){
-        selectedPaths.value.push(currentRightClickedItem.value.data)
+        selectedPaths.value.length = 0;
+        //@ts-ignore
+        selectedPaths.value[0] = currentRightClickedItem.value.data
         switch(rightClickItemAction.value){
           case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
             showDeleteDialog.value = true;
