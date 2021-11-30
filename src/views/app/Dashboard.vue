@@ -13,8 +13,8 @@
 
 <script setup lang="ts">
     import Applayout from '@/layout/AppLayout.vue';
-    import CreatePost from '@/components/Dashboard/CreatePost.vue';
-    import Post from '@/components/Dashboard/Post.vue';
+    import CreatePost from '@/components/dashboard/CreatePost.vue';
+    import Post from '@/components/dashboard/Post.vue';
     import { onBeforeMount, ref } from 'vue';
     import { fetchPosts, posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
 

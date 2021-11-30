@@ -40,9 +40,9 @@ export enum Action {
     COPY,
 }
 
-export enum View {
-    LIST,
-    GRID,
+export enum ViewType {
+    LIST = "LIST",
+    GRID = "GRID",
 }
 
 export interface PathInfoModel extends Api.PathInfo {
@@ -75,7 +75,7 @@ export const chatFiles = ref<File[]>();
 export const allSharedContent = ref<SharedFileInterface[]>([]);
 export const chatsWithFiles = ref<Chat[]>();
 
-export const fileBrowserTypeView = ref<string>('LIST');
+export const fileBrowserTypeView = ref<ViewType>('LIST');
 export const accessDenied = ref(false);
 export const chatFilesBreadcrumbs = ref([])
 

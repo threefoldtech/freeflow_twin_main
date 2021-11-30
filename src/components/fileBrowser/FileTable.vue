@@ -13,7 +13,7 @@
                             </div>
                         </div>
                         <table
-                            v-if="fileBrowserTypeView === 'LIST'"
+                            v-if="fileBrowserTypeView === ViewType.LIST"
                             :key="currentDirectory"
                             class="min-w-full divide-y divide-gray-200 shadow"
                             @dragenter="onDragEnterParent"
@@ -115,112 +115,29 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-if="currentDirectoryContent.length === 0">
-                                    <td class="px-6 py-4 whitespace-nowrap">Empty directory</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                </tr>
-                                <!-- File Share Folder -->
-                                <tr v-if="currentDirectory === '/'">
-                                    <td class="px-6 py-4 whitespace-nowrap hidden"></td>
-                                    <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
-                                            </div>
-                                            <span class="hover:underline cursor-pointer">Shared with me </span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                </tr>
-                                <!-- Files received in chat -->
-                                <tr v-if="currentDirectory === '/'">
-                                    <td class="px-6 py-4 whitespace-nowrap hidden"></td>
-                                    <td class="px-6 py-4 whitespace-nowrap" @click="router.push({name: 'filesReceivedInChat'})">
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
-                                            </div>
-                                            <span class="hover:underline cursor-pointer">Files received in chat </span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                </tr>
-                                <tr v-if="currentDirectory === '/'">
-                                    <td class="px-6 py-4 whitespace-nowrap hidden"></td>
-                                    <td
-                                        class="px-6 py-4 whitespace-nowrap"
-                                        @click="router.push({name: 'filesSentInChat'})"
-                                    >
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
-                                            </div>
-                                            <span class="hover:underline cursor-pointer">Files sent in chat </span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                </tr>
-                                <tr
-                                    v-for="item in sortContent()"
-                                    :key="item.fullName"
-                                    :class="{
+                                <TableItemEmpty v-if="currentDirectoryContent.length === 0" />
+                                <TableItemPlaceholder v-if="currentDirectory === '/'" :action="() => goToShared()" :title="'Shared with me'"  />
+                                <TableItemPlaceholder v-if="currentDirectory === '/'" :action="() => router.push({name: 'filesReceivedInChat'})" :title="'Files received in chat'"  />
+                                <TableItemPlaceholder v-if="currentDirectory === '/'" :action="() => router.push({name: 'filesSentInChat'})" :title="'Files sent in chat'"  />
+                                <TableItem v-for="item in sortContent()"
+                                           :key="item.fullName"
+                                           :item="item"
+                                           :class="{
                                         'bg-gray-300': isSelected(item),
-                                    }"
-                                    class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                                    draggable="true"
-                                    @click="handleSelect(item)"
-                                    @dragover="event => onDragOver(event, item)"
-                                    @dragstart="event => onDragStart(event, item)"
-                                    @drop="() => onDrop(item)"
-                                >
-                                    <td class="px-6 py-4 whitespace-nowrap hidden">
-                                        <input
-                                            :checked="
-                                                selectedPaths.some(
-                                                    x =>
-                                                        x.fullName === item.fullName &&
-                                                        x.extension === item.extension &&
-                                                        x.path === item.path
-                                                )
-                                            "
-                                            class="h-auto w-auto"
-                                            type="checkbox"
-                                        />
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
-                                            </div>
-                                            <span class="hover:underline" @click.stop="handleItemClick(item)">
-                                                {{ item.name }}
-                                            </span>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ getFileExtension(item) }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ getFileSize(item) }}
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {{ getFileLastModified(item) }}
-                                    </td>
-                                </tr>
+                                          }"
+                                           class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
+                                           draggable="true"
+                                           @click="handleSelect(item)"
+                                           @dragover="event => onDragOver(event, item)"
+                                           @dragstart="event => onDragStart(event, item)"
+                                           @drop="() => onDrop(item)"
+                                />
                             </tbody>
                         </table>
                         <!-- GRID -->
                         <!-- Local filebrowser -->
                         <ul
-                            v-else
+                            v-if="fileBrowserTypeView === ViewType.GRID"
                             class="
                                 grid grid-cols-2
                                 gap-x-2 gap-y-4
@@ -233,209 +150,21 @@
                             "
                             role="list"
                         >
-                            <p
-                                v-if="sortContent().length === 0"
-                                class="
-                                    px-6
-                                    py-4
-                                    whitespace-nowrap
-                                    col-span-12
-                                    text-base
-                                    font-medium
-                                    text-center text-gray-800
-                                    flex
-                                    justify-center
-                                    flex-col
-                                "
-                            >
-                                No items in this folder
-                                <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
-                            </p>
-                            <li v-if="currentDirectory === '/'" title="Shared folder">
-                                <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
-                                    @click="goToShared()"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-2">
-                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
-                                        <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
-                                        >
-                                            Shared with me
-                                        </p>
-                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li v-if="currentDirectory === '/'" title="Shared folder">
-                                <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
-                                    @click="goToFilesInChat(true)"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-2">
-                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
-                                        <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
-                                        >
-                                            Files received in chat
-                                        </p>
-                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li v-if="currentDirectory === '/'" title="Shared folder">
-                                <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
-                                    @click="goToFilesInChat(false)"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-2">
-                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
-                                        <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
-                                        >
-                                            Files sent in chat
-                                        </p>
-                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li
-                                v-for="item in sortContent()"
-                                :key="item.fullName"
-                                :title="item.fullName"
-                                class="relative"
-                                draggable="true"
-                                @click="handleSelect(item)"
-                                @dblclick="handleItemClick(item)"
-                                @dragover="event => onDragOver(event, item)"
-                                @dragstart="event => onDragStart(event, item)"
-                                @drop="() => onDrop(item)"
-                            >
-                                <div
-                                    :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        rounded-lg
-                                        border-2
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-center
-                                        items-center
-                                    "
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-4">
-                                        <i
-                                            :key="item.name"
-                                            :class="getIcon(item) + ' ' + getIconColor(item)"
-                                            class="fa-lg"
-                                        ></i>
-                                        <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
-                                        >
-                                            {{ item.name
-                                            }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="hidden block text-sm font-medium text-gray-500 pointer-events-none">
-                                    {{ getFileLastModified(item) }}
-                                </p>
-                            </li>
+                          <GridItemEmpty v-if="sortContent().length === 0" />
+                          <GridItemPlaceholder v-if="currentDirectory === '/'" @click="goToShared()" :title="'Shared with me'" />
+                          <GridItemPlaceholder v-if="currentDirectory === '/'" @click="goToFilesInChat(true)" :title="'Files received in chat'" />
+                          <GridItemPlaceholder v-if="currentDirectory === '/'" @click="goToFilesInChat(false)" :title="'Files sent in chat'" />
+                          <GridItem v-for="item in sortContent()"
+                                    :key="item.fullName"
+                                    :item="item"
+                                    :title="item.fullName"
+                                    class="relative"
+                                    draggable="true"
+                                    @click="handleSelect(item)"
+                                    @dblclick="handleItemClick(item)"
+                                    @dragover="event => onDragOver(event, item)"
+                                    @dragstart="event => onDragStart(event, item)"
+                                    @drop="() => onDrop(item)" />
                         </ul>
                     </FileDropArea>
                 </div>
@@ -484,6 +213,14 @@
     import FileDropArea from '@/components/FileDropArea.vue';
     import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
+    import GridItem from '@/components/fileBrowser/Grid/GridItem.vue'
+    import GridItemPlaceholder from '@/components/fileBrowser/Grid/GridItemPlaceholder.vue'
+    import TableItemPlaceholder from '@/components/fileBrowser/Table/TableItemPlaceholder.vue'
+    import TableItemEmpty from '@/components/fileBrowser/Table/TableItemEmpty.vue'
+    import TableItem from '@/components/fileBrowser/Table/TableItem.vue'
+    import GridItemEmpty from '@/components/fileBrowser/Grid/GridItemEmpty.vue'
+    import {ViewType} from '@/store/fileBrowserStore';
+
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -558,9 +295,6 @@
         isDraggingFiles.value = false;
     };
 
-    const goBack = () => {
-        router.go(-1);
-    };
 </script>
 
 <style scoped>
