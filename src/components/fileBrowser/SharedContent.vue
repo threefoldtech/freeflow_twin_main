@@ -13,7 +13,7 @@
                     <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table
-                            v-if="fileBrowserTypeView === 'LIST'"
+                            v-if="fileBrowserTypeView === ViewType.LIST"
                             class="min-w-full divide-y divide-gray-200 shadow"
                             :key="currentDirectory"
                         >
@@ -58,6 +58,8 @@
                                     <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
                                     <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
+                                <SharedTableEmpty />
+
                                 <!-- CHAT FILES -->
                                 <tr
                                     v-if='isQuantumChatFiles'
@@ -190,7 +192,7 @@
                         <!-- SHARED -->
                         <ul
                             role="list"
-                            v-else
+                            v-if="fileBrowserTypeView === ViewType.GRID"
                             class="
                                 grid grid-cols-2
                                 gap-x-2 gap-y-4
@@ -435,14 +437,17 @@
         chatFilesReceived,
         goToFilesInChat,
         isQuantumChatFiles,
+        ViewType,
         chatFiles,
     } from '@/store/fileBrowserStore';
+
     import { SharedFileInterface } from '@/types';
     import { cloneVNode, defineComponent } from '@vue/runtime-core';
     import { onBeforeMount, watch, computed } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import Spinner from '@/components/Spinner.vue';
-    import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
+    import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue'
+    import SharedTableEmpty from '@/components/fileBrowser/Shared/SharedTableEmpty.vue'
 
     onBeforeMount(async () => {
         sharedBreadcrumbs.value = [];
