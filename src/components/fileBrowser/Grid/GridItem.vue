@@ -25,7 +25,11 @@
       <div class="flex justify-start items-center cursor-pointer px-4">
         <i
             :key="item.name"
-            :class="getIcon(item) + ' ' + getIconColor(item)"
+            :class="
+                                                getIconDirty(item.isFolder, getFileType(getExtension(item.name))) +
+                                                ' ' +
+                                                getIconColorDirty(item.isFolder, getFileType(getExtension(item.name)))
+                                            "
             class="fa-lg"
         ></i>
         <p
@@ -52,10 +56,10 @@
 
 <script setup lang="ts">
 import {
+  getExtension,
   getFileExtension,
-  getFileLastModified,
-  getIcon,
-  getIconColor,
+  getFileLastModified, getFileType,
+  getIconColorDirty, getIconDirty,
   PathInfoModel,
   selectedPaths
 } from "@/store/fileBrowserStore";
