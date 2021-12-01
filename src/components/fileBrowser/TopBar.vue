@@ -58,7 +58,7 @@
     import Dialog from '@/components/Dialog.vue';
     import MainActionButtons from '@/components/fileBrowser/MainActionButtons.vue';
     import Breadcrumbs from '@/components/fileBrowser/Breadcrumbs.vue';
-    import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
+    import SelectedOptions from '@/components/fileBrowser/OptionsSelectedItems.vue';
     import Button from '@/components/Button.vue';
     import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
     import { useSocketActions } from '@/store/socketStore';

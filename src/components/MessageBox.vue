@@ -65,7 +65,7 @@
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
     import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
-    import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
+    import SelectedOptions from '@/components/fileBrowser/OptionsSelectedItems.vue';
     import Dialog from '@/components/Dialog.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';

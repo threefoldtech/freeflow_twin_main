@@ -25,10 +25,6 @@
                 <span v-if="canWrite(data.data)">Write</span>
                 <span v-else>Read</span>
             </div>
-            <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
-                <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length <=1 }"> Read</span>
-                <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length > 1}"> Write</span>
-            </div> -->
         </template>
         <template #data-delete="data">
             <span class="my-1 p-2 rounded-md bg-red-500 text-white" @click="remove(data.row)"> Remove </span>
@@ -86,7 +82,7 @@
 
     const renderPermissionsData = async () => {
         currentShare.value = await getShareByPath(props.selectedFile.path);
-        currentShare.value.permissions = currentShare.value.permissions.map(item => {
+        currentShare.value.permissions = currentShare.value?.permissions?.map(item => {
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.chatId;
             });
