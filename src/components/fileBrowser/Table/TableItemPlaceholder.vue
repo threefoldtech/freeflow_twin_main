@@ -1,5 +1,5 @@
 <template>
-  <tr>
+  <tr class="cursor-pointer">
     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
     <td
         class="px-6 py-4 whitespace-nowrap"

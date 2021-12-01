@@ -125,7 +125,7 @@
                                            :class="{
                                         'bg-gray-300': isSelected(item),
                                           }"
-                                           class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
+                                           class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300 cursor-pointer"
                                            draggable="true"
                                            @click="handleSelect(item)"
                                            @dragover="event => onDragOver(event, item)"

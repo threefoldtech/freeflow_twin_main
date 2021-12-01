@@ -22,8 +22,8 @@
 <script setup lang="ts">
 import {selectedPaths, selectedTab} from "@/store/fileBrowserStore";
 import Dialog from '@/components/Dialog.vue';
-import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
-import EditShare from '@/components/fileBrowser/EditShare.vue';
+import ShareChatTable from '@/components/fileBrowser/OptionsSelectedItem/ShareChatTable.vue';
+import EditShare from '@/components/fileBrowser/OptionsSelectedItem/EditShare.vue';
 import {onBeforeMount} from "vue";
 import {usechatsActions, usechatsState} from "@/store/chatStore";
 

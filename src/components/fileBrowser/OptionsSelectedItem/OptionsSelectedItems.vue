@@ -74,38 +74,24 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import { ref } from 'vue';
     import {
         selectedPaths,
-        deleteFiles,
         downloadFiles,
         copyPasteSelected,
         copiedFiles,
         clearClipboard,
-        renameFile,
         searchDir,
         searchDirValue,
         searchResults,
-        isDraggingFiles,
-        moveFiles,
         selectedAction,
         Action,
-        addShare,
-        sharedDir,
         selectedTab,
     } from '@/store/fileBrowserStore';
-    import { usechatsActions, usechatsState } from '@/store/chatStore';
     import { showShareDialog } from '@/services/dialogService';
     import DeleteDialog from '@/components/fileBrowser/OptionsSelectedItem/DeleteDialog.vue'
     import RenameDialog from '@/components/fileBrowser/OptionsSelectedItem/RenameDialog.vue'
     import ShareDialog from '@/components/fileBrowser/OptionsSelectedItem/ShareDialog.vue'
-
-
-
-    const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
-
-    const tabs = ['Create shares', 'Edit shares'];
 
     let debounce;
     const showDeleteDialog = ref(false);
@@ -133,12 +119,6 @@
     const copyFiles = async () => {
         selectedAction.value = Action.COPY;
         await copyPasteSelected();
-    };
-
-    const resetShareDialog = () => {
-        showShareDialog.value = false;
-        selectedPaths.value = [];
-        selectedTab.value = 0;
     };
 </script>
 
