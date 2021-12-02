@@ -140,7 +140,7 @@
                         <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
                     </div>
 
-                    <p @click="showComingSoonToUhuru = true" class="text-gray-600 mr-0 ml-auto cursor-pointer">
+                    <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer">
                         {{ Math.abs(props.item.comments) }} Comments
                     </p>
                 </div>
@@ -153,7 +153,7 @@
                 :key="action.name"
                 @click="
                     () => {
-                        action.name === 'Comment' ? (showComingSoonToUhuru = true) : '';
+                        action.name === 'Comment' ? (showComments = !showComments) : '';
                         localLike = !localLike;
                     }
                 "
@@ -168,6 +168,7 @@
                 </p>
             </div>
         </div>
+      <div><CommentsContainer v-if="showComments" :comments="comments" /></div>
     </div>
 </template>
 
@@ -187,8 +188,10 @@
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
     import { ChevronDownIcon } from '@heroicons/vue/solid';
     import { showComingSoonToUhuru } from '@/services/dashboardService';
-
+    import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
     import MarkdownIt from 'markdown-it';
+
+    const showComments = ref<boolean>(false);
 
     const md = new MarkdownIt({
         html: true,
@@ -206,13 +209,16 @@
             content_html: string;
             url: string;
             title: string;
-            date_modified: date;
+            date_modified: Date;
             likes: number;
             comments: number;
             persons: string[];
             author: string;
         };
     }
+
+    const comments = [{name: 'Jonas Delrue', profile_image: 'https://images.unsplash.com/photo-1609349744982-0de6526d978b?ixid=MXwxMjA3fDB8MHx0b3BpYy1mZWVkfDU5fHRvd0paRnNrcEdnfHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60', message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!"},
+      {name: 'Laurens Van Aken', profile_image: 'https://images.unsplash.com/photo-1638214522452-a49ea98b4682?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1887&q=80', message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!"}]
 
     const props = defineProps<IProps>();
 
