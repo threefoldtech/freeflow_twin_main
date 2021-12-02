@@ -264,12 +264,12 @@
         initializeSocket(user.id.toString());
     })
 
-
     const allDirectories = computed(() => {
-      return currentDirectoryContent.value.filter(item => item.isDirectory)
+      return sortContent().filter(item => item.isDirectory)
+      //return currentDirectoryContent.value.filter(item => item.isDirectory)
     })
     const allFiles = computed(() => {
-      return currentDirectoryContent.value.filter(item => !item.isDirectory)
+      return sortContent().filter(item => !item.isDirectory)
     })
 
     const handleSelect = (item: PathInfoModel) => {

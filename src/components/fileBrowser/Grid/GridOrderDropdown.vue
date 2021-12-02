@@ -1,11 +1,12 @@
 <template>
   <div class="w-48 z-50">
+    {{selectedPerson}}
     <Listbox v-model="selectedPerson">
       <div class="relative mt-1">
         <ListboxButton
             class="relative w-full py-2 px-3 text-left focus:outline-none sm:text-sm cursor-pointer text-right"
         >
-          <span class="block truncate">{{ selectedPerson.name }}</span>
+          <span class="block truncate font-semibold">{{ selectedPerson.name }}</span>
         </ListboxButton>
         <transition
             leave-active-class="transition duration-100 ease-in"
@@ -16,10 +17,11 @@
               class="absolute w-full py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm text-right"
           >
             <ListboxOption
+                @click="() => order.action()"
                 v-slot="{ active, selected }"
-                v-for="person in order"
-                :key="person.name"
-                :value="person"
+                v-for="order in viewingOrders"
+                :key="order.name"
+                :value="order"
                 as="template"
             >
               <li
@@ -41,9 +43,8 @@
                     'block truncate',
                   ]"
                     class="mr-8"
-                >{{ person.name }}</span
+                >{{ order.name }}</span
                 >
-
               </li>
             </ListboxOption>
           </ListboxOptions>
@@ -54,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import {computed, onBeforeMount, ref, watch} from 'vue'
 import {
   Listbox,
   ListboxLabel,
@@ -63,13 +64,26 @@ import {
   ListboxOption,
 } from '@headlessui/vue'
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid'
+import {currentSort, currentSortDir, sortAction} from "@/store/fileBrowserStore";
 
 
-    const order = [
-      { name: 'Name' },
-      { name: 'Last updated' },
+    const viewingOrders = [
+      { name: 'Name', action: () => sortAction('name'), value: 'name' },
+      { name: 'Extension', action: () => sortAction('extension'), value: 'extension' },
+      { name: 'Size', action: () => sortAction('size'), value: 'size' },
+      { name: 'Last updated', action: () => sortAction('lastModified'), value: 'lastModified' },
     ]
-    const selectedPerson = ref(order[0])
 
+    const selectedPerson = ref(viewingOrders[0])
+      watch([currentSort, currentSortDir],() => {
+        selectListItem()
+      })
 
+      onBeforeMount(() => {
+        selectListItem()
+      })
+
+      const selectListItem = () => {
+        selectedPerson.value = viewingOrders.filter(order => order.value === currentSort.value)[0]
+      }
 </script>
