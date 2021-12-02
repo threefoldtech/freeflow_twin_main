@@ -173,7 +173,7 @@
 
 <script setup lang="ts">
     import moment from 'moment';
-    import { useSocketActions } from '@/store/socketStore';
+    import { state, useSocketActions } from '@/store/socketStore';
     import { defineComponent, ref, computed, onBeforeMount, inject } from 'vue';
     import { usechatsState, usechatsActions } from '@/store/chatStore';
     import { useAuthState, useAuthActions } from '@/store/authStore';
@@ -222,7 +222,8 @@
     });
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
+        // initializeSocket(user.id.toString());
+        if(!state.socket) initializeSocket(user.id.toString())
         retrievechats();
     });
 

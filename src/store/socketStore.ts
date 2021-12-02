@@ -7,7 +7,8 @@ import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { login } from '@/services/authService';
-const state = reactive<State>({
+import { io } from 'socket.io-client';
+export const state = reactive<State>({
     socket: '',
     notification: {
         id: '',
@@ -22,64 +23,105 @@ const notify = ({ id, sound = 'beep.mp3' }) => {
     };
 };
 
-const initializeSocket = (username: string) => {
-    state.socket = inject('socket');
 
-    state.socket.on('connect', () => {
-        console.log('connected with socket.');
-    });
-    state.socket.emit('identify', {
-        name: username,
-    });
-    state.socket.on('chat_removed', chatId => {
-        console.log('chat_removed');
-        removeChat(chatId);
-    });
-    state.socket.on('chat_blocked', chatId => {
-        addUserToBlockList(chatId);
-    });
-    state.socket.on('message', message => {
-        console.log("message in websocket client ", message)
-        const { user } = useAuthState();
-        if (message.type === 'FILE_SHARE_REQUEST') {
-            return;
-        }
-        if (message.type === 'READ') {
-            handleRead(message);
-            return;
-        }
-        if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
-            notify({ id: message.id });
-        }
-        const { addMessage } = usechatsActions();
+export let socket;
+export const initializeSocket = async (username: string) => {
+    // console.log(inject('socket'))
+    // socket = inject('socket');
 
-        addMessage(message.to === user.id ? message.from : message.to, message);
-    });
-    state.socket.on('connectionRequest', newContactRequest => {
-        const { addChat } = usechatsActions();
-        const { contacts } = useContactsState();
-        const { user } = useAuthState();
-        addChat(newContactRequest);
-    });
-    state.socket.on('chat_updated', chat => {
-        const { updateChat } = usechatsActions();
-        updateChat(chat);
-    });
-    state.socket.on('new_chat', chat => {
-        const { addChat } = usechatsActions();
-        addChat(chat);
-    });
-    state.socket.on('disconnect', () => {
-        createErrorNotification('Connection Lost', 'You appear to be having connection issues');
-    });
-    state.socket.on('shares_updated', share => {
-        //@todo implement this
-    });
-    state.socket.on('status', share => {
-        console.log("getting avatar")
-    });
+    // let p = new Promise((resolve, reject) => {
+    //     socket = inject('socket');
+    //     if (!socket) reject('Failed')
+    //     else resolve('succes')
+    // });
 
-};
+
+//  socket.on('connect', () =>{
+//         console.log("connected through promises")
+//     })
+
+
+
+
+       socket  = io("dr15.digitaltwin.jimbertesting.be", {
+            "debug": true,
+            "path": "/socket.io",
+            "hostname": "dr15.digitaltwin.jimbertesting.be",
+            "secure": true,
+            "port": "443"
+        });
+        // socket.connect();
+        // setTimeout(() => {
+            socket.on('connect', () =>{
+                console.log("connected through promises")
+            })
+            // , 10000
+        // })
+    
+
+        socket.on('connect', () =>{
+            console.log("connected with my new socket")
+
+        })
+
+
+
+        console.log("this state", state.socket, state)
+
+        socket.on('connect', () => {
+            console.log('connected with socket.');
+        });
+        socket.emit('identify', {
+            name: username,
+        });
+        socket.on('chat_removed', chatId => {
+            console.log('chat_removed');
+            removeChat(chatId);
+        });
+        socket.on('chat_blocked', chatId => {
+            addUserToBlockList(chatId);
+        });
+        socket.on('message', message => {
+            console.log("message in websocket client ", message)
+            const { user } = useAuthState();
+            if (message.type === 'FILE_SHARE_REQUEST') {
+                return;
+            }
+            if (message.type === 'READ') {
+                handleRead(message);
+                return;
+            }
+            if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
+                notify({ id: message.id });
+            }
+            const { addMessage } = usechatsActions();
+
+            addMessage(message.to === user.id ? message.from : message.to, message);
+        });
+        socket.on('connectionRequest', newContactRequest => {
+            const { addChat } = usechatsActions();
+            const { contacts } = useContactsState();
+            const { user } = useAuthState();
+            addChat(newContactRequest);
+        });
+        socket.on('chat_updated', chat => {
+            const { updateChat } = usechatsActions();
+            updateChat(chat);
+        });
+        socket.on('new_chat', chat => {
+            const { addChat } = usechatsActions();
+            addChat(chat);
+        });
+        socket.on('disconnect', () => {
+            createErrorNotification('Connection Lost', 'You appear to be having connection issues');
+        });
+        socket.on('shares_updated', share => {
+            //@todo implement this
+        });
+        socket.on('status', share => {
+            console.log("getting avatar")
+        });
+}
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
     const data = {
@@ -127,7 +169,7 @@ export const sendDraftMessage = async (message: MessageBodyType) => {
     // state.socket.emit('draft_message', function (response) {
     //     console.log(response);
     // });
-    state.socket.emit("get_avatar", { property: message }, function (data) {
+    socket.emit("draft_message", { property: message }, function (data) {
         console.log("data from backend", data)
         if (data.error)
             console.log('Something went wrong on the server');
@@ -153,3 +195,4 @@ interface State {
     socket: any;
     notification: object;
 }
+

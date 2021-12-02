@@ -482,7 +482,7 @@
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { useSocketActions } from '@/store/socketStore';
+    import { state, useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
@@ -494,7 +494,8 @@
     const { user } = useAuthState();
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
+        // initializeSocket(user.id.toString());
+            if(!state.socket) initializeSocket(user.id.toString())
     });
 
     const handleSelect = (item: PathInfoModel) => {

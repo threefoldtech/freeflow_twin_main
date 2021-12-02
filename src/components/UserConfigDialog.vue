@@ -191,7 +191,7 @@
 
 <script setup lang="ts">
     import { computed, defineComponent, onBeforeMount, onMounted, ref, watch, watchEffect } from 'vue';
-    import { useAuthState, getMyStatus } from '../store/authStore';
+    import { useAuthState, getMyStatus, sendGetMyStatus, myAccountStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -208,6 +208,7 @@
     const emit = defineEmits(['addUser']);
 
     initBlocklist();
+    sendGetMyStatus();
 
     const { user } = useAuthState();
     const showEditPic = ref(false);
@@ -217,7 +218,7 @@
     const isEditingStatus = ref(false);
     const router = useRouter();
     const route = useRoute();
-    const myStatus = await getMyStatus();
+    const myStatus = myAccountStatus;
     const cropper = ref(null);
     const isHoveringAvatar = ref(false);
     const showEditAvatar = ref(false);
