@@ -1,13 +1,13 @@
 <template>
   <li  title="Shared folder">
     <div
-        class="
+        class="bg-white
                                         group
                                         w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
+                                        aspect-w-16 aspect-h-3
+                                        rounded
+                                        border
+                                        border-gray-200
                                         hover:bg-gray-200
                                         transition
                                         duration:200
@@ -17,11 +17,11 @@
                                         focus-within:ring-indigo-500
                                         overflow-hidden
                                         flex
-                                        justify-start
+                                        justify-center
                                         items-center
                                     "
     >
-      <div class="flex justify-start items-center cursor-pointer px-2">
+      <div class="flex justify-start items-center cursor-pointer px-4">
         <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
         <p
             class="

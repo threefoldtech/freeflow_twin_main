@@ -7,6 +7,9 @@ module.exports = {
     darkMode: false, // or 'media' or 'class'
     theme: {
         extend: {
+            gridTemplateColumns: {
+                'filebrowser': 'repeat(auto-fill, minmax(220px, 1fr))',
+            },
             colors: {
                 accent: {
                     50: '#f8fafb',

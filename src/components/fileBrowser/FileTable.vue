@@ -5,7 +5,7 @@
                 <div class="flex justify-end mb-2">
                     <ViewSelect />
                 </div>
-                <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <div class="overflow-hidden sm:rounded-lg">
                     <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
                             <div ref="ghostImage" class="bg-white p-2">
@@ -136,25 +136,25 @@
                         </table>
                         <!-- GRID -->
                         <!-- Local filebrowser -->
+                      <div  v-if="fileBrowserTypeView === ViewType.GRID">
+                        <div class="flex items-center justify-between  text-gray-700 my-4 md:my-6">
+                          <p class="font-semibold">Directories</p>
+                          <div @click="sortAction('name')" class="flex items-center cursor-pointer"><p class="mr-1 font-medium">Name</p><div class="hover:bg-gray-300 transition duration-100 rounded-full p-1 ml-2"><ArrowSmDownIcon :class="{ 'rotate-180': 'asc' === currentSortDir, 'rotate-0': 'desc' === currentSortDir }" class="w-6 h-6" /></div></div>
+                        </div>
+                        <div class="grid grid-cols-filebrowser"></div>
                         <ul
                             v-if="fileBrowserTypeView === ViewType.GRID"
                             class="
-                                grid grid-cols-2
-                                gap-x-2 gap-y-4
-                                sm:grid-cols-4 sm:gap-x-4
-                                lg:grid-cols-6
-                                xl:grid-cols-8
-                                2xl:grid-cols-10
-                                xl:gap-x-6
-                                mt-4
-                            "
+                                grid grid-cols-filebrowser
+                                gap-4
+                                                       "
                             role="list"
                         >
                           <GridItemEmpty v-if="sortContent().length === 0" />
                           <GridItemPlaceholder v-if="currentDirectory === '/'" @click="goToShared()" :title="'Shared with me'" />
                           <GridItemPlaceholder v-if="currentDirectory === '/'" @click="goToFilesInChat(true)" :title="'Files received in chat'" />
                           <GridItemPlaceholder v-if="currentDirectory === '/'" @click="goToFilesInChat(false)" :title="'Files sent in chat'" />
-                          <GridItem v-for="item in sortContent()"
+                          <GridItem v-for="item in allDirectories"
                                     :key="item.fullName"
                                     :item="item"
                                     :title="item.fullName"
@@ -166,6 +166,28 @@
                                     @dragstart="event => onDragStart(event, item)"
                                     @drop="() => onDrop(item)" />
                         </ul>
+                      <p class="font-semibold text-gray-700 my-4 md:my-6">Files</p>
+                        <ul
+                            v-if="fileBrowserTypeView === ViewType.GRID"
+                            class="
+                                grid grid-cols-filebrowser
+                                gap-4
+                                                        "
+                            role="list"
+                        >
+                          <GridItem v-for="item in allFiles"
+                                    :key="item.fullName"
+                                    :item="item"
+                                    :title="item.fullName"
+                                    class="relative"
+                                    draggable="true"
+                                    @click="handleSelect(item)"
+                                    @dblclick="handleItemClick(item)"
+                                    @dragover="event => onDragOver(event, item)"
+                                    @dragstart="event => onDragStart(event, item)"
+                                    @drop="() => onDrop(item)" />
+                        </ul>
+                      </div>
                     </FileDropArea>
                 </div>
             </div>
@@ -176,6 +198,7 @@
 <script lang="ts" setup>
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
     import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+    import {ArrowSmDownIcon} from "@heroicons/vue/solid";
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -232,7 +255,15 @@
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
-    });
+    })
+
+
+    const allDirectories = computed(() => {
+      return currentDirectoryContent.value.filter(item => item.isDirectory)
+    })
+    const allFiles = computed(() => {
+      return currentDirectoryContent.value.filter(item => !item.isDirectory)
+    })
 
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) selectItem(item);

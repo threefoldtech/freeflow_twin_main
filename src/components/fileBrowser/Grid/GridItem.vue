@@ -6,9 +6,10 @@
         class="
                                         group
                                         w-full
-                                        aspect-w-12 aspect-h-4
-                                        rounded-lg
-                                        border-2
+                                        aspect-w-16 aspect-h-3
+                                        rounded
+                                        border
+                                        border-gray-200
                                         hover:bg-gray-200
                                         transition
                                         duration:200

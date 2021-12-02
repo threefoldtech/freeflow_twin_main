@@ -3,7 +3,6 @@
         <h1 v-if='!isQuantumChatFiles' class="p-2">
             Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>
         </h1>
-
         <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
             <Spinner :xlarge="true" />
         </div>
@@ -63,9 +62,6 @@
                                                  :item="item"/>
                             </tbody>
                         </table>
-                        <!-- GRID -->
-
-                        <!-- SHARED -->
                         <ul
                             role="list"
                             v-if="fileBrowserTypeView === ViewType.GRID"
