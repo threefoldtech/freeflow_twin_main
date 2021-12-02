@@ -66,17 +66,10 @@
                             role="list"
                             v-if="fileBrowserTypeView === ViewType.GRID"
                             class="
-                                grid grid-cols-2
-                                gap-x-2 gap-y-4
-                                sm:grid-cols-4 sm:gap-x-4
-                                lg:grid-cols-6
-                                xl:grid-cols-8
-                                2xl:grid-cols-10
-                                xl:gap-x-6
-                                mt-4
+                                grid grid-cols-filebrowser
+                                gap-4
                             "
                         >
-
                           <GridItemEmpty  v-if="chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles" title="Nothing has been shared with you yet!" />
                           <GridItemEmpty  v-if="chatsWithFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatsWithFiles && !$route.meta.chatFilesNested" title="Nothing has been shared with you yet!" />
                           <GridItem v-for="item in sharedContent" :key="item.name" :title="item.name" :item="item"   class="relative" @click="goTo(item)" />

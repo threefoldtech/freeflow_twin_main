@@ -5,9 +5,8 @@
                 <div
                     class="h-20 w-20 rounded-full grid place-items-center mb-1"
                     style="position: relative"
-                    @click="changePage('chat')"
+                    @click="router.push({name: 'whisper'})"
                 >
-                    <!--                    <img alt="Threefold logo" src="../../public/Symbol_secundary_color.png" width="65" />-->
                     <svg class="w-12 mt-6" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient
@@ -44,7 +43,7 @@
                 :key="app.name"
                 :class="{
                     'cursor-pointer transition duration-300 hover:bg-primarylight rounded-xl': app.enabled,
-                    'bg-primarylight rounded-xl': app?.enabled && router.currentRoute?.value.meta.app === app.name,
+                    'bg-primarylight rounded-xl': app?.enabled && router.currentRoute?.value.meta.app === app.value,
                     'text-gray-500': !app?.enabled,
                 }"
                 class="mb-4 grid"
@@ -52,9 +51,10 @@
                 <div
                     class="h-20 w-20 rounded-full grid place-items-center mb-1"
                     style="position: relative"
-                    @click="changePage(app.name)"
+                    @click="router.push({name: app.value})"
                 >
-                    <img alt="icon of navigation item" :src="app.icon" width="66" />
+                    <img alt="icon of navigation item" :src="`/icons${app.icon}`" height="30" />
+                  <p class="uppercase text-white mt-1 text-xs font-normal">{{app.name}}</p>
                 </div>
             </div>
             <div class="flex-grow"></div>
@@ -79,19 +79,22 @@
 
     const apps: Array<AppItemType> = [
         {
-            name: AppType.Dashboard,
+            value: AppType.Dashboard,
             icon: '/flow.svg',
             enabled: true,
+            name: 'Flow'
         },
         {
-            name: AppType.Whisper,
+            value: AppType.Whisper,
             icon: '/whisper.svg',
             enabled: true,
+            name: "Whisper"
         },
         {
-            name: AppType.Quantum,
+            value: AppType.Quantum,
             icon: '/quantum.svg',
             enabled: true,
+            name: 'Quantum'
         },
         // {
         //     name: AppType.Forum,
@@ -99,14 +102,16 @@
         //     enabled: true,
         // },
         {
-            name: AppType.Glass,
+            value: AppType.Glass,
             icon: '/glass.svg',
             enabled: true,
+            name: 'Glass'
         },
         {
-            name: AppType.Kutana,
+            value: AppType.Kutana,
             icon: '/kutana.svg',
             enabled: true,
+            name: 'Kutana'
         },
         // {
         //     name: AppType.Meetings,

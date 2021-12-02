@@ -9,7 +9,8 @@ export enum AppType {
 }
 
 export interface AppItemType {
-    name: AppType;
+    name: AppType | string;
     icon: string;
     enabled: boolean;
+    value: AppType;
 }
