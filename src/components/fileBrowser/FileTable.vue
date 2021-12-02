@@ -141,13 +141,10 @@
                           <p class="font-semibold">Directories</p>
                           <div  class="flex items-center cursor-pointer">
                             <p class="hidden mr-1 font-medium">Name</p>
-                            <GridOrderDropdown />
-
-                            <div @click="sortAction('name')" class="hover:bg-gray-300 transition duration-100 rounded-full p-1 ml-2"><ArrowSmDownIcon :class="{ 'rotate-180': 'asc' === currentSortDir, 'rotate-0': 'desc' === currentSortDir }" class="w-6 h-6" /></div>
-
+                            <GridOrderDropdown :selectedOrder="selectedOrder" :viewingOrders="viewingOrders" />
+                            <div @click="sortAction(selectedOrder.value)" class="hover:bg-gray-300 transition duration-100 rounded-full p-1 ml-2"><ArrowSmDownIcon :class="{ 'rotate-180': 'asc' === currentSortDir, 'rotate-0': 'desc' === currentSortDir }" class="w-6 h-6" /></div>
                           </div>
                         </div>
-                        <div class="grid grid-cols-filebrowser"></div>
                         <ul
                             v-if="fileBrowserTypeView === ViewType.GRID"
                             class="
@@ -202,7 +199,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import {computed, defineComponent, onBeforeMount, ref, watch} from 'vue';
     import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {ArrowSmDownIcon} from "@heroicons/vue/solid";
     import {
@@ -263,6 +260,27 @@
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
     })
+
+    const viewingOrders = [
+      { name: 'Name', action: () => sortAction('name'), value: 'name' },
+      { name: 'Extension', action: () => sortAction('extension'), value: 'extension' },
+      { name: 'Size', action: () => sortAction('size'), value: 'size' },
+      { name: 'Last updated', action: () => sortAction('lastModified'), value: 'lastModified' },
+    ]
+
+    const selectedOrder = ref(viewingOrders[0])
+
+    watch([currentSort, currentSortDir],() => {
+      selectListItem()
+    })
+
+    onBeforeMount(() => {
+      selectListItem()
+    })
+
+    const selectListItem = () => {
+      selectedOrder.value = viewingOrders.filter(order => order.value === currentSort.value)[0]
+    }
 
     const allDirectories = computed(() => {
       return sortContent().filter(item => item.isDirectory)

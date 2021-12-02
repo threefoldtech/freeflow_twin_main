@@ -1,12 +1,11 @@
 <template>
   <div class="w-48 z-50">
-    {{selectedPerson}}
-    <Listbox v-model="selectedPerson">
+    <Listbox v-model="selectedOrder">
       <div class="relative mt-1">
         <ListboxButton
             class="relative w-full py-2 px-3 text-left focus:outline-none sm:text-sm cursor-pointer text-right"
         >
-          <span class="block truncate font-semibold">{{ selectedPerson.name }}</span>
+          <span class="block truncate font-semibold">{{ selectedOrder.name }}</span>
         </ListboxButton>
         <transition
             leave-active-class="transition duration-100 ease-in"
@@ -64,17 +63,25 @@ import {
   ListboxOption,
 } from '@headlessui/vue'
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid'
-import {currentSort, currentSortDir, sortAction} from "@/store/fileBrowserStore";
+import {currentSort, currentSortDir, sortAction, ViewOrder, IViewOrder} from "@/store/fileBrowserStore";
 
 
-    const viewingOrders = [
+interface IProps{
+  viewingOrders: IViewOrder[];
+  selectedOrder : IViewOrder;
+}
+
+const props = defineProps<IProps>()
+
+
+   /* const viewingOrders = [
       { name: 'Name', action: () => sortAction('name'), value: 'name' },
       { name: 'Extension', action: () => sortAction('extension'), value: 'extension' },
       { name: 'Size', action: () => sortAction('size'), value: 'size' },
       { name: 'Last updated', action: () => sortAction('lastModified'), value: 'lastModified' },
-    ]
+    ]*/
 
-    const selectedPerson = ref(viewingOrders[0])
+  /*  const selectedPerson = ref(viewingOrders[0])
       watch([currentSort, currentSortDir],() => {
         selectListItem()
       })
@@ -85,5 +92,5 @@ import {currentSort, currentSortDir, sortAction} from "@/store/fileBrowserStore"
 
       const selectListItem = () => {
         selectedPerson.value = viewingOrders.filter(order => order.value === currentSort.value)[0]
-      }
+      }*/
 </script>

@@ -40,6 +40,14 @@ export enum Action {
     COPY,
 }
 
+export enum ViewOrder {
+    NAME = "name",
+    EXTENSION = "extension",
+    SIZE = "size",
+    LAST_UPDATED = "lastUpdated"
+
+}
+
 export enum ViewType {
     LIST = "LIST",
     GRID = "GRID",
@@ -55,6 +63,12 @@ export interface FullPathInfoModel extends Api.EditPathInfo {
 
 export interface ShareContent extends PathInfoModel {
     // share:
+}
+
+export interface IViewOrder {
+    name: string;
+    action: Function;
+    value: string;
 }
 
 export const rootDirectory = '/';
