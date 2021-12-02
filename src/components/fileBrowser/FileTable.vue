@@ -139,7 +139,13 @@
                       <div  v-if="fileBrowserTypeView === ViewType.GRID">
                         <div class="flex items-center justify-between  text-gray-700 my-4 md:my-6">
                           <p class="font-semibold">Directories</p>
-                          <div @click="sortAction('name')" class="flex items-center cursor-pointer"><p class="mr-1 font-medium">Name</p><div class="hover:bg-gray-300 transition duration-100 rounded-full p-1 ml-2"><ArrowSmDownIcon :class="{ 'rotate-180': 'asc' === currentSortDir, 'rotate-0': 'desc' === currentSortDir }" class="w-6 h-6" /></div></div>
+                          <div  class="flex items-center cursor-pointer">
+                            <p class="hidden mr-1 font-medium">Name</p>
+                            <GridOrderDropdown />
+
+                            <div @click="sortAction('name')" class="hover:bg-gray-300 transition duration-100 rounded-full p-1 ml-2"><ArrowSmDownIcon :class="{ 'rotate-180': 'asc' === currentSortDir, 'rotate-0': 'desc' === currentSortDir }" class="w-6 h-6" /></div>
+
+                          </div>
                         </div>
                         <div class="grid grid-cols-filebrowser"></div>
                         <ul
@@ -243,6 +249,7 @@
     import TableItem from '@/components/fileBrowser/Table/TableItem.vue'
     import GridItemEmpty from '@/components/fileBrowser/Grid/GridItemEmpty.vue'
     import {ViewType} from '@/store/fileBrowserStore';
+    import GridOrderDropdown from "@/components/fileBrowser/Grid/GridOrderDropdown.vue"
 
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
