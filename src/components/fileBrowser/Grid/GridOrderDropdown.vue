@@ -73,24 +73,4 @@ interface IProps{
 
 const props = defineProps<IProps>()
 
-
-   /* const viewingOrders = [
-      { name: 'Name', action: () => sortAction('name'), value: 'name' },
-      { name: 'Extension', action: () => sortAction('extension'), value: 'extension' },
-      { name: 'Size', action: () => sortAction('size'), value: 'size' },
-      { name: 'Last updated', action: () => sortAction('lastModified'), value: 'lastModified' },
-    ]*/
-
-  /*  const selectedPerson = ref(viewingOrders[0])
-      watch([currentSort, currentSortDir],() => {
-        selectListItem()
-      })
-
-      onBeforeMount(() => {
-        selectListItem()
-      })
-
-      const selectListItem = () => {
-        selectedPerson.value = viewingOrders.filter(order => order.value === currentSort.value)[0]
-      }*/
 </script>

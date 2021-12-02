@@ -68,7 +68,7 @@ export interface ShareContent extends PathInfoModel {
 export interface IViewOrder {
     name: string;
     action: Function;
-    value: string;
+    value: ViewOrder;
 }
 
 export const rootDirectory = '/';

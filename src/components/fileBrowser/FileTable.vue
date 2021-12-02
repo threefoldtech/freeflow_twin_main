@@ -245,7 +245,7 @@ import {computed, defineComponent, onBeforeMount, ref, watch} from 'vue';
     import TableItemEmpty from '@/components/fileBrowser/Table/TableItemEmpty.vue'
     import TableItem from '@/components/fileBrowser/Table/TableItem.vue'
     import GridItemEmpty from '@/components/fileBrowser/Grid/GridItemEmpty.vue'
-    import {ViewType} from '@/store/fileBrowserStore';
+    import {ViewType, ViewOrder} from '@/store/fileBrowserStore';
     import GridOrderDropdown from "@/components/fileBrowser/Grid/GridOrderDropdown.vue"
 
 
@@ -262,10 +262,10 @@ import {computed, defineComponent, onBeforeMount, ref, watch} from 'vue';
     })
 
     const viewingOrders = [
-      { name: 'Name', action: () => sortAction('name'), value: 'name' },
-      { name: 'Extension', action: () => sortAction('extension'), value: 'extension' },
-      { name: 'Size', action: () => sortAction('size'), value: 'size' },
-      { name: 'Last updated', action: () => sortAction('lastModified'), value: 'lastModified' },
+      { name: 'Name', action: () => sortAction(ViewOrder.NAME), value: ViewOrder.NAME },
+      { name: 'Extension', action: () => sortAction(ViewOrder.EXTENSION), value: ViewOrder.EXTENSION },
+      { name: 'Size', action: () => sortAction(ViewOrder.SIZE), value: ViewOrder.SIZE },
+      { name: 'Last updated', action: () => sortAction(ViewOrder.LAST_UPDATED), value: ViewOrder.LAST_UPDATED },
     ]
 
     const selectedOrder = ref(viewingOrders[0])
