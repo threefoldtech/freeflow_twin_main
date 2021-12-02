@@ -53,7 +53,7 @@
                     style="position: relative"
                     @click="router.push({name: app.value})"
                 >
-                    <img alt="icon of navigation item" :src="`/icons${app.icon}`" height="30" />
+                  <img alt="icon of navigation item" :src="`/icons${app.icon}`" height="30" />
                   <p class="uppercase text-white mt-1 text-xs font-normal">{{app.name}}</p>
                 </div>
             </div>
