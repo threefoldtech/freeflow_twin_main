@@ -48,7 +48,6 @@
         </div>
       </a>
     </div>
-
   </div>
   <ReplyComment v-for="(reply, idx) in comment.replies" :comment="reply" />
   <form @submit.prevent="handleReplyForm" v-if="showReplyInput" class="relative flex items-center pl-20 flex-start w-full">
@@ -65,7 +64,7 @@ import moment from "moment";
 import {ThumbUpIcon} from "@heroicons/vue/solid";
 
 
-const openPanel = ref<boolean>(true);
+const openPanel = ref<boolean>(false);
 const showComments = ref<boolean>(false);
 const props = defineProps<{comment: object}>()
 const showReplyInput = ref<boolean>(false);
