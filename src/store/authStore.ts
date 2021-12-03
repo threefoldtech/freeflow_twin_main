@@ -1,23 +1,11 @@
+import { useSocket } from '@/plugins/SocketIo';
 import { reactive } from '@vue/reactivity';
 import axios from 'axios';
 import { Socket } from 'socket.io-client';
-import { inject, ref } from 'vue';
+import { ref } from 'vue';
 import { User } from '../types';
 import { sendMessageObject } from './chatStore';
-import { socket, state, useSocketActions } from './socketStore';
-
-
-
-
-export const getMyStatus = async () => {
-    const res = await axios.get(`${window.location.origin}/api/user/getStatus`);
-    // sendGetMyStatus();
-    console.log('shodul be result', res.data.status)
-    return res.data.status;
-};
-
-
-
+import { initializeSocket, socket, state, useSocketActions } from './socketStore';
 
 
 const authState = reactive<AuthState>({
@@ -35,9 +23,22 @@ const authState = reactive<AuthState>({
 export const loginName = window.location.host.split('.')[0];
 
 export const myYggdrasilAddress = async () => {
+    sendMyYggdrasilAddress()
     const res = await axios.get(`${window.location.origin}/api/yggdrasil_address`);
     return res.data;
 };
+
+export const sendMyYggdrasilAddress = () => {
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+    socket.emit("my_yggdrasil_address", {}, function (data) {
+        if (data.error)
+            throw new Error('my_yggdrasil_address Failed in backend', data.error)
+        console.log('yggdrasil data', data)
+
+    });
+}
 
 export const useAuthState = () => {
     return {
@@ -54,23 +55,19 @@ interface AuthState {
 }
 
 
+
+
 export const myAccountStatus = ref('')
 const { user } = useAuthState();
+
+
 export const sendGetMyStatus = async () => {
-
-
-
-    const { initializeSocket } = useSocketActions();
-    if (!socket) initializeSocket(user.id.toString())
-
-
-    console.log("send get my status -------------", state.socket)
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
     socket.emit("get_my_status", {}, function (data) {
         if (data.error)
-            console.log('Something went wrong on the server');
-
-        if (data.ok)
-            console.log('Event was processed successfully');
+            throw new Error('get_my_status Failed in backend', data.error)
         myAccountStatus.value = data.data.status;
 
     });

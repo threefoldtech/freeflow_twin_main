@@ -10,44 +10,39 @@ import MessageContent from '@/components/MessageContent.vue';
 import { clickOutside } from '@/plugins/ClickOutside';
 import axios from 'axios';
 
-// console.log(Socketio)
-// const a = Socketio.install
+const init = async () => {
+    const app = createApp(App)
+        .directive('click-outside', clickOutside)
+        .use(router)
 
-const app = createApp(App)
-    .directive('click-outside', clickOutside)
-    .use(router)
-    .use(socketIo, {
-        connection: config.baseUrl,
-        options: {
-            debug: true,
+    // this fixes some issues with rendering inside of QouteContent n
+    app.component('MessageContent', MessageContent);
+
+    app.directive('focus', {
+        // When the bound element is mounted into the DOM...
+        mounted(el) {
+            // Focus the element
+            el.focus();
         },
-        transports: ['websocket'],
     });
 
-// this fixes some issues with rendering inside of QouteContent n
-app.component('MessageContent', MessageContent);
+    axios.interceptors.response.use(
+        function (response) {
+            // Any status code that lie within the range of 2xx cause this function to trigger
+            // Do something with response data
 
-app.directive('focus', {
-    // When the bound element is mounted into the DOM...
-    mounted(el) {
-        // Focus the element
-        el.focus();
-    },
-});
+            return response;
+        },
+        function (error) {
+            // Any status codes that falls outside the range of 2xx cause this function to trigger
+            // Do something with response error
+            return Promise.reject(error);
+        }
+    );
 
-axios.interceptors.response.use(
-    function (response) {
-        // Any status code that lie within the range of 2xx cause this function to trigger
-        // Do something with response data
+    app.mount('#app')
 
-        return response;
-    },
-    function (error) {
-        // Any status codes that falls outside the range of 2xx cause this function to trigger
-        // Do something with response error
-        return Promise.reject(error);
-    }
-);
+}
 
-app.mount('#app');
-export default app;
+
+init();
