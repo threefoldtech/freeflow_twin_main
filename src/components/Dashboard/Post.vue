@@ -1,25 +1,25 @@
 <template>
-    <div class="bg-white my-5 rounded">
-        <div class="p-6">
+  <div class="bg-white my-5 rounded">
+    <div class="p-6">
+      <div>
+        <div class="relative">
+          <div class="flex items-center">
+            <div class="relative mr-4">
+              <!--<AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>-->
+              <img src="/threefold_logo.png" class="w-12 h-12"/>
+            </div>
             <div>
-                <div class="relative">
-                    <div class="flex items-center">
-                        <div class="relative mr-4">
-                            <!--<AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>-->
-                            <img src="/threefold_logo.png" class="w-12 h-12" />
-                        </div>
-                        <div>
-                            <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
-                                Threefold
-                            </p>
-                            <p class="text-xs text-gray-400">{{ timeAgo(props.item.date_modified) }}</p>
-                        </div>
-                    </div>
-                    <div class="group absolute right-0 top-0">
-                        <Popover v-slot="{ open }" class="relative">
-                            <PopoverButton
-                                :class="open ? '' : 'text-opacity-90'"
-                                class="
+              <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
+                Threefold
+              </p>
+              <p class="text-xs text-gray-400">{{ timeAgo(props.item.date_modified) }}</p>
+            </div>
+          </div>
+          <div class="group absolute right-0 top-0">
+            <Popover v-slot="{ open }" class="relative">
+              <PopoverButton
+                  :class="open ? '' : 'text-opacity-90'"
+                  class="
                                     items-center
                                     text-base
                                     font-medium
@@ -31,13 +31,13 @@
                                     focus:outline-none
                                     focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75
                                 "
-                            >
-                                <DotsVerticalIcon
-                                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
-                                />
-                                <ChevronDownIcon
-                                    :class="open ? '' : 'text-opacity-70'"
-                                    class="
+              >
+                <DotsVerticalIcon
+                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
+                />
+                <ChevronDownIcon
+                    :class="open ? '' : 'text-opacity-70'"
+                    class="
                                         w-5
                                         h-5
                                         ml-2
@@ -47,20 +47,20 @@
                                         ease-in-out
                                         group-hover:text-opacity-80
                                     "
-                                    aria-hidden="true"
-                                />
-                            </PopoverButton>
+                    aria-hidden="true"
+                />
+              </PopoverButton>
 
-                            <transition
-                                enter-active-class="transition duration-200 ease-out"
-                                enter-from-class="translate-y-1 opacity-0"
-                                enter-to-class="translate-y-0 opacity-100"
-                                leave-active-class="transition duration-150 ease-in"
-                                leave-from-class="translate-y-0 opacity-100"
-                                leave-to-class="translate-y-1 opacity-0"
-                            >
-                                <PopoverPanel
-                                    class="
+              <transition
+                  enter-active-class="transition duration-200 ease-out"
+                  enter-from-class="translate-y-1 opacity-0"
+                  enter-to-class="translate-y-0 opacity-100"
+                  leave-active-class="transition duration-150 ease-in"
+                  leave-from-class="translate-y-0 opacity-100"
+                  leave-to-class="translate-y-1 opacity-0"
+              >
+                <PopoverPanel
+                    class="
                                         absolute
                                         z-10
                                         w-screen
@@ -72,15 +72,15 @@
                                         sm:px-0
                                         lg:max-w-3xl
                                     "
-                                >
-                                    <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div class="relative grid gap-8 bg-white p-6">
-                                            <a
-                                                v-for="item in solutions"
-                                                :key="item.name"
-                                                :href="item.href"
-                                                @click="showComingSoonToUhuru = true"
-                                                class="
+                >
+                  <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div class="relative grid gap-8 bg-white p-6">
+                      <a
+                          v-for="item in solutions"
+                          :key="item.name"
+                          :href="item.href"
+                          @click="showComingSoonToUhuru = true"
+                          class="
                                                     items-center
                                                     p-2
                                                     -m-3
@@ -94,165 +94,234 @@
                                                     focus-visible:ring-orange-500
                                                     focus-visible:ring-opacity-50
                                                 "
-                                            >
-                                                <div class="">
-                                                    <p class="text-sm font-medium text-gray-900">
-                                                        {{ item.name }}
-                                                    </p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </PopoverPanel>
-                            </transition>
-                        </Popover>
+                      >
+                        <div class="">
+                          <p class="text-sm font-medium text-gray-900">
+                            {{ item.name }}
+                          </p>
+                        </div>
+                      </a>
                     </div>
-                </div>
-            </div>
-            <div class="mt-4 text-gray-600">
-                <p class="mb-8" v-html="renderMarkdown(item.content_html)"></p>
-            </div>
-            <div>
-                <div class="flex items-center w-full">
-                    <div class="flex -space-x-2 overflow-hidden">
-                        <img
-                            class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                            src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt=""
-                        />
-                        <img
-                            class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                            src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt=""
-                        />
-                        <img
-                            class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-                            alt=""
-                        />
-                    </div>
-                    <div class="ml-4">
-                        <p class="font-medium text-primary flex">
+                  </div>
+                </PopoverPanel>
+              </transition>
+            </Popover>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 text-gray-600">
+        <p class="mb-8" v-html="renderMarkdown(item.content_html)"></p>
+      </div>
+      <div>
+        <div class="flex items-center w-full">
+          <div class="flex -space-x-2 overflow-hidden">
+            <img
+                class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt=""
+            />
+            <img
+                class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt=""
+            />
+            <img
+                class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
+                alt=""
+            />
+          </div>
+          <div class="ml-4">
+            <p class="font-medium text-primary flex">
                             <span v-for="(name, idx) in props.item.persons" :key="name">
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
-                        </p>
-                        <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
-                    </div>
+            </p>
+            <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
+          </div>
 
-                    <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer">
-                        {{ Math.abs(props.item.comments) }} Comments
-                    </p>
-                </div>
-            </div>
+          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer">
+            {{ Math.abs(props.item.comments) }} Comments
+          </p>
         </div>
-        <div class="border-t-2 flex space-x-8 p-4">
-            <div
-                class="flex items-center cursor-pointer"
-                v-for="action in actions"
-                :key="action.name"
-                @click="
+      </div>
+    </div>
+    <div class="border-t-2 flex space-x-8 p-4">
+      <div
+          class="flex items-center cursor-pointer"
+          v-for="action in actions"
+          :key="action.name"
+          @click="
                     () => {
                         action.name === 'Comment' ? (showComments = !showComments) : '';
                         localLike = !localLike;
                     }
                 "
-            >
-                <component
-                    :is="localLike ? action.active : action.component"
-                    class="w-6 text-gray-500 mr-3"
-                    :class="{ 'text-red-500': localLike && action.name === 'Like' }"
-                />
-                <p class="text-gray-500">
-                    {{ localLike ? (action.active_text ? action?.active_text : action.name) : action.name }}
-                </p>
-            </div>
-        </div>
-      <div><CommentsContainer v-if="showComments" :comments="comments" /></div>
+      >
+        <component
+            :is="localLike ? action.active : action.component"
+            class="w-6 text-gray-500 mr-3"
+            :class="{ 'text-red-500': localLike && action.name === 'Like' }"
+        />
+        <p class="text-gray-500">
+          {{ localLike ? (action.active_text ? action?.active_text : action.name) : action.name }}
+        </p>
+      </div>
     </div>
+    <div>
+      <CommentsContainer v-if="showComments" :comments="comments"/>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-    import {
-        PhotographIcon,
-        PencilAltIcon,
-        FilmIcon,
-        DotsVerticalIcon,
-        HeartIcon as HeartIconSolid,
-    } from '@heroicons/vue/solid';
-    import { HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { useAuthState } from '@/store/authStore';
-    import { ref, computed } from 'vue';
-    import moment from 'moment';
-    import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
-    import { ChevronDownIcon } from '@heroicons/vue/solid';
-    import { showComingSoonToUhuru } from '@/services/dashboardService';
-    import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
-    import MarkdownIt from 'markdown-it';
+import {
+  PhotographIcon,
+  PencilAltIcon,
+  FilmIcon,
+  DotsVerticalIcon,
+  HeartIcon as HeartIconSolid,
+} from '@heroicons/vue/solid';
+import {HeartIcon, ChatAltIcon} from '@heroicons/vue/outline';
+import AvatarImg from '@/components/AvatarImg.vue';
+import {useAuthState} from '@/store/authStore';
+import {ref, computed} from 'vue';
+import moment from 'moment';
+import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
+import {ChevronDownIcon} from '@heroicons/vue/solid';
+import {showComingSoonToUhuru} from '@/services/dashboardService';
+import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
+import MarkdownIt from 'markdown-it';
+import {uuidv4} from "@/common";
 
-    const showComments = ref<boolean>(false);
 
-    const md = new MarkdownIt({
-        html: true,
-        linkify: true,
-        typographer: true,
-    });
+const showComments = ref<boolean>(false);
 
-    const renderMarkdown = content => {
-        return md.render(content);
-    };
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
 
-    interface IProps {
-        item: {
-            id: string;
-            content_html: string;
-            url: string;
-            title: string;
-            date_modified: Date;
-            likes: number;
-            comments: number;
-            persons: string[];
-            author: string;
-        };
-    }
+const renderMarkdown = content => {
+  return md.render(content);
+};
 
-    const comments = [{name: 'Jonas Delrue', profile_image: 'https://images.unsplash.com/photo-1609349744982-0de6526d978b?ixid=MXwxMjA3fDB8MHx0b3BpYy1mZWVkfDU5fHRvd0paRnNrcEdnfHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60', message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!"},
-      {name: 'Laurens Van Aken', profile_image: 'https://images.unsplash.com/photo-1638214522452-a49ea98b4682?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1887&q=80', message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!"}]
+interface IProps {
+  item: {
+    id: string;
+    content_html: string;
+    url: string;
+    title: string;
+    date_modified: Date;
+    likes: number;
+    comments: number;
+    persons: string[];
+    author: string;
+  };
+}
 
-    const props = defineProps<IProps>();
+enum MESSAGE_TYPE {
+  COMMENT = "COMMENT",
+  COMMENT_REPLY = "COMMENT_REPLY"
+}
 
-    const localLike = ref(false);
+interface COMMENT_MODEL {
+  id: string;
+  name: string;
+  location?: string;
+  profile_image: string;
+  message: string;
+  type: MESSAGE_TYPE;
+  replies: COMMENT_MODEL[];
+  createdOn: Date;
+  likes: LIKE_MODEL[];
+  replyTo?: string | undefined;
+  isReply: boolean;
+}
 
-    const executeAction = (name: string) => {
-        if (name !== 'Like') return;
-        localLike.value = !localLike.value;
-    };
+interface LIKE_MODEL {
+  location?: string;
+  name: string;
+}
 
-    const timeAgo = time => {
-        return moment(time).fromNow();
-    };
+const like: LIKE_MODEL = {
+  location: "200:c692:4765:1f37:fe3f:64cc:4458:93eb",
+  name: 'Bert Meeuws'
+}
+const uuid1 = uuidv4();
 
-    const actions = ref([
-        {
-            name: 'Like',
-            component: HeartIcon,
-            active: HeartIconSolid,
-            active_text: 'Liked',
-        },
-        {
-            name: 'Comment',
-            component: ChatAltIcon,
-            active: ChatAltIcon,
-        },
-    ]);
+const reply = {
+  id: uuidv4(),
+  name: 'Bert Meeuws',
+  profile_image: 'https://images.unsplash.com/photo-1609349744982-0de6526d978b?ixid=MXwxMjA3fDB8MHx0b3BpYy1mZWVkfDU5fHRvd0paRnNrcEdnfHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+  message: "Lorem ipsum, dolor THIS IS REPLY!",
+  type: MESSAGE_TYPE.COMMENT_REPLY,
+  replies: [],
+  likes: [like, like, like],
+  createdOn: new Date('December 17, 2020 03:24:00'),
+  replyTo: uuid1,
+  isReply: true
+}
 
-    const solutions = [
-        {
-            name: 'Send private message',
-            description: 'Measure actions your users take',
-            href: '##',
-            icon: `
+const comments: COMMENT_MODEL[] = [{
+  id: uuid1,
+  name: 'Jonas Delrue',
+  profile_image: 'https://images.unsplash.com/photo-1609349744982-0de6526d978b?ixid=MXwxMjA3fDB8MHx0b3BpYy1mZWVkfDU5fHRvd0paRnNrcEdnfHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+  message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!",
+  type: MESSAGE_TYPE.COMMENT,
+  replies: [reply, reply],
+  likes: [like, like],
+  createdOn: new Date('December 17, 1995 03:24:00'),
+  replyTo: undefined,
+  isReply: false,
+},
+  {
+    id: uuidv4(),
+    name: 'Laurens Van Aken',
+    profile_image: 'https://images.unsplash.com/photo-1638214522452-a49ea98b4682?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1887&q=80',
+    message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!",
+    type: MESSAGE_TYPE.COMMENT,
+    replies: [],
+    likes: [],
+    createdOn: new Date('December 10, 1995 03:24:00'),
+    replyTo: undefined,
+    isReply: false
+  }]
+
+const props = defineProps<IProps>();
+
+const localLike = ref(false);
+
+const executeAction = (name: string) => {
+  if (name !== 'Like') return;
+  localLike.value = !localLike.value;
+};
+
+const timeAgo = time => {
+  return moment(time).fromNow();
+};
+
+const actions = ref([
+  {
+    name: 'Like',
+    component: HeartIcon,
+    active: HeartIconSolid,
+    active_text: 'Liked',
+  },
+  {
+    name: 'Comment',
+    component: ChatAltIcon,
+    active: ChatAltIcon,
+  },
+]);
+
+const solutions = [
+  {
+    name: 'Send private message',
+    description: 'Measure actions your users take',
+    href: '##',
+    icon: `
             <svg
               width="48"
               height="48"
@@ -283,12 +352,12 @@
               />
             </svg>
           `,
-        },
-        {
-            name: 'Share with a friend',
-            description: 'Create your own targeted content',
-            href: '##',
-            icon: `
+  },
+  {
+    name: 'Share with a friend',
+    description: 'Create your own targeted content',
+    href: '##',
+    icon: `
             <svg
               width="48"
               height="48"
@@ -310,10 +379,10 @@
                 stroke-width="2"
               />
             </svg>`,
-        },
-    ];
+  },
+];
 
-    const { user } = useAuthState();
+const {user} = useAuthState();
 </script>
 
 <style scoped></style>
