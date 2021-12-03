@@ -65,13 +65,13 @@ import moment from "moment";
 import {ThumbUpIcon} from "@heroicons/vue/solid";
 
 
-const openPanel = ref<boolean>(false);
+const openPanel = ref<boolean>(true);
 const showComments = ref<boolean>(false);
 const props = defineProps<{comment: object}>()
 const showReplyInput = ref<boolean>(false);
 
 const handleReplyForm = () => {
-
+  showReplyInput.value = false;
 }
 
 const reply = () => {

@@ -63,15 +63,12 @@
                     class="
                                         absolute
                                         z-10
-                                        w-screen
-                                        max-w-sm
+                                        w-64
                                         px-4
                                         transform
                                         -translate-x-1/2
                                         left-1/2
-                                        sm:px-0
-                                        lg:max-w-3xl
-                                    "
+                                                                           "
                 >
                   <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                     <div class="relative grid gap-8 bg-white p-6">
@@ -95,8 +92,8 @@
                                                     focus-visible:ring-opacity-50
                                                 "
                       >
-                        <div class="">
-                          <p class="text-sm font-medium text-gray-900">
+                        <div class="w-full">
+                          <p class="text-sm font-medium text-gray-900 w-full">
                             {{ item.name }}
                           </p>
                         </div>
@@ -116,37 +113,37 @@
         <div class="flex items-center w-full">
           <div class="flex -space-x-2 overflow-hidden">
             <img
-                class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                class="inline-block h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                 alt=""
             />
             <img
-                class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                class="inline-block  h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                 alt=""
             />
             <img
-                class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
+                class="inline-block  h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
                 alt=""
             />
           </div>
           <div class="ml-4">
-            <p class="font-medium text-primary flex">
+            <p class="font-medium text-primary flex text-xs">
                             <span v-for="(name, idx) in props.item.persons" :key="name">
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
             </p>
-            <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
+            <p class="text-gray-600 text-xs">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
           </div>
 
-          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer">
+          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-xs">
             {{ Math.abs(props.item.comments) }} Comments
           </p>
         </div>
       </div>
     </div>
-    <div class="border-t-2 flex space-x-8 p-4">
+    <div class="border-t-2 border-b-2 flex space-x-8 p-4">
       <div
           class="flex items-center cursor-pointer"
           v-for="action in actions"
@@ -169,9 +166,15 @@
       </div>
     </div>
     <div>
+      <form @submit.prevent="handleAddComment" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
+        <AvatarImg :showOnlineStatus="false" class="rounded-full" />
+      <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
+        <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
+      </form>
       <CommentsContainer v-if="showComments" :comments="comments"/>
     </div>
   </div>
+
 </template>
 
 <script setup lang="ts">
@@ -194,6 +197,7 @@ import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
 import MarkdownIt from 'markdown-it';
 import {uuidv4} from "@/common";
 
+const messageInput = ref<string>("")
 
 const showComments = ref<boolean>(false);
 
@@ -301,6 +305,10 @@ const executeAction = (name: string) => {
 const timeAgo = time => {
   return moment(time).fromNow();
 };
+
+const handleAddComment = () => {
+  messageInput.value = "";
+}
 
 const actions = ref([
   {
