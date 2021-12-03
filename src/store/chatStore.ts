@@ -16,7 +16,7 @@ import {
     SystemMessageTypes,
 } from '../types';
 import { sendDraftMessage, useSocketActions } from './socketStore';
-import { useAuthState } from './authStore';
+import { requestMyYggdrasilAddress, useAuthState } from './authStore';
 import config from '@/config';
 import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
@@ -470,7 +470,8 @@ const readMessage = (chatId, messageId) => {
 
 const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
     const { user } = useAuthState();
-    const myLocation = await myYggdrasilAddress();
+    requestMyYggdrasilAddress();
+    const myLocation = myYggdrasilAddress.value;
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
         from: user.id,

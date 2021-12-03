@@ -43,11 +43,10 @@
 
 <script lang="ts" setup>
     import version from '../public/config/version';
-    import { myYggdrasilAddress } from '@/store/authStore';
-    import { ref, watch } from 'vue';
+    import { myYggdrasilAddress, requestMyYggdrasilAddress } from '@/store/authStore';
+    import { ref } from 'vue';
     import config from '@/config';
-    import Browser from '@/views/app/Browser.vue';
-    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    import { hasBrowserBeenStartedOnce } from '@/store/browserStore'
 
     //const {hasBrowserBeenStartedOnce} = useBrowserState()
 
@@ -59,7 +58,8 @@
     const isDev = import.meta.env.DEV;
     const isBeta = config.beta;
     const location = ref();
-    myYggdrasilAddress().then(v => (location.value = v));
+    requestMyYggdrasilAddress();
+    location.value = myYggdrasilAddress.value;
 </script>
 
 <style></style>

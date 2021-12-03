@@ -218,7 +218,7 @@
     import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
     import { defineComponent, ref, computed, nextTick, watch } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState, myYggdrasilAddress } from '../store/authStore';
+    import { useAuthState, myYggdrasilAddress, requestMyYggdrasilAddress } from '../store/authStore';
     import { Chat, Contact, Message } from '../types/index';
     import axios from 'axios';
     import config from '@/config';
@@ -308,7 +308,8 @@
             groupnameAddError.value = "The name can't contain more than 20 characters";
             return;
         }
-        const mylocation = await myYggdrasilAddress();
+        requestMyYggdrasilAddress();
+        const mylocation = myYggdrasilAddress.value;
         usersInGroup.value.push({
             id: user.id,
             location: mylocation,

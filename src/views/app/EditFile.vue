@@ -49,13 +49,10 @@
     import { get } from 'scriptjs';
     import config from '@/config';
     ('../../../public/config/config');
-    import { Contact, DtId } from '@/types';
-    import axios, { ResponseType } from 'axios';
-    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
-    import { fetchStatus, startFetchStatusLoop, watchingUsers, showUserOfflineMessage } from '@/store/statusStore';
+    import { myYggdrasilAddress, requestMyYggdrasilAddress } from '@/store/authStore';
+    import { startFetchStatusLoop, showUserOfflineMessage } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
-    import { showShareDialog } from '@/services/dialogService';
+    import { EditPathInfo, getFileInfo } from '@/services/fileBrowserService';
     import Spinner from '@/components/Spinner.vue';
     import { isUndefined } from 'lodash';
 
@@ -77,7 +74,8 @@
         let location;
         let documentServerconfig;
         let fileAccesDetails: EditPathInfo;
-        const myAddress = await myYggdrasilAddress();
+        requestMyYggdrasilAddress();
+        const myAddress = myYggdrasilAddress.value;
 
         if (shareId) {
             const shareDetails = await fetchShareDetails(shareId);
@@ -104,7 +102,7 @@
         } else {
             fileAccesDetails = (await getFileInfo(path)).data;
             //@todo find better way to get name
-            location = await myYggdrasilAddress();
+            location = myYggdrasilAddress.value;
             readUrl.value = generateUrl(
                 'https',
                 window.location.hostname,
