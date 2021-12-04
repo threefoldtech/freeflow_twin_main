@@ -47,7 +47,6 @@
         accessDenied,
     } from '@/store/fileBrowserStore';
     import { get } from 'scriptjs';
-    import config from '@/config';
     ('../../../public/config/config');
     import { myYggdrasilAddress, requestMyYggdrasilAddress } from '@/store/authStore';
     import { startFetchStatusLoop, showUserOfflineMessage } from '@/store/statusStore';

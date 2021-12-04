@@ -194,7 +194,7 @@
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
     const { chats, chatRequests } = usechatsState();
-    const { retrievechats } = usechatsActions();
+    const { sendRetrieveChats } = usechatsActions();
     const collapsed = ref(false);
     let selectedId = ref('');
 
@@ -224,7 +224,7 @@
         const { initializeSocket } = useSocketActions();
         // initializeSocket(user.id.toString());
         if(!state.socket) initializeSocket(user.id.toString())
-        retrievechats();
+        sendRetrieveChats();
     });
 
     const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));

@@ -67,13 +67,13 @@
     import { SearchIcon } from '@heroicons/vue/solid';
 
     const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
+    const { sendRetrieveChats, sendMessage } = usechatsActions();
 
     let debounce;
     const parts = computed(() => currentDirectory.value.split('/'));
 
     onBeforeMount(() => {
-        retrievechats();
+        sendRetrieveChats();
     });
 
     function debounceSearch(event) {

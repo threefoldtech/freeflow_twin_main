@@ -1,5 +1,4 @@
 <template>
-ygg adress : {{ myYggdrasilAddress}}
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="py-2 px-4 align-middle inline-block min-w-full">

@@ -1,11 +1,10 @@
 import { useSocket } from '@/plugins/SocketIo';
 import { reactive } from '@vue/reactivity';
-import axios from 'axios';
 import { Socket } from 'socket.io-client';
 import { ref } from 'vue';
 import { User } from '../types';
 import { sendMessageObject } from './chatStore';
-import { initializeSocket, socket, state, useSocketActions } from './socketStore';
+import { initializeSocket } from './socketStore';
 
 
 const authState = reactive<AuthState>({
@@ -65,9 +64,7 @@ export const requestMyYggdrasilAddress = () => {
     socket.emit("my_yggdrasil_address", {}, function (data) {
         if (data.error)
             throw new Error('my_yggdrasil_address Failed in backend', data.error)
-            console.log("ygg", data.data)
         myYggdrasilAddress.value = data.data;
-        console.log("return from backend" ,data.data)
 
     });
 }

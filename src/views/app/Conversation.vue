@@ -369,8 +369,8 @@ watch(
     }
 );
 
-const { retrievechats, sendFile } = usechatsActions();
-onBeforeMount(retrievechats);
+const { sendRetrieveChats, sendFile } = usechatsActions();
+onBeforeMount(sendRetrieveChats);
 
 const { contacts } = useContactsState();
 const { chats } = usechatsState();

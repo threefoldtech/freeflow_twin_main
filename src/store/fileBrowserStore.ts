@@ -191,7 +191,7 @@ export const goToFilesInChat = async (chat?: Chat) => {
 
 
 export const loadFilesReceivedNested = async () => {
-    const { retrievechats } = usechatsActions();
+    const { sendRetrieveChats } = usechatsActions();
     const {chats} = usechatsState()
     const chatId = router.currentRoute.value.params?.chatId;
     const received = router.currentRoute.value.meta.received as boolean;
@@ -202,7 +202,7 @@ export const loadFilesReceivedNested = async () => {
     }
 
 
-    await retrievechats();
+    await sendRetrieveChats();
     const chat = chats.value.find(item => item.chatId === chatId);
     if (!chat) {
         router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });

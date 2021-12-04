@@ -201,7 +201,7 @@
     import { showShareDialog } from '@/services/dialogService';
 
     const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
+    const { sendRetrieveChats, sendMessage } = usechatsActions();
 
     const tabs = ['Create shares', 'Edit shares'];
 
@@ -213,7 +213,7 @@
     const writeRights = ref(false);
 
     onBeforeMount(() => {
-        retrievechats();
+        sendRetrieveChats();
     });
     const debounceSearch = event => {
         clearTimeout(debounce);

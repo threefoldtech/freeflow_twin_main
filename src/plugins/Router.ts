@@ -46,7 +46,7 @@ import { usechatsActions } from '@/store/chatStore';
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
 
-const { retrievechats } = usechatsActions();
+const { sendRetrieveChats } = usechatsActions();
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -320,7 +320,7 @@ router.afterEach(async (to, from) => {
     }
     if (to.name === 'filesReceivedInChat') {
         chatFilesBreadcrumbs.value = []
-        await retrievechats();
+        await sendRetrieveChats();
         isQuantumChatFiles.value = true
         fetchSharedInChatFiles(true);
         chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/received'})
@@ -329,7 +329,7 @@ router.afterEach(async (to, from) => {
         chatFilesBreadcrumbs.value = []
         isQuantumChatFiles.value = true
         chatFilesBreadcrumbs.value.push({name: 'Sent files in chat', path: '/quantum/sent'})
-        await retrievechats();
+        await sendRetrieveChats();
         fetchSharedInChatFiles(false);
     }
     if (to.name === 'filesReceivedInChatNested' || to.name === 'filesSentInChatNested') {

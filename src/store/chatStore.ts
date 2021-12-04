@@ -15,7 +15,7 @@ import {
     SystemBody,
     SystemMessageTypes,
 } from '../types';
-import { sendDraftMessage, useSocketActions } from './socketStore';
+import { initializeSocket, sendDraftMessage, useSocketActions } from './socketStore';
 import { requestMyYggdrasilAddress, useAuthState } from './authStore';
 import config from '@/config';
 import { uuidv4 } from '@/common';
@@ -24,6 +24,7 @@ import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { myYggdrasilAddress } from '@/store/authStore';
 import { blocklist } from '@/store/blockStore';
+import { useSocket } from '@/plugins/SocketIo';
 
 const messageLimit = 50;
 const state = reactive<ChatState>({
@@ -71,21 +72,27 @@ export const clearMessageAction = (chatId: string) => {
     };
 };
 
-const retrievechats = async () => {
-    const params = new URLSearchParams();
-    params.append('limit', messageLimit.toString());
-    isLoading.value = true;
-    await axios.get(`${config.baseUrl}api/chats`, { params: params }).then(response => {
-        const incommingchats = response.data;
 
-        // debugger
-        incommingchats.forEach(chat => {
-            addChat(chat);
-        });
-        sortChats();
-        isLoading.value = false;
+
+
+export const sendRetrieveChats = () => {
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    socket.emit("retrieve_chats", {'limit': messageLimit.toString()}, function (result) {
+        if (result.error)
+            throw new Error('retrieve_chats Failed in backend', result.error)
+            const incommingchats = result.data;
+            incommingchats.forEach(chat => {
+                addChat(chat);
+            });
+            sortChats();
+            isLoading.value = false;
     });
-};
+}
+
 
 export const editMessage = (chatId, message) => {
     clearMessageAction(chatId);
@@ -505,7 +512,7 @@ export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
 export const usechatsActions = () => {
     return {
         addChat,
-        retrievechats,
+        sendRetrieveChats,
         sendMessage,
         addMessage,
         sendFile,
