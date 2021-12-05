@@ -47,13 +47,13 @@
     import { ref } from 'vue';
     import config from '@/config';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore'
+import { fetchedMessages } from './store/chatStore';
 
     //const {hasBrowserBeenStartedOnce} = useBrowserState()
 
     console.log('Version: ' + version);
 
     document.querySelector('body').classList.add('overflow-y-hidden');
-
     //@ts-ignore
     const isDev = import.meta.env.DEV;
     const isBeta = config.beta;

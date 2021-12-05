@@ -81,15 +81,15 @@ export const sendRetrieveChats = () => {
     if (!isSocketInit) initializeSocket(user.id.toString())
     const socket = useSocket();
 
-    socket.emit("retrieve_chats", {'limit': messageLimit.toString()}, function (result) {
+    socket.emit("retrieve_chats", { 'limit': messageLimit.toString() }, function (result) {
         if (result.error)
             throw new Error('retrieve_chats Failed in backend', result.error)
-            const incommingchats = result.data;
-            incommingchats.forEach(chat => {
-                addChat(chat);
-            });
-            sortChats();
-            isLoading.value = false;
+        const incommingchats = result.data;
+        incommingchats.forEach(chat => {
+            addChat(chat);
+        });
+        sortChats();
+        isLoading.value = false;
     });
 }
 
@@ -152,7 +152,7 @@ export const removeChat = chatId => {
     selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const sendAddGroupChat = (name: string, contacts: Contact[]) =>{
+const sendAddGroupChat = (name: string, contacts: Contact[]) => {
     const { user } = useAuthState();
 
 
@@ -187,7 +187,7 @@ const sendAddGroupChat = (name: string, contacts: Contact[]) =>{
         acceptedChat: true,
         draft: undefined
     };
-    
+
     const isSocketInit = <boolean>useSocket();
     if (!isSocketInit) initializeSocket(user.id.toString())
     const socket = useSocket();
@@ -198,11 +198,6 @@ const sendAddGroupChat = (name: string, contacts: Contact[]) =>{
     });
 
 }
-
-
-
-
-
 
 const acceptChat = id => {
     axios
@@ -248,41 +243,69 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
     chat.messages = messages.concat(chat.messages);
 };
 
-const fetchMessages = async (
-    chatId: string,
+export const fetchedMessages = ref<Object>('')
+
+const sendFetchMessages = async (chatId: string,
     limit: number,
     lastMessageId: string | undefined
-): Promise<GetMessagesResponse | undefined> => {
-    const params = new URLSearchParams();
-    if (lastMessageId) params.append('fromId', lastMessageId);
-    params.append('limit', limit.toString());
+) => {
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
 
-    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/messages/${chatId}`, {
-        params: params,
+    const params = new Object();
+
+    if (lastMessageId) params['fromId'] = lastMessageId;
+
+    params['limit'] = limit.toString();
+
+    let hasMore;
+    let messages;
+
+    const callToWebsocket = (res) => socket.emit("fetch_messages", {
+        'chatId': chatId, 'params': params
+    }, function callback(result) {
+        if (result.error)
+            throw new Error('fetch_messages Failed in backend', result.error)
+        res({
+            hasMore: result.hasMore,
+            messages: result.messages
+        })
+
+
     });
 
-    if (200 > response.status && response.status >= 300) {
-        console.error(response.statusText + ': failed fetching more messages');
-        return;
-    }
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebsocket(res);
+        });
+    };
 
-    return response.data;
-};
+    return functionWithPromise().then( val => {
+        return val;
+      })
+     
+
+}
+
 
 const getNewMessages = async (chatId: string) => {
+
     const info = getChatInfo(chatId);
+    console.log(info)
     if (!info || info.isLoading || !info.hasMoreMessages) return;
 
     try {
         setChatMessagesAreLoading(chatId, true);
-
         const chat = getChat(chatId);
         if (!chat) return;
+        const response = await sendFetchMessages(<string>chat.chatId, messageLimit, <string>chat.messages[0]?.id);
+        console.log("response from websocket is ", response)
+        sendFetchMessages(<string>chat.chatId, messageLimit, <string>chat.messages[0]?.id).then(val => {
+            console.log("promise", val)
+        })
 
-        const response = await fetchMessages(<string>chat.chatId, messageLimit, <string>chat.messages[0]?.id);
-        setChatHasMoreMessages(<string>chat.chatId, response.hasMore);
-        appendMessages(chat, response.messages);
-        return response.messages.length > 0;
     } catch (ex) {
         return false;
     } finally {
@@ -382,7 +405,6 @@ const sendSystemMessage = (chatId, message: string) => {
 
 export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
     const { sendSocketMessage } = useSocketActions();
-    // console.log(chatId, message);
     // @TODO when doing add message on SYSTEM/groupupdate results in  max call stack exeeded
     if (message.type !== 'SYSTEM') {
         addMessage(chatId, message);
@@ -523,6 +545,7 @@ export const usechatsActions = () => {
         addChat,
         sendRetrieveChats,
         sendMessage,
+        sendFetchMessages,
         addMessage,
         sendFile,
         sendMessageObject,
@@ -567,4 +590,4 @@ export const handleRead = (message: Message<string>) => {
     }
 
     chat.read[<string>message.from] = message.body;
-};
+}
