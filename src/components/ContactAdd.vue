@@ -297,7 +297,7 @@
     };
 
     const groupAdd = async () => {
-        const { addGroupchat } = usechatsActions();
+        const { sendAddGroupChat } = usechatsActions();
         const { user } = useAuthState();
         const { chats } = usechatsState();
         if (groupnameAdd.value == '') {
@@ -315,7 +315,7 @@
             location: mylocation,
         });
 
-        addGroupchat(groupnameAdd.value, usersInGroup.value);
+        sendAddGroupChat(groupnameAdd.value, usersInGroup.value);
         //@todo: setTimeout is dirty should be removed
         // next tick was not possible reason: chat was not loaded yet
         setTimeout(() => {

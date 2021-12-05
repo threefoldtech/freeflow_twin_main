@@ -152,8 +152,9 @@ export const removeChat = chatId => {
     selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const addGroupchat = (name: string, contacts: Contact[]) => {
+const sendAddGroupChat = (name: string, contacts: Contact[]) =>{
     const { user } = useAuthState();
+
 
     const contactInGroup = contacts.map(contact => {
         if (user.id !== contact.id)
@@ -184,16 +185,24 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
         adminId: user.id,
         read: {},
         acceptedChat: true,
+        draft: undefined
     };
-    axios
-        .put(`${config.baseUrl}api/group`, newGroupchat)
-        .then(res => {
-            console.log(res);
-        })
-        .catch(e => {
-            console.log('failed to add groupchat', e);
-        });
-};
+    
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    socket.emit("add_group_chat", newGroupchat, function (result) {
+        if (result.error)
+            throw new Error('add_group_chat Failed in backend', result.error)
+    });
+
+}
+
+
+
+
+
 
 const acceptChat = id => {
     axios
@@ -517,7 +526,7 @@ export const usechatsActions = () => {
         addMessage,
         sendFile,
         sendMessageObject,
-        addGroupchat,
+        sendAddGroupChat,
         readMessage,
         acceptChat,
         removeChat,
