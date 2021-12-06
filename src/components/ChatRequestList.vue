@@ -33,8 +33,8 @@
     const props = defineProps<Props>();
 
     const acceptChatRequest = id => {
-        const { acceptChat } = usechatsActions();
-        acceptChat(id);
+        const { sendAcceptChat } = usechatsActions();
+        sendAcceptChat(id);
     };
 
     const denyChatRequest = id => {

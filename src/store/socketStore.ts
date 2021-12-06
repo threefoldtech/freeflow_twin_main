@@ -130,7 +130,7 @@ export const useSocketState = () => {
     return {
         ...toRefs(state),
     };
-};
+};4
 
 export const sendDraftMessage = async (message: MessageBodyType) => {
     const socket = useSocket();

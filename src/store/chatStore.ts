@@ -199,21 +199,28 @@ const sendAddGroupChat = (name: string, contacts: Contact[]) => {
 
 }
 
-const acceptChat = id => {
-    axios
-        .post(`${config.baseUrl}api/chats?id=${id}`)
-        .then(() => {
-            const index = state.chatRequests.findIndex(c => c.chatId == id);
-            state.chatRequests[index].acceptedChat = true;
-            addChat(state.chatRequests[index]);
-            const { user } = useAuthState();
-            sendSystemMessage(id, `${user.id} accepted invitation`);
-            state.chatRequests.splice(index, 1);
-        })
-        .catch(error => {
-            console.log('Got an error: ', error);
+
+const sendAcceptChat = (id) => {
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("accept_chat", { id }, function (result) {
+        if (result.error)
+            throw new Error('accept_chat Failed in backend', result.error)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
         });
-};
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
 
 const updateChat = (chat: Chat) => {
     removeChat(chat.chatId);
@@ -282,10 +289,10 @@ const sendFetchMessages = async (chatId: string,
         });
     };
 
-    return functionWithPromise().then( val => {
+    return functionWithPromise().then(val => {
         return val;
-      })
-     
+    })
+
 
 }
 
@@ -551,7 +558,7 @@ export const usechatsActions = () => {
         sendMessageObject,
         sendAddGroupChat,
         readMessage,
-        acceptChat,
+        sendAcceptChat,
         removeChat,
         updateContactsInGroup,
         updateChat,
