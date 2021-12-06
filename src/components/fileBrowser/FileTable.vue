@@ -483,7 +483,7 @@
     import { useRouter } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
     import { state, useSocketActions } from '@/store/socketStore';
-    import { requestMyYggdrasilAddress, useAuthState } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -496,10 +496,8 @@
         const { initializeSocket } = useSocketActions();
         // initializeSocket(user.id.toString());
             if(!state.socket) initializeSocket(user.id.toString())
-            requestMyYggdrasilAddress();
             
     });
-    requestMyYggdrasilAddress();
 
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) selectItem(item);

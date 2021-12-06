@@ -73,8 +73,7 @@
         let location;
         let documentServerconfig;
         let fileAccesDetails: EditPathInfo;
-        requestMyYggdrasilAddress();
-        const myAddress = myYggdrasilAddress.value;
+        const myAddress = await requestMyYggdrasilAddress();
 
         if (shareId) {
             const shareDetails = await fetchShareDetails(shareId);
@@ -101,7 +100,7 @@
         } else {
             fileAccesDetails = (await getFileInfo(path)).data;
             //@todo find better way to get name
-            location = myYggdrasilAddress.value;
+            location = await requestMyYggdrasilAddress();
             readUrl.value = generateUrl(
                 'https',
                 window.location.hostname,

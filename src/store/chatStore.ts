@@ -22,7 +22,6 @@ import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
-import { myYggdrasilAddress } from '@/store/authStore';
 import { blocklist } from '@/store/blockStore';
 import { useSocket } from '@/plugins/SocketIo';
 
@@ -515,8 +514,7 @@ const readMessage = (chatId, messageId) => {
 
 const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
     const { user } = useAuthState();
-    requestMyYggdrasilAddress();
-    const myLocation = myYggdrasilAddress.value;
+    const myLocation = await requestMyYggdrasilAddress();
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
         from: user.id,

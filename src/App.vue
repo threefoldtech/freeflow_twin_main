@@ -43,7 +43,7 @@
 
 <script lang="ts" setup>
     import version from '../public/config/version';
-    import { myYggdrasilAddress, requestMyYggdrasilAddress } from '@/store/authStore';
+    import { requestMyYggdrasilAddress } from '@/store/authStore';
     import { ref } from 'vue';
     import config from '@/config';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore'
@@ -58,8 +58,7 @@ import { fetchedMessages } from './store/chatStore';
     const isDev = import.meta.env.DEV;
     const isBeta = config.beta;
     const location = ref();
-    requestMyYggdrasilAddress();
-    location.value = myYggdrasilAddress.value;
+    requestMyYggdrasilAddress().then(v => (location.value = v));
 </script>
 
 <style></style>

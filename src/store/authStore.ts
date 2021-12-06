@@ -48,23 +48,43 @@ export const sendGetMyStatus = async () => {
     const isSocketInit = <boolean>useSocket();
     if (!isSocketInit) initializeSocket(user.id.toString())
     const socket = useSocket();
-    socket.emit("get_my_status", {}, function (data) {
+    const callToWebsocket = (res) =>socket.emit("get_my_status", {}, function (data) {
         if (data.error)
             throw new Error('get_my_status Failed in backend', data.error)
-        myAccountStatus.value = data.data.status;
+        myAccountStatus.value = data.data.status
+        res(data.data.status)
 
     });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebsocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
 }
-export const myYggdrasilAddress = ref('');
 
 export const requestMyYggdrasilAddress = () => {
     const isSocketInit = <boolean>useSocket();
     if (!isSocketInit) initializeSocket(user.id.toString())
     const socket = useSocket();
-    socket.emit("my_yggdrasil_address", {}, function (data) {
+    const callToWebsocket = (res) =>socket.emit("my_yggdrasil_address", {}, function (data) {
         if (data.error)
             throw new Error('my_yggdrasil_address Failed in backend', data.error)
-        myYggdrasilAddress.value = data.data;
+        res(data.data)
 
     });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebsocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
 }
