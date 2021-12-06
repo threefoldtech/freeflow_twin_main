@@ -62,7 +62,7 @@
     import { useSocketActions } from '../store/socketStore';
     import Dialog from './Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
+    import {  sendGetBlockList, sendUnblockUser } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
@@ -118,12 +118,12 @@
 
     // @todo: config
 
-    onBeforeMount(() => {
-        initBlocklist();
+    onBeforeMount(async () => {
+        sendGetBlockList();
     });
 
     const unblockUser = async user => {
-        await deleteBlockedEntry(user);
+        sendUnblockUser(user);
         showUserConfigDialog.value = false;
     };
 

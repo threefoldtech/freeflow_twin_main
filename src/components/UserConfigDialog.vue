@@ -195,7 +195,7 @@
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { blocklist, deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
+    import { blocklist, sendGetBlockList, sendUnblockUser } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
@@ -207,7 +207,8 @@
 
     const emit = defineEmits(['addUser']);
 
-    initBlocklist();
+    sendGetBlockList();
+
 
     const { user } = useAuthState();
     const showEditPic = ref(false);
@@ -309,7 +310,7 @@
     };
 
     const unblockUser = async user => {
-        await deleteBlockedEntry(user);
+        sendUnblockUser(user);
         showUserConfigDialog.value = false;
     };
 

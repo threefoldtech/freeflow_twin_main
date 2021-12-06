@@ -340,7 +340,7 @@ import MessageBox from '@/components/MessageBox.vue';
 import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
 import Button from '@/components/Button.vue';
 
-import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+import { sendUnblockUser, isBlocked } from '@/store/blockStore';
 import FileDropArea from '@/components/FileDropArea.vue';
 import TimeContent from '@/components/TimeContent.vue';
 import { XIcon } from '@heroicons/vue/outline';
@@ -509,7 +509,7 @@ const doBlockChat = () => {
 };
 
 const unBlockChat = async () => {
-    await deleteBlockedEntry(chat.value.chatId);
+    sendUnblockUser(chat.value.chatId);
 };
 
 const reads = computed(() => {

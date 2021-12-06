@@ -1,16 +1,25 @@
 import axios from 'axios';
 import config from '@/config';
 import { ref } from 'vue';
+import { useAuthState } from './authStore';
+import { useSocket } from '@/plugins/SocketIo';
+import { initializeSocket } from './socketStore';
 
 export const blocklist = ref([]);
 
-export const initBlocklist = async () => {
-    try {
-        const axiosResponse = await axios.get(`${config.baseUrl}api/blocked/`);
-        blocklist.value = axiosResponse.data;
-    } catch (e) {
-        console.log('could not get blocklist');
-    }
+
+export const sendGetBlockList = async () => {
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    socket.emit("get_block_list", {}, function (result) {
+        if (result.error)
+            throw new Error('get_block_list Failed in backend', result.error)
+            blocklist.value = result.data;
+    });
+
 };
 
 export const addUserToBlockList = userid => {
@@ -19,7 +28,25 @@ export const addUserToBlockList = userid => {
 
 export const isBlocked = (userId: string) => blocklist.value.includes(userId);
 
-export const deleteBlockedEntry = async user => {
-    await axios.delete(`${config.baseUrl}api/blocked/${user}/`);
-    blocklist.value = blocklist.value.filter(x => x !== user);
-};
+
+export const sendUnblockUser =async (username: string) =>{
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("unblock_user", { username }, function (result) {
+        if (result.error)
+            throw new Error('unblock_user Failed in backend', result.error)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
