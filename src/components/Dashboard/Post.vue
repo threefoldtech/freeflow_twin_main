@@ -111,7 +111,7 @@
       </div>
       <div>
         <div class="flex items-center w-full">
-          <div class="flex -space-x-2 overflow-hidden">
+          <div class="hidden flex -space-x-2 overflow-hidden">
             <img
                 class="inline-block h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -128,7 +128,7 @@
                 alt=""
             />
           </div>
-          <div class="ml-4">
+          <div class="hidden ml-4">
             <p class="font-medium text-primary flex text-xs">
                             <span v-for="(name, idx) in props.item.persons" :key="name">
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
@@ -136,8 +136,11 @@
             </p>
             <p class="text-gray-600 text-xs">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
           </div>
-
-          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-xs">
+          <div class="flex items-center">
+            <HeartIconSolid class="text-red-500 w-5 h-5 mr-2"  />
+            <p class="text-gray-600 text-base font-medium flex-shrink-0 text-base">{{Math.abs(props.item.comments)}} Likes</p>
+          </div>
+          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-md">
             {{ Math.abs(props.item.comments) }} Comments
           </p>
         </div>
@@ -196,6 +199,7 @@ import {showComingSoonToUhuru} from '@/services/dashboardService';
 import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
 import MarkdownIt from 'markdown-it';
 import {uuidv4} from "@/common";
+
 
 const messageInput = ref<string>("")
 

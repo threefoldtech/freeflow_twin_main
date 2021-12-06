@@ -36,7 +36,7 @@
                         />
                     </div>
                   <div class="p-4">
-                    <ImageGrid v-if="new_post_images.length >= 1" :images="new_post_images" @resetImage="new_post_images = []" />
+                    <ImageGrid v-if="new_post_images.length >= 1 && createPostModalStatus" :images="new_post_images" @resetImage="new_post_images = []" />
                   </div>
                   <input @change="handleFileInput" type="file" multiple="multiple" ref="create_post_file_upload" accept="image/png, image/gif, image/jpeg" class="hidden">
                     <div class="border-t-2 p-4 block">
