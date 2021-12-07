@@ -1,5 +1,8 @@
 import axios from 'axios';
 import config from '@/config';
+import { useSocket } from '@/plugins/SocketIo';
+import { useAuthState } from './authStore';
+import { initializeSocket } from './socketStore';
 
 export const setNewAvatar = async selectedFile => {
     var formData = new FormData();
@@ -26,3 +29,37 @@ export const isUserAuthenticated = async () => {
         console.log(e);
     }
 };
+
+// export const sendIsUserAuthenticated = () =>{
+//     const { user } = useAuthState();
+//     const isSocketInit = <boolean>useSocket();
+//     const userId = user.id.toString();
+//     if (!isSocketInit) initializeSocket(user.id.toString())
+//     const socket = useSocket();
+
+
+  
+
+//     const callToWebsocket = (res) => socket.emit("is_user_authenticated", {
+//         userId
+//     }, function callback(result) {
+//         if (result.error)
+//             throw new Error('is_user_authenticated Failed in backend', result.error)
+//         res({
+//             hasMore: result.hasMore,
+//             messages: result.messages
+//         })
+
+
+//     });
+
+//     const functionWithPromise = () => {
+//         return new Promise((res) => {
+//             callToWebsocket(res);
+//         });
+//     };
+
+//     return functionWithPromise().then(val => {
+//         return val;
+//     })
+// }

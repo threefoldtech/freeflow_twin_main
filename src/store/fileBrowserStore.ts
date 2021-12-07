@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { getShareWithId } from '@/services/fileBrowserService';
+import { getShareWithId, sendGetDirectoryContent } from '@/services/fileBrowserService';
 import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
@@ -111,7 +111,8 @@ export const getFile = async (fullPath: string): Promise<FullPathInfoModel> => {
 };
 
 export const updateContent = async (path = currentDirectory.value) => {
-    const result = await Api.getDirectoryContent(path);
+    const result = await sendGetDirectoryContent(path);
+    console.log("resres" , result)
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     currentDirectoryContent.value = result.data.map(createModel);

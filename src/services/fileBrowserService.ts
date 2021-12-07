@@ -5,6 +5,9 @@ import { ProgressNotification } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
 import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
+import { useSocket } from '@/plugins/SocketIo';
+import { useAuthState } from '@/store/authStore';
+import { initializeSocket } from '@/store/socketStore';
 
 const endpoint = `${config.baseUrl}api/browse`;
 
@@ -41,11 +44,37 @@ export interface EditPathInfo extends PathInfo {
     writeToken: string;
 }
 
-export const getDirectoryContent = async (path: string): Promise<AxiosResponse<PathInfo[]>> => {
-    const params = new URLSearchParams();
-    params.append('path', path);
-    return await axios.get<PathInfo[]>(`${endpoint}/directories/content`, { params: params });
-};
+
+
+export const sendGetDirectoryContent = (path: string)=>{
+    // const params = new URLSearchParams();
+    // params.append('path', path);
+    // console.log(params.toString())
+
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("get_directory_content", { path }, function (result) {
+        if (result.error)
+            throw new Error('get_directory_content Failed in backend', result.error)
+            console.log("result from get directory content", result)
+            // result.status = 200;
+            console.log(result.status)
+            res(result)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
 
 export const getDirectoryInfo = async (path: string) => {
     const params = new URLSearchParams();
