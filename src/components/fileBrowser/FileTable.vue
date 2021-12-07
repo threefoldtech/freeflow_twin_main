@@ -474,7 +474,6 @@
         sharedContent,
         getSharedContent,
         searchResults,
-        searchDirValue,
         currentShare,
         goToShared,
         fileBrowserTypeView,

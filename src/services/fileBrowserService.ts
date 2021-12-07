@@ -46,7 +46,7 @@ export interface EditPathInfo extends PathInfo {
 
 
 
-export const sendGetDirectoryContent = (path: string)=>{
+export const sendGetDirectoryContent = (path: string) => {
     // const params = new URLSearchParams();
     // params.append('path', path);
     // console.log(params.toString())
@@ -59,10 +59,7 @@ export const sendGetDirectoryContent = (path: string)=>{
     const callToWebSocket = (res) => socket.emit("get_directory_content", { path }, function (result) {
         if (result.error)
             throw new Error('get_directory_content Failed in backend', result.error)
-            console.log("result from get directory content", result)
-            // result.status = 200;
-            console.log(result.status)
-            res(result)
+        res(result)
     });
 
     const functionWithPromise = () => {
@@ -75,12 +72,6 @@ export const sendGetDirectoryContent = (path: string)=>{
         return val;
     })
 }
-
-export const getDirectoryInfo = async (path: string) => {
-    const params = new URLSearchParams();
-    params.append('path', path);
-    return await axios.get(`${endpoint}/directories/info`, { params: params });
-};
 
 export const createDirectory = async (path: string, name: string): Promise<AxiosResponse<PathInfo>> => {
     const body = {
@@ -144,9 +135,31 @@ export const uploadFile = async (
     }
 };
 
-export const deleteFile = async (path: string) => {
-    return await axios.delete<PathInfo>(`${endpoint}/files`, { data: { filepath: path } });
-};
+export const sendDeleteFile = (path: string): any => {
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("delete_file", { path }, function (result) {
+        if (result.error)
+            throw new Error('delete_file Failed in backend', result.error)
+        res(result)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
+
+
+
 
 export const downloadFileEndpoint = `${endpoint}/files`;
 export const getDownloadFileEndpoint = (path: string) => {
@@ -158,12 +171,44 @@ export const downloadFile = async (path: string, responseType: ResponseType = 'b
         responseType: responseType,
     });
 };
-export const searchDir = async (searchTerm: string, currentDir: string) => {
-    const params = new URLSearchParams();
-    params.append('searchTerm', searchTerm);
-    params.append('currentDir', currentDir);
-    return await axios.get<PathInfo[]>(`${endpoint}/files/search`, { params: params });
-};
+// export const searchDir = async (searchTerm: string, currentDir: string) => {
+//     const params = new URLSearchParams();
+//     params.append('searchTerm', searchTerm);
+//     params.append('currentDir', currentDir);
+//     // return await axios.get<PathInfo[]>(`${endpoint}/files/search`, { params: params });
+//     return sendSearchDir(searchTerm, currentDir);
+// };
+
+export const sendSearchDir = async (searchTerm: string, currentDir: string) => {
+    const params = {
+        'searchTerm': searchTerm,
+        'currentDir': currentDir
+    }
+
+
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("search_dir", { params }, function (result) {
+        if (result.error)
+            throw new Error('search_dir Failed in backend', result.error)
+        res(result)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+
+}
+
 export const copyFiles = async (paths: string[], pathToPaste: string) => {
     return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste });
 };

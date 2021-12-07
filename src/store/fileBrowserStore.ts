@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { getShareWithId, sendGetDirectoryContent } from '@/services/fileBrowserService';
+import { getShareWithId, sendDeleteFile, sendGetDirectoryContent } from '@/services/fileBrowserService';
 import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
@@ -112,7 +112,6 @@ export const getFile = async (fullPath: string): Promise<FullPathInfoModel> => {
 
 export const updateContent = async (path = currentDirectory.value) => {
     const result = await sendGetDirectoryContent(path);
-    console.log("resres" , result)
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     currentDirectoryContent.value = result.data.map(createModel);
@@ -259,7 +258,7 @@ export const uploadFile = async (file: File, path = currentDirectory.value) => {
 export const deleteFiles = async (list: PathInfoModel[]) => {
     await Promise.all(
         list.map(async f => {
-            const result = await Api.deleteFile(f.path);
+            const result = await sendDeleteFile(f.path);
             if (result.status !== 200 && result.status !== 201) throw new Error('Could not delete file');
             selectedPaths.value = [];
             await updateContent();
@@ -361,8 +360,7 @@ export const clearClipboard = () => {
 };
 
 export const searchDir = async () => {
-    const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
-
+    const result = await Api.sendSearchDir(searchDirValue.value, currentDirectory.value);
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
     if (result.data.toString() === 'None') {
         searchResults.value = 'None';
