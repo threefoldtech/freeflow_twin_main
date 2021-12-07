@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { getShareWithId, sendDeleteFile, sendGetDirectoryContent } from '@/services/fileBrowserService';
+import { getShareWithId, sendCopyFiles, sendDeleteFile, sendGetDirectoryContent, sendMoveFiles } from '@/services/fileBrowserService';
 import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
@@ -317,7 +317,7 @@ export const moveFiles = async (destination: string, items = selectedPaths.value
         return;
     }
 
-    const result = await Api.moveFiles(items, destination);
+    const result = await sendMoveFiles(items, destination);
     if (result.status !== 200 && result.status !== 201) {
         createErrorNotification('Error while moving', 'Something went wrong');
         return;
@@ -337,7 +337,7 @@ export const copyPasteSelected = async () => {
 
     //paste
     if (selectedAction.value === Action.COPY) {
-        const result = await Api.copyFiles(
+        const result = await sendCopyFiles(
             copiedFiles.value.map(x => x.path),
             currentDirectory.value
         );
@@ -375,7 +375,7 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
     let newPath = pathJoin([currentDirectory.value, name]);
     if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
 
-    const result = await Api.renameFile(oldPath, newPath);
+    const result = await Api.sendRenameFile(oldPath, newPath);
     if (result.status !== 200 && result.status !== 201) throw new Error('Could not rename file');
 
     selectedPaths.value = [];
@@ -945,7 +945,7 @@ export const goTo = async (item: SharedFileInterface) => {
 };
 
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
-    return await Api.addShare(userId, path, filename, size, writable);
+    return await Api.sendAddShare(userId, path, filename, size, writable);
 };
 
 export const parseJwt = token => {

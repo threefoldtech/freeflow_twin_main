@@ -171,13 +171,6 @@ export const downloadFile = async (path: string, responseType: ResponseType = 'b
         responseType: responseType,
     });
 };
-// export const searchDir = async (searchTerm: string, currentDir: string) => {
-//     const params = new URLSearchParams();
-//     params.append('searchTerm', searchTerm);
-//     params.append('currentDir', currentDir);
-//     // return await axios.get<PathInfo[]>(`${endpoint}/files/search`, { params: params });
-//     return sendSearchDir(searchTerm, currentDir);
-// };
 
 export const sendSearchDir = async (searchTerm: string, currentDir: string) => {
     const params = {
@@ -209,34 +202,171 @@ export const sendSearchDir = async (searchTerm: string, currentDir: string) => {
 
 }
 
-export const copyFiles = async (paths: string[], pathToPaste: string) => {
-    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste });
-};
+export const sendCopyFiles = async(paths: string[], pathToPaste: string)=>{
+    console.log('p',pathToPaste)
+    const params = { paths: paths, destinationPath: pathToPaste };
 
-export const moveFiles = async (paths: string[], pathToPaste: string) => {
-    return await axios.post<PathInfo[]>(`${endpoint}/files/move`, { paths: paths, destinationPath: pathToPaste });
-};
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+    console.log("komt hier ")
+    const callToWebSocket = (res) => socket.emit("copy_files", { params }, function (result) {
+        if (result.error)
+            throw new Error('copy_files Failed in backend', result.error)
+            console.log(result)
+        res(result)
+    });
 
-export const renameFile = async (oldPath: string, newPath: string) => {
-    return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
-};
-export const addShare = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
-    return await axios.post<GetShareToken>(`${endpoint}/files/share`, {
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
+
+export const sendMoveFiles = async(paths: string[], pathToMove: string) =>{
+
+    const params = { paths: paths, destinationPath: pathToMove };
+
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("move_file", { params }, function (result) {
+        if (result.error)
+            throw new Error('move_file Failed in backend', result.error)
+        res(result)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
+
+// export const renameFile = async (oldPath: string, newPath: string) => {
+//     // return sendRenameFile(oldPath, newPath)
+//     // return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
+// };
+
+export const sendRenameFile = async(oldPath: string, newPath: string) =>{
+
+    const params = { oldPath: oldPath, newPath: newPath };
+    console.log('p', params)
+
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("rename_file", { params }, function (result) {
+        if (result.error)
+            throw new Error('rename_file Failed in backend', result.error)
+        res(result)
+    });
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
+// export const addShare = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
+//     return sendAddShare(userId, path, filename, size, writable);
+//     return await axios.post<GetShareToken>(`${endpoint}/files/share`, {
+//         chatId: userId,
+//         writable: writable,
+//         path: path,
+//         filename: filename,
+//         size: size,
+//     });
+// };
+
+export const sendAddShare = async(userId: string, path: string, filename: string, size: number, writable: boolean) =>{
+
+    const params = {
         chatId: userId,
         writable: writable,
         path: path,
         filename: filename,
         size: size,
+    };
+
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("add_share", { params }, function (result) {
+        if (result.error)
+            throw new Error('add_share Failed in backend', result.error)
+        res(result)
     });
-};
-export const removeFilePermissions = async (userId: string, path: string, location: string) => {
-    console.log(userId, path);
-    return await axios.post<GetShareToken>(`${endpoint}/files/removeFilePermissions`, {
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
+
+// export const removeFilePermissions = async (userId: string, path: string, location: string) => {
+//     console.log(userId, path);
+//     return sendRemoveFilePermissions(userId, path, location);
+//     return await axios.post<GetShareToken>(`${endpoint}/files/removeFilePermissions`, {
+//         chatId: userId,
+//         path: path,
+//         location: location,
+//     });
+// };
+
+export const sendRemoveFilePermissions = async(userId: string, path: string, location: string) =>{
+    const params = {
         chatId: userId,
         path: path,
         location: location,
+    }
+
+    const { user } = useAuthState();
+    const isSocketInit = <boolean>useSocket();
+    if (!isSocketInit) initializeSocket(user.id.toString())
+    const socket = useSocket();
+
+    const callToWebSocket = (res) => socket.emit("remove_file_permissions", { params }, function (result) {
+        if (result.error)
+            throw new Error('remove_file_permissions Failed in backend', result.error)
+        res(result)
     });
-};
+
+    const functionWithPromise = () => {
+        return new Promise((res) => {
+            callToWebSocket(res);
+        });
+    };
+
+    return functionWithPromise().then(val => {
+        return val;
+    })
+}
 
 export const getShared = async (shareStatus: string) => {
     const params = new URLSearchParams();
@@ -290,3 +420,7 @@ export const getSharedFolderContent = async (
 export const getShareByPath = async (path: string): Promise<SharedFileInterface> => {
     return (await axios.get(`${endpoint}/share/path/`, { params: { path } })).data;
 };
+export function moveFiles(items: string[], destination: string) {
+    throw new Error('Function not implemented.');
+}
+

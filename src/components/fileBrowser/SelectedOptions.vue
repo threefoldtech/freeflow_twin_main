@@ -181,10 +181,8 @@
         searchDirValue,
         searchResults,
         isDraggingFiles,
-        moveFiles,
         selectedAction,
         Action,
-        addShare,
         sharedDir,
         selectedTab,
     } from '@/store/fileBrowserStore';

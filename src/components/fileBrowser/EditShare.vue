@@ -38,7 +38,7 @@
 </template>
 <script lang="ts" setup>
     import { Chat, SharedFileInterface } from '@/types';
-    import { selectedPaths, addShare, PathInfoModel } from '@/store/fileBrowserStore';
+    import {  PathInfoModel } from '@/store/fileBrowserStore';
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
     import Toggle from '@/components/Toggle.vue';
     import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
@@ -51,7 +51,7 @@
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
     import { isObject } from 'lodash';
-    import { getShareByPath, removeFilePermissions } from '@/services/fileBrowserService';
+    import { getShareByPath, sendRemoveFilePermissions } from '@/services/fileBrowserService';
     import { SearchIcon } from '@heroicons/vue/solid';
     import { useRoute } from 'vue-router';
 
@@ -126,7 +126,7 @@
     });
 
     const remove = async (data: any) => {
-        removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
+        sendRemoveFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
         renderPermissionsData();
     };
 </script>

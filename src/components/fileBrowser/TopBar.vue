@@ -52,7 +52,6 @@
         moveFiles,
         selectedAction,
         Action,
-        addShare,
         sharedDir,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
