@@ -107,8 +107,13 @@
       </div>
       <div class="mt-4 text-gray-600">
         <p class="mb-8">{{item.post.body}}</p>
-        <div class="grid grid-cols-2 my-4">
-          <img  :src="fetchPostImage(image)" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx"/>
+        <div class="grid grid-cols-2 my-4 gap-1">
+          <div class="relative overflow-hidden cursor-pointer" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
+            <div v-if="!showAllImages && idx === 3 && item.images.length >= 5" class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
+              <p class="text-white text-2xl">+{{item.images.length - 4}}</p>
+            </div>
+            <img class="object-cover"  :src="fetchPostImage(image)" />
+          </div>
         </div>
         <p v-if="item.images.length > 4" class="w-full text-center my-3 cursor-pointer font-medium" @click="() => showAllImages = !showAllImages">{{showAllImages ? 'Hide images' : 'Show all images'}}</p>
       </div>

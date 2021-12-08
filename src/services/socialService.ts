@@ -51,10 +51,15 @@ export const createSocialPost = async (text?: string, files?: File[] = []) => {
     });
 };
 
+export const sortPosts = posts => {
+    return posts.sort(function (a, b) {
+        return new Date(b.post.createdOn) - new Date(a.post.createdOn);
+    });
+};
+
 export const getAllPosts = async () => {
     isLoadingSocialPosts.value = true;
     const posts = (await axios.get<any>(`${endpoint}`)).data;
-    console.log(posts);
     isLoadingSocialPosts.value = false;
-    allSocialPosts.value = posts;
+    allSocialPosts.value = sortPosts(posts);
 };
