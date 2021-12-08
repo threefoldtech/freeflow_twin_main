@@ -5,14 +5,13 @@
         <div class="relative">
           <div class="flex items-center">
             <div class="relative mr-4">
-              <!--<AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>-->
-              <img src="/threefold_logo.png" class="w-12 h-12"/>
+              <img :src="avatarImg" class="w-12 h-12"/>
             </div>
             <div>
               <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
-                Threefold
+                {{item.owner.id}}
               </p>
-              <p class="text-xs text-gray-400">{{ timeAgo(props.item.date_modified) }}</p>
+              <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
             </div>
           </div>
           <div class="group absolute right-0 top-0">
@@ -107,7 +106,11 @@
         </div>
       </div>
       <div class="mt-4 text-gray-600">
-        <p class="mb-8" v-html="renderMarkdown(item.content_html)"></p>
+        <p class="mb-8">{{item.post.body}}</p>
+        <div class="grid grid-cols-2 my-4">
+          <img  :src="fetchPostImage(image)" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx"/>
+        </div>
+        <p v-if="item.images.length > 4" class="w-full text-center my-3 cursor-pointer font-medium" @click="() => showAllImages = !showAllImages">{{showAllImages ? 'Hide images' : 'Show all images'}}</p>
       </div>
       <div>
         <div class="flex items-center w-full">
@@ -134,14 +137,14 @@
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
             </p>
-            <p class="text-gray-600 text-xs">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
+            <p class="text-gray-600 text-xs" v-if="false">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
           </div>
           <div class="flex items-center">
             <HeartIconSolid class="text-red-500 w-5 h-5 mr-2"  />
-            <p class="text-gray-600 text-base font-medium flex-shrink-0 text-base">{{Math.abs(props.item.comments)}} Likes</p>
+            <p class="text-gray-600 text-base font-medium flex-shrink-0 text-base">{{item.likes.length}} Likes</p>
           </div>
           <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-md">
-            {{ Math.abs(props.item.comments) }} Comments
+            {{ item.replies.length }} Comments
           </p>
         </div>
       </div>
@@ -164,7 +167,7 @@
             :class="{ 'text-red-500': localLike && action.name === 'Like' }"
         />
         <p class="text-gray-500">
-          {{ localLike ? (action.active_text ? action?.active_text : action.name) : action.name }}
+          {{action.name}}
         </p>
       </div>
     </div>
@@ -174,7 +177,7 @@
       <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
         <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
       </form>
-      <CommentsContainer v-if="showComments" :comments="comments"/>
+      <CommentsContainer v-if="showComments" :comments="item.replies"/>
     </div>
   </div>
 
@@ -191,7 +194,7 @@ import {
 import {HeartIcon, ChatAltIcon} from '@heroicons/vue/outline';
 import AvatarImg from '@/components/AvatarImg.vue';
 import {useAuthState} from '@/store/authStore';
-import {ref, computed} from 'vue';
+import {ref, computed, onMounted} from 'vue';
 import moment from 'moment';
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
 import {ChevronDownIcon} from '@heroicons/vue/solid';
@@ -199,11 +202,14 @@ import {showComingSoonToUhuru} from '@/services/dashboardService';
 import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
 import MarkdownIt from 'markdown-it';
 import {uuidv4} from "@/common";
+import {SOCIAL_POST} from "@/store/socialStore";
+import axios from "axios";
+import {calcExternalResourceLink} from "@/services/urlService";
 
 
 const messageInput = ref<string>("")
-
 const showComments = ref<boolean>(false);
+const showAllImages = ref<boolean>(false)
 
 const md = new MarkdownIt({
   html: true,
@@ -297,7 +303,20 @@ const comments: COMMENT_MODEL[] = [{
     isReply: false
   }]
 
-const props = defineProps<IProps>();
+const props = defineProps<{item: SOCIAL_POST}>();
+
+onMounted(async() => {
+  console.log(await axios.get(`https://[${props.item.owner.location}]/api/user/avatar/default`))
+})
+
+const avatarImg = computed(() => {
+  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`)
+})
+
+const fetchPostImage = (image) => {
+  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
+}
+
 
 const localLike = ref(false);
 

@@ -3,11 +3,9 @@ import { PathInfo } from '@/services/fileBrowserService';
 import config from '@/config';
 import { uuidv4 } from '@/common';
 import { ref } from 'vue';
+import { allSocialPosts, isLoadingSocialPosts } from '@/store/socialStore';
 
 const endpoint = `${config.baseUrl}api/posts`;
-
-export const allSocialPosts = ref<any[]>([]);
-export const isLoadingSocialPosts = ref<boolean>(false);
 
 interface socialMeta {
     createdOn: Date;
@@ -55,7 +53,8 @@ export const createSocialPost = async (text?: string, files?: File[] = []) => {
 
 export const getAllPosts = async () => {
     isLoadingSocialPosts.value = true;
-    const posts = await axios.get<any>(`${endpoint}`);
+    const posts = (await axios.get<any>(`${endpoint}`)).data;
+    console.log(posts);
     isLoadingSocialPosts.value = false;
     allSocialPosts.value = posts;
 };

@@ -101,7 +101,7 @@
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
     import ImageGrid from '@/components/Dashboard/ImageGrid.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { createSocialPost } from '@/services/socialService';
+    import {createSocialPost, getAllPosts} from '@/services/socialService';
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
@@ -128,7 +128,7 @@
         if (!isAllowedToPost.value) return;
         console.log('inside');
         await createSocialPost(new_post_text.value, new_post_images.value);
-
+        await getAllPosts();
         new_post_images.value = [];
         new_post_text.value = '';
     };
