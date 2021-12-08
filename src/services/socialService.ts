@@ -2,10 +2,12 @@ import axios from 'axios';
 import { PathInfo } from '@/services/fileBrowserService';
 import config from '@/config';
 import { uuidv4 } from '@/common';
+import { ref } from 'vue';
 
 const endpoint = `${config.baseUrl}api/posts`;
 
-export const createPostInSocial = () => {};
+export const allSocialPosts = ref<any[]>([]);
+export const isLoadingSocialPosts = ref<boolean>(false);
 
 interface socialMeta {
     createdOn: Date;
@@ -30,7 +32,7 @@ export const createSocialPost = async (text?: string, files?: File[] = []) => {
     const formData = new FormData();
 
     files?.forEach((file, key) => {
-        formData.append(`image${key}`, file);
+        formData.append(`images`, file);
     });
 
     const post: createPostModel = {
@@ -49,4 +51,11 @@ export const createSocialPost = async (text?: string, files?: File[] = []) => {
             'Content-Type': 'multipart/form-data',
         },
     });
+};
+
+export const getAllPosts = async () => {
+    isLoadingSocialPosts.value = true;
+    const posts = await axios.get<any>(`${endpoint}`);
+    isLoadingSocialPosts.value = false;
+    allSocialPosts.value = posts;
 };

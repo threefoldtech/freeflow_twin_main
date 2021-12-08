@@ -20,9 +20,11 @@
     import FlowSidebar from '@/components/Dashboard/FlowSidebar.vue'
     import { onBeforeMount, ref } from 'vue';
     import { fetchPosts, posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
+    import {getAllPosts} from "@/services/socialService";
 
     onBeforeMount(async () => {
         await fetchPosts();
+        await getAllPosts();
     });
 </script>
 
