@@ -1,4 +1,8 @@
 <template>
+  <div v-if="showImagePreview" class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8">
+      <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
+      <img  :src="imagePreviewSrc" class="pointer-events-none" />
+  </div>
   <div class="bg-white my-5 rounded">
     <div class="p-6">
       <div>
@@ -106,13 +110,13 @@
         </div>
       </div>
       <div class="mt-4 text-gray-600">
-        <p class="mb-8">{{item.post.body}}</p>
+        <p class="my-2">{{item.post.body}}</p>
         <div class="grid grid-cols-2 my-4 gap-1">
           <div class="relative overflow-hidden cursor-pointer" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
             <div v-if="!showAllImages && idx === 3 && item.images.length >= 5" class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
               <p class="text-white text-2xl">+{{item.images.length - 4}}</p>
             </div>
-            <img class="object-cover"  :src="fetchPostImage(image)" />
+            <img @click="openImagePreview(image)" class="object-cover"  :src="fetchPostImage(image)" />
           </div>
         </div>
         <p v-if="item.images.length > 4" class="w-full text-center my-3 cursor-pointer font-medium" @click="() => showAllImages = !showAllImages">{{showAllImages ? 'Hide images' : 'Show all images'}}</p>
@@ -190,11 +194,11 @@ import {
   PencilAltIcon,
   FilmIcon,
   DotsVerticalIcon,
-  HeartIcon as HeartIconSolid,
+  HeartIcon as HeartIconSolid, XIcon,
 } from '@heroicons/vue/solid';
 import {HeartIcon, ChatAltIcon} from '@heroicons/vue/outline';
 import AvatarImg from '@/components/AvatarImg.vue';
-import {useAuthState} from '@/store/authStore';
+import {useAuthState, myYggdrasilAddress} from '@/store/authStore';
 import {ref, computed, onMounted, onBeforeMount} from 'vue';
 import moment from 'moment';
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
@@ -209,11 +213,18 @@ import {calcExternalResourceLink} from "@/services/urlService";
 import {commentOnPost, getAllPosts, likePost} from "@/services/socialService";
 
 
+
+
 const props = defineProps<{item: SOCIAL_POST}>();
 const messageInput = ref<string>("")
 const showComments = ref<boolean>(false);
 const showAllImages = ref<boolean>(false)
 const amount_likes = ref<number>(props.item.likes.length)
+const myLocation = ref<string | null>(null)
+const showImagePreview = ref<boolean>(false)
+const imagePreviewSrc = ref<string | null>(null)
+
+const {user} = useAuthState();
 
 const md = new MarkdownIt({
   html: true,
@@ -239,82 +250,22 @@ interface IProps {
   };
 }
 
-enum MESSAGE_TYPE {
-  COMMENT = "COMMENT",
-  COMMENT_REPLY = "COMMENT_REPLY"
-}
-
-interface COMMENT_MODEL {
-  id: string;
-  name: string;
-  location?: string;
-  profile_image: string;
-  message: string;
-  type: MESSAGE_TYPE;
-  replies: COMMENT_MODEL[];
-  createdOn: Date;
-  likes: LIKE_MODEL[];
-  replyTo?: string | undefined;
-  isReply: boolean;
-}
-
-interface LIKE_MODEL {
-  location?: string;
-  name: string;
-}
-
-const like: LIKE_MODEL = {
-  location: "200:c692:4765:1f37:fe3f:64cc:4458:93eb",
-  name: 'Bert Meeuws'
-}
 const uuid1 = uuidv4();
-
-const reply = {
-  id: uuidv4(),
-  name: 'Bert Meeuws',
-  profile_image: 'https://images.unsplash.com/photo-1609349744982-0de6526d978b?ixid=MXwxMjA3fDB8MHx0b3BpYy1mZWVkfDU5fHRvd0paRnNrcEdnfHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-  message: "Lorem ipsum, dolor THIS IS REPLY!",
-  type: MESSAGE_TYPE.COMMENT_REPLY,
-  replies: [],
-  likes: [like, like, like],
-  createdOn: new Date('December 17, 2020 03:24:00'),
-  replyTo: uuid1,
-  isReply: true
-}
-
-const comments: COMMENT_MODEL[] = [{
-  id: uuid1,
-  name: 'Jonas Delrue',
-  profile_image: 'https://images.unsplash.com/photo-1609349744982-0de6526d978b?ixid=MXwxMjA3fDB8MHx0b3BpYy1mZWVkfDU5fHRvd0paRnNrcEdnfHxlbnwwfHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
-  message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!",
-  type: MESSAGE_TYPE.COMMENT,
-  replies: [reply, reply],
-  likes: [like, like],
-  createdOn: new Date('December 17, 1995 03:24:00'),
-  replyTo: undefined,
-  isReply: false,
-},
-  {
-    id: uuidv4(),
-    name: 'Laurens Van Aken',
-    profile_image: 'https://images.unsplash.com/photo-1638214522452-a49ea98b4682?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1887&q=80',
-    message: "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Expedita, maiores!",
-    type: MESSAGE_TYPE.COMMENT,
-    replies: [],
-    likes: [],
-    createdOn: new Date('December 10, 1995 03:24:00'),
-    replyTo: undefined,
-    isReply: false
-  }]
 
 const localLike = ref(false);
 
-onBeforeMount(() => {
+onBeforeMount(async() => {
+  myLocation.value = await myYggdrasilAddress();
   const {user} = useAuthState()
   if(props.item.likes.some(item => item.id === user.id)){
     localLike.value= true;
   }
 })
+
+const openImagePreview = (image) => {
+  imagePreviewSrc.value = fetchPostImage(image)
+  showImagePreview.value = true
+}
 
 const avatarImg = computed(() => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`)
@@ -324,13 +275,14 @@ const fetchPostImage = (image) => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
 }
 
-
 const timeAgo = time => {
   return moment(time).fromNow();
 };
 
 const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
-  const comment = await commentOnPost(isReplyToComment ?  messageInput.value: message, props.item, isReplyToComment, comment_id)
+  const comment_value = isReplyToComment ?  message: messageInput.value
+  if(!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
+  const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id)
   messageInput.value = "";
   await getAllPosts()
 }
@@ -429,7 +381,7 @@ const solutions = [
   },
 ];
 
-const {user} = useAuthState();
+
 </script>
 
 <style scoped></style>

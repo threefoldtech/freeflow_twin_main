@@ -1,9 +1,9 @@
 <template>
   <div :class="{'ml-10': comment.type === MESSAGE_TYPE.COMMENT_REPLY}" class="flex items-center space-x-2 relative" @mouseleave="openPanel = false">
     <div class="flex flex-shrink-0 self-start cursor-pointer" @mouseover="openPanel = true">
-      <img :src="comment.profile_image" alt="" class="h-8 w-8 object-cover rounded-full">
+      <img :src="avatarImg" alt="" class="h-8 w-8 object-cover rounded-full">
     </div>
-    <CommentHoverPanel v-if="openPanel"  :comment="comment" @mouseleave="openPanel = false" />
+    <CommentHoverPanel v-if="openPanel"  :avatar="avatarImg" :comment="comment" @mouseleave="openPanel = false" />
     <div class="flex items-center justify-center space-x-2 relative">
       <div class="block">
         <div class="bg-gray-100 w-auto rounded-xl px-2 pb-2 ">
@@ -21,8 +21,8 @@
             <a href="#" class="hover:underline">
               <small>Like</small>
             </a>
-            <small class="self-center">.</small>
-            <a href="#" class="hover:underline" @click="reply">
+            <small v-if="comment.type === MESSAGE_TYPE.COMMENT" class="self-center">.</small>
+            <a v-if="comment.type === MESSAGE_TYPE.COMMENT" href="#" class="hover:underline" @click="reply">
               <small>Reply</small>
             </a>
             <small class="self-center">.</small>
@@ -49,7 +49,7 @@
       </a>
     </div>
   </div>
- <ReplyComment v-if="commentsSorted.length > 0" v-for="(reply, idx) in commentsSorted" :comment="idx" />
+ <ReplyComment v-if="commentsSorted.length > 0 && MESSAGE_TYPE.COMMENT" v-for="(reply, idx) in commentsSorted" :key="reply.id" :comment="reply" />
   <form @submit.prevent="handleReplyForm" v-if="showReplyInput" class="relative flex items-center pl-20 flex-start w-full">
     <div class="w-6 h-6 bg-red-400 rounded-full absolute left-20"></div>
     <input v-model="replyInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3" placeholder="Type your message here" />
@@ -63,6 +63,7 @@ import ReplyComment from '@/components/Dashboard/PostComment.vue';
 import moment from "moment";
 import {ThumbUpIcon} from "@heroicons/vue/solid";
 import {MESSAGE_TYPE} from "@/store/socialStore";
+import {calcExternalResourceLink} from "@/services/urlService";
 
 const openPanel = ref<boolean>(false);
 const showComments = ref<boolean>(false);
@@ -74,8 +75,12 @@ const emit = defineEmits(['replyToComment'])
 
 const commentsSorted = computed(() => {
   return props.comment?.replies.sort(function (a, b) {
-    return new Date(b.createdOn) - new Date(a.createdOn);
+    return new Date(a.createdOn) - new Date(b.createdOn);
   });
+})
+
+const avatarImg = computed(() => {
+  return calcExternalResourceLink(`http://[${props.comment.owner.location}]/api/user/avatar/default`)
 })
 
 const handleReplyForm = () => {
@@ -87,6 +92,7 @@ const handleReplyForm = () => {
     input: replyInput.value,
     comment_id: props.comment.id
   })
+  replyInput.value = "";
   showReplyInput.value = false;
 }
 

@@ -3,17 +3,17 @@
        class="absolute -top-40 -left-10 mt-4 bg-white px-4 py-4 w-72 shadow rounded cursor-default z-10">
     <div class="flex space-x-3">
       <div class="flex flex-shrink-0">
-        <img :src="comment.profile_image" alt="" class="h-16 w-16 object-fill rounded-full">
+        <img :src="avatar" alt="" class="h-16 w-16 object-fill rounded-full">
       </div>
       <div class="flex flex-col space-y-2">
         <div class="font-semibold text-base">
           <a href="#" class="hover:underline">
-            {{ comment.name }}
+            {{ comment.owner.id }}
           </a>
         </div>
 
         <div class="flex justify-start items-center space-x-2">
-          <div class="w-auto text-sm leading-none">
+          <div class="w-auto text-sm leading-none hidden">
             <small>
               Friends since <span class="font-medium">21 November</span>
             </small>
@@ -57,7 +57,7 @@
 <script lang="ts" setup>
 import {DotsHorizontalIcon} from "@heroicons/vue/solid";
 
-const props = defineProps<{ comment: object }>()
+const props = defineProps<{ comment: object, avatar: string }>()
 </script>
 
 <style scoped>

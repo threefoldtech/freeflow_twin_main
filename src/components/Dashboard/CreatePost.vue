@@ -132,6 +132,7 @@
         await getAllPosts();
         new_post_images.value = [];
         new_post_text.value = '';
+        createPostModalStatus.value = false
     };
 
     const actions = ref([

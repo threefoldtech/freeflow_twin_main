@@ -84,7 +84,7 @@ export const likePost = async (postId: string, location: string) => {
 export const commentOnPost = async (
     message: string,
     item: SOCIAL_POST,
-    isReplyToComment: boolean = true,
+    isReplyToComment: boolean,
     comment_id?: string
 ) => {
     const data: COMMENT_MODEL = {
@@ -108,6 +108,5 @@ export const commentOnPost = async (
         replyTo: isReplyToComment ? comment_id : '',
         isReplyToComment: isReplyToComment,
     };
-    console.log(data);
     return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
 };
