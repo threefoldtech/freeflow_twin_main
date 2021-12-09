@@ -1,6 +1,6 @@
 <template>
   <div class="bg-white w-full h-auto px-3 py-2 flex flex-col space-y-2">
-    <PostComment :key="idx" v-for="(comment, idx) in commentsSorted" :comment="comment"/>
+    <PostComment @replyToComment="e => $emit('replyToComment', e)" :key="comment.id" v-for="(comment, idx) in commentsSorted" :comment="comment"/>
   </div>
 </template>
 
@@ -8,7 +8,8 @@
 import PostComment from '@/components/Dashboard/PostComment.vue'
 import {computed, onBeforeMount, ref} from "vue";
 
-const props = defineProps<{ comments: object }>()
+const props = defineProps<{ comments: any }>()
+const emit = defineEmits(['replyToComment'])
 
 const commentsSorted = computed(() => {
   return props.comments.sort(function (a, b) {

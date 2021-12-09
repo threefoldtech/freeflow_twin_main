@@ -1,5 +1,5 @@
 <template>
-  <div :class="{'ml-10': comment.isReply}" class="flex items-center space-x-2 relative" @mouseleave="openPanel = false">
+  <div :class="{'ml-10': comment.type === MESSAGE_TYPE.COMMENT_REPLY}" class="flex items-center space-x-2 relative" @mouseleave="openPanel = false">
     <div class="flex flex-shrink-0 self-start cursor-pointer" @mouseover="openPanel = true">
       <img :src="comment.profile_image" alt="" class="h-8 w-8 object-cover rounded-full">
     </div>
@@ -49,33 +49,49 @@
       </a>
     </div>
   </div>
-  <ReplyComment v-for="(reply, idx) in comment.replies" :comment="reply" />
+ <ReplyComment v-if="commentsSorted.length > 0" v-for="(reply, idx) in commentsSorted" :comment="idx" />
   <form @submit.prevent="handleReplyForm" v-if="showReplyInput" class="relative flex items-center pl-20 flex-start w-full">
     <div class="w-6 h-6 bg-red-400 rounded-full absolute left-20"></div>
-    <input  type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3" placeholder="Type your message here" />
+    <input v-model="replyInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3" placeholder="Type your message here" />
   </form>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
+import {computed, ref} from 'vue';
 import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue'
 import ReplyComment from '@/components/Dashboard/PostComment.vue';
 import moment from "moment";
 import {ThumbUpIcon} from "@heroicons/vue/solid";
-
+import {MESSAGE_TYPE} from "@/store/socialStore";
 
 const openPanel = ref<boolean>(false);
 const showComments = ref<boolean>(false);
-const props = defineProps<{comment: object}>()
+const props = defineProps<{comment: any}>()
 const showReplyInput = ref<boolean>(false);
+const replyInput = ref<string>("")
+
+const emit = defineEmits(['replyToComment'])
+
+const commentsSorted = computed(() => {
+  return props.comment?.replies.sort(function (a, b) {
+    return new Date(b.createdOn) - new Date(a.createdOn);
+  });
+})
 
 const handleReplyForm = () => {
+  console.log(props.comment)
+  console.log(replyInput.value)
+  if(replyInput.value === "") return;
+  console.log(props)
+    emit('replyToComment', {
+    input: replyInput.value,
+    comment_id: props.comment.id
+  })
   showReplyInput.value = false;
 }
 
 const reply = () => {
-  if(props.comment.isReply){
-    console.log(props.comment)
+  if(props.comment.type === MESSAGE_TYPE.COMMENT){
     showReplyInput.value = !showReplyInput.value;
   }
 }

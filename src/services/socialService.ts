@@ -84,10 +84,9 @@ export const likePost = async (postId: string, location: string) => {
 export const commentOnPost = async (
     message: string,
     item: SOCIAL_POST,
-    isQuote: boolean = true,
-    comment_id: string = '3d38970e-40ac-4811-a938-c8a9c392ddbf'
+    isReplyToComment: boolean = true,
+    comment_id?: string
 ) => {
-    console.log(item);
     const data: COMMENT_MODEL = {
         id: uuidv4(),
         body: message,
@@ -102,12 +101,13 @@ export const commentOnPost = async (
                 id: String(item.owner.id),
             },
         },
-        type: isQuote ? MESSAGE_TYPE.COMMENT : MESSAGE_TYPE.COMMENT_REPLY,
-        replies: [], //Look at this again for quotes
+        type: isReplyToComment ? MESSAGE_TYPE.COMMENT_REPLY : MESSAGE_TYPE.COMMENT,
+        replies: [],
         createdOn: new Date(),
         likes: [],
-        replyTo: isQuote ? comment_id : '',
-        isReplyToComment: isQuote,
+        replyTo: isReplyToComment ? comment_id : '',
+        isReplyToComment: isReplyToComment,
     };
+    console.log(data);
     return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
 };

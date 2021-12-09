@@ -178,7 +178,7 @@
       <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
         <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
       </form>
-      <CommentsContainer v-if="showComments" :comments="item.replies"/>
+      <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments" :comments="item.replies"/>
     </div>
   </div>
 
@@ -329,9 +329,8 @@ const timeAgo = time => {
   return moment(time).fromNow();
 };
 
-const handleAddComment = async (isQuote: boolean = false) => {
-  const comment = await commentOnPost(messageInput.value, props.item, true)
-  console.log(comment)
+const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
+  const comment = await commentOnPost(isReplyToComment ?  messageInput.value: message, props.item, isReplyToComment, comment_id)
   messageInput.value = "";
   await getAllPosts()
 }
