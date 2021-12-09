@@ -1,7 +1,7 @@
 import { computed, ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { getShareWithId, sendCopyFiles, sendDeleteFile, sendGetDirectoryContent, sendMoveFiles } from '@/services/fileBrowserService';
+import { getShareWithId, sendCopyFiles, sendDeleteFile, sendGetDirectoryContent, sendGetShareWithId, sendMoveFiles } from '@/services/fileBrowserService';
 import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
@@ -958,7 +958,7 @@ export const getExtension = filename => {
 };
 
 export const fetchShareDetails = async (shareId: string) => {
-    const shareDetails = await getShareWithId(shareId);
+    const shareDetails = await sendGetShareWithId(shareId);
     return shareDetails;
 };
 

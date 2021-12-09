@@ -51,7 +51,7 @@
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
     import { isObject } from 'lodash';
-    import { getShareByPath, sendRemoveFilePermissions } from '@/services/fileBrowserService';
+    import { getShareByPath, sendGetShareByPath, sendRemoveFilePermissions } from '@/services/fileBrowserService';
     import { SearchIcon } from '@heroicons/vue/solid';
     import { useRoute } from 'vue-router';
 
@@ -85,7 +85,7 @@
     });
 
     const renderPermissionsData = async () => {
-        currentShare.value = await getShareByPath(props.selectedFile.path);
+        currentShare.value = await sendGetShareByPath(props.selectedFile.path);
         currentShare.value.permissions = currentShare.value.permissions.map(item => {
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.chatId;

@@ -44,7 +44,6 @@ export const initializeSocket = async (username: string) => {
             addUserToBlockList(chatId);
         });
         socket.on('message', message => {
-            console.log("message in websocket client ", message)
             const { user } = useAuthState();
             if (message.type === 'FILE_SHARE_REQUEST') {
                 return;
