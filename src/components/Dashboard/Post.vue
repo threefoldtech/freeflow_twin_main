@@ -173,7 +173,7 @@
       </div>
     </div>
     <div>
-      <form @submit.prevent="handleAddComment" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
+      <form @submit.prevent="handleAddComment(false)" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
         <AvatarImg :showOnlineStatus="false" class="rounded-full" />
       <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
         <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
@@ -206,7 +206,7 @@ import {uuidv4} from "@/common";
 import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
 import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
-import {likePost} from "@/services/socialService";
+import {commentOnPost, getAllPosts, likePost} from "@/services/socialService";
 
 
 const props = defineProps<{item: SOCIAL_POST}>();
@@ -329,8 +329,11 @@ const timeAgo = time => {
   return moment(time).fromNow();
 };
 
-const handleAddComment = () => {
+const handleAddComment = async (isQuote: boolean = false) => {
+  const comment = await commentOnPost(messageInput.value, props.item, true)
+  console.log(comment)
   messageInput.value = "";
+  await getAllPosts()
 }
 
 const actions = ref([
@@ -340,7 +343,6 @@ const actions = ref([
     active: HeartIconSolid,
     active_text: 'Liked',
     execute: async () => {
-
       const {status} = await likePost(props.item.post.id, props.item.owner.location)
       if(status === LIKE_STATUS.LIKED){
           localLike.value = true;

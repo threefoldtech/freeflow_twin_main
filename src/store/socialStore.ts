@@ -9,7 +9,12 @@ export enum LIKE_STATUS {
     UNLIKE = 'unliked',
 }
 
-interface POST_MODEL {
+export enum MESSAGE_TYPE {
+    COMMENT = 'COMMENT',
+    COMMENT_REPLY = 'COMMENT_REPLY',
+}
+
+export interface POST_MODEL {
     id: string;
     type: POST_TYPE;
     body: string;
@@ -21,6 +26,25 @@ interface POST_MODEL {
 interface POST_OWNER {
     id: string;
     location: string;
+}
+
+interface LIKE_MODEL extends POST_OWNER {}
+interface COMMENT_OWNER extends POST_OWNER {}
+
+export interface COMMENT_MODEL {
+    id: string;
+    body: string;
+    owner: COMMENT_OWNER;
+    post: {
+        id: string;
+        owner: POST_OWNER;
+    };
+    type: MESSAGE_TYPE;
+    replies: COMMENT_MODEL[];
+    createdOn: Date;
+    likes: LIKE_MODEL[];
+    replyTo?: string | undefined;
+    isReplyToComment: boolean;
 }
 
 interface POST_IMAGE {
@@ -38,7 +62,7 @@ interface POST_IMAGE {
 export interface SOCIAL_POST {
     post: POST_MODEL;
     owner: POST_OWNER;
-    likes: any[];
+    likes: LIKE_MODEL[];
     images: POST_IMAGE[];
 }
 
