@@ -145,8 +145,8 @@
             <p class="text-gray-600 text-xs" v-if="false">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
           </div>
           <div class="flex items-center">
-            <HeartIconSolid class="text-red-500 w-5 h-5 mr-2"  />
-            <p class="text-gray-600 text-base font-medium flex-shrink-0 text-base">{{item.likes.length}} Likes</p>
+            <HeartIconSolid class="hidden text-red-500 w-5 h-5 mr-2"  />
+            <p class="text-gray-600 font-medium flex-shrink-0 text-sm">{{amount_likes}} {{amount_likes === 1 ? "Like" : "Likes"}}</p>
           </div>
           <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-md">
             {{ item.replies.length }} Comments
@@ -159,17 +159,13 @@
           class="flex items-center cursor-pointer"
           v-for="action in actions"
           :key="action.name"
-          @click="
-                    () => {
-                        action.name === 'Comment' ? (showComments = !showComments) : '';
-                        localLike = !localLike;
-                    }
-                "
+          @click="() => action.execute()"
       >
         <component
             :is="localLike ? action.active : action.component"
-            class="w-6 text-gray-500 mr-3"
-            :class="{ 'text-red-500': localLike && action.name === 'Like' }"
+            class="w-6 mr-3"
+            :class="{ 'text-red-500': localLike && action.name === 'Like','text-gray-400': !localLike && action.name === 'Like', 'text-gray-500': action.name !== 'Like' }"
+
         />
         <p class="text-gray-500">
           {{action.name}}
@@ -199,7 +195,7 @@ import {
 import {HeartIcon, ChatAltIcon} from '@heroicons/vue/outline';
 import AvatarImg from '@/components/AvatarImg.vue';
 import {useAuthState} from '@/store/authStore';
-import {ref, computed, onMounted} from 'vue';
+import {ref, computed, onMounted, onBeforeMount} from 'vue';
 import moment from 'moment';
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
 import {ChevronDownIcon} from '@heroicons/vue/solid';
@@ -207,14 +203,17 @@ import {showComingSoonToUhuru} from '@/services/dashboardService';
 import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
 import MarkdownIt from 'markdown-it';
 import {uuidv4} from "@/common";
-import {SOCIAL_POST} from "@/store/socialStore";
+import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
 import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
+import {likePost} from "@/services/socialService";
 
 
+const props = defineProps<{item: SOCIAL_POST}>();
 const messageInput = ref<string>("")
 const showComments = ref<boolean>(false);
 const showAllImages = ref<boolean>(false)
+const amount_likes = ref<number>(props.item.likes.length)
 
 const md = new MarkdownIt({
   html: true,
@@ -308,10 +307,13 @@ const comments: COMMENT_MODEL[] = [{
     isReply: false
   }]
 
-const props = defineProps<{item: SOCIAL_POST}>();
+const localLike = ref(false);
 
-onMounted(async() => {
-  console.log(await axios.get(`https://[${props.item.owner.location}]/api/user/avatar/default`))
+onBeforeMount(() => {
+  const {user} = useAuthState()
+  if(props.item.likes.some(item => item.id === user.id)){
+    localLike.value= true;
+  }
 })
 
 const avatarImg = computed(() => {
@@ -322,13 +324,6 @@ const fetchPostImage = (image) => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
 }
 
-
-const localLike = ref(false);
-
-const executeAction = (name: string) => {
-  if (name !== 'Like') return;
-  localLike.value = !localLike.value;
-};
 
 const timeAgo = time => {
   return moment(time).fromNow();
@@ -344,11 +339,26 @@ const actions = ref([
     component: HeartIcon,
     active: HeartIconSolid,
     active_text: 'Liked',
+    execute: async () => {
+
+      const {status} = await likePost(props.item.post.id, props.item.owner.location)
+      if(status === LIKE_STATUS.LIKED){
+          localLike.value = true;
+          amount_likes.value = amount_likes.value +1
+          console.log(amount_likes.value)
+        return;
+      }
+      amount_likes.value = amount_likes.value - 1
+      localLike.value = false;
+      console.log(amount_likes.value)
+      return;
+    }
   },
   {
     name: 'Comment',
     component: ChatAltIcon,
     active: ChatAltIcon,
+    execute: () => {}
   },
 ]);
 

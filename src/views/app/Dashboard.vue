@@ -5,7 +5,7 @@
         <p v-if="isLoadingSocialPosts">Loading</p>
         <pre class="hidden">{{JSON.stringify(allSocialPosts, null, 2)}}</pre>
         <Post v-if="false" :item="item" v-for="(item, idx) in posts" :key="idx" />
-        <Post :item="item" v-for="(item, idx) in allSocialPosts" :key="idx" />
+        <Post :item="item" v-for="(item, idx) in allSocialPosts" :key="item.post.id" />
 
         <div v-if='showComingSoonToUhuru' @click='showComingSoonToUhuru = false' class='w-full h-full inset-0 bg-black bg-opacity-75 fixed z-50 flex justify-center items-center flex-col'>
           <p class='text-white text-lg font-semibold' @click.stop>Coming soon to Uhuru.</p>

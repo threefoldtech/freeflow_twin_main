@@ -4,6 +4,11 @@ export enum POST_TYPE {
     SOCIAL_POST = 'SOCIAL_POST',
 }
 
+export enum LIKE_STATUS {
+    LIKED = 'liked',
+    UNLIKE = 'unliked',
+}
+
 interface POST_MODEL {
     id: string;
     type: POST_TYPE;

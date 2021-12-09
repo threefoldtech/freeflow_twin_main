@@ -106,6 +106,7 @@
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
 
+
     const isAllowedToPost = computed(() => {
         return new_post_images.value.length >= 1 || new_post_text.value !== '' ? true : false;
     });
