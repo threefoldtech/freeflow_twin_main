@@ -9,7 +9,7 @@
         <div class="relative">
           <div class="flex items-center">
             <div class="relative mr-4">
-              <img :src="avatarImg" class="w-12 h-12"/>
+              <img :src="avatarImg" class="w-12 h-12 rounded-full"/>
             </div>
             <div>
               <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
@@ -178,7 +178,7 @@
     </div>
     <div>
       <form @submit.prevent="handleAddComment(false)" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
-        <AvatarImg :showOnlineStatus="false" class="rounded-full" />
+        <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
       <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
         <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
       </form>
@@ -271,6 +271,12 @@ const avatarImg = computed(() => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`)
 })
 
+const myAvatar = computed(() => {
+  return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`)
+})
+
+
+
 const fetchPostImage = (image) => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
 }
@@ -311,7 +317,9 @@ const actions = ref([
     name: 'Comment',
     component: ChatAltIcon,
     active: ChatAltIcon,
-    execute: () => {}
+    execute: () => {
+      showComments.value = !showComments.value
+    }
   },
 ]);
 

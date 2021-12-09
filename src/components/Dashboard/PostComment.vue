@@ -1,7 +1,9 @@
 <template>
   <div :class="{'ml-10': comment.type === MESSAGE_TYPE.COMMENT_REPLY}" class="flex items-center space-x-2 relative" @mouseleave="openPanel = false">
     <div class="flex flex-shrink-0 self-start cursor-pointer" @mouseover="openPanel = true">
-      <img :src="avatarImg" alt="" class="h-8 w-8 object-cover rounded-full">
+      <div class="w-10">
+        <img :src="avatarImg" alt="" class=" object-cover rounded-full">
+      </div>
     </div>
     <CommentHoverPanel v-if="openPanel"  :avatar="avatarImg" :comment="comment" @mouseleave="openPanel = false" />
     <div class="flex items-center justify-center space-x-2 relative">
