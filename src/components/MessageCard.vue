@@ -94,7 +94,7 @@
                         <span class="text-gray-600 pl-2">Edit permissions</span>
                     </span>
                     <span
-                        v-if="message.type === MessageTypes.FILE"
+                        v-if="message.type === MessageTypes.FILE && message.to === user.id"
                       class="reply text-xs pr-4 cursor-pointer hover:underline"
                       @click="downloadAttachmentToQuantum(message)"
                   >
