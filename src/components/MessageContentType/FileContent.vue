@@ -1,8 +1,9 @@
 <template>
+    <!-- :href="calcExternalResourceLink(message.body.url)" -->
     <a
         :download="message.body.filename"
-        :href="calcExternalResourceLink(message.body.url)"
-        class="px-4 my-2 my-message:bg-accent-200"
+        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer"
+        @click="openSharedFile(message)"
     >
         <div
             class="
@@ -27,11 +28,38 @@
 </template>
 
 <script lang="ts" setup>
-    import { calcExternalResourceLink } from '@/services/urlService';
+import { downloadAttachment } from '@/services/fileBrowserService';
+import { calcExternalResourceLink } from '@/services/urlService';
+import { FileShareMessageType, Message, MessageBodyType } from '@/types';
+import router from "@/plugins/Router";
+import {currentDirectoryContent, itemAction, savedAttachments, updateAttachments} from "@/store/fileBrowserStore";
+import {useAuthState} from "@/store/authStore";
 
-    interface IProp {
-        message: Object;
+interface IProp {
+    message: Object;
+}
+
+const props = defineProps<IProp>();
+
+const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) => {
+  await downloadAttachment(message);
+};
+
+const openSharedFile = async (message: Message<MessageBodyType>, count = 0) => {
+  const {user} = useAuthState()
+  if(message.from !== user.id){
+    //@TODO make this more efficient
+    const result = (await updateAttachments(`/${message.from}`))?.data
+    const file = result.find(item => item.fullName === message.body.filename)
+    if (count >= 3) return;
+    if(!file){
+      await downloadAttachmentToQuantum(message)
+      openSharedFile(message)
+      return;
     }
-
-    const props = defineProps<IProp>();
+    savedAttachments.value = true
+    //@ts-ignore
+    itemAction(file, undefined)
+  }
+};
 </script>

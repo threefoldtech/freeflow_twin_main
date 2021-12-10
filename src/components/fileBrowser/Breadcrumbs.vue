@@ -15,8 +15,7 @@
     </div>-->
 
             <div class="flex-1 mr-4">
-            <div v-if="!sharedDir && !isQuantumChatFiles">
-
+            <div v-if="!sharedDir && !isQuantumChatFiles && !savedAttachments">
                 <template v-for="(item, i) in parts">
                     <span v-if="i !== 0 && item">
                         <i class="fas fa-chevron-right"></i>
@@ -68,6 +67,19 @@
                     </span>
                 </template>
             </div>
+              <!-- SAVED ATTACHMENTS -->
+              <div v-if='!isQuantumChatFiles && savedAttachments'>
+                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
+                <i class="fas fa-chevron-right"></i>
+                <template v-for="(breadcrumb, idx) in savedAttachmentsBreadcrumbs" :key='idx'>
+                    <span v-if="idx !== 0 && breadcrumb">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                  <span class='mx-2 cursor-pointer' @click='router.push({path: breadcrumb.path})'>
+                        {{breadcrumb.name}}
+                    </span>
+                </template>
+              </div>
         </div>
     </div>
 </template>
@@ -77,22 +89,25 @@
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
 
     import {
-        clickBreadcrumb,
-        currentDirectory,
-        FileType,
-        getFileType,
-        goToAPreviousDirectory,
-        goToHome,
-        isDraggingFiles,
-        moveFiles,
-        selectedPaths,
-        sharedBreadcrumbs,
-        sharedDir,
-        chatFilesBreadcrumbs,
-        isQuantumChatFiles
+      clickBreadcrumb,
+      currentDirectory,
+      FileType,
+      getFileType,
+      goToAPreviousDirectory,
+      goToHome,
+      isDraggingFiles,
+      moveFiles,
+      selectedPaths,
+      sharedBreadcrumbs,
+      sharedDir,
+      chatFilesBreadcrumbs,
+      savedAttachments,
+      isQuantumChatFiles,
+      savedAttachmentsBreadcrumbs
     } from '@/store/fileBrowserStore';
     import {useRouter} from 'vue-router';
     import { createNotification } from '@/store/notificiationStore';
+
 
     const router = useRouter()
 

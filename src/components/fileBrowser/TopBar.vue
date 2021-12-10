@@ -18,6 +18,8 @@
                     "
                     placeholder="Search"
                     type="text"
+                    :class="{'opacity-50' : route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat'}"
+                    :disabled="route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat'"
                     @input="debounceSearch"
                 />
                 <div
@@ -65,6 +67,9 @@
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import {useRoute} from "vue-router";
+
+    const route = useRoute();
 
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
