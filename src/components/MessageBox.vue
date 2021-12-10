@@ -26,7 +26,7 @@
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
       <v-contextmenu v-if="currentRightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
-        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id" @click="() => {
+        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id && currentRightClickedItem.data.type === 'STRING'" @click="() => {
                            triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
                            rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
                                   }">Edit message</v-contextmenu-item>
@@ -36,7 +36,7 @@
                                   }">Delete</v-contextmenu-item>
         <v-contextmenu-item @click="() => {
                            triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY;
                                   }">Reply</v-contextmenu-item>
         </v-contextmenu>
         <div class="relative w-full mt-8 px-4">
@@ -178,10 +178,11 @@
     import EditShare from '@/components/fileBrowser/EditShare.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import {
-      currentRightClickedItem,
       rightClickItemAction,
+      currentRightClickedItem,
       triggerWatchOnRightClickItem,
       RIGHT_CLICK_ACTIONS_MESSAGE,
+      RIGHT_CLICK_ACTIONS_CHAT_CARD,
       RIGHT_CLICK_TYPE
     } from '@/store/contextmenuStore'
 
@@ -225,6 +226,7 @@
         selectedEditFile.value = file;
         showShareDialog.value = true;
     };
+
 
     const retry = (file) =>{
         file.cancelToken.cancel('Operation canceled by the user.');
@@ -285,8 +287,6 @@
             scroll();
         }, 100);
     });
-
-    onUpdated(() => scroll());
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';
