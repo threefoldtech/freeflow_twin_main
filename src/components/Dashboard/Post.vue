@@ -112,7 +112,7 @@
       <div class="mt-4 text-gray-600">
         <p class="my-2">{{item.post.body}}</p>
         <div class="grid grid-cols-2 my-4 gap-1">
-          <div class="relative overflow-hidden cursor-pointer" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
+          <div class="relative overflow-hidden cursor-pointer h-64" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
             <div v-if="!showAllImages && idx === 3 && item.images.length >= 5" class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
               <p class="text-white text-2xl">+{{item.images.length - 4}}</p>
             </div>
@@ -275,8 +275,6 @@ const myAvatar = computed(() => {
   return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`)
 })
 
-
-
 const fetchPostImage = (image) => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
 }
@@ -317,7 +315,7 @@ const actions = ref([
     name: 'Comment',
     component: ChatAltIcon,
     active: ChatAltIcon,
-    execute: () => {
+    execute: async () => {
       showComments.value = !showComments.value
     }
   },
