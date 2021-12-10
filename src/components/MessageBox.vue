@@ -216,7 +216,6 @@
     const selectedEditFile = ref<any>(null);
 
     const setCurrentRightClickedItem = (item) => {
-      console.log(item)
       currentRightClickedItem.value = {
         type: RIGHT_CLICK_TYPE.MESSAGE,
         data: item

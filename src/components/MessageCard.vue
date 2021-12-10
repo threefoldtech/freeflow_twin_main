@@ -189,7 +189,6 @@ import {showShareDialog} from "@/services/dialogService";
       if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE && currentRightClickedItem.value.data.id === props.message.id){
         switch(rightClickItemAction.value){
           case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
-            console.log(currentRightClickedItem.value.data)
             replyMessage(props.chatId, props.message)
             break;
           case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
