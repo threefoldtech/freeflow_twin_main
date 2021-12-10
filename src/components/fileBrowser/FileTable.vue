@@ -479,7 +479,7 @@ isDraggingFiles,
     goToFilesInChat,
     savedAttachments,
 } from '@/store/fileBrowserStore';
-import {useRouter} from 'vue-router';
+import {useRouter, useRoute} from 'vue-router';
 import FileDropArea from '@/components/FileDropArea.vue';
 import {useSocketActions} from '@/store/socketStore';
 import {useAuthState} from '@/store/authStore';
