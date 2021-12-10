@@ -112,7 +112,7 @@
                         >
                             <div class="py-2 pl-4 flex-1">
                                 <p class="font-bold font overflow-hidden overflow-ellipsis w-80">
-                                    {{ chat.name }}
+                                  {{ chat.name }} <span v-if='!online' class='font-normal text-xs text-red-600'>You appear to be offline</span>
                                 </p>
                                 <p v-if="!blocked" class="font-thin">
                                     {{ getChatStatus.message }}
@@ -322,15 +322,18 @@ import { useContactsState } from '@/store/contactStore';
 import { each } from 'lodash';
 import { statusList } from '@/store/statusStore';
 import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
+
 import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
 import { useAuthState } from '@/store/authStore';
 import { popupCenter } from '@/services/popupService';
+
 import MessageCard from '@/components/MessageCard.vue';
 import ChatList from '@/components/ChatList.vue';
 import ChatInput from '@/components/ChatInput.vue';
 import AvatarImg from '@/components/AvatarImg.vue';
 import GroupManagement from '@/components/GroupManagement.vue';
 import Dialog from '@/components/Dialog.vue';
+
 import * as crypto from 'crypto-js';
 import { useIntersectionObserver } from '@/lib/intersectionObserver';
 import { useRoute, useRouter } from 'vue-router';
@@ -345,6 +348,10 @@ import FileDropArea from '@/components/FileDropArea.vue';
 import TimeContent from '@/components/TimeContent.vue';
 import { XIcon } from '@heroicons/vue/outline';
 import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
+
+import { useOnline } from '@vueuse/core'
+
+const online = useOnline()
 
 const route = useRoute();
 const selectedId = ref(<string>route.params.id);
