@@ -174,7 +174,8 @@ import {
   rightClickItemAction,
   triggerWatchOnRightClickItem
 } from "@/store/contextmenuStore";
-import {downloadFiles, selectedPaths, downloadAttachment} from "@/store/fileBrowserStore";
+import {downloadFiles, selectedPaths} from "@/store/fileBrowserStore";
+import {downloadAttachment} from '@/services/fileBrowserService'
 import {showShareDialog} from "@/services/dialogService";
 
 
