@@ -135,6 +135,20 @@
                     v-if="filteredChats && filteredChats.length"
                     class="flex flex-col justify-center items-center pt-2 px-2 collapsed-bar:px-0"
                 >
+                  <v-contextmenu ref="contextmenu-chat-card">
+                    <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT;
+                                  }">Open chat</v-contextmenu-item>
+                    <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK;
+                                  }">Block user</v-contextmenu-item>
+                    <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE
+                                  }">Delete user</v-contextmenu-item>
+                  </v-contextmenu>
                     <ChatCard
                         v-for="chat in filteredChats"
                         :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
@@ -150,6 +164,8 @@
                             cursor-pointer
                         "
                         @selectChat="setSelected(chat.chatId)"
+                        @mousedown.right="setCurrentRightClickedItem(chat, RIGHT_CLICK_TYPE.CHAT_CARD)"
+                        v-contextmenu:contextmenu-chat-card
                     />
                 </div>
             </div>
@@ -174,8 +190,8 @@
 <script setup lang="ts">
     import moment from 'moment';
     import { useSocketActions } from '@/store/socketStore';
-    import { defineComponent, ref, computed, onBeforeMount, inject } from 'vue';
-    import { usechatsState, usechatsActions } from '@/store/chatStore';
+    import {defineComponent, ref, computed, onBeforeMount, inject, watch} from 'vue';
+    import {usechatsState, usechatsActions, replyMessage, editMessage} from '@/store/chatStore';
     import { useAuthState, useAuthActions } from '@/store/authStore';
     import AddContact from '@/components/ContactAdd.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -190,6 +206,17 @@
     import { useScrollActions } from '@/store/scrollStore';
     import { SearchIcon } from '@heroicons/vue/solid';
     import { Dialog as HeadlessUIDialog, DialogOverlay, TransitionRoot } from '@headlessui/vue';
+    import {
+      triggerWatchOnRightClickItem,
+      RIGHT_CLICK_ACTIONS_CHAT_CARD,
+      rightClickItemAction,
+      currentRightClickedItem,
+      RIGHT_CLICK_TYPE,
+      setCurrentRightClickedItem,
+      RIGHT_CLICK_ACTIONS_MESSAGE,
+      openBlockDialogFromOtherFile,
+      openDeleteDialogFromOtherFile, conversationComponentRerender
+    } from '@/store/contextmenuStore'
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
@@ -204,11 +231,42 @@
 
     const { user } = useAuthState();
 
+
+
     const m = val => moment(val);
     const searchValue = ref('');
     let showContacts = ref(false);
 
     const router = useRouter();
+
+
+    watch(triggerWatchOnRightClickItem,async () => {
+      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.CHAT_CARD){
+        switch(rightClickItemAction.value){
+          case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
+              router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
+            break;
+          case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
+            openBlockDialogFromOtherFile.value = true
+              if(router.currentRoute.value.name === 'single'){
+                conversationComponentRerender.value = conversationComponentRerender.value++
+              }
+            await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
+            break;
+          case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
+            openDeleteDialogFromOtherFile.value = true;
+            if(router.currentRoute.value.name === 'single'){
+              conversationComponentRerender.value = conversationComponentRerender.value++
+            }
+            await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
+            break;
+          default:
+            break;
+        }
+      }
+      rightClickItemAction.value = null;
+      return;
+    }, {deep: true})
 
     const setSelected = id => {
         router.push({ name: 'single', params: { id } });

@@ -45,6 +45,7 @@
         "typescript": "^4.3.5",
         "unicode-emoji-picker": "^1.1.1",
         "universal-cookie": "^4.0.4",
+        "v-contextmenu": "^3.0.0",
         "vue": "^3.2.2",
         "vue-cropperjs": "^5.0.0",
         "vue-router": "^4.0.11",

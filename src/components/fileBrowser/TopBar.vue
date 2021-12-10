@@ -29,7 +29,7 @@
                 </div>
             </div>
             <div class="flex flex-row items-center">
-                <SelectedOptions v-if="!sharedDir || selectedPaths.length > 0"></SelectedOptions>
+                <SelectedOptions v-if="!sharedDir"></SelectedOptions>
                 <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
         </div>

@@ -25,15 +25,30 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
-        <div class="relative w-full px-4" :class="{'mt-8':chatInfo.isLoading}">
-            <div  v-if='chatInfo.isLoading'  class="flex flex-col justify-center items-center w-full ">
-                <Spinner class='mb-6' />
-                <span class='text-gray-600 text-xs'>Loading more messages</span>
+      <v-contextmenu v-if="currentRightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
+        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id" @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
+                                  }">Edit message</v-contextmenu-item>
+        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id" @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE;
+                                  }">Delete</v-contextmenu-item>
+        <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY
+                                  }">Reply</v-contextmenu-item>
+        </v-contextmenu>
+        <div class="relative w-full mt-8 px-4">
+            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
+                <Spinner />
+                <span>Loading more messages</span>
             </div>
             <div v-for="(message, i) in chat.messages">
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
                     {{ moment(message.timeStamp).calendar() }}
                 </div>
+
                 <MessageCard
                     :key="`${message.id}-${i <= lastRead}`"
                     :chatId="chat.chatId"
@@ -46,7 +61,8 @@
                     :message="message"
                     @copy="copyMessage($event, message)"
                     @openEditShare="editFileSharePermission"
-
+                    @mousedown.right="setCurrentRightClickedItem(message)"
+                    v-contextmenu:contextmenu-message
                 />
             </div>
             <slot name="viewAnchor" />
@@ -149,7 +165,7 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, onMounted, onUnmounted, onUpdated, ref, watch, nextTick } from 'vue';
+    import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
     import { imageUploadQueue, usechatsActions, retrySendFile, usechatsState } from '@/store/chatStore';
@@ -161,6 +177,13 @@
     import Dialog from '@/components/Dialog.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
+    import {
+      currentRightClickedItem,
+      rightClickItemAction,
+      triggerWatchOnRightClickItem,
+      RIGHT_CLICK_ACTIONS_MESSAGE,
+      RIGHT_CLICK_TYPE
+    } from '@/store/contextmenuStore'
 
 
     interface IProps {
@@ -168,12 +191,35 @@
     }
 
     const { chats } = usechatsState();
+    const { user } = useAuthState();
+
+
     const tabs = ['Create shares', 'Edit permissions'];
+
     const messageBoxLocal = ref(null);
     const selectedTab = ref<number>(1);
+
+    const scroll = () => {
+        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
+    };
+
+    watch(messageBoxLocal, () => {
+        //Refs can't seem to bind to refs in other files in script setup
+        messageBox.value = messageBoxLocal.value;
+    });
+
     const props = defineProps<IProps>();
+
     const showShareDialog = ref<boolean>(false);
+
     const selectedEditFile = ref<any>(null);
+
+    const setCurrentRightClickedItem = (item) => {
+      currentRightClickedItem.value = {
+        type: RIGHT_CLICK_TYPE.MESSAGE,
+        data: item
+      }
+    }
 
     const editFileSharePermission = file => {
         selectedEditFile.value = file;
@@ -208,6 +254,7 @@
         let id = <string>user.id;
         //@ts-ignore
         const { [id]: _, ...read } = props.chat.read;
+
         const reads = Object.values(read);
 
         return findLastIndex(props.chat.messages, message => reads.includes(<string>message.id));
@@ -217,11 +264,13 @@
         return findLastIndex(props.chat.messages, message => props.chat.read[<string>user.id] === message.id);
     });
     const handleScroll = async e => {
-        let element = messageBoxLocal.value;
-        const oldScrollHeight = element?.scrollHeight;
-             if (element.scrollTop < 20) {
+        let element = messageBox.value;
+
+        const oldScrollHeight = element.scrollHeight;
+        if (element.scrollTop < 100) {
             getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
                 if (!newMessagesLoaded) return;
+
                 messageBoxLocal.value.scrollTo({
                     top: element.scrollHeight - oldScrollHeight + element.scrollTop,
                     behavior: 'auto',
@@ -229,11 +278,15 @@
             });
         }
     };
-
+    const { addScrollEvent } = useScrollActions();
     onMounted(() => {
-        messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
-        localStorage.setItem('lastOpenedChat', props.chat.chatId.toString())
+        //TODO make this more effecient
+        setTimeout(() => {
+            scroll();
+        }, 100);
     });
+
+    onUpdated(() => scroll());
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';
@@ -262,7 +315,7 @@
         event.preventDefault();
     };
 
-    const { user } = useAuthState();
+
     const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
 </script>
 <style scoped type="text/css">
