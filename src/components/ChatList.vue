@@ -263,8 +263,8 @@
           default:
             break;
         }
+        rightClickItemAction.value = null;
       }
-      rightClickItemAction.value = null;
       return;
     }, {deep: true})
 

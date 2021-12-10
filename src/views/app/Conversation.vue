@@ -350,8 +350,7 @@
       rightClickItemAction, triggerWatchOnRightClickItem,
       conversationComponentRerender
     } from "@/store/contextmenuStore";
-    import { 
-    } from '@vueuse/core'
+    import { useOnline } from '@vueuse/core'
 
     const online = useOnline()
 

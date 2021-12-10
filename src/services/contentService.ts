@@ -10,5 +10,5 @@ export const isImage = filename => {
 };
 
 export const isAudio = filename => {
-    return filename.indexOf('.mp3') !== -1 || filename.indexOf('.WebM') !== -1;
+    return filename?.indexOf('.mp3') !== -1 || filename.indexOf('.WebM') !== -1;
 };

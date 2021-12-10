@@ -201,6 +201,7 @@ import {showShareDialog} from "@/services/dialogService";
           default:
             break;
         }
+        rightClickItemAction.value = null;
       }
       return;
     }, {deep: true})
