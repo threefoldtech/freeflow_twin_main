@@ -116,9 +116,9 @@
             <input class="hidden" type="file" id="fileInput" ref="fileInput" accept="image/*" @change="changeFile" />
 
             <div>
-                <h2>{{ blockedUsers?.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
-                <ul v-if="blockedUsers?.length > 0" class="max-h-28 overflow-y-auto">
-                    <template v-for="blockedUser in blockedUsers" :key="blockedUser">
+                <h2>{{ blocklist?.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
+                <ul v-if="blocklist?.length > 0" class="max-h-28 overflow-y-auto">
+                    <template v-for="blockedUser in blocklist" :key="blockedUser">
                         <li class="flex flex-row justify-between items-center mt-2 pb-2 border-b">
                             <span>{{ blockedUser }}</span>
                             <button
@@ -221,6 +221,10 @@
     const cropper = ref(null);
     const isHoveringAvatar = ref(false);
     const showEditAvatar = ref(false);
+
+    onBeforeMount(async() => {
+      await initBlocklist()
+    })
 
     watch(showEditAvatar, () => {
         if (showEditAvatar.value) {

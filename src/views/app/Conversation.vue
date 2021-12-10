@@ -1,4 +1,6 @@
 <template>
+  <p class="hidden">{{JSON.stringify(openBlockDialogFromOtherFile)}}</p>
+  <div :key="conversationComponentRerender" class="h-full w-full">
     <appLayout>
         <template v-slot:top>
             <div v-if="chat" :class="{ 'group-chat': chat?.isGroup }" class="w-full flex md:px-4 text-white">
@@ -19,7 +21,7 @@
             <div v-else>Loading</div>
         </template>
         <template v-slot:actions>
-            <div :class="{ 'group-chat': chat?.isGroup }">
+            <div  :class="{ 'group-chat': chat?.isGroup }">
                 <div class="relative">
                     <button class="text-lg text-white md:hidden" @click="showMenu = true">
                         <i class="fas fa-ellipsis-v"></i>
@@ -112,7 +114,7 @@
                         >
                             <div class="py-2 pl-4 flex-1">
                                 <p class="font-bold font overflow-hidden overflow-ellipsis w-80">
-                                    {{ chat.name }}
+                                  {{ chat.name }} <span v-if='!online' class='font-normal text-xs text-red-600'>You appear to be offline</span>
                                 </p>
                                 <p v-if="!blocked" class="font-thin">
                                     {{ getChatStatus.message }}
@@ -258,7 +260,6 @@
                         <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
                         <group-management
                             :chat="chat"
-                            :sidebarFileList="getListFilesChat"
                             @app-call="popupMeeting"
                             @app-block="blockChat"
                             @app-unblock="unBlockChat"
@@ -269,7 +270,7 @@
             </div>
         </template>
     </appLayout>
-    <Dialog v-model="showDialog" class="max-w-10" :noActions="true" @update-model-value="showDialog = false">
+    <Dialog v-model="showDialog" class="max-w-10" :noActions='true' @update-model-value="showDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Blocking</h1>
         </template>
@@ -286,12 +287,7 @@
             </button>
         </div>
     </Dialog>
-    <Dialog
-        v-model="showDeleteDialog"
-        class="max-w-10"
-        :noActions="true"
-        @update-model-value="showDeleteDialog = false"
-    >
+    <Dialog v-model="showDeleteDialog" class="max-w-10" :noActions='true' @update-model-value="showDeleteDialog = false">
         <template v-slot:title class="center">
             <h1 class="text-center">Deleting Conversation</h1>
         </template>
@@ -311,288 +307,304 @@
             </button>
         </div>
     </Dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useScrollActions, useScrollState } from '@/store/scrollStore';
-import AppLayout from '../../layout/AppLayout.vue';
-import moment from 'moment';
-import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
-import { useContactsState } from '@/store/contactStore';
-import { each } from 'lodash';
-import { statusList } from '@/store/statusStore';
-import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
-import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
-import { useAuthState } from '@/store/authStore';
-import { popupCenter } from '@/services/popupService';
-import MessageCard from '@/components/MessageCard.vue';
-import ChatList from '@/components/ChatList.vue';
-import ChatInput from '@/components/ChatInput.vue';
-import AvatarImg from '@/components/AvatarImg.vue';
-import GroupManagement from '@/components/GroupManagement.vue';
-import Dialog from '@/components/Dialog.vue';
-import * as crypto from 'crypto-js';
-import { useIntersectionObserver } from '@/lib/intersectionObserver';
-import { useRoute, useRouter } from 'vue-router';
-import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
-import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
-import MessageBox from '@/components/MessageBox.vue';
-import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
-import Button from '@/components/Button.vue';
+    import { useScrollActions, useScrollState } from '@/store/scrollStore';
 
-import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
-import FileDropArea from '@/components/FileDropArea.vue';
-import TimeContent from '@/components/TimeContent.vue';
-import { XIcon } from '@heroicons/vue/outline';
-import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
+    import AppLayout from '../../layout/AppLayout.vue';
+    import moment from 'moment';
+    import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
+    import { useContactsState } from '@/store/contactStore';
 
-const route = useRoute();
-const selectedId = ref(<string>route.params.id);
+    import { each } from 'lodash';
+    import { statusList } from '@/store/statusStore';
+    import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
+    import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
+    import { useAuthState } from '@/store/authStore';
+    import { popupCenter } from '@/services/popupService';
+    import MessageCard from '@/components/MessageCard.vue';
+    import ChatList from '@/components/ChatList.vue';
+    import ChatInput from '@/components/ChatInput.vue';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import GroupManagement from '@/components/GroupManagement.vue';
+    import Dialog from '@/components/Dialog.vue';
+    import * as crypto from 'crypto-js';
+    import { useIntersectionObserver } from '@/lib/intersectionObserver';
+    import { useRoute, useRouter } from 'vue-router';
+    import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
+    import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
+    import MessageBox from '@/components/MessageBox.vue';
+    import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
+    import Button from '@/components/Button.vue';
 
-const viewAnchor = ref(null);
+    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+    import FileDropArea from '@/components/FileDropArea.vue';
+    import TimeContent from '@/components/TimeContent.vue';
+    import { XIcon } from '@heroicons/vue/outline';
+    import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
+    import {
+      openBlockDialogFromOtherFile,
+      openDeleteDialogFromOtherFile,
+      rightClickItemAction, triggerWatchOnRightClickItem,
+      conversationComponentRerender
+    } from "@/store/contextmenuStore";
+    import { useOnline } from '@vueuse/core'
 
-const { isIntersecting } = useIntersectionObserver(viewAnchor);
+    const online = useOnline()
 
-const scrollToBottom = (force = false) => {
-    if (!force && !isIntersecting.value) return;
-
-    nextTick(() => {
-        scrollMessageBoxToBottom();
-    });
-};
-
-watch(
-    () => route.params.id,
-    id => {
-        selectedId.value = <string>id;
-        scrollToBottom(true);
-    }
-);
-
-const { retrievechats, sendFile } = usechatsActions();
-onBeforeMount(retrievechats);
-
-const { contacts } = useContactsState();
-const { chats } = usechatsState();
-const { sendMessage } = usechatsActions();
-const { user } = useAuthState();
-const m = val => moment(val);
-const showMenu = ref(false);
-const file = ref();
-const router = useRouter();
-let showDialog = ref(false);
-let showDeleteDialog = ref(false);
-let showInfo = ref(false);
-const showRemoveUserDialog = ref(false);
-const toBeRemovedUser = ref();
-
-const truncate = (value, limit = 20) => {
-    if (value.length > limit) {
-        value = value.substring(0, limit - 3) + '...';
-    }
-    return value;
-};
-
-const getMessagesSortedByUser = computed(() => {
-    let chatBlockIndex = 0;
-    return chat.value.messages.reduce((acc: any, message) => {
-        if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
-            acc[chatBlockIndex].messages.push(message);
-            return acc;
-        } else {
-            chatBlockIndex++;
+    const route = useRoute();
+    let selectedId = ref(<string>route.params.id);
+    
+    watch(
+        () => route.params.id,
+        id => {
+            selectedId.value = <string>id;
+            scrollToBottom(true);
         }
-        acc[chatBlockIndex] = {
-            user: <string>message.from,
-            messages: [],
-        };
-        acc[chatBlockIndex].messages.push(message);
-        return acc;
-    }, {});
-});
-
-const message = ref('');
-
-const chat = computed(() => {
-    const chat = chats.value.find(c => c.chatId == selectedId.value);
-    if (!chat) router.push({ name: 'whisper' });
-    return chat;
-});
-
-const popupMeeting = () => {
-    // @ts-ignore
-    // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
-    const str: string = chat.value.isGroup
-        ? chat.value.chatId
-        : chat.value.contacts
-              .map(c => c.id)
-              .sort()
-              .join();
-
-    const id = crypto.SHA1(str);
-    sendMessage(
-        chat.value.chatId,
-        {
-            type: SystemMessageTypes.JOINED_VIDEOROOM,
-            message: `${user.id} joined the video chat`,
-            id: id.toString(),
-        } as JoinedVideoRoomBody,
-        MessageTypes.SYSTEM
     );
 
-    popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
-};
 
-const getExtension = filename => {
-    return filename.substring(filename.lastIndexOf('.') + 1, filename.length) || filename;
-};
+    const { retrievechats, sendFile } = usechatsActions();
+    onBeforeMount(retrievechats);
 
-const getListFilesChat = computed(() => {
-    //Show list of files in the sidebar
-    return getFilesInChat(chat.value);
-});
+    const { contacts } = useContactsState();
+    const { chats } = usechatsState();
+    const { sendMessage } = usechatsActions();
+    const { user } = useAuthState();
+    const m = val => moment(val);
+    const showMenu = ref(false);
+    const file = ref();
+    const router = useRouter();
+    const showDialog = ref(false);
+    const showDeleteDialog = ref(false);
+    const showInfo = ref(false);
+    const showRemoveUserDialog = ref(false);
+    const toBeRemovedUser = ref();
 
-const getChatStatus = computed(() => {
-    if (!chat.value) {
-        return;
-    }
-
-    if (chat.value.isGroup) {
-        let message = `${chat.value.contacts.length} members`;
-        const onlineMembers = chat.value.contacts
-            .filter(c => c.id != user.id)
-            .map(c => ({
-                ...c,
-                isOnline: statusList[<string>c.id]?.isOnline ?? false,
-            })).length;
-
-        if (onlineMembers > 0) {
-            message += `, ${onlineMembers} online`;
+    const truncate = (value, limit = 20) => {
+        if (value.length > limit) {
+            value = value.substring(0, limit - 3) + '...';
         }
-
-        return {
-            message: message,
-            lastSeen: undefined,
-        };
-    }
-
-    const status = statusList[<string>chat.value.chatId];
-    let lastSeen: string | undefined = undefined;
-    lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
-    lastSeen = lastSeen?.slice(0, -3);
-    return {
-        message: status?.isOnline ? 'Online' : 'Offline',
-        lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
+        return value;
     };
-});
 
-const deleteChat = () => {
-    showDeleteDialog.value = true;
-};
-const infoChat = () => {
-    showInfo.value = true;
-};
-const doDeleteChat = () => {
-    sendRemoveChat(chat.value.chatId);
-    localStorage.removeItem('lastOpenedChat');
-    router.push({ name: 'whisper' });
-};
+    const getMessagesSortedByUser = computed(() => {
+        let chatBlockIndex = 0;
 
-const blockChat = () => {
-    showDialog.value = true;
-};
-const doBlockChat = () => {
-    showDialog.value = false;
-    sendBlockChat(chat.value.chatId);
-    localStorage.removeItem('lastOpenedChat');
-    router.push({ name: 'whisper' });
-};
+        return chat.value.messages.reduce((acc: any, message) => {
+            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
+                acc[chatBlockIndex].messages.push(message);
+                return acc;
+            } else {
+                chatBlockIndex++;
+            }
 
-const unBlockChat = async () => {
-    await deleteBlockedEntry(chat.value.chatId);
-};
+            acc[chatBlockIndex] = {
+                user: <string>message.from,
+                messages: [],
+            };
+            acc[chatBlockIndex].messages.push(message);
 
-const reads = computed(() => {
-    const preReads = {};
-    each(chat.value.read, (val: string, key: string) => {
-        if (key === user.id) {
+            return acc;
+        }, {});
+    });
+
+
+    const message = ref('');
+
+    const chat = computed(() => {
+        return chats.value.find(c => c.chatId == selectedId.value);
+    });
+
+    const getChatStatus = computed(() => {
+        if (!chat.value) {
             return;
         }
-        preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
+
+        if (chat.value.isGroup) {
+            let message = `${chat.value.contacts.length} members`;
+            const onlineMembers = chat.value.contacts
+                .filter(c => c.id != user.id)
+                .map(c => ({
+                    ...c,
+                    isOnline: statusList[<string>c.id]?.isOnline ?? false,
+                })).length;
+
+            if (onlineMembers > 0) {
+                message += `, ${onlineMembers} online`;
+            }
+
+            return {
+                message: message,
+                lastSeen: undefined,
+            };
+        }
+
+        const status = statusList[<string>chat.value.chatId];
+        let lastSeen: string | undefined = undefined;
+        lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
+        lastSeen = lastSeen?.slice(0, -3);
+        return {
+            message: status?.isOnline ? 'Online' : 'Offline',
+            lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
+        };
     });
-    return preReads;
-});
 
-onMounted(() => {
-    nextTick(() => {
-        scrollToBottom(true);
+    const popupMeeting = () => {
+        // @ts-ignore
+        // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+        const str: string = chat.value.isGroup
+            ? chat.value.chatId
+            : chat.value.contacts
+                  .map(c => c.id)
+                  .sort()
+                  .join();
+
+        const id = crypto.SHA1(str);
+        sendMessage(
+            chat.value.chatId,
+            {
+                type: SystemMessageTypes.JOINED_VIDEOROOM,
+                message: `${user.id} joined the video chat`,
+                id: id.toString(),
+            } as JoinedVideoRoomBody,
+            MessageTypes.SYSTEM
+        );
+
+        popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
+    };
+
+    const deleteChat = () => {
+        showDeleteDialog.value = true;
+    };
+    const infoChat = () => {
+        showInfo.value = true;
+    };
+    const doDeleteChat = () => {
+        sendRemoveChat(chat.value.chatId);
+        router.push({ name: 'whisper' });
+    };
+
+    const blockChat = () => {
+        showDialog.value = true;
+    };
+    const doBlockChat = () => {
+        showDialog.value = false;
+        sendBlockChat(chat.value.chatId);
+        router.push({ name: 'whisper' });
+    };
+
+    const unBlockChat = async () => {
+        await deleteBlockedEntry(chat.value.chatId);
+    };
+
+    const reads = computed(() => {
+        const preReads = {};
+        each(chat.value.read, (val: string, key: string) => {
+            if (key === user.id) {
+                return;
+            }
+            preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
+        });
+        return preReads;
     });
-});
 
-const status = computed(() => {
-    return statusList[selectedId.value];
-});
+    const viewAnchor = ref(null);
 
-const { scrollEvents } = useScrollState();
-const { shiftScrollEvent } = useScrollActions();
+    const { isIntersecting } = useIntersectionObserver(viewAnchor);
 
-watch(scrollEvents, () => {
-    if (!scrollEvents || scrollEvents.length === 0) return;
-    nextTick(() => {
-        scrollToBottom(scrollEvents[0]);
-        shiftScrollEvent();
+    const scrollToBottom = (force = false) => {
+        if (!force && !isIntersecting.value) return;
+
+        nextTick(() => {
+            scrollMessageBoxToBottom();
+        });
+    };
+
+    onMounted(() => {
+        nextTick(() => {
+            scrollToBottom(true);
+        });
+      if(openBlockDialogFromOtherFile.value) showDialog.value = true;
+      if(openDeleteDialogFromOtherFile.value) showDeleteDialog.value = true
+      openDeleteDialogFromOtherFile.value = false;
+      openBlockDialogFromOtherFile.value = false;
     });
-});
 
-const blocked = computed(() => {
-    if (!chat.value || chat.value.isGroup) return false;
-    return isBlocked(<string>chat.value.chatId);
-});
 
-const removeFromGroup = contact => {
-    showRemoveUserDialog.value = true;
-    toBeRemovedUser.value = contact;
-};
-const doRemoveFromGroup = () => {
-    const { updateContactsInGroup } = usechatsActions();
-    //@ts-ignore
-    updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
-};
+    onUpdated(() => {
+      //For when component is already mounted
+      if(openBlockDialogFromOtherFile.value) showDialog.value = true;
+      if(openDeleteDialogFromOtherFile.value) showDeleteDialog.value = true;
+      openDeleteDialogFromOtherFile.value = false;
+      openBlockDialogFromOtherFile.value = false;
+    })
 
-const isAdmin = computed(() => {
-    const { user } = useAuthState();
-    //@ts-ignore
+    const status = computed(() => {
+        return statusList[selectedId.value];
+    });
 
-    return chat.value.adminId == user.id;
-});
+    const { scrollEvents } = useScrollState();
+    const { shiftScrollEvent } = useScrollActions();
 
-const activeItem = ref('edit');
+    watch(scrollEvents, () => {
+        if (!scrollEvents || scrollEvents.length === 0) return;
+        nextTick(() => {
+            scrollToBottom(scrollEvents[0]);
+            shiftScrollEvent();
+        });
+    });
 
-const isActive = menuItem => {
-    return activeItem.value === menuItem;
-};
+    const blocked = computed(() => {
+        if (!chat.value || chat.value.isGroup) return false;
+        return isBlocked(<string>chat.value.chatId);
+    });
 
-const setActive = menuItem => {
-    activeItem.value = menuItem;
-};
-
-const addToGroup = contact => {
-    const { updateContactsInGroup } = usechatsActions();
-    //@ts-ignore
-    updateContactsInGroup(chat.value.chatId, contact, false);
-};
-const filteredContacts = computed(() => {
-    return contacts.filter(
+    const removeFromGroup = contact => {
+        showRemoveUserDialog.value = true;
+        toBeRemovedUser.value = contact;
+    };
+    const doRemoveFromGroup = () => {
+        const { updateContactsInGroup } = usechatsActions();
         //@ts-ignore
-        c => !chat.value.contacts.map(x => x.id).includes(c.id)
-    );
-});
+        updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
+    };
 
-const showSideBar = getShowSideBar();
+    const isAdmin = computed(() => {
+        const { user } = useAuthState();
+        //@ts-ignore
+        console.log(chat.value.adminId);
+        return chat.value.adminId == user.id;
+    });
+
+    let activeItem = ref('edit');
+    const isActive = menuItem => {
+        return activeItem.value === menuItem;
+    };
+
+    const setActive = menuItem => {
+        activeItem.value = menuItem;
+    };
+
+    const addToGroup = contact => {
+        const { updateContactsInGroup } = usechatsActions();
+        //@ts-ignore
+        updateContactsInGroup(chat.value.chatId, contact, false);
+    };
+    const filteredContacts = computed(() => {
+        return contacts.filter(
+            //@ts-ignore
+            c => !chat.value.contacts.map(x => x.id).includes(c.id)
+        );
+    });
+
+    const showSideBar = getShowSideBar();
 </script>
 
 <style scoped type="text/css">
-a.active {
-    background: #e5e7eb;
-}
+    a.active {
+        background: #e5e7eb;
+    }
 </style>

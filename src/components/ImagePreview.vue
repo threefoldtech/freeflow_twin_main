@@ -22,7 +22,7 @@
         </div>
 
         <img
-            class="modal-content m-auto block md:max-w-80p md:max-h-80p max-w-full max-w-full self-center"
+            class="modal-content m-auto block md:max-w-80p md:max-h-80p max-w-full max-w-full self-center z-50"
             id="full-image"
             :src="src"
         />

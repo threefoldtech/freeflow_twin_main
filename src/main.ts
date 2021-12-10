@@ -4,6 +4,8 @@ import './assets/index.css';
 import router from '@/plugins/Router';
 import '@fortawesome/fontawesome-free/js/all';
 import socketIo from '@/plugins/SocketIo';
+import contextmenu from "v-contextmenu";
+import "v-contextmenu/dist/themes/default.css";
 import config from '@/config';
 ('@/config');
 import MessageContent from '@/components/MessageContent.vue';
@@ -49,5 +51,5 @@ axios.interceptors.response.use(
     }
 );
 
-app.mount('#app');
+app.use(contextmenu).mount('#app');
 export default app;

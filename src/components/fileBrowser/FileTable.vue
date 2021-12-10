@@ -1,4 +1,22 @@
 <template>
+  <v-contextmenu ref="contextmenu-filebrowser-item-local">
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
+                                  }">Share</v-contextmenu-item>
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
+                                  }">Download</v-contextmenu-item>
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME
+                                  }">Rename</v-contextmenu-item>
+    <v-contextmenu-item @click="() => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE
+                                  }">Delete</v-contextmenu-item>
+  </v-contextmenu>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="py-2 px-4 align-middle inline-block min-w-full">
@@ -144,6 +162,7 @@
                                             <div class="flex flex-row items-center text-md">
                                                 <span class="hover:underline cursor-pointer">{{ item }} </span>
                                             </div>
+
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
@@ -176,13 +195,14 @@
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer">Saved attachments</span>
+                                            <span class="hover:underline cursor-pointer">Saved attachments</span>                                       
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
+
                                 <tr
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
@@ -195,6 +215,8 @@
                                     @dragover="event => onDragOver(event, item)"
                                     @dragstart="event => onDragStart(event, item)"
                                     @drop="() => onDrop(item)"
+                                    @mousedown.right="setCurrentRightClickedItem(item)"
+                                    v-contextmenu:contextmenu-filebrowser-item-local
                                 >
                                     <td class="px-6 py-4 whitespace-nowrap hidden">
                                         <input
@@ -361,6 +383,8 @@
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
+                                @mousedown.right="setCurrentRightClickedItem(item)"
+                                v-contextmenu:contextmenu-filebrowser-item-local
                             >
                                 <div
                                     :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
@@ -418,11 +442,13 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import {computed, onBeforeMount, ref} from 'vue';
 import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
 import {
     currentDirectory,
     currentDirectoryContent,
+    currentSort,
+    currentSortDir,
     itemAction,
     PathInfoModel,
     selectItem,
@@ -437,6 +463,12 @@ import {
     getFileLastModified,
     getFileExtension,
     getFileSize,
+selectItem,
+selectedPaths,
+sortContent,
+sortAction,
+selectAll,
+PathInfoModel,
     getIconColor,
     getIcon,
     uploadFiles,
@@ -444,38 +476,56 @@ import {
     moveFiles,
     isDraggingFiles,
     sharedDir,
+itemAction,
     sharedContent,
     getSharedContent,
     searchResults,
     searchDirValue,
     currentShare,
+isDraggingFiles,
     goToShared,
     fileBrowserTypeView,
     goToFilesInChat,
     savedAttachments,
 } from '@/store/fileBrowserStore';
-import { useRouter, useRoute } from 'vue-router';
+import {useRouter} from 'vue-router';
 import FileDropArea from '@/components/FileDropArea.vue';
-import { useSocketActions } from '@/store/socketStore';
-import { useAuthState } from '@/store/authStore';
+import {useSocketActions} from '@/store/socketStore';
+import {useAuthState} from '@/store/authStore';
+import {
+  currentRightClickedItem,
+  rightClickItemAction,
+  triggerWatchOnRightClickItem,
+  RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
+  RIGHT_CLICK_TYPE,
+  } from '@/store/contextmenuStore'
 
 const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
-const hiddenItems = ref<HTMLDivElement>();
-const ghostImage = ref<HTMLDivElement>();
-const dragOverItem = ref<PathInfoModel>();
-let tempCounter = 0;
-const router = useRouter();
-const route = useRoute();
-const { user } = useAuthState();
-onBeforeMount(() => {
-    const { initializeSocket } = useSocketActions();
-    initializeSocket(user.id.toString());
-});
+    const hiddenItems = ref<HTMLDivElement>();
+    const ghostImage = ref<HTMLDivElement>();
+    const dragOverItem = ref<PathInfoModel>();
+    let tempCounter = 0;
+    const route = useRoute();
+    const router = useRouter();
+    
+    const { user } = useAuthState();
 
-const handleSelect = (item: PathInfoModel) => {
-    if (!selectedPaths.value.includes(item)) selectItem(item);
-    else deselectItem(item);
-};
+    onBeforeMount(() => {
+        const { initializeSocket } = useSocketActions();
+        initializeSocket(user.id.toString());
+    });
+
+    const setCurrentRightClickedItem = (item) => {
+      currentRightClickedItem.value = {
+        type: RIGHT_CLICK_TYPE.LOCAL_FILE,
+        data: item
+      }
+    }
+
+    const handleSelect = (item: PathInfoModel) => {
+        if (!selectedPaths.value.includes(item)) selectItem(item);
+        else deselectItem(item);
+    };
 
 const isSelected = (item: PathInfoModel) => {
     if (!selectedPaths.value.includes(item)) return false;
