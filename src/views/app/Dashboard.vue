@@ -26,6 +26,7 @@
     import { fetchPosts, posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
     import {getAllPosts} from "@/services/socialService";
     import {allSocialPosts, isLoadingSocialPosts} from "@/store/socialStore";
+    import {startFetchStatusLoop} from "@/store/statusStore";
 
 
     onBeforeMount(async () => {
