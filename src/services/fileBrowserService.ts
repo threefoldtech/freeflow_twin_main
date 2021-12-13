@@ -234,6 +234,8 @@ export const getShareByPath = async (path: string): Promise<SharedFileInterface>
 
 export const downloadAttachment = async (message: any) => {
     return (
-        await axios.get(`${endpoint}/attachment/download`, { params: { owner: message.from, path: message.body.url } })
+        await axios.get(`${endpoint}/attachment/download`, {
+            params: { owner: message.from, path: message.body.url, to: message.to, messageId: message.id },
+        })
     ).data;
 };
