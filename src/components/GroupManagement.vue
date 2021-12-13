@@ -29,7 +29,6 @@
         </div>
         <div id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
     </div>
-  <pre>{{JSON.stringify(sidebarFileList, null, 2)}}</pre>
     <div v-if="sidebarFileList?.length !== 0" class="p-2">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Files</h3>
         <ul class="space-y-2 max-h-64 overflow-y-auto">
@@ -222,13 +221,19 @@
     import { getIconColor, getIcon, getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
+    import {MessageTypes} from "@/types";
 
     interface IProps {
         chat: any;
-        sidebarFileList: any[];
     }
 
+
+
     const props = defineProps<IProps>();
+
+    const sidebarFileList = computed(() => {
+          return props.chat.messages.filter(msg => msg.type === MessageTypes.FILE)
+    })
 
     defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);
 
