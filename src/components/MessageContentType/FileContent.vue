@@ -46,8 +46,6 @@ const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) =>
 };
 
 const openSharedFile = async (message: Message<MessageBodyType>, count = 0) => {
-  const {user} = useAuthState()
-  if(message.from !== user.id){
     //@TODO make this more efficient
     const result = (await updateAttachments(`/${message.from}`))?.data
     const file = result.find(item => item.fullName === message.body.filename)
@@ -59,7 +57,7 @@ const openSharedFile = async (message: Message<MessageBodyType>, count = 0) => {
     }
     savedAttachments.value = true
     //@ts-ignore
-    itemAction(file, undefined)
-  }
+    await itemAction(file, undefined)
+
 };
 </script>

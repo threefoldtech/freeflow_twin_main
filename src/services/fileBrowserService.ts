@@ -42,15 +42,16 @@ export interface EditPathInfo extends PathInfo {
     writeToken: string;
 }
 
-export const getDirectoryContent = async (path: string, attachments: boolean = false): Promise<AxiosResponse<PathInfo[]>> => {
+export const getDirectoryContent = async (
+    path: string,
+    attachments: boolean = false
+): Promise<AxiosResponse<PathInfo[]>> => {
     // /user
     const params = new URLSearchParams();
     params.append('path', path);
-    if (attachments) params.append('attachments', "1");
+    if (attachments) params.append('attachments', '1');
     return await axios.get<PathInfo[]>(`${endpoint}/directories/content`, { params: params });
 };
-
-
 
 export const getDirectoryInfo = async (path: string) => {
     const params = new URLSearchParams();
@@ -138,8 +139,7 @@ export const downloadFile = async (path: string, responseType: ResponseType = 'b
 
 export const getChatsWithAttachments = async () => {
     return await axios.get(`${endpoint}/attachments`);
-
-}
+};
 
 export const searchDir = async (searchTerm: string, currentDir: string) => {
     const params = new URLSearchParams();
@@ -191,7 +191,13 @@ export const getShareWithId = async (id: string) => {
     return <SharedFileInterface>res.data;
 };
 
-export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string, path: string, attachments: boolean) => {
+export const getFileAccessDetails = async (
+    owner: ContactInterface,
+    shareId: string,
+    userId: string,
+    path: string,
+    attachments: boolean
+) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
@@ -227,5 +233,9 @@ export const getShareByPath = async (path: string): Promise<SharedFileInterface>
 };
 
 export const downloadAttachment = async (message: any) => {
-    return (await axios.get(`${endpoint}/attachment/download`, { params: { "owner": message.from, "path": message.body.url } })).data;
-}
+    return (
+        await axios.get(`${endpoint}/attachment/download`, {
+            params: { owner: message.from, path: message.body.url, to: message.to, messageId: message.id },
+        })
+    ).data;
+};
