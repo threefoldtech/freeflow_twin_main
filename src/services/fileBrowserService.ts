@@ -8,6 +8,7 @@ import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
 import { useSocket } from '@/plugins/SocketIo';
 import { useAuthState } from '@/store/authStore';
 import { initializeSocket } from '@/store/socketStore';
+import { stringifyQuery } from 'vue-router';
 
 const endpoint = `${config.baseUrl}api/browse`;
 
@@ -45,16 +46,15 @@ export interface EditPathInfo extends PathInfo {
 }
 
 
-
-export const sendGetDirectoryContent = (path: string) => {
+const listenSocket = (route: string, params: Object): Promise<any> => {
     const { user } = useAuthState();
     const isSocketInit = <boolean>useSocket();
     if (!isSocketInit) initializeSocket(user.id.toString())
     const socket = useSocket();
 
-    const callToWebSocket = (res) => socket.emit("get_directory_content", { path }, function (result) {
+    const callToWebSocket = (res) => socket.emit(route, { ...params }, function (result) {
         if (result.error)
-            throw new Error('get_directory_content Failed in backend', result.error)
+            throw new Error(route+ '  Failed in backend', result.error)
         res(result)
     });
 
@@ -69,19 +69,34 @@ export const sendGetDirectoryContent = (path: string) => {
     })
 }
 
-export const createDirectory = async (path: string, name: string): Promise<AxiosResponse<PathInfo>> => {
-    const body = {
-        path,
-        name,
-    };
-    return await axios.post<PathInfo>(`${endpoint}/directories`, body);
-};
+
+export const sendGetDirectoryContent = (path: string) => {
+    const route = "get_directory_content";
+    return listenSocket(route, {
+        path: path
+    } );
+}
+
+
+
+export const sendCreateDirectory = async (path: string, name: string) : Promise<PathInfo> =>{
+    const route = "create_directory";
+    return await <Promise<PathInfo>>listenSocket(route, {
+        path: path,
+        name: name,
+    }) ;
+}
 
 export const getFileInfo = async (path: string): Promise<AxiosResponse<EditPathInfo>> => {
     const params = new URLSearchParams();
     params.append('path', path);
     return await axios.get(`${endpoint}/files/info`, { params: params });
 };
+
+
+export const sendGetFileInfo = async(path:string)=>{
+
+}
 
 export const uploadFile = async (
     path: string,
@@ -131,31 +146,12 @@ export const uploadFile = async (
     }
 };
 
-export const sendDeleteFile = (path: string): any => {
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-
-    const callToWebSocket = (res) => socket.emit("delete_file", { path }, function (result) {
-        if (result.error)
-            throw new Error('delete_file Failed in backend', result.error)
-        res(result)
+export const sendDeleteFile = async (path: string): Promise<any> => {
+    const route = 'delete_file'
+    return await listenSocket(route, {
+        path: path
     });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
-    })
 }
-
-
-
 
 export const downloadFileEndpoint = `${endpoint}/files`;
 export const getDownloadFileEndpoint = (path: string) => {
@@ -169,170 +165,74 @@ export const downloadFile = async (path: string, responseType: ResponseType = 'b
 };
 
 export const sendSearchDir = async (searchTerm: string, currentDir: string) => {
-    const params = {
-        'searchTerm': searchTerm,
-        'currentDir': currentDir
-    }
-
-
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-
-    const callToWebSocket = (res) => socket.emit("search_dir", { params }, function (result) {
-        if (result.error)
-            throw new Error('search_dir Failed in backend', result.error)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
-    })
+    const route = 'search_dir'
+    return await listenSocket(route, {'searchTerm':searchTerm, 'currentDir':currentDir})
 
 }
 
 export const sendCopyFiles = async(paths: string[], pathToPaste: string)=>{
-    const params = { paths: paths, destinationPath: pathToPaste };
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-    const callToWebSocket = (res) => socket.emit("copy_files", { params }, function (result) {
-        if (result.error)
-            throw new Error('copy_files Failed in backend', result.error)
-            console.log(result)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
+    const route = 'copy_files'
+    return await listenSocket(route, {
+        paths: paths,
+        destinationPath: pathToPaste
     })
 }
 
 export const sendMoveFiles = async(paths: string[], pathToMove: string) =>{
-
-    const params = { paths: paths, destinationPath: pathToMove };
-
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-
-    const callToWebSocket = (res) => socket.emit("move_file", { params }, function (result) {
-        if (result.error)
-            throw new Error('move_file Failed in backend', result.error)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
-    })
+    const route = 'move_file'
+    return await listenSocket(route, {paths: paths, destinationPath: pathToMove})
 }
 
 export const sendRenameFile = async(oldPath: string, newPath: string) =>{
-
-    const params = { oldPath: oldPath, newPath: newPath };
-
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-
-    const callToWebSocket = (res) => socket.emit("rename_file", { params }, function (result) {
-        if (result.error)
-            throw new Error('rename_file Failed in backend', result.error)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
-    })
+    const route = 'rename_file'
+    return await listenSocket(route, {oldPath: oldPath, newPath: newPath})
 }
 
 export const sendAddShare = async(userId: string, path: string, filename: string, size: number, writable: boolean) =>{
-
-    const params = {
+    const route = 'add_share'
+    return await listenSocket(route, {
         chatId: userId,
         writable: writable,
         path: path,
         filename: filename,
         size: size,
-    };
-
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-
-    const callToWebSocket = (res) => socket.emit("add_share", { params }, function (result) {
-        if (result.error)
-            throw new Error('add_share Failed in backend', result.error)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
     })
 }
 
 export const sendRemoveFilePermissions = async(userId: string, path: string, location: string) =>{
-    const params = {
+    // const params = {
+    //     chatId: userId,
+    //     path: path,
+    //     location: location,
+    // }
+
+    // const { user } = useAuthState();
+    // const isSocketInit = <boolean>useSocket();
+    // if (!isSocketInit) initializeSocket(user.id.toString())
+    // const socket = useSocket();
+
+    // const callToWebSocket = (res) => socket.emit("remove_file_permissions", { params }, function (result) {
+    //     if (result.error)
+    //         throw new Error('remove_file_permissions Failed in backend', result.error)
+    //     res(result)
+    // });
+
+    // const functionWithPromise = () => {
+    //     return new Promise((res) => {
+    //         callToWebSocket(res);
+    //     });
+    // };
+
+    // return functionWithPromise().then(val => {
+    //     return val;
+    // })
+    const route = 'remove_file_permissions'
+    return await listenSocket(route, {
         chatId: userId,
         path: path,
         location: location,
-    }
-
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-
-    const callToWebSocket = (res) => socket.emit("remove_file_permissions", { params }, function (result) {
-        if (result.error)
-            throw new Error('remove_file_permissions Failed in backend', result.error)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        return val;
     })
+
 }
 
 export const getShared = async (shareStatus: string) => {
@@ -342,59 +242,42 @@ export const getShared = async (shareStatus: string) => {
 };
 
 export const sendGetShared = async(path:string): Promise<SharedFileInterface> =>{
-    const params = {
-        path: path}
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-    const callToWebSocket = (res) => socket.emit("get_share_by_path", { params }, function (result) {
-        if (result.error)
-            throw new Error('get_share_by_path Failed in backend', result.error)
-        res(result)
-    });
+    // const params = {
+    //     path: path}
+    // const { user } = useAuthState();
+    // const isSocketInit = <boolean>useSocket();
+    // if (!isSocketInit) initializeSocket(user.id.toString())
+    // const socket = useSocket();
+    // const callToWebSocket = (res) => socket.emit("get_share_by_path", { params }, function (result) {
+    //     if (result.error)
+    //         throw new Error('get_share_by_path Failed in backend', result.error)
+    //     res(result)
+    // });
 
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
+    // const functionWithPromise = () => {
+    //     return new Promise((res) => {
+    //         callToWebSocket(res);
+    //     });
+    // };
 
-    return functionWithPromise().then(val => {
-        return <SharedFileInterface>val;
-    })
+    // return functionWithPromise().then(val => {
+    //     return val;
+    // })
+
+    const route = 'get_share_by_path'
+    return  <Promise<SharedFileInterface>>listenSocket(route, {
+        path: path});
 }
 
 
 
-export const sendGetShareWithId = async(id: string) =>{
-    const params = {
-        id: id}
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-    const callToWebSocket = (res) => socket.emit("get_share_with_id", { params }, function (result) {
-        if (result.error)
-            throw new Error('get_share_with_id Failed in backend', result.error)
-        res(result)
-    });
-
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
-
-    return functionWithPromise().then(val => {
-        if (val.data['message'] === 'ACCESS_DENIED') {
-            accessDenied.value = true;
-            return;
-        }
-        return <SharedFileInterface>val.data;
-    })
+export const sendGetShareWithId = async(id: string): Promise<SharedFileInterface> =>{
+    const route = 'get_share_with_id'
+    return  <Promise<SharedFileInterface>>listenSocket(route, {
+        id: id})
 }
 
+// @external endpoint
 export const getFileAccessDetails = async (owner: ContactInterface, shareId: string, userId: string, path: string) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
@@ -409,6 +292,7 @@ export const getFileAccessDetails = async (owner: ContactInterface, shareId: str
     return <EditPathInfo>res.data;
 };
 
+    // @external endpoint
 export const getSharedFolderContent = async (
     owner: ContactInterface,
     shareId: string,
@@ -428,27 +312,34 @@ export const getSharedFolderContent = async (
     return <PathInfoModel[]>res.data;
 };
 
-export const sendGetShareByPath = async(path:string): Promise<SharedFileInterface> =>{
-    const params = {
-        path: path}
-    const { user } = useAuthState();
-    const isSocketInit = <boolean>useSocket();
-    if (!isSocketInit) initializeSocket(user.id.toString())
-    const socket = useSocket();
-    const callToWebSocket = (res) => socket.emit("get_share_by_path", { params }, function (result) {
-        if (result.error)
-            throw new Error('get_share_by_path Failed in backend', result.error)
-        res(result)
-    });
+export const sendGetShareByPath = async(path:string)=>{
+// : Promise<SharedFileInterface> 
 
-    const functionWithPromise = () => {
-        return new Promise((res) => {
-            callToWebSocket(res);
-        });
-    };
+    // console.log("getting here")
+    // const params = {
+    //     path: path}
+    // const { user } = useAuthState();
+    // const isSocketInit = <boolean>useSocket();
+    // if (!isSocketInit) initializeSocket(user.id.toString())
+    // const socket = useSocket();
+    // const callToWebSocket = (res) => socket.emit("get_share_by_path", { params }, function (result) {
+    //     if (result.error)
+    //         throw new Error('get_share_by_path Failed in backend', result.error)
+    //     res(result)
+    // });
 
-    return functionWithPromise().then(val => {
-        return <SharedFileInterface>val;
-    })
+    // const functionWithPromise = () => {
+    //     return new Promise((res) => {
+    //         callToWebSocket(res);
+    //     });
+    // };
+
+    // return functionWithPromise().then(val => {
+    //     return <SharedFileInterface>val;
+    // })
+
+    const route = 'get_share_by_path'
+    return  await (listenSocket(route, {
+        path: path}))
 }
 

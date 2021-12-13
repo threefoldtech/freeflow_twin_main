@@ -118,7 +118,7 @@ export const updateContent = async (path = currentDirectory.value) => {
 };
 
 export const createDirectory = async (name: string, path = currentDirectory.value) => {
-    const result = await Api.createDirectory(path, name);
+    const result = await Api.sendCreateDirectory(path, name);
     if ((result.status !== 200 && result.status !== 201) || !result.data)
         throw new Error('Could not create new folder');
 
