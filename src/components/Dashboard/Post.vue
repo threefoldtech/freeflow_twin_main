@@ -3,6 +3,7 @@
       <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
       <img  :src="imagePreviewSrc" class="pointer-events-none" />
   </div>
+  <SharePostDialog v-if="showShareDialog" />
   <div class="bg-white my-5 rounded">
     <div class="p-6">
       <div>
@@ -177,6 +178,7 @@
       </div>
       <div
           class="flex items-center cursor-pointer"
+          @click="SharePostDialog = true"
       >
         <ShareIcon class="w-6 text-gray-500 mr-4" />
         <p class="text-gray-500">
@@ -229,7 +231,7 @@ const amount_likes = ref<number>(props.item.likes.length)
 const myLocation = ref<string | null>(null)
 const showImagePreview = ref<boolean>(false)
 const imagePreviewSrc = ref<string | null>(null)
-const showShareDialog = ref<boolean>(null)
+const showShareDialog = ref<boolean>(false)
 
 
 const {user} = useAuthState();
