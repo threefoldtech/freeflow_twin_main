@@ -127,7 +127,6 @@
 
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value) return;
-        console.log('inside');
         await createSocialPost(new_post_text.value, new_post_images.value);
         await getAllPosts();
         new_post_images.value = [];
