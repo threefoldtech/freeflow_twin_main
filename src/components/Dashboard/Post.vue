@@ -175,6 +175,14 @@
           {{action.name}}
         </p>
       </div>
+      <div
+          class="flex items-center cursor-pointer"
+      >
+        <ShareIcon class="w-6 text-gray-500 mr-4" />
+        <p class="text-gray-500">
+          Share
+        </p>
+      </div>
     </div>
     <div>
       <form @submit.prevent="handleAddComment(false)" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
@@ -194,9 +202,9 @@ import {
   PencilAltIcon,
   FilmIcon,
   DotsVerticalIcon,
-  HeartIcon as HeartIconSolid, XIcon,
+  HeartIcon as HeartIconSolid, XIcon
 } from '@heroicons/vue/solid';
-import {HeartIcon, ChatAltIcon} from '@heroicons/vue/outline';
+import {HeartIcon, ChatAltIcon, ShareIcon} from '@heroicons/vue/outline';
 import AvatarImg from '@/components/AvatarImg.vue';
 import {useAuthState, myYggdrasilAddress} from '@/store/authStore';
 import {ref, computed, onMounted, onBeforeMount} from 'vue';
@@ -211,9 +219,7 @@ import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
 import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
 import {commentOnPost, getAllPosts, likePost} from "@/services/socialService";
-
-
-
+import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
 
 const props = defineProps<{item: SOCIAL_POST}>();
 const messageInput = ref<string>("")
@@ -223,6 +229,8 @@ const amount_likes = ref<number>(props.item.likes.length)
 const myLocation = ref<string | null>(null)
 const showImagePreview = ref<boolean>(false)
 const imagePreviewSrc = ref<string | null>(null)
+const showShareDialog = ref<boolean>(null)
+
 
 const {user} = useAuthState();
 
@@ -302,12 +310,12 @@ const actions = ref([
       if(status === LIKE_STATUS.LIKED){
           localLike.value = true;
           amount_likes.value = amount_likes.value +1
-          console.log(amount_likes.value)
+
         return;
       }
       amount_likes.value = amount_likes.value - 1
       localLike.value = false;
-      console.log(amount_likes.value)
+
       return;
     }
   },

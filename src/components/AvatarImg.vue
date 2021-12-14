@@ -86,7 +86,6 @@ import {useAuthState} from "@/store/authStore";
         if (!status.value || !status.value.avatar) {
             return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(<string>props.id)}.svg?m=14&b=%23ffffff`;
         }
-        console.log(status)
         return calcExternalResourceLink(status.value.avatar);
     });
 </script>

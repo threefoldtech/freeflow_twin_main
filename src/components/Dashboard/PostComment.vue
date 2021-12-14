@@ -53,27 +53,35 @@
   </div>
  <ReplyComment v-if="commentsSorted.length > 0 && MESSAGE_TYPE.COMMENT" v-for="(reply, idx) in commentsSorted" :key="reply.id" :comment="reply" />
   <form @submit.prevent="handleReplyForm" v-if="showReplyInput" class="relative flex items-center pl-20 flex-start w-full">
-    <div class="w-6 h-6 bg-red-400 rounded-full absolute left-20"></div>
+    <div class="w-8 h-8 bg-red-400 rounded-full absolute left-20">
+      <img :src="myAvatar" class="h-8 rounded-full pointer-events-none">
+    </div>
     <input v-model="replyInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3" placeholder="Type your message here" />
   </form>
 </template>
 
 <script setup lang="ts">
-import {computed, ref} from 'vue';
+import {computed, onBeforeMount, ref} from 'vue';
 import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue'
 import ReplyComment from '@/components/Dashboard/PostComment.vue';
 import moment from "moment";
 import {ThumbUpIcon} from "@heroicons/vue/solid";
 import {MESSAGE_TYPE} from "@/store/socialStore";
 import {calcExternalResourceLink} from "@/services/urlService";
+import {myYggdrasilAddress} from "@/store/authStore";
 
 const openPanel = ref<boolean>(false);
 const showComments = ref<boolean>(false);
 const props = defineProps<{comment: any}>()
 const showReplyInput = ref<boolean>(false);
 const replyInput = ref<string>("")
+const myLocation = ref<string>("")
 
 const emit = defineEmits(['replyToComment'])
+
+onBeforeMount(async() => {
+  myLocation.value = await myYggdrasilAddress();
+})
 
 const commentsSorted = computed(() => {
   return props.comment?.replies.sort(function (a, b) {
@@ -84,6 +92,12 @@ const commentsSorted = computed(() => {
 const avatarImg = computed(() => {
   return calcExternalResourceLink(`http://[${props.comment.owner.location}]/api/user/avatar/default`)
 })
+
+const myAvatar = computed(() => {
+  return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`)
+})
+
+
 
 const handleReplyForm = () => {
   console.log(props.comment)

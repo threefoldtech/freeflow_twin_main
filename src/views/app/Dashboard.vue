@@ -2,7 +2,7 @@
     <Applayout>
       <div class="my-0 mx-auto p-4 lg:w-3/5 2xl:w-2/6 xl:w-5/12">
         <CreatePost />
-        <p v-if="isLoadingSocialPosts">Loading</p>
+        <p class="flex justify-center my-8" v-if="isLoadingSocialPosts">Loading posts</p>
         <pre class="hidden">{{JSON.stringify(allSocialPosts, null, 2)}}</pre>
         <Post v-if="false" :item="item" v-for="(item, idx) in posts" :key="idx" />
         <Post :item="item" v-for="(item, idx) in allSocialPosts" :key="item.post.id" />
