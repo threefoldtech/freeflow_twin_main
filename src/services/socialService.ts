@@ -5,7 +5,7 @@ import { allSocialPosts, COMMENT_MODEL, isLoadingSocialPosts, MESSAGE_TYPE, SOCI
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 
 const endpoint = `${config.baseUrl}api/posts`;
-const myAddress = await myYggdrasilAddress();
+
 const { user } = useAuthState();
 
 interface socialMeta {
@@ -72,6 +72,7 @@ export const getAllPosts = async () => {
 };
 
 export const likePost = async (postId: string, location: string) => {
+    const myAddress = await myYggdrasilAddress();
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {
             liker_location: myAddress,
@@ -87,6 +88,7 @@ export const commentOnPost = async (
     isReplyToComment: boolean,
     comment_id?: string
 ) => {
+    const myAddress = await myYggdrasilAddress();
     const data: COMMENT_MODEL = {
         id: uuidv4(),
         body: message,
