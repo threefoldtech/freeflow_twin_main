@@ -100,10 +100,7 @@ const myAvatar = computed(() => {
 
 
 const handleReplyForm = () => {
-  console.log(props.comment)
-  console.log(replyInput.value)
   if(replyInput.value === "") return;
-  console.log(props)
     emit('replyToComment', {
     input: replyInput.value,
     comment_id: props.comment.id
