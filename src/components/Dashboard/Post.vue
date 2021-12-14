@@ -1,25 +1,29 @@
 <template>
-    <div class="bg-white my-5 rounded">
-        <div class="p-6">
+  <div v-if="showImagePreview" class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8">
+      <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
+      <img  :src="imagePreviewSrc" class="pointer-events-none" />
+  </div>
+  <SharePostDialog v-if="showShareDialog" />
+  <div class="bg-white my-5 rounded">
+    <div class="p-6">
+      <div>
+        <div class="relative">
+          <div class="flex items-center">
+            <div class="relative mr-4">
+              <img :src="avatarImg" class="w-12 h-12 rounded-full"/>
+            </div>
             <div>
-                <div class="relative">
-                    <div class="flex items-center">
-                        <div class="relative mr-4">
-                            <!--<AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>-->
-                            <img src="/threefold_logo.png" class="w-12 h-12" />
-                        </div>
-                        <div>
-                            <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
-                                Threefold
-                            </p>
-                            <p class="text-xs text-gray-400">{{ timeAgo(props.item.date_modified) }}</p>
-                        </div>
-                    </div>
-                    <div class="group absolute right-0 top-0">
-                        <Popover v-slot="{ open }" class="relative">
-                            <PopoverButton
-                                :class="open ? '' : 'text-opacity-90'"
-                                class="
+              <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
+                {{item.owner.id}}
+              </p>
+              <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
+            </div>
+          </div>
+          <div class="group absolute right-0 top-0">
+            <Popover v-slot="{ open }" class="relative">
+              <PopoverButton
+                  :class="open ? '' : 'text-opacity-90'"
+                  class="
                                     items-center
                                     text-base
                                     font-medium
@@ -31,13 +35,13 @@
                                     focus:outline-none
                                     focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75
                                 "
-                            >
-                                <DotsVerticalIcon
-                                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
-                                />
-                                <ChevronDownIcon
-                                    :class="open ? '' : 'text-opacity-70'"
-                                    class="
+              >
+                <DotsVerticalIcon
+                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
+                />
+                <ChevronDownIcon
+                    :class="open ? '' : 'text-opacity-70'"
+                    class="
                                         w-5
                                         h-5
                                         ml-2
@@ -47,40 +51,37 @@
                                         ease-in-out
                                         group-hover:text-opacity-80
                                     "
-                                    aria-hidden="true"
-                                />
-                            </PopoverButton>
+                    aria-hidden="true"
+                />
+              </PopoverButton>
 
-                            <transition
-                                enter-active-class="transition duration-200 ease-out"
-                                enter-from-class="translate-y-1 opacity-0"
-                                enter-to-class="translate-y-0 opacity-100"
-                                leave-active-class="transition duration-150 ease-in"
-                                leave-from-class="translate-y-0 opacity-100"
-                                leave-to-class="translate-y-1 opacity-0"
-                            >
-                                <PopoverPanel
-                                    class="
+              <transition
+                  enter-active-class="transition duration-200 ease-out"
+                  enter-from-class="translate-y-1 opacity-0"
+                  enter-to-class="translate-y-0 opacity-100"
+                  leave-active-class="transition duration-150 ease-in"
+                  leave-from-class="translate-y-0 opacity-100"
+                  leave-to-class="translate-y-1 opacity-0"
+              >
+                <PopoverPanel
+                    class="
                                         absolute
                                         z-10
-                                        w-screen
-                                        max-w-sm
+                                        w-64
                                         px-4
                                         transform
                                         -translate-x-1/2
                                         left-1/2
-                                        sm:px-0
-                                        lg:max-w-3xl
-                                    "
-                                >
-                                    <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div class="relative grid gap-8 bg-white p-6">
-                                            <a
-                                                v-for="item in solutions"
-                                                :key="item.name"
-                                                :href="item.href"
-                                                @click="showComingSoonToUhuru = true"
-                                                class="
+                                                                           "
+                >
+                  <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div class="relative grid gap-8 bg-white p-6">
+                      <a
+                          v-for="item in solutions"
+                          :key="item.name"
+                          :href="item.href"
+                          @click="showComingSoonToUhuru = true"
+                          class="
                                                     items-center
                                                     p-2
                                                     -m-3
@@ -94,159 +95,248 @@
                                                     focus-visible:ring-orange-500
                                                     focus-visible:ring-opacity-50
                                                 "
-                                            >
-                                                <div class="">
-                                                    <p class="text-sm font-medium text-gray-900">
-                                                        {{ item.name }}
-                                                    </p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </PopoverPanel>
-                            </transition>
-                        </Popover>
+                      >
+                        <div class="w-full">
+                          <p class="text-sm font-medium text-gray-900 w-full">
+                            {{ item.name }}
+                          </p>
+                        </div>
+                      </a>
                     </div>
-                </div>
+                  </div>
+                </PopoverPanel>
+              </transition>
+            </Popover>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 text-gray-600">
+        <p class="my-2">{{item.post.body}}</p>
+        <div class="grid grid-cols-2 my-4 gap-1">
+          <div class="relative overflow-hidden cursor-pointer h-64" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
+            <div v-if="!showAllImages && idx === 3 && item.images.length >= 5" class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
+              <p class="text-white text-2xl">+{{item.images.length - 4}}</p>
             </div>
-            <div class="mt-4 text-gray-600">
-                <p class="mb-8" v-html="renderMarkdown(item.content_html)"></p>
-            </div>
-            <div>
-                <div class="flex items-center w-full">
-                    <div class="flex -space-x-2 overflow-hidden">
-                        <img
-                            class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                            src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt=""
-                        />
-                        <img
-                            class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                            src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                            alt=""
-                        />
-                        <img
-                            class="inline-block h-10 w-10 rounded-full ring-2 ring-white"
-                            src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-                            alt=""
-                        />
-                    </div>
-                    <div class="ml-4">
-                        <p class="font-medium text-primary flex">
+            <img @click="openImagePreview(image)" class="object-cover"  :src="fetchPostImage(image)" />
+          </div>
+        </div>
+        <p v-if="item.images.length > 4" class="w-full text-center my-3 cursor-pointer font-medium" @click="() => showAllImages = !showAllImages">{{showAllImages ? 'Hide images' : 'Show all images'}}</p>
+      </div>
+      <div>
+        <div class="flex items-center w-full">
+          <div class="hidden flex -space-x-2 overflow-hidden">
+            <img
+                class="inline-block h-8 w-8 rounded-full ring-2 ring-white"
+                src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt=""
+            />
+            <img
+                class="inline-block  h-8 w-8 rounded-full ring-2 ring-white"
+                src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                alt=""
+            />
+            <img
+                class="inline-block  h-8 w-8 rounded-full ring-2 ring-white"
+                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
+                alt=""
+            />
+          </div>
+          <div class="hidden ml-4">
+            <p class="font-medium text-primary flex text-xs">
                             <span v-for="(name, idx) in props.item.persons" :key="name">
                                 {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
                             </span>
-                        </p>
-                        <p class="text-gray-600">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
-                    </div>
-
-                    <p @click="showComingSoonToUhuru = true" class="text-gray-600 mr-0 ml-auto cursor-pointer">
-                        {{ Math.abs(props.item.comments) }} Comments
-                    </p>
-                </div>
-            </div>
+            </p>
+            <p class="text-gray-600 text-xs" v-if="false">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
+          </div>
+          <div class="flex items-center">
+            <HeartIconSolid class="hidden text-red-500 w-5 h-5 mr-2"  />
+            <p class="text-gray-600 font-medium flex-shrink-0 text-sm">{{amount_likes}} {{amount_likes === 1 ? "Like" : "Likes"}}</p>
+          </div>
+          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-md">
+            {{ item.replies.length }} Comments
+          </p>
         </div>
-        <div class="border-t-2 flex space-x-8 p-4">
-            <div
-                class="flex items-center cursor-pointer"
-                v-for="action in actions"
-                :key="action.name"
-                @click="
-                    () => {
-                        action.name === 'Comment' ? (showComingSoonToUhuru = true) : '';
-                        localLike = !localLike;
-                    }
-                "
-            >
-                <component
-                    :is="localLike ? action.active : action.component"
-                    class="w-6 text-gray-500 mr-3"
-                    :class="{ 'text-red-500': localLike && action.name === 'Like' }"
-                />
-                <p class="text-gray-500">
-                    {{ localLike ? (action.active_text ? action?.active_text : action.name) : action.name }}
-                </p>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="border-t-2 border-b-2 flex space-x-8 p-4">
+      <div
+          class="flex items-center cursor-pointer"
+          v-for="action in actions"
+          :key="action.name"
+          @click="() => action.execute()"
+      >
+        <component
+            :is="localLike ? action.active : action.component"
+            class="w-6 mr-3"
+            :class="{ 'text-red-500': localLike && action.name === 'Like','text-gray-400': !localLike && action.name === 'Like', 'text-gray-500': action.name !== 'Like' }"
+
+        />
+        <p class="text-gray-500">
+          {{action.name}}
+        </p>
+      </div>
+      <div
+          class="flex items-center cursor-pointer"
+          @click="SharePostDialog = true"
+      >
+        <ShareIcon class="w-6 text-gray-500 mr-4" />
+        <p class="text-gray-500">
+          Share
+        </p>
+      </div>
+    </div>
+    <div>
+      <form @submit.prevent="handleAddComment(false)" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
+        <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
+      <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
+        <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
+      </form>
+      <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments" :comments="item.replies"/>
+    </div>
+  </div>
+
 </template>
 
 <script setup lang="ts">
-    import {
-        PhotographIcon,
-        PencilAltIcon,
-        FilmIcon,
-        DotsVerticalIcon,
-        HeartIcon as HeartIconSolid,
-    } from '@heroicons/vue/solid';
-    import { HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { useAuthState } from '@/store/authStore';
-    import { ref, computed } from 'vue';
-    import moment from 'moment';
-    import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
-    import { ChevronDownIcon } from '@heroicons/vue/solid';
-    import { showComingSoonToUhuru } from '@/services/dashboardService';
+import {
+  PhotographIcon,
+  PencilAltIcon,
+  FilmIcon,
+  DotsVerticalIcon,
+  HeartIcon as HeartIconSolid, XIcon
+} from '@heroicons/vue/solid';
+import {HeartIcon, ChatAltIcon, ShareIcon} from '@heroicons/vue/outline';
+import AvatarImg from '@/components/AvatarImg.vue';
+import {useAuthState, myYggdrasilAddress} from '@/store/authStore';
+import {ref, computed, onMounted, onBeforeMount} from 'vue';
+import moment from 'moment';
+import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
+import {ChevronDownIcon} from '@heroicons/vue/solid';
+import {showComingSoonToUhuru} from '@/services/dashboardService';
+import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'
+import MarkdownIt from 'markdown-it';
+import {uuidv4} from "@/common";
+import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
+import axios from "axios";
+import {calcExternalResourceLink} from "@/services/urlService";
+import {commentOnPost, getAllPosts, likePost} from "@/services/socialService";
+import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
 
-    import MarkdownIt from 'markdown-it';
+const props = defineProps<{item: SOCIAL_POST}>();
+const messageInput = ref<string>("")
+const showComments = ref<boolean>(false);
+const showAllImages = ref<boolean>(false)
+const amount_likes = ref<number>(props.item.likes.length)
+const myLocation = ref<string | null>(null)
+const showImagePreview = ref<boolean>(false)
+const imagePreviewSrc = ref<string | null>(null)
+const showShareDialog = ref<boolean>(false)
 
-    const md = new MarkdownIt({
-        html: true,
-        linkify: true,
-        typographer: true,
-    });
 
-    const renderMarkdown = content => {
-        return md.render(content);
-    };
+const {user} = useAuthState();
 
-    interface IProps {
-        item: {
-            id: string;
-            content_html: string;
-            url: string;
-            title: string;
-            date_modified: date;
-            likes: number;
-            comments: number;
-            persons: string[];
-            author: string;
-        };
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+  typographer: true,
+});
+
+const renderMarkdown = content => {
+  return md.render(content);
+};
+
+interface IProps {
+  item: {
+    id: string;
+    content_html: string;
+    url: string;
+    title: string;
+    date_modified: Date;
+    likes: number;
+    comments: number;
+    persons: string[];
+    author: string;
+  };
+}
+
+const uuid1 = uuidv4();
+
+const localLike = ref(false);
+
+onBeforeMount(async() => {
+  myLocation.value = await myYggdrasilAddress();
+  const {user} = useAuthState()
+  if(props.item.likes.some(item => item.id === user.id)){
+    localLike.value= true;
+  }
+})
+
+const openImagePreview = (image) => {
+  imagePreviewSrc.value = fetchPostImage(image)
+  showImagePreview.value = true
+}
+
+const avatarImg = computed(() => {
+  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`)
+})
+
+const myAvatar = computed(() => {
+  return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`)
+})
+
+const fetchPostImage = (image) => {
+  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
+}
+
+const timeAgo = time => {
+  return moment(time).fromNow();
+};
+
+const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
+  const comment_value = isReplyToComment ?  message: messageInput.value
+  if(!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
+  const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id)
+  messageInput.value = "";
+  await getAllPosts()
+}
+
+const actions = ref([
+  {
+    name: 'Like',
+    component: HeartIcon,
+    active: HeartIconSolid,
+    active_text: 'Liked',
+    execute: async () => {
+      const {status} = await likePost(props.item.post.id, props.item.owner.location)
+      if(status === LIKE_STATUS.LIKED){
+          localLike.value = true;
+          amount_likes.value = amount_likes.value +1
+
+        return;
+      }
+      amount_likes.value = amount_likes.value - 1
+      localLike.value = false;
+
+      return;
     }
+  },
+  {
+    name: 'Comment',
+    component: ChatAltIcon,
+    active: ChatAltIcon,
+    execute: async () => {
+      showComments.value = !showComments.value
+    }
+  },
+]);
 
-    const props = defineProps<IProps>();
-
-    const localLike = ref(false);
-
-    const executeAction = (name: string) => {
-        if (name !== 'Like') return;
-        localLike.value = !localLike.value;
-    };
-
-    const timeAgo = time => {
-        return moment(time).fromNow();
-    };
-
-    const actions = ref([
-        {
-            name: 'Like',
-            component: HeartIcon,
-            active: HeartIconSolid,
-            active_text: 'Liked',
-        },
-        {
-            name: 'Comment',
-            component: ChatAltIcon,
-            active: ChatAltIcon,
-        },
-    ]);
-
-    const solutions = [
-        {
-            name: 'Send private message',
-            description: 'Measure actions your users take',
-            href: '##',
-            icon: `
+const solutions = [
+  {
+    name: 'Send private message',
+    description: 'Measure actions your users take',
+    href: '##',
+    icon: `
             <svg
               width="48"
               height="48"
@@ -277,12 +367,12 @@
               />
             </svg>
           `,
-        },
-        {
-            name: 'Share with a friend',
-            description: 'Create your own targeted content',
-            href: '##',
-            icon: `
+  },
+  {
+    name: 'Share with a friend',
+    description: 'Create your own targeted content',
+    href: '##',
+    icon: `
             <svg
               width="48"
               height="48"
@@ -304,10 +394,10 @@
                 stroke-width="2"
               />
             </svg>`,
-        },
-    ];
+  },
+];
 
-    const { user } = useAuthState();
+
 </script>
 
 <style scoped></style>

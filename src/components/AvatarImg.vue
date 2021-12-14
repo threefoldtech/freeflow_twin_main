@@ -49,9 +49,11 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed } from 'vue';
-    import { startFetchStatusLoop, statusList } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '../services/urlService';
+import {computed, onBeforeMount} from 'vue';
+import {fetchStatus, startFetchStatusLoop, statusList} from '@/store/statusStore';
+import { calcExternalResourceLink } from '../services/urlService';
+import {useAuthState} from "@/store/authStore";
+
 
     interface IProps {
         id: string;
@@ -61,6 +63,11 @@
         small?: boolean;
         xsmall?: boolean;
     }
+
+    onBeforeMount(async () => {
+      const { user } = useAuthState();
+      await fetchStatus(user.id);
+    })
 
     const props = withDefaults(defineProps<IProps>(), {
         showOnlineStatus: true,
@@ -72,6 +79,8 @@
     const status = computed(() => {
         return statusList[<string>props.id];
     });
+
+
 
     const src = computed(() => {
         if (!status.value || !status.value.avatar) {
