@@ -178,7 +178,6 @@
       </div>
       <div
           class="flex items-center cursor-pointer"
-          @click="SharePostDialog = true"
       >
         <ShareIcon class="w-6 text-gray-500 mr-4" />
         <p class="text-gray-500">
