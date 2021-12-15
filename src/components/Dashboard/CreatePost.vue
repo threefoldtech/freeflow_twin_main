@@ -158,8 +158,6 @@
       errorFileSize.value ? new_post_images.value = [] : ''
     };
 
-
-
     const handleCreatePost = async () => {
         errorFileSize.value = false;
         if (!isAllowedToPost.value) return;
