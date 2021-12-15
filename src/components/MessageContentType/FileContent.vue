@@ -2,7 +2,7 @@
     <!-- :href="calcExternalResourceLink(message.body.url)" -->
     <a
         :download="message.body.filename"
-        class="px-4 my-2 my-message:bg-accent-200 cursor-pointer"
+        class="px-4 pr-6 my-2 my-message:bg-accent-200 cursor-pointer"
         @click="openSharedFile(message)"
     >
         <div
@@ -69,7 +69,6 @@ const openSharedFile = async (message: Message<MessageBodyType>, count: number =
     loadingFileMessage.value = "Searching file"
     updatedAttachments.value = (await updateAttachments(`/${message.from}`))?.data
     const file = updatedAttachments.value.find(item => item.fullName === message.body.filename)
-    console.log(file)
     if(!file){
       if(count === 5) return;
       loadingFileMessage.value = "Downloading file"
