@@ -6,6 +6,7 @@
         @click="openSharedFile(message)"
     >
         <div
+            v-if="!isLoadingFile && !props.isDownloadingAttachment"
             class="
                 icon
                 bg-gray-600
@@ -17,10 +18,15 @@
                 justify-center
                 text-white
                 my-message:bg-icon
+
             "
         >
             <i class="fas fa-file"></i>
         </div>
+      <div class="flex flex-col items-center space-y-2" v-if="isLoadingFile || props.isDownloadingAttachment">
+        <Spinner  />
+        <small>{{props.isDownloadingAttachment ? 'Downloading to quantum' : loadingFileMessage }}</small>
+      </div>
         <div class="pt-2 my-message:text-icon text-base">
             {{ message.body.filename }}
         </div>
@@ -34,30 +40,47 @@ import { FileShareMessageType, Message, MessageBodyType } from '@/types';
 import router from "@/plugins/Router";
 import {currentDirectoryContent, itemAction, savedAttachments, updateAttachments} from "@/store/fileBrowserStore";
 import {useAuthState} from "@/store/authStore";
+import {ref} from "vue";
+import Spinner from '@/components/Spinner.vue'
 
 interface IProp {
     message: Object;
+    isDownloadingAttachment: boolean
 }
 
 const props = defineProps<IProp>();
+const isLoadingFile = ref<boolean>(false)
+const updatedAttachments = ref<any>([])
+const loadingFileMessage = ref<string>("Downloading")
 
 const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) => {
   await downloadAttachment(message);
 };
 
-const openSharedFile = async (message: Message<MessageBodyType>, count = 0) => {
-    //@TODO make this more efficient
-    const result = (await updateAttachments(`/${message.from}`))?.data
-    const file = result.find(item => item.fullName === message.body.filename)
-    if (count >= 3) return;
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+const openSharedFile = async (message: Message<MessageBodyType>, count: number = 0) => {
+    if(isLoadingFile.value || props.isDownloadingAttachment) return;
+    isLoadingFile.value = true
+    if(count !== 0) await sleep(1500)
+    count++;
+    loadingFileMessage.value = "Searching file"
+    updatedAttachments.value = (await updateAttachments(`/${message.from}`))?.data
+    const file = updatedAttachments.value.find(item => item.fullName === message.body.filename)
+    console.log(file)
     if(!file){
+      if(count === 5) return;
+      loadingFileMessage.value = "Downloading file"
       await downloadAttachmentToQuantum(message)
-      openSharedFile(message)
+      isLoadingFile.value = false;
+      await openSharedFile(message)
       return;
     }
     savedAttachments.value = true
     //@ts-ignore
     await itemAction(file, undefined)
-
+    isLoadingFile.value = false
 };
 </script>
