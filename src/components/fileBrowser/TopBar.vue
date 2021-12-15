@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-row my-4 items-center justify-between">
-            <div v-if="!sharedDir" class="mt-1 mx-2 relative rounded-md shadow-sm">
+            <div class="mt-1 mx-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
                 </div>
@@ -18,8 +18,8 @@
                     "
                     placeholder="Search"
                     type="text"
-                    :class="{'opacity-50' : route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat'}"
-                    :disabled="route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat'"
+                    :class="{'opacity-50' : route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir}"
+                    :disabled="route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir"
                     @input="debounceSearch"
                 />
                 <div
@@ -68,6 +68,7 @@
     import { createNotification } from '@/store/notificiationStore';
     import { SearchIcon } from '@heroicons/vue/solid';
     import {useRoute} from "vue-router";
+
 
     const route = useRoute();
 

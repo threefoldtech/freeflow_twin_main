@@ -19,10 +19,8 @@
   </v-contextmenu>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
-            <div class="py-2 px-4 align-middle inline-block min-w-full">
-                <div class="flex justify-end mb-2">
-                    <ViewSelect />
-                </div>
+            <div class="align-middle inline-block min-w-full">
+              <ViewSelect />
                 <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
@@ -139,38 +137,6 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <!-- <tr
-                                    v-for="item in chatsWithAttachments"
-                                    class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                                    :class="{
-                                        'bg-gray-100': isSelected(item),
-                                    }"
-                                    @click="goToAttachmentsFromChat(item)"
-                                    :key="item"
-                                >
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i
-                                                    :key="item"
-                                                    :class="{
-                                                        'text-gray-600 fa-2x fas fa-users': item,
-                                                        'text-gray-600 fa-2x fas fa-user': !item,
-                                                    }"
-                                                ></i>
-                                            </div>
-                                            <div class="flex flex-row items-center text-md">
-                                                <span class="hover:underline cursor-pointer">{{ item }} </span>
-                                            </div>
-
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                    <td class="px-6 py-4 whitespace-nowrap">-</td>
-                                </tr> -->
-
-                                <!-- File Share Folder -->
                                 <tr v-if="currentDirectory === '/' && !savedAttachments">
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
@@ -202,7 +168,6 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-
                                 <tr
                                     v-for="item in sortContent()"
                                     :key="item.fullName"
