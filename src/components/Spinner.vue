@@ -1,6 +1,6 @@
 <template>
     <div
-        class="loader ease-linear rounded-full border-4 border-gray-200 inline-block"
+        class="loader ease-linear rounded-full border-4 border-accent-200 inline-block"
         :class="{
             'h-12 w-12 border-4': xlarge,
             'h-10 w-10': large,
@@ -29,7 +29,7 @@
 
 <style scoped>
     .loader {
-        border-top-color: rgb(78, 196, 143) !important;
+        border-top-color: rgb(46, 38, 111) !important;
         -webkit-animation: 1.5s spinner linear infinite;
         animation: 1.5s spinner linear infinite;
     }

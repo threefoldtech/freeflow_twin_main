@@ -49,7 +49,7 @@
                         {{ message.from }}
                     </header>
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
-                        <MessageContent :message="message" :key="message.type"></MessageContent>
+                        <MessageContent :message="message" :key="message.type"  :isDownloadingAttachment="isDownloadingAttachment"></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
                         <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
@@ -120,7 +120,7 @@
                         }"
                     >
                         <main class="max-w-[750px] break-all flex justify-between">
-                            <MessageContent :message="reply"></MessageContent>
+                            <MessageContent :message="reply" :isDownloadingAttachment="isDownloadingAttachment"></MessageContent>
                         </main>
                     </div>
 
@@ -142,12 +142,12 @@
         </div>
     </div>
     <div v-else>
-        <MessageContent :message="message"></MessageContent>
+        <MessageContent :message="message" :isDownloadingAttachment="isDownloadingAttachment"></MessageContent>
     </div>
 </template>
 
 <script setup lang="ts">
-import {computed, defineComponent, nextTick, onMounted, watch} from 'vue';
+import {computed, defineComponent, nextTick, onMounted, ref, watch} from 'vue';
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
@@ -190,9 +190,11 @@ import {showShareDialog} from "@/services/dialogService";
         isLastMessage: boolean;
     }
 
+    const isDownloadingAttachment = ref<boolean>(false)
     const props = defineProps<IProps>();
 
     const emit = defineEmits(['openEditShare']);
+
 
     const { user } = useAuthState();
 
@@ -250,6 +252,10 @@ import {showShareDialog} from "@/services/dialogService";
         sendMessageObject(props.chatId, updatedMessage);
     };
 
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     const deleteReply = (message, reply) => {
         //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
@@ -265,8 +271,18 @@ import {showShareDialog} from "@/services/dialogService";
         sendMessageObject(props.chatId, updatedMessage);
     };
 
-    const downloadAttachmentToQuantum = (message: Message<MessageBodyType>) => {
-      downloadAttachment(message);
+    const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
+      if(count >= 4){
+        isDownloadingAttachment.value = false;
+        console.log("Couldn't download attachments")
+        return;
+      }
+      isDownloadingAttachment.value = true;
+      const response = await downloadAttachment(message);
+      count++;
+      if(response !== "OK") await downloadAttachmentToQuantum(message);
+      await sleep(1500)
+      isDownloadingAttachment.value = false;
     };
 </script>
 <style lang="css" scoped></style>

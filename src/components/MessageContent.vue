@@ -3,7 +3,7 @@
     <SystemContent v-else-if="message.type === MessageTypes.SYSTEM" :message="message" />
     <AudioContent v-else-if="message.type === MessageTypes.FILE && isAudio(message.body.filename)" :message="message" />
     <ImageContent v-else-if="message.type === MessageTypes.FILE && isImage(message.body.filename)" :message="message" />
-    <FileContent v-else-if="message.type === MessageTypes.FILE" :message="message" />
+    <FileContent v-else-if="message.type === MessageTypes.FILE" :message="message" :isDownloadingAttachment="props.isDownloadingAttachment" />
     <GifContent v-else-if="message.type === MessageTypes.GIF" :message="message" />
     <QuoteContent
         v-else-if="message.type === MessageTypes.QUOTE"
@@ -25,11 +25,14 @@
     import FileShareContent from '@/components/MessageContentType/FileShareContent.vue';
     import { isAudio, isImage } from '@/services/contentService';
     import { Message, MessageBodyType, MessageTypes } from '@/types';
+    import {watch} from "vue";
 
     interface Props {
         message: Message<MessageBodyType>;
         preventRecursion?: boolean;
+        isDownloadingAttachment?: boolean;
     }
 
-    const props = withDefaults(defineProps<Props>(), { preventRecursion: false });
+    const props = withDefaults(defineProps<Props>(), { preventRecursion: false, isDownloadingAttachment: false });
+
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div
         @click="createPostModalStatus = true"
-        class="z-50 bg-white rounded-lg relative"
+        class="z-50 bg-white relative"
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
@@ -25,15 +25,19 @@
                 </div>
             </TabList>
             <TabPanels>
-                <TabPanel>
+                <TabPanel class="relative">
                     <FileDropArea @send-file="selectFiles">
                         <div class="p-4 flex items-start h-48">
-                            <AvatarImg :id="user.id" class="rounded-full w-12 h-12"></AvatarImg>
+                            <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
                             <textarea
                                 class="ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full"
                                 placeholder="Write something about you"
                                 v-model="new_post_text"
                             />
+                        </div>
+                        <div class="flex flex-col" v-if="errorFileSize">
+                          <small class="px-4 text-gray-500">File size limit is 20MB per image</small>
+                          <small class="px-4 text-gray-500">Only png/jpeg files allowed</small>
                         </div>
                         <div class="p-4">
                             <ImageGrid
@@ -50,7 +54,8 @@
                             accept="image/png, image/gif, image/jpeg"
                             class="hidden border-none outline-none ring-0"
                         />
-                        <div class="border-t-2 p-4 block">
+                        <div :class="{'border-b-lg' : createPostModalStatus}"
+                        class="border-t-2 p-4 block">
                             <div
                                 @click="$refs.create_post_file_upload.click()"
                                 class="bg-gray-300 px-4 py-2 rounded-full flex items-center w-28 cursor-pointer hover:bg-gray-200"
@@ -61,7 +66,7 @@
                             </div>
                         </div>
                     </FileDropArea>
-                    <div @click.stop v-if="createPostModalStatus" class="bg-gray-200 px-4 py-4 border-t-2 rounded-b-lg">
+                    <div @click.stop v-if="createPostModalStatus" class="bg-gray-200 px-4 h-14 flex items-center justify-center border-t-2 rounded-b-lg absolute -bottom-14 w-full">
                         <button
                             class="w-full py-2 bg-primary text-white font-semibold rounded hover:bg-accent-800 duration-100"
                             :class="{ 'opacity-50': !isAllowedToPost }"
@@ -87,7 +92,7 @@
     <div
         @click="createPostModalStatus = false"
         v-if="createPostModalStatus"
-        class="w-full h-full inset-0 fixed z-40 bg-black bg-opacity-25"
+        class="w-full h-full inset-0 fixed z-40 bg-black opacity-10"
     ></div>
 </template>
 
@@ -105,27 +110,56 @@
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
+    const errorFileSize = ref<boolean>(false)
 
 
     const isAllowedToPost = computed(() => {
         return new_post_images.value.length >= 1 || new_post_text.value !== '' ? true : false;
     });
 
+    const checkFileSize = (image: File) => {
+      if((image.size/1024 /1024) >= 20){
+        errorFileSize.value = true
+      }
+    }
+
+    enum SUPPORTED_EXTENSIONS {
+      JPEG = "image/jpeg",
+      PNG = "image/png",
+    }
+
+    const isExtensionSupported = (image: File) => {
+        const options = Object.values(SUPPORTED_EXTENSIONS)
+        options.includes(image.type) ? '' : errorFileSize.value = true
+    }
+
     const handleFileInput = e => {
+        errorFileSize.value = false;
         new_post_images.value = [];
         for (const file of e.target.files) {
+            checkFileSize(file)
+            isExtensionSupported(file)
             new_post_images.value.push(file);
         }
+        errorFileSize.value ? new_post_images.value = [] : ''
     };
 
+
+
     const selectFiles = (files: File[]) => {
-        new_post_images.value = [];
+      createPostModalStatus.value = true;
+      errorFileSize.value = false;
+      new_post_images.value = [];
         for (const file of files) {
+            checkFileSize(file)
+            isExtensionSupported(file)
             new_post_images.value.push(file);
         }
+      errorFileSize.value ? new_post_images.value = [] : ''
     };
 
     const handleCreatePost = async () => {
+        errorFileSize.value = false;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);
         await getAllPosts();

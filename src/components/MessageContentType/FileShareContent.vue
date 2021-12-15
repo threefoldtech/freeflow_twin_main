@@ -1,5 +1,5 @@
 <template>
-    <a class="px-4 my-2 my-message:bg-accent-200 cursor-pointer text-xs" @click="visitFileInMessage(message)">
+    <a class="px-4 my-2 pr-6 my-message:bg-accent-200 cursor-pointer text-xs" @click="visitFileInMessage(message)">
         <p class="my-message:text-icon text-center text-xs mb-1">
             <span v-if="message.body.isFolder">Folder</span>
             <span v-else>File</span>
