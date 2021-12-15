@@ -1,11 +1,12 @@
 <template>
 <div @click="$emit('close')" class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-50 flex justify-center items-center">
-  <div @click.stop class="bg-white w-11/12 sm:w-9/12 lg:w-2/4 2xl:w-1/3 p-4 rounded-lg">
+  <div @click.stop class="bg-white w-11/12 sm:w-9/12 lg:w-2/4 2xl:w-1/3 p-4 rounded-lg relative">
+    <XIcon @click="$emit('close')" class="w-5 h-5 text-gray-500 absolute right-4 top-4 cursor-pointer" />
     <h1 class="font-medium">Share post</h1>
     <div class="p-4 rounded  bg-gray-100 my-4">
       <div class="flex items-center">
           <img class="w-10 h-10 rounded-full" :src="avatarImg" />
-        <p class="ml-3 font-medium">Conor Mcgregor</p>
+        <p class="ml-3 font-medium">{{item.owner.id}}</p>
       </div>
       <div class="mt-2 text-gray-600">
         <p>{{item.post.body}}</p>
@@ -64,6 +65,7 @@ import {computed, onBeforeMount, ref} from "vue";
   import {SOCIAL_POST} from "@/store/socialStore";
   import {calcExternalResourceLink} from "@/services/urlService";
   import Spinner from '@/components/Spinner.vue'
+  import {XIcon} from "@heroicons/vue/solid";
 
   const emit = defineEmits(['close'])
 
