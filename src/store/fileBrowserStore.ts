@@ -85,6 +85,7 @@ export const isQuantumChatFiles = ref<boolean>(false);
 export const currentShare = ref<SharedFileInterface>(undefined);
 export const selectedTab = ref(0);
 export const savedAttachments = ref<boolean>(false);
+export const savedAttachmentsIsLoading = ref<boolean>(false);
 const { user } = useAuthState();
 
 watch([currentDirectory], () => {
@@ -118,12 +119,14 @@ export const updateContent = async (path = currentDirectory.value) => {
 };
 
 export const updateAttachments = async (path = currentDirectory.value) => {
+    savedAttachmentsIsLoading.value = true;
     const result = await Api.getDirectoryContent(path, true);
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     // attachments.value = result.data.map(createModel);
     currentDirectoryContent.value = result.data.map(createModel);
     savedAttachments.value = true;
+    savedAttachmentsIsLoading.value = false;
     return result;
 };
 

@@ -30,7 +30,7 @@
                     <i aria-hidden="true" class="fa fa-window-close h-5 w-5 text-gray-400" />
                 </div>
             </div>
-            <div class="flex flex-row items-center">
+            <div v-if="!savedAttachments" class="flex flex-row items-center">
                 <SelectedOptions v-if="!sharedDir"></SelectedOptions>
                 <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
@@ -42,20 +42,20 @@
 <script lang="ts" setup>
     import { computed, onBeforeMount, ref } from 'vue';
     import {
-        selectedPaths,
-        currentDirectory,
-        goToHome,
-        goToAPreviousDirectory,
-        goBack,
-        searchDir,
-        searchDirValue,
-        searchResults,
-        isDraggingFiles,
-        moveFiles,
-        selectedAction,
-        Action,
-        addShare,
-        sharedDir,
+      selectedPaths,
+      currentDirectory,
+      goToHome,
+      goToAPreviousDirectory,
+      goBack,
+      searchDir,
+      searchDirValue,
+      searchResults,
+      isDraggingFiles,
+      moveFiles,
+      selectedAction,
+      Action,
+      addShare,
+      sharedDir, savedAttachments,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
     import MainActionButtons from '@/components/fileBrowser/MainActionButtons.vue';
@@ -68,6 +68,7 @@
     import { createNotification } from '@/store/notificiationStore';
     import { SearchIcon } from '@heroicons/vue/solid';
     import {useRoute} from "vue-router";
+
 
 
     const route = useRoute();

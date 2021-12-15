@@ -28,8 +28,11 @@
                                 Moving {{ selectedPaths.length }} selected File(s)
                             </div>
                         </div>
+                      <div v-if="savedAttachmentsIsLoading" class="w-full h-36 flex justify-center items-center">
+                        <Spinner  />
+                      </div>
                         <table
-                            v-if="fileBrowserTypeView === 'LIST'"
+                            v-if="fileBrowserTypeView === 'LIST' && !savedAttachmentsIsLoading"
                             :key="currentDirectory"
                             class="min-w-full divide-y divide-gray-200 shadow"
                             @dragenter="onDragEnterParent"
@@ -137,7 +140,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <tr v-if="currentDirectory === '/' && !savedAttachments">
+                                <tr v-if="currentDirectory === '/' && !savedAttachments && $route.name === 'quantum'">
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
                                         <div class="flex flex-row items-center text-md">
@@ -151,7 +154,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <tr v-if="currentDirectory === '/' && !savedAttachments">
+                                <tr v-if="currentDirectory === '/' && !savedAttachments  && $route.name === 'quantum'">
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap"
@@ -222,7 +225,7 @@
                         <!-- GRID -->
                         <!-- Local filebrowser -->
                         <ul
-                            v-else
+                            v-if="fileBrowserTypeView === 'GRID' && !savedAttachmentsIsLoading"
                             class="
                                 grid grid-cols-2
                                 gap-x-2 gap-y-4
@@ -316,7 +319,7 @@
                                         justify-start
                                         items-center
                                     "
-                                    @click="goToFilesInChat(true)"
+                                    @click="router.push({ name: 'savedAttachments' })"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
                                         <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
@@ -331,7 +334,7 @@
                                                 ml-4
                                             "
                                         >
-                                            Downloaded attachments
+                                            Saved attachments
                                         </p>
                                         <button class="absolute inset-0 focus:outline-none" type="button"></button>
                                     </div>
@@ -410,39 +413,39 @@
 import {computed, onBeforeMount, ref} from 'vue';
 import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
 import {
-    currentDirectory,
-    currentDirectoryContent,
-    currentSort,
-    itemAction,
-    PathInfoModel,
-    selectItem,
-    deselectAll,
-    deselectItem,
-    sortContent,
-    sortAction,
-    currentSortDir,
-    getFileLastModified,
-    getFileExtension,
-    getFileSize,
-selectedPaths,
+  currentDirectory,
+  currentDirectoryContent,
+  currentSort,
+  itemAction,
+  PathInfoModel,
+  selectItem,
+  deselectAll,
+  deselectItem,
+  sortContent,
+  sortAction,
+  currentSortDir,
+  getFileLastModified,
+  getFileExtension,
+  getFileSize,
+  selectedPaths,
 
-selectAll,
-    getIconColor,
-    getIcon,
-    uploadFiles,
-    equals,
-    moveFiles,
-    sharedDir,
-    sharedContent,
-    getSharedContent,
-    searchResults,
-    searchDirValue,
-    currentShare,
-isDraggingFiles,
-    goToShared,
-    fileBrowserTypeView,
-    goToFilesInChat,
-    savedAttachments,
+  selectAll,
+  getIconColor,
+  getIcon,
+  uploadFiles,
+  equals,
+  moveFiles,
+  sharedDir,
+  sharedContent,
+  getSharedContent,
+  searchResults,
+  searchDirValue,
+  currentShare,
+  isDraggingFiles,
+  goToShared,
+  fileBrowserTypeView,
+  goToFilesInChat,
+  savedAttachments, savedAttachmentsIsLoading,
 } from '@/store/fileBrowserStore';
 import {useRouter, useRoute} from 'vue-router';
 import FileDropArea from '@/components/FileDropArea.vue';
@@ -455,6 +458,7 @@ import {
   RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
   RIGHT_CLICK_TYPE,
   } from '@/store/contextmenuStore'
+import Spinner from "@/components/Spinner.vue";
 
 const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
