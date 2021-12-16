@@ -141,7 +141,7 @@
 
 
     const isAllowedToPost = computed(() => {
-        return new_post_images.value.length >= 1 || new_post_text.value !== '' ? true : false;
+        return new_post_images.value.length >= 1 || new_post_text.value !== '' || !isPublishingNewPost ? true : false;
     });
 
     const checkFileSize = (image: File) => {
@@ -186,7 +186,7 @@
     };
 
     const handleCreatePost = async () => {
-        if(isPublishingNewPost.value) return;
+        if(!isAllowedToPost.value) return;
         errorFileSize.value = false;
         isPublishingNewPost.value = true
         if (!isAllowedToPost.value) return;
