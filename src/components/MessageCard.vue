@@ -177,6 +177,8 @@ import {
 import {downloadFiles, selectedPaths} from "@/store/fileBrowserStore";
 import {downloadAttachment} from '@/services/fileBrowserService'
 import {showShareDialog} from "@/services/dialogService";
+import {createNotification} from "@/store/notificiationStore";
+import {Status} from "@/types/notifications";
 
 
     interface IProps {
