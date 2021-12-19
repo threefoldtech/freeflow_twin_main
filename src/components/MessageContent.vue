@@ -12,7 +12,6 @@
     />
     <FileShareContent v-else-if="message.type === MessageTypes.FILE_SHARE" :message="message" />
     <PostShareContent v-else-if="message.type === MessageTypes.POST_SHARE" :message="message" />
-
   <StringContent v-else :message="message" />
 
 </template>

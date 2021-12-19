@@ -129,6 +129,9 @@ const lastMessageBody = computed(() => {
             }
             return 'File has been shared';
         }
+        case MessageTypes.POST_SHARE: {
+          return "A post has been shared"
+        }
         case 'DELETE':
         default:
             return lstmsg.body;

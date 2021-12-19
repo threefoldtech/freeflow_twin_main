@@ -159,7 +159,7 @@
         </div>
       </div>
     </div>
-    <div class="border-t-2 border-b-2 flex space-x-8 p-4">
+    <div class="border-t-2 flex space-x-8 p-4">
       <div
           class="flex items-center cursor-pointer"
           v-for="action in actions"
@@ -192,7 +192,7 @@
       <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
         <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
       </form>
-      <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments" :comments="item.replies"/>
+      <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments && item.replies.length > 0" :comments="item.replies" class="border-t-2 rounded-b-lg" />
     </div>
   </div>
 
