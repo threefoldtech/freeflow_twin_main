@@ -1,8 +1,17 @@
 import axios from 'axios';
 import config from '@/config';
 import { uuidv4 } from '@/common';
-import { allSocialPosts, COMMENT_MODEL, isLoadingSocialPosts, MESSAGE_TYPE, SOCIAL_POST } from '@/store/socialStore';
+import {
+    allSocialPosts,
+    COMMENT_MODEL,
+    isLoadingSocialPosts,
+    MESSAGE_POST_SHARE_BODY,
+    MESSAGE_TYPE,
+    SOCIAL_POST,
+} from '@/store/socialStore';
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+import { Message, MessageTypes } from '@/types';
+import { sendMessageObject } from '@/store/chatStore';
 
 const endpoint = `${config.baseUrl}api/posts`;
 const myAddress = await myYggdrasilAddress();
@@ -109,4 +118,28 @@ export const commentOnPost = async (
         isReplyToComment: isReplyToComment,
     };
     return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
+};
+
+export const createMessage = async (chatId, post: SOCIAL_POST): Promise<Message<MESSAGE_POST_SHARE_BODY>> => {
+    const { user } = useAuthState();
+    return {
+        id: uuidv4(),
+        from: user.id,
+        to: <string>chatId,
+        body: {
+            message: 'A post has been shared',
+            post: post.post,
+            images: post.images,
+            owner: post.owner,
+        },
+        timeStamp: new Date(),
+        type: MessageTypes.POST_SHARE,
+        replies: [],
+        subject: null,
+    };
+};
+
+export const sendMessageSharePost = async (chatId: string, post: SOCIAL_POST) => {
+    const newMessage: Message<MESSAGE_POST_SHARE_BODY> = await createMessage(chatId, post);
+    sendMessageObject(chatId, newMessage);
 };

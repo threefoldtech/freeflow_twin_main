@@ -1,4 +1,4 @@
-import { MessageAction } from "@/store/chatStore";
+import { MessageAction } from '@/store/chatStore';
 
 export interface User extends Contact {
     image: string;
@@ -64,7 +64,7 @@ export interface Chat {
     name: string;
     isGroup: boolean;
     adminId: Id;
-    draft: Message<MessageBodyType>
+    draft: Message<MessageBodyType>;
 }
 export interface PersonChat extends Chat {}
 
@@ -130,6 +130,7 @@ export enum MessageTypes {
     CONTACT_REQUEST = 'CONTACT_REQUEST',
     DELETE = 'DELETE',
     QUOTE = 'QUOTE',
+    POST_SHARE = 'POST_SHARE',
 }
 
 export interface SharedFileInterface {

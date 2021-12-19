@@ -59,6 +59,13 @@ interface POST_IMAGE {
     path: string;
 }
 
+export interface MESSAGE_POST_SHARE_BODY {
+    post: POST_MODEL;
+    images: POST_IMAGE[];
+    owner: POST_OWNER;
+    message: string;
+}
+
 export interface SOCIAL_POST {
     post: POST_MODEL;
     owner: POST_OWNER;

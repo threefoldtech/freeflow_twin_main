@@ -66,6 +66,7 @@ import {computed, onBeforeMount, ref} from "vue";
   import {calcExternalResourceLink} from "@/services/urlService";
   import Spinner from '@/components/Spinner.vue'
   import {XIcon} from "@heroicons/vue/solid";
+import {sendMessageSharePost} from "@/services/socialService";
 
   const emit = defineEmits(['close'])
 
@@ -77,13 +78,15 @@ import {computed, onBeforeMount, ref} from "vue";
 
   const props = defineProps<{item: SOCIAL_POST, avatar: any}>();
 
-  const sharePostWithFriend = (id: string) => {
+
+
+  const sharePostWithFriend = async (id: string) => {
     queue.value.push(id)
-    setTimeout(() => {
+    setTimeout(async () => {
         if(!isInQueue(id)) return
         queue.value = queue.value.filter(item => item !== id)
         //Do request
-
+        await sendMessageSharePost(id,props.item)
         peopleIHaveSharedWith.value.push(id)
     }, 2000)
   }
