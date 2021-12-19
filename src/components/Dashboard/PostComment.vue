@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, onBeforeMount, ref} from 'vue';
+import {computed, onBeforeMount, ref, watch} from 'vue';
 import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue'
 import ReplyComment from '@/components/Dashboard/PostComment.vue';
 import moment from "moment";
@@ -96,7 +96,6 @@ const avatarImg = computed(() => {
 const myAvatar = computed(() => {
   return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`)
 })
-
 
 
 const handleReplyForm = () => {

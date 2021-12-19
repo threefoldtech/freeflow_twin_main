@@ -91,8 +91,7 @@ export const likePost = async (postId: string, location: string) => {
 };
 
 export const getSinglePost = async (postId: string, location: string) => {
-    console.log(postId, location);
-    return (
+    const response = (
         await axios.get<any>(`${endpoint}/single/post`, {
             params: {
                 postId: postId,
@@ -100,6 +99,8 @@ export const getSinglePost = async (postId: string, location: string) => {
             },
         })
     ).data;
+    allSocialPosts.value = allSocialPosts.value.map(item => (item.post.id === postId ? response : { ...item }));
+    return response;
 };
 
 export const commentOnPost = async (

@@ -195,7 +195,6 @@
       <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments && item.replies.length > 0" :comments="item.replies" class="border-t-2 rounded-b-lg" />
     </div>
   </div>
-
 </template>
 
 <script setup lang="ts">
@@ -209,7 +208,7 @@ import {
 import {HeartIcon, ChatAltIcon, ShareIcon} from '@heroicons/vue/outline';
 import AvatarImg from '@/components/AvatarImg.vue';
 import {useAuthState, myYggdrasilAddress} from '@/store/authStore';
-import {ref, computed, onMounted, onBeforeMount} from 'vue';
+import {ref, computed, onMounted, onBeforeMount, watch} from 'vue';
 import moment from 'moment';
 import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
 import {ChevronDownIcon} from '@heroicons/vue/solid';
@@ -220,7 +219,7 @@ import {uuidv4} from "@/common";
 import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
 import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
-import {commentOnPost, getAllPosts, likePost} from "@/services/socialService";
+import {commentOnPost, getAllPosts, getSinglePost, likePost} from "@/services/socialService";
 import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
 
 const props = defineProps<{item: SOCIAL_POST}>();
@@ -235,6 +234,8 @@ const showShareDialog = ref<boolean>(false)
 
 
 const {user} = useAuthState();
+
+const emit = defineEmits(['refreshPost'])
 
 const md = new MarkdownIt({
   html: true,
@@ -259,6 +260,11 @@ interface IProps {
     author: string;
   };
 }
+
+watch(messageInput,() => {
+  console.log(messageInput.value)
+
+})
 
 const uuid1 = uuidv4();
 
@@ -298,7 +304,9 @@ const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: 
   if(!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
   const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id)
   messageInput.value = "";
-  await getAllPosts()
+  const response = await getSinglePost(props.item.post.id, props.item.owner.location);
+  emit('refreshPost', response)
+
 }
 
 const actions = ref([
