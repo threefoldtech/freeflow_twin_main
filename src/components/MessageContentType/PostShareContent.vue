@@ -15,7 +15,7 @@
     </div>
   </div>
   </TransitionRoot>
-<div @click="goToSocialPost" class="bg-white rounded-lg px-4 py-2 cursor-pointer">
+<div v-if="props.message.body.images.length === 0" @click="goToSocialPost" class="bg-white rounded-lg px-4 py-2 cursor-pointer">
  <p class="text-lg font-semibold mb-2">Shared a post</p>
   <div class="flex items-center space-x-2">
     <img :src="avatarImg" class="w-8 h-8 rounded-full" />
@@ -23,6 +23,17 @@
   </div>
   <p class="mt-2 text-xs text-gray-400">{{truncatedText}}</p>
 </div>
+  <div v-else @click="goToSocialPost" class="bg-black rounded-lg cursor-pointer relative bg-gradient-to-t from-black via-black to-transparent">
+    <img class="object-contain opacity-[75%] max-h-[16rem]" :src="thumbnailImage" />
+    <div class="p-4 z-40 absolute bottom-0 left-0 text-white">
+    <p class="text-lg font-semibold mb-2">Shared a post</p>
+    <div class="flex items-center space-x-2">
+      <img :src="avatarImg" class="w-8 h-8 rounded-full" />
+      <p>{{message.body.owner.id}}</p>
+    </div>
+    <p class="mt-2 text-xs text-gray-200">{{truncatedText}}</p>
+  </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -47,6 +58,11 @@ const truncatedText = computed(() => {
 const refreshPost = (post) => {
   postData.value = post;
 }
+
+const thumbnailImage = computed(() => {
+  return calcExternalResourceLink(`http://[${props.message.body.owner.location}]/api/posts/download/${btoa(props.message.body.images[0].path)}`)
+
+})
 
 const avatarImg = computed(() => {
   return calcExternalResourceLink(`http://[${props.message.body.owner.location}]/api/user/avatar/default`)

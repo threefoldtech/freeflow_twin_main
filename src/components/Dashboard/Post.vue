@@ -112,7 +112,7 @@
       </div>
       <div class="mt-4 text-gray-600">
         <p class="my-2">{{item.post.body}}</p>
-        <div class="grid grid-cols-2 my-4 gap-1">
+        <div class="grid grid-cols-2 my-4 gap-1" :class="{'grid-cols-1' : item.images.length === 1}">
           <div class="relative overflow-hidden cursor-pointer h-64" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
             <div v-if="!showAllImages && idx === 3 && item.images.length >= 5" class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
               <p class="text-white text-2xl">+{{item.images.length - 4}}</p>
@@ -219,7 +219,7 @@ import {uuidv4} from "@/common";
 import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
 import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
-import {commentOnPost, getAllPosts, getSinglePost, likePost} from "@/services/socialService";
+import {commentOnPost, getAllPosts, getSinglePost, likePost, setSomeoneIsTyping} from "@/services/socialService";
 import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
 
 const props = defineProps<{item: SOCIAL_POST}>();
@@ -243,6 +243,10 @@ const md = new MarkdownIt({
   typographer: true,
 });
 
+watch([showComments, amount_likes],() => {
+  getSinglePost(props.item.post.id, props.item.owner.location)
+})
+
 const renderMarkdown = content => {
   return md.render(content);
 };
@@ -261,9 +265,9 @@ interface IProps {
   };
 }
 
-watch(messageInput,() => {
+watch(messageInput,async () => {
   console.log(messageInput.value)
-
+  await setSomeoneIsTyping(props.item.post.id, props.item.owner.location)
 })
 
 const uuid1 = uuidv4();

@@ -12,6 +12,7 @@ import {
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
+import { calcExternalResourceLink } from '@/services/urlService';
 
 const endpoint = `${config.baseUrl}api/posts`;
 const myAddress = await myYggdrasilAddress();
@@ -101,6 +102,14 @@ export const getSinglePost = async (postId: string, location: string) => {
     ).data;
     allSocialPosts.value = allSocialPosts.value.map(item => (item.post.id === postId ? response : { ...item }));
     return response;
+};
+
+export const setSomeoneIsTyping = async (postId, location) => {
+    const url = calcExternalResourceLink(`http://[${location}]/api/posts/typing/`);
+    await axios.put(url, {
+        postId: postId,
+        location: location,
+    });
 };
 
 export const commentOnPost = async (

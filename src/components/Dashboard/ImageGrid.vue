@@ -1,5 +1,5 @@
 <template>
-  <div @click="$emit('resetImage')" class="grid grid-cols-2 gap-1 relative">
+  <div @click="$emit('resetImage')" class="grid grid-cols-2 gap-1 relative" :class="{'grid-cols-1':images.length === 1}">
     <div @click="$emit('resetImage')" class="z-40 absolute right-2 top-2 cursor-pointer bg-gray-800 hover:bg-gray-500 rounded-full w-8 h-8 flex items-center justify-center">
       <XIcon class="w-6 text-gray-400" />
     </div>
