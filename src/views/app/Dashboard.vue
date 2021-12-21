@@ -1,19 +1,40 @@
 <template>
     <Applayout>
-      <div class="my-0 mx-auto p-4 lg:w-3/5 2xl:w-2/6 xl:w-5/12">
+      <div>
+      <div ref="dashboardWindow" class="flex flex-row">
+        <div class="fixed flex justify-end hidden">
+          <nav class="mt-5 px-2 w-[300px] flex flex-col space-y-3 z-50">
+            <h1 class="font-semibold text-accent-800 text-lg">Flow</h1>
+            <a href="#" class="group flex items-center px-6 py-4 text-base leading-6 font-semibold rounded-lg bg-accent-800 text-white transition duration-100">
+              <HomeIcon class="mr-4 h-6 w-6" />
+              Dashboard
+            </a>
+            <a href="#" class="group flex items-center px-6 py-4 text-base leading-6 font-semibold rounded-lg bg-transparent text-accent-800 hover:bg-accent-800 hover:text-white transition duration-100">
+              <BellIcon class="mr-4 h-6 w-6"  />
+              Notifications<span class="ml-12">5</span>
+            </a>
+            <a href="#" class="group flex items-center px-6 py-4 text-base leading-6 font-semibold rounded-lg bg-transparent text-accent-800 hover:bg-accent-800 hover:text-white transition duration-100">
+              <UserGroupIcon class="mr-4 h-6 w-6" />
+              Communities
+            </a>
+            <a href="#" class="group flex items-center px-6 py-4 text-base leading-6 font-semibold rounded-lg bg-transparent text-accent-800 hover:bg-accent-800 hover:text-white transition duration-100">
+              <UserAddIcon class="mr-4 h-6 w-6" />
+              Contact list<span class="ml-12">5</span>
+            </a>
+          </nav>
+        </div>
+      <div class="my-0 mx-auto p-4 w-[600px]">
         <CreatePost />
         <p class="flex justify-center my-8" v-if="isLoadingSocialPosts">Loading posts</p>
-        <pre class="hidden">{{JSON.stringify(allSocialPosts, null, 2)}}</pre>
-        <Post v-if="false" :item="item" v-for="(item, idx) in posts" :key="idx" />
-        <Post :item="item" v-for="(item, idx) in allSocialPosts" :key="item.post.id" />
-
+        <Post  :item="item" v-for="(item, idx) in allSocialPosts" :key="item.post.id" />
         <div v-if='showComingSoonToUhuru' @click='showComingSoonToUhuru = false' class='w-full h-full inset-0 bg-black bg-opacity-75 fixed z-50 flex justify-center items-center flex-col'>
           <p class='text-white text-lg font-semibold' @click.stop>Coming soon to Uhuru.</p>
           <button class='text-black text-lg font-semibold mt-4 bg-white px-4 py-2 rounded-md' @click='showComingSoonToUhuru = false'>Close dialog</button>
         </div>
       </div>
-
-
+      </div>
+      <div></div>
+      </div>
     </Applayout>
 </template>
 
@@ -22,17 +43,27 @@
     import CreatePost from '@/components/Dashboard/CreatePost.vue';
     import Post from '@/components/Dashboard/Post.vue';
     import FlowSidebar from '@/components/Dashboard/FlowSidebar.vue'
-    import { onBeforeMount, ref } from 'vue';
+    import {nextTick, onBeforeMount, onMounted, ref, watch} from 'vue';
     import { fetchPosts, posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
     import {getAllPosts} from "@/services/socialService";
     import {allSocialPosts, isLoadingSocialPosts} from "@/store/socialStore";
     import {startFetchStatusLoop} from "@/store/statusStore";
+    import {BellIcon, HomeIcon, UserAddIcon, UserGroupIcon} from "@heroicons/vue/solid";
+    import {useSocketActions} from "@/store/socketStore";
+    import {useAuthState} from "@/store/authStore";
 
+    const { user } = useAuthState();
+
+    const dashboardWindow = ref<HTMLElement>(null)
 
     onBeforeMount(async () => {
+      const { initializeSocket } = useSocketActions();
+        initializeSocket(user.id.toString());
         await fetchPosts();
         await getAllPosts();
     });
+
+
 </script>
 
 <style scoped></style>

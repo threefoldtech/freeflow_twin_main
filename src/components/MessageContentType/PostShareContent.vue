@@ -71,7 +71,6 @@ const avatarImg = computed(() => {
 const goToSocialPost = async () => {
   const post = await getSinglePost(props.message.body.post.id,props.message.body.owner.location)
   if(!post) return;
-  console.log(postData)
   postData.value = post;
   showPost.value = true;
 }

@@ -71,6 +71,7 @@ export interface SOCIAL_POST {
     owner: POST_OWNER;
     likes: LIKE_MODEL[];
     images: POST_IMAGE[];
+    isTyping?: String[];
 }
 
 export const allSocialPosts = ref<SOCIAL_POST[]>([]);

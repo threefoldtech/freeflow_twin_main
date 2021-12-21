@@ -13,9 +13,9 @@ import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
 import { calcExternalResourceLink } from '@/services/urlService';
+import { destroyNotification } from '@/store/notificiationStore';
 
 const endpoint = `${config.baseUrl}api/posts`;
-const myAddress = await myYggdrasilAddress();
 const { user } = useAuthState();
 
 interface socialMeta {
@@ -82,6 +82,7 @@ export const getAllPosts = async () => {
 };
 
 export const likePost = async (postId: string, location: string) => {
+    const myAddress = await myYggdrasilAddress();
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {
             liker_location: myAddress,
@@ -105,8 +106,7 @@ export const getSinglePost = async (postId: string, location: string) => {
 };
 
 export const setSomeoneIsTyping = async (postId, location) => {
-    const url = calcExternalResourceLink(`http://[${location}]/api/posts/typing/`);
-    await axios.put(url, {
+    await axios.put(`${endpoint}/typing`, {
         postId: postId,
         location: location,
     });
@@ -140,6 +140,41 @@ export const commentOnPost = async (
         isReplyToComment: isReplyToComment,
     };
     return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
+};
+
+export const updateSomeoneIsTyping = (chatId: string) => {
+    const id = uuidv4();
+    allSocialPosts.value = allSocialPosts.value.map((item, idx) => {
+        if (item.post.id === chatId) {
+            return {
+                ...item,
+                isTyping: [allSocialPosts.value[idx].isTyping, id].flat(Infinity),
+            };
+        }
+        return {
+            ...item,
+        };
+    });
+    setTimeout(() => destroySomeoneIsTyping(chatId, id), 2500);
+};
+
+export const destroySomeoneIsTyping = (chatId, queueId) => {
+    allSocialPosts.value = allSocialPosts.value.map((item, idx) => {
+        if (item.post.id === chatId) {
+            const filteredArray = item.isTyping
+                .filter(item => item !== queueId)
+                .filter(function (x) {
+                    return x !== undefined;
+                });
+            return {
+                ...item,
+                isTyping: filteredArray,
+            };
+        }
+        return {
+            ...item,
+        };
+    });
 };
 
 export const createMessage = async (chatId, post: SOCIAL_POST): Promise<Message<MESSAGE_POST_SHARE_BODY>> => {

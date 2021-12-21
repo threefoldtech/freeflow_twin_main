@@ -80,7 +80,8 @@
                           v-for="item in solutions"
                           :key="item.name"
                           :href="item.href"
-                          @click="showComingSoonToUhuru = true"
+                          @click="() => item.action()"
+
                           class="
                                                     items-center
                                                     p-2
@@ -189,10 +190,26 @@
     <div>
       <form @submit.prevent="handleAddComment(false)" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
         <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
-      <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
+      <input  :ref="inputRef" @focus="focusInput" v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
         <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
       </form>
       <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments && item.replies.length > 0" :comments="item.replies" class="border-t-2 rounded-b-lg" />
+      <TransitionRoot :show="showIsUserTyping"
+                      as="div"
+                      class="flex items-center px-4"
+                      enter="transition-opacity duration-150"
+                      enter-from="opacity-0"
+                      enter-to="opacity-100"
+                      leave="transition-opacity duration-250"
+                      leave-from="opacity-100"
+                      leave-to="opacity-0">
+        <div class='ds-preloader-block'>
+          <div class='ds-preloader-block__loading-bubble'></div>
+          <div class='ds-preloader-block__loading-bubble'></div>
+          <div class='ds-preloader-block__loading-bubble'></div>
+        </div>
+        <p class="px-4 py-2 text-sm font-medium text-gray-500">Someone is typing</p>
+      </TransitionRoot>
     </div>
   </div>
 </template>
@@ -221,8 +238,11 @@ import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
 import {commentOnPost, getAllPosts, getSinglePost, likePost, setSomeoneIsTyping} from "@/services/socialService";
 import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
+import { TransitionRoot } from '@headlessui/vue'
+
 
 const props = defineProps<{item: SOCIAL_POST}>();
+const inputRef = ref<HTMLInputElement>(null)
 const messageInput = ref<string>("")
 const showComments = ref<boolean>(false);
 const showAllImages = ref<boolean>(false)
@@ -251,6 +271,10 @@ const renderMarkdown = content => {
   return md.render(content);
 };
 
+const showIsUserTyping = computed(() => {
+  return props.item?.isTyping && props.item?.isTyping?.length !== 0 && showComments.value ?  true :  false;
+})
+
 interface IProps {
   item: {
     id: string;
@@ -265,9 +289,11 @@ interface IProps {
   };
 }
 
-watch(messageInput,async () => {
-  console.log(messageInput.value)
-  await setSomeoneIsTyping(props.item.post.id, props.item.owner.location)
+watch(messageInput,async (n,o) => {
+  if(n.length > o.length){
+    await setSomeoneIsTyping(props.item.post.id, props.item.owner.location)
+
+  }
 })
 
 const uuid1 = uuidv4();
@@ -345,6 +371,7 @@ const actions = ref([
 
 const solutions = [
   {
+    action: () => showComingSoonToUhuru.value = true,
     name: 'Send private message',
     description: 'Measure actions your users take',
     href: '##',
@@ -381,6 +408,7 @@ const solutions = [
           `,
   },
   {
+    action: () => showShareDialog.value = true,
     name: 'Share with a friend',
     description: 'Create your own targeted content',
     href: '##',
@@ -412,4 +440,56 @@ const solutions = [
 
 </script>
 
-<style scoped></style>
+<style scoped>
+@keyframes bubble-load{
+  0%{
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  25%{
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100%{
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+body{
+  text-align: center;
+}
+
+/*
+.some-holder-styles{
+  display: none;
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+*/
+
+.ds-preloader-block__loading-bubble{
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 2px;
+  transform: scale(0);
+  opacity: 0;
+  background: #2e266f;
+  animation: bubble-load 1.5s infinite backwards;
+  border-radius: 50%;
+}
+
+.ds-preloader-block__loading-bubble:nth-child(2){
+  animation-delay: .18s;
+}
+
+.ds-preloader-block__loading-bubble:nth-child(3){
+  animation-delay: .36s;
+}
+</style>
