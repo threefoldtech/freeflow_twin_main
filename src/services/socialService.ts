@@ -118,6 +118,7 @@ export const commentOnPost = async (
     isReplyToComment: boolean,
     comment_id?: string
 ) => {
+    const myAddress = await myYggdrasilAddress();
     const data: COMMENT_MODEL = {
         id: uuidv4(),
         body: message,
@@ -159,9 +160,9 @@ export const updateSomeoneIsTyping = (chatId: string) => {
 };
 
 export const destroySomeoneIsTyping = (chatId, queueId) => {
-    allSocialPosts.value = allSocialPosts.value.map((item, idx) => {
+    allSocialPosts.value = allSocialPosts?.value?.map((item, idx) => {
         if (item.post.id === chatId) {
-            const filteredArray = item.isTyping
+            const filteredArray = item?.isTyping
                 .filter(item => item !== queueId)
                 .filter(function (x) {
                     return x !== undefined;
