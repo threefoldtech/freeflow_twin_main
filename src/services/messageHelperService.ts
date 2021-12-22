@@ -2,7 +2,7 @@ import { Chat, MessageTypes } from '@/types';
 import moment from 'moment';
 import { ref } from 'vue';
 
-export const messageBox = ref(null);
+export const messageBox = ref<HTMLElement>(null);
 export const scrollMessageBoxToBottom = () => {
     messageBox?.value?.scrollTo(0, messageBox.value.scrollHeight);
 };

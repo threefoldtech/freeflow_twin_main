@@ -210,6 +210,8 @@
 
     const router = useRouter();
 
+
+
     const setSelected = id => {
         router.push({ name: 'single', params: { id } });
     };

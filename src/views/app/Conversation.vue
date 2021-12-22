@@ -148,7 +148,8 @@
                                 </button>
                             </div>
                         </div>
-                        <MessageBox :chat="chat" style="flex: 2">
+                        <MessageBox ref="messageBox" :chat="chat" style="flex: 2">
+                          <div></div>
                             <template v-slot:viewAnchor>
                                 <div
                                     id="viewAnchor"
@@ -337,7 +338,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
 import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
 import MessageBox from '@/components/MessageBox.vue';
-import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
 import Button from '@/components/Button.vue';
 
 import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
@@ -352,6 +352,8 @@ const selectedId = ref(<string>route.params.id);
 const viewAnchor = ref(null);
 
 const { isIntersecting } = useIntersectionObserver(viewAnchor);
+
+
 
 const scrollToBottom = (force = false) => {
     if (!force && !isIntersecting.value) return;
@@ -369,6 +371,7 @@ watch(
     }
 );
 
+
 const { retrievechats, sendFile } = usechatsActions();
 onBeforeMount(retrievechats);
 
@@ -385,6 +388,13 @@ let showDeleteDialog = ref(false);
 let showInfo = ref(false);
 const showRemoveUserDialog = ref(false);
 const toBeRemovedUser = ref();
+const messageBox = ref<HTMLElement>(null);
+
+
+const scrollMessageBoxToBottom = () => {
+  console.log(messageBox.value)
+};
+
 
 const truncate = (value, limit = 20) => {
     if (value.length > limit) {
@@ -410,6 +420,7 @@ const getMessagesSortedByUser = computed(() => {
         return acc;
     }, {});
 });
+
 
 const message = ref('');
 
@@ -543,6 +554,10 @@ watch(scrollEvents, () => {
         shiftScrollEvent();
     });
 });
+
+watch(chat?.value?.messages,() => {
+  scrollMessageBoxToBottom()
+})
 
 const blocked = computed(() => {
     if (!chat.value || chat.value.isGroup) return false;

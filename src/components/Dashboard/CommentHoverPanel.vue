@@ -70,7 +70,7 @@ const {retrievechats} = usechatsActions()
 
 const props = defineProps<{ comment: object, avatar: string }>()
 const location = ref<string>()
-const router = useRouter()
+
 
 onBeforeMount(async () => {
   await retrievechats()
@@ -90,9 +90,15 @@ const goToChat = async () => {
     await addContact(props.comment.owner.id, props.comment.owner.location)
     return false
   }
+  const router = useRouter()
+  console.log(await router.push({
+    name: 'single', params: {
+      id: String(props.comment.owner.id)
+    }
+  }))
   router.push({
     name: 'single', params: {
-      id: props.comment.owner.id
+      id: String(props.comment.owner.id)
     }
   })
 }
