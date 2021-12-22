@@ -357,17 +357,15 @@ const { isIntersecting } = useIntersectionObserver(viewAnchor);
 
 const scrollToBottom = (force = false) => {
     if (!force && !isIntersecting.value) return;
-
     nextTick(() => {
-        scrollMessageBoxToBottom();
+
     });
 };
 
 watch(
     () => route.params.id,
     id => {
-        selectedId.value = <string>id;
-        scrollToBottom(true);
+      selectedId.value = <string>id;
     }
 );
 
@@ -389,11 +387,6 @@ let showInfo = ref(false);
 const showRemoveUserDialog = ref(false);
 const toBeRemovedUser = ref();
 const messageBox = ref<HTMLElement>(null);
-
-
-const scrollMessageBoxToBottom = () => {
-  console.log(messageBox.value)
-};
 
 
 const truncate = (value, limit = 20) => {
@@ -555,9 +548,7 @@ watch(scrollEvents, () => {
     });
 });
 
-watch(chat?.value?.messages,() => {
-  scrollMessageBoxToBottom()
-})
+
 
 const blocked = computed(() => {
     if (!chat.value || chat.value.isGroup) return false;
