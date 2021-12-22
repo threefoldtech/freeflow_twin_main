@@ -1,7 +1,7 @@
 <template>
   <div class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-50 flex justify-center items-center"
        @click="$emit('close')">
-    <div class="bg-white w-11/12 sm:w-9/12 lg:w-2/4 2xl:w-1/3 p-4 rounded-lg relative" @click.stop>
+    <div class="bg-white w-11/12 sm:w-9/12 lg:w-2/4 2xl:w-2/5 p-4 rounded-lg relative" @click.stop>
       <XIcon class="w-5 h-5 text-gray-500 absolute right-4 top-4 cursor-pointer" @click="$emit('close')"/>
       <h1 class="font-medium">Share post</h1>
       <div class="p-4 rounded bg-gray-100 my-4" :class="{'min-h-[200px]': item?.images?.length !== 0}">
@@ -10,7 +10,7 @@
           <p class="ml-3 font-medium">{{ item.owner.id }}</p>
         </div>
         <div class="mt-2 text-gray-600">
-          <p>{{ item.post.body }}</p>
+          <p class="break-words">{{ item.post.body }}</p>
         </div>
         <div v-if="item?.images?.length !== 0">
           <img :src="fetchPostImage(item.images[0])" class="rounded-lg max-h-[200px] object-cover mt-2"/>
@@ -57,7 +57,7 @@
                       <p v-if="isInQueue(chat.adminId)" class="cursor-pointer text-red-500 ml-4"
                          @click="cancelShare(chat.adminId)">Cancel</p>
                     </div>
-                    <a v-if="!isInQueue(chat.adminId) && !isAlreadySharedWWithPerson(chat.adminId)" class="text-indigo-600 hover:text-accent-900"
+                    <a v-if="!isInQueue(chat.adminId) && !isAlreadySharedWWithPerson(chat.adminId)" class="text-indigo-600 hover:text-accent-800"
                        href="#"
                        @click="sharePostWithFriend(chat.adminId)">Share</a>
                     <p v-if="isAlreadySharedWWithPerson(chat.adminId)">Post shared</p>
@@ -118,6 +118,7 @@ const isAlreadySharedWWithPerson = (id: string) => {
 
 const cancelShare = (id: string) => {
   queue.value = queue.value.filter(item => item !== id)
+  console.log(queue.value)
 }
 
 const isInQueue = (id) => {
