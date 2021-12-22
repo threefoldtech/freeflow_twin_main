@@ -30,14 +30,14 @@
       </div>
     </div>
     <div class="flex space-x-1 mt-4">
-      <div class="w-1/2">
+      <div class="">
         <a class="text-xs text-accent-600 hover:bg-opacity-60 font-semibold flex items-center justify-center px-3 py-2 bg-accent-300 bg-opacity-50 rounded-lg"
            href="#"
            @click="goToChat">
-          <div class="mr-1">
-            <img class="w-6 h-6" src="/whisperbold.svg"/>
+          <div class="mr-1 h-6 flex items-center flex-shrink-0">
+            <img class="" src="/whisperbold.svg"/>
           </div>
-          {{ isPersonFriend }}
+         {{ isPersonFriend }}
         </a>
       </div>
       <div class="w-auto">
