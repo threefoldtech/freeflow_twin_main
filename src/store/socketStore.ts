@@ -7,6 +7,7 @@ import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { login } from '@/services/authService';
+import { updateSomeoneIsTyping } from '@/services/socialService';
 const state = reactive<State>({
     socket: '',
     notification: {
@@ -67,6 +68,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('new_chat', chat => {
         const { addChat } = usechatsActions();
         addChat(chat);
+    });
+    state.socket.on('post_typing', chatId => {
+        updateSomeoneIsTyping(chatId);
     });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');

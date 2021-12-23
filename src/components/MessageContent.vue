@@ -11,7 +11,9 @@
         :preventRecursion="preventRecursion"
     />
     <FileShareContent v-else-if="message.type === MessageTypes.FILE_SHARE" :message="message" />
-    <StringContent v-else :message="message" />
+    <PostShareContent v-else-if="message.type === MessageTypes.POST_SHARE" :message="message" />
+  <StringContent v-else :message="message" />
+
 </template>
 
 <script lang="ts" setup>
@@ -23,9 +25,12 @@
     import GifContent from '@/components/MessageContentType/GifContent.vue';
     import QuoteContent from '@/components/MessageContentType/QuoteContent.vue';
     import FileShareContent from '@/components/MessageContentType/FileShareContent.vue';
+    import PostShareContent from '@/components/MessageContentType/PostShareContent.vue';
+
     import { isAudio, isImage } from '@/services/contentService';
     import { Message, MessageBodyType, MessageTypes } from '@/types';
     import {watch} from "vue";
+
 
     interface Props {
         message: Message<MessageBodyType>;

@@ -1,7 +1,7 @@
 <template>
     <div
         id="image-viewer"
-        class="fixed z-10 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-90 flex"
+        class="fixed z-50 left-0 top-0 w-full h-full overflow-auto bg-black bg-opacity-50 flex"
         v-if="src"
         @click="close"
         tabindex="0"

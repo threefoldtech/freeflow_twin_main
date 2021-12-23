@@ -3,18 +3,27 @@
       <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
       <img  @click.stop :src="imagePreviewSrc" class="pointer-events-none" />
   </div>
-  <SharePostDialog v-if="showShareDialog" />
+  <SharePostDialog v-if="showShareDialog" :avatarImg="avatarImg" :item="item" @close="showShareDialog = false"/>
   <div class="bg-white my-5 rounded">
     <div class="p-6">
       <div>
         <div class="relative">
+          <TransitionRoot :show="openPanel"
+                          enter="transition-opacity duration-150"
+                          enter-from="opacity-0"
+                          enter-to="opacity-100"
+                          leave="transition-opacity duration-250"
+                          leave-from="opacity-100"
+                          leave-to="opacity-0">
+          <CommentHoverPanel v-if="openPanel" class="-top-30" :avatar="avatarImg" :comment="item" @mouseleave="openPanel = false"/>
+          </TransitionRoot>
           <div class="flex items-center">
             <div class="relative mr-4">
               <img :src="avatarImg" class="w-12 h-12 rounded-full"/>
             </div>
             <div>
-              <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true">
-                {{item.owner.id}}
+              <p class="text-base font-medium cursor-pointer"  @mouseover="openPanel = true"  @click="showComingSoonToUhuru = true">
+                {{ item.owner.id }}
               </p>
               <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
             </div>
@@ -41,6 +50,7 @@
                 />
                 <ChevronDownIcon
                     :class="open ? '' : 'text-opacity-70'"
+                    aria-hidden="true"
                     class="
                                         w-5
                                         h-5
@@ -51,10 +61,8 @@
                                         ease-in-out
                                         group-hover:text-opacity-80
                                     "
-                    aria-hidden="true"
                 />
               </PopoverButton>
-
               <transition
                   enter-active-class="transition duration-200 ease-out"
                   enter-from-class="translate-y-1 opacity-0"
@@ -80,7 +88,6 @@
                           v-for="item in solutions"
                           :key="item.name"
                           :href="item.href"
-                          @click="showComingSoonToUhuru = true"
                           class="
                                                     items-center
                                                     p-2
@@ -95,6 +102,8 @@
                                                     focus-visible:ring-orange-500
                                                     focus-visible:ring-opacity-50
                                                 "
+
+                          @click="() => item.action()"
                       >
                         <div class="w-full">
                           <p class="text-sm font-medium text-gray-900 w-full">
@@ -111,93 +120,155 @@
         </div>
       </div>
       <div class="mt-4 text-gray-600">
-        <p class="my-2">{{item.post.body}}</p>
-        <div class="grid grid-cols-2 my-4 gap-1">
-          <div class="relative overflow-hidden cursor-pointer h-64" v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)" :key="idx">
-            <div v-if="!showAllImages && idx === 3 && item.images.length >= 5" class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
-              <p class="text-white text-2xl">+{{item.images.length - 4}}</p>
+        <p class="my-2 break-words">{{ item.post.body }}</p>
+        <div :class="{'grid-cols-1' : item.images.length === 1}" class="grid grid-cols-2 my-4 gap-1">
+          <div v-for="(image,idx) in item.images.slice(0,showAllImages ? item.images.length : 4)"
+               :key="idx" class="relative overflow-hidden cursor-pointer h-64 rounded">
+            <div v-if="!showAllImages && idx === 3 && item.images.length >= 5"
+                 class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center">
+              <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
             </div>
-            <img @click="openImagePreview(image)" class="object-cover"  :src="fetchPostImage(image)" />
+            <img :src="fetchPostImage(image)" class="object-cover rounded" @click="openImagePreview(image)"/>
           </div>
         </div>
-        <p v-if="item.images.length > 4" class="w-full text-center my-3 cursor-pointer font-medium" @click="() => showAllImages = !showAllImages">{{showAllImages ? 'Hide images' : 'Show all images'}}</p>
+        <p v-if="item.images.length > 4" class="w-full text-center my-3 cursor-pointer font-medium"
+           @click="() => showAllImages = !showAllImages">{{ showAllImages ? 'Hide images' : 'Show all images' }}</p>
       </div>
       <div>
         <div class="flex items-center w-full">
           <div class="hidden flex -space-x-2 overflow-hidden">
             <img
+                alt=""
                 class="inline-block h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt=""
             />
             <img
+                alt=""
                 class="inline-block  h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                alt=""
             />
             <img
+                alt=""
                 class="inline-block  h-8 w-8 rounded-full ring-2 ring-white"
                 src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-                alt=""
             />
           </div>
           <div class="hidden ml-4">
             <p class="font-medium text-primary flex text-xs">
                             <span v-for="(name, idx) in props.item.persons" :key="name">
-                                {{ name }}<span class="mr-1" v-if="idx === 0">,</span>
+                                {{ name }}<span v-if="idx === 0" class="mr-1">,</span>
                             </span>
             </p>
-            <p class="text-gray-600 text-xs" v-if="false">and {{ Math.abs(props.item.comments - 2) }} other liked this</p>
+            <p v-if="false" class="text-gray-600 text-xs">and {{ Math.abs(props.item.comments - 2) }} other liked
+              this</p>
           </div>
           <div class="flex items-center">
-            <HeartIconSolid class="hidden text-red-500 w-5 h-5 mr-2"  />
-            <p class="text-gray-600 font-medium flex-shrink-0 text-sm">{{amount_likes}} {{amount_likes === 1 ? "Like" : "Likes"}}</p>
+            <HeartIconSolid class="hidden text-red-500 w-5 h-5 mr-2"/>
+            <p class="text-gray-600 font-medium flex-shrink-0 text-sm">{{ amount_likes }} {{
+                amount_likes === 1 ? "Like" : "Likes"
+              }}</p>
           </div>
-          <p @click="showComments = !showComments" class="text-gray-600 mr-0 ml-auto cursor-pointer text-md">
+          <p class="text-gray-600 mr-0 ml-auto cursor-pointer text-md" @click="showComments = !showComments">
             {{ item.replies.length }} Comments
           </p>
         </div>
       </div>
     </div>
-    <div class="border-t-2 border-b-2 flex space-x-8 p-4">
+    <div class="border-t-2 flex space-x-8 p-4">
       <div
           class="flex items-center cursor-pointer"
-          v-for="action in actions"
-          :key="action.name"
-          @click="() => action.execute()"
+          @click="like"
       >
-        <component
-            :is="localLike ? action.active : action.component"
-            class="w-6 mr-3"
-            :class="{ 'text-red-500': localLike && action.name === 'Like','text-gray-400': !localLike && action.name === 'Like', 'text-gray-500': action.name !== 'Like' }"
+        <TransitionRoot :show="!localLike"
+                        enter="transition-opacity duration-150"
+                        enter-from="opacity-0"
+                        enter-to="opacity-100"
+                        leave="transition-opacity duration-250"
+                        leave-from="opacity-100"
+                        leave-to="opacity-0">
+          <HeartIcon v-if="!localLike" class="w-6 text-gray-500 mr-4"/>
+        </TransitionRoot>
+        <TransitionRoot :show="localLike"
+                        enter="transition-opacity duration-150"
+                        enter-from="opacity-0"
+                        enter-to="opacity-100"
+                        leave="transition-opacity duration-250"
+                        leave-from="opacity-100"
+                        leave-to="opacity-0">
+          <HeartIconSolid v-if="localLike" class="w-6 text-red-500 mr-4"/>
+        </TransitionRoot>
+        <p class="text-gray-500 w-11">
+          {{ localLike ? 'Liked' : 'Like' }}
+        </p>
 
-        />
+      </div>
+      <div
+          class="flex items-center cursor-pointer"
+          @click="showComments = !showComments"
+      >
+        <ChatAltIcon class="w-6 text-gray-500 mr-4"/>
         <p class="text-gray-500">
-          {{action.name}}
+          Comment
         </p>
       </div>
       <div
           class="flex items-center cursor-pointer"
+          @click="showShareDialog = true"
       >
-        <ShareIcon class="w-6 text-gray-500 mr-4" />
+        <ShareIcon class="w-6 text-gray-500 mr-4"/>
         <p class="text-gray-500">
           Share
         </p>
       </div>
     </div>
     <div>
-      <form @submit.prevent="handleAddComment(false)" v-if="showComments" class="px-2 py-2 flex items-center space-x-1">
-        <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
-      <input  v-model="messageInput" type="text" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow" placeholder="Type your message here" />
-        <input type="submit" value="Send" class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"  />
-      </form>
-      <CommentsContainer @replyToComment="e => handleAddComment(true, e.comment_id, e.input)" v-if="showComments" :comments="item.replies"/>
+      <TransitionRoot :show="showComments"
+                      enter="transition-opacity duration-150"
+                      enter-from="opacity-0"
+                      enter-to="opacity-100"
+                      leave="transition-opacity duration-250"
+                      leave-from="opacity-100"
+                      leave-to="opacity-0">
+        <form v-if="showComments" class="px-2 py-2 flex items-center space-x-1" :class="{'opacity-50' : postingCommentInProgress}"
+              @submit.prevent="handleAddComment(false)">
+          <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
+          <input :ref="inputRef" v-model="messageInput"
+                 class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
+                 placeholder="Type your message here"
+                 type="text"
+                 :disabled="postingCommentInProgress"
+                 @focus="focusInput"/>
+          <input
+              class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"
+              type="submit"
+              value="Send"/>
+        </form>
+        <CommentsContainer v-if="showComments && item.replies.length > 0"
+                           :comments="item.replies" class="border-t-2 rounded-b-lg"
+                           :postingCommentInProgress="postingCommentInProgress"
+                           @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"/>
+      </TransitionRoot>
+      <TransitionRoot :show="showIsUserTyping"
+                      as="div"
+                      class="flex items-center px-4"
+                      enter="transition-opacity duration-150"
+                      enter-from="opacity-0"
+                      enter-to="opacity-100"
+                      leave="transition-opacity duration-250"
+                      leave-from="opacity-100"
+                      leave-to="opacity-0">
+        <div class='ds-preloader-block'>
+          <div class='ds-preloader-block__loading-bubble'></div>
+          <div class='ds-preloader-block__loading-bubble'></div>
+          <div class='ds-preloader-block__loading-bubble'></div>
+        </div>
+        <p class="px-4 py-2 text-sm font-medium text-gray-500">Someone is typing</p>
+      </TransitionRoot>
     </div>
   </div>
-
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import {
   PhotographIcon,
   PencilAltIcon,
@@ -208,7 +279,7 @@ import {
 import {HeartIcon, ChatAltIcon, ShareIcon} from '@heroicons/vue/outline';
 import AvatarImg from '@/components/AvatarImg.vue';
 import {useAuthState, myYggdrasilAddress} from '@/store/authStore';
-import {ref, computed, onMounted, onBeforeMount} from 'vue';
+import {ref, computed, onMounted, onBeforeMount, watch} from 'vue';
 import moment from 'moment';
 import {Popover, PopoverButton, PopoverPanel, TransitionRoot} from '@headlessui/vue';
 import {ChevronDownIcon} from '@heroicons/vue/solid';
@@ -219,10 +290,12 @@ import {uuidv4} from "@/common";
 import {SOCIAL_POST, LIKE_STATUS} from "@/store/socialStore";
 import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
-import {commentOnPost, getAllPosts, likePost} from "@/services/socialService";
+import {commentOnPost, getAllPosts, getSinglePost, likePost, setSomeoneIsTyping} from "@/services/socialService";
 import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
+import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue'
 
-const props = defineProps<{item: SOCIAL_POST}>();
+const props = defineProps<{ item: SOCIAL_POST }>();
+const inputRef = ref<HTMLInputElement>(null)
 const messageInput = ref<string>("")
 const showComments = ref<boolean>(false);
 const showAllImages = ref<boolean>(false)
@@ -231,9 +304,13 @@ const myLocation = ref<string | null>(null)
 const showImagePreview = ref<boolean>(false)
 const imagePreviewSrc = ref<string | null>(null)
 const showShareDialog = ref<boolean>(false)
+const openPanel = ref<boolean>(false)
+const postingCommentInProgress = ref<boolean>(false)
 
 
 const {user} = useAuthState();
+
+const emit = defineEmits(['refreshPost'])
 
 const md = new MarkdownIt({
   html: true,
@@ -241,9 +318,17 @@ const md = new MarkdownIt({
   typographer: true,
 });
 
+watch([showComments, amount_likes], () => {
+  getSinglePost(props.item.post.id, props.item.owner.location)
+})
+
 const renderMarkdown = content => {
   return md.render(content);
 };
+
+const showIsUserTyping = computed(() => {
+  return props.item?.isTyping && props.item?.isTyping?.length !== 0 && showComments.value ? true : false;
+})
 
 interface IProps {
   item: {
@@ -259,15 +344,22 @@ interface IProps {
   };
 }
 
+watch(messageInput, async (n, o) => {
+  if (n.length > o.length) {
+    await setSomeoneIsTyping(props.item.post.id, props.item.owner.location)
+
+  }
+})
+
 const uuid1 = uuidv4();
 
 const localLike = ref(false);
 
-onBeforeMount(async() => {
+onBeforeMount(async () => {
   myLocation.value = await myYggdrasilAddress();
   const {user} = useAuthState()
-  if(props.item.likes.some(item => item.id === user.id)){
-    localLike.value= true;
+  if (props.item.likes.some(item => item.id === user.id)) {
+    localLike.value = true;
   }
 })
 
@@ -293,11 +385,29 @@ const timeAgo = time => {
 };
 
 const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
-  const comment_value = isReplyToComment ?  message: messageInput.value
-  if(!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
+  if(postingCommentInProgress.value) return
+  const comment_value = isReplyToComment ? message : messageInput.value
+  if (!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
+  postingCommentInProgress.value = true
   const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id)
   messageInput.value = "";
-  await getAllPosts()
+  const response = await getSinglePost(props.item.post.id, props.item.owner.location);
+  postingCommentInProgress.value = false
+  emit('refreshPost', response)
+}
+
+const like = async () => {
+  const {status} = await likePost(props.item.post.id, props.item.owner.location)
+  if (status === LIKE_STATUS.LIKED) {
+    localLike.value = true;
+    amount_likes.value = amount_likes.value + 1
+
+    return;
+  }
+  amount_likes.value = amount_likes.value - 1
+  localLike.value = false;
+
+  return;
 }
 
 const actions = ref([
@@ -308,9 +418,9 @@ const actions = ref([
     active_text: 'Liked',
     execute: async () => {
       const {status} = await likePost(props.item.post.id, props.item.owner.location)
-      if(status === LIKE_STATUS.LIKED){
-          localLike.value = true;
-          amount_likes.value = amount_likes.value +1
+      if (status === LIKE_STATUS.LIKED) {
+        localLike.value = true;
+        amount_likes.value = amount_likes.value + 1
 
         return;
       }
@@ -332,6 +442,7 @@ const actions = ref([
 
 const solutions = [
   {
+    action: () => showComingSoonToUhuru.value = true,
     name: 'Send private message',
     description: 'Measure actions your users take',
     href: '##',
@@ -368,6 +479,7 @@ const solutions = [
           `,
   },
   {
+    action: () => showShareDialog.value = true,
     name: 'Share with a friend',
     description: 'Create your own targeted content',
     href: '##',
@@ -399,4 +511,56 @@ const solutions = [
 
 </script>
 
-<style scoped></style>
+<style scoped>
+@keyframes bubble-load {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+
+  25% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+body {
+  text-align: center;
+}
+
+/*
+.some-holder-styles{
+  display: none;
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+*/
+
+.ds-preloader-block__loading-bubble {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin: 0 2px;
+  transform: scale(0);
+  opacity: 0;
+  background: #2e266f;
+  animation: bubble-load 1.5s infinite backwards;
+  border-radius: 50%;
+}
+
+.ds-preloader-block__loading-bubble:nth-child(2) {
+  animation-delay: .18s;
+}
+
+.ds-preloader-block__loading-bubble:nth-child(3) {
+  animation-delay: .36s;
+}
+</style>

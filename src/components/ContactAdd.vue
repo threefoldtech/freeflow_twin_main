@@ -255,7 +255,6 @@
             id: contact?.id ? contact.id : manualContactAddUsername.value,
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
-        console.log('contact to add ', contactToAdd);
         try {
             const { chats } = usechatsState();
 

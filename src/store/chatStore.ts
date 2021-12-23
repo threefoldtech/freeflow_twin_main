@@ -148,12 +148,13 @@ export const removeChat = chatId => {
 const addGroupchat = (name: string, contacts: Contact[]) => {
     const { user } = useAuthState();
 
-    const contactInGroup = contacts.map(contact => {
-        if(user.id !== contact.id)
-            return contact.id
-    }).filter(x => {
-        return x !== undefined;
-    })
+    const contactInGroup = contacts
+        .map(contact => {
+            if (user.id !== contact.id) return contact.id;
+        })
+        .filter(x => {
+            return x !== undefined;
+        });
 
     const newGroupchat: GroupChat = {
         isGroup: true,
@@ -164,7 +165,9 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(', ')}`,
+                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
+                        ', '
+                    )}`,
                 } as SystemBody,
                 timeStamp: new Date(),
                 id: uuidv4(),
@@ -382,7 +385,6 @@ export const imageUploadQueue = ref([]);
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
     const { user } = useAuthState();
     let formData = new FormData();
-
     if (!isBlob) {
         formData.append('file', selectedFile);
     } else {

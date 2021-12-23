@@ -268,6 +268,7 @@
       return;
     }, {deep: true})
 
+
     const setSelected = id => {
         router.push({ name: 'single', params: { id } });
     };

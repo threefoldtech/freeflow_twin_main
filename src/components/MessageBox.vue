@@ -165,7 +165,7 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
+    import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
     import { imageUploadQueue, usechatsActions, retrySendFile, usechatsState } from '@/store/chatStore';
@@ -287,6 +287,18 @@
             scroll();
         }, 100);
     });
+
+
+    watch(props.chat.messages,() => {
+     nextTick(() => {
+       const myName = window.location.host.split('.')[0];
+       const lastItem = props.chat.messages[props.chat.messages.length-1].from
+
+       if(myName !== lastItem) return;
+       messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
+
+     })
+    })
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';

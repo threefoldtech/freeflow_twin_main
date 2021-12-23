@@ -150,7 +150,8 @@
                                 </button>
                             </div>
                         </div>
-                        <MessageBox :chat="chat" style="flex: 2">
+                        <MessageBox ref="messageBox" :chat="chat" style="flex: 2">
+                          <div></div>
                             <template v-slot:viewAnchor>
                                 <div
                                     id="viewAnchor"
@@ -311,59 +312,62 @@
 </template>
 
 <script setup lang="ts">
-    import { useScrollActions, useScrollState } from '@/store/scrollStore';
+import { useScrollActions, useScrollState } from '@/store/scrollStore';
+import AppLayout from '../../layout/AppLayout.vue';
+import moment from 'moment';
+import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
+import { useContactsState } from '@/store/contactStore';
+import { each } from 'lodash';
+import { statusList } from '@/store/statusStore';
+import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
+import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
+import { useAuthState } from '@/store/authStore';
+import { popupCenter } from '@/services/popupService';
+import MessageCard from '@/components/MessageCard.vue';
+import ChatList from '@/components/ChatList.vue';
+import ChatInput from '@/components/ChatInput.vue';
+import AvatarImg from '@/components/AvatarImg.vue';
+import GroupManagement from '@/components/GroupManagement.vue';
+import Dialog from '@/components/Dialog.vue';
+import * as crypto from 'crypto-js';
+import { useIntersectionObserver } from '@/lib/intersectionObserver';
+import { useRoute, useRouter } from 'vue-router';
+import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
+import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
+import MessageBox from '@/components/MessageBox.vue';
+import Button from '@/components/Button.vue';
 
-    import AppLayout from '../../layout/AppLayout.vue';
-    import moment from 'moment';
-    import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
-    import { useContactsState } from '@/store/contactStore';
+import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+import FileDropArea from '@/components/FileDropArea.vue';
+import TimeContent from '@/components/TimeContent.vue';
+import { XIcon } from '@heroicons/vue/outline';
+import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
+import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
+import {
+  openBlockDialogFromOtherFile,
+  openDeleteDialogFromOtherFile,
+  rightClickItemAction, triggerWatchOnRightClickItem,
+  conversationComponentRerender
+} from "@/store/contextmenuStore";
+import { useOnline } from '@vueuse/core'
 
-    import { each } from 'lodash';
-    import { statusList } from '@/store/statusStore';
-    import { usechatsState, usechatsActions, isLoading } from '@/store/chatStore';
-    import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
-    import { useAuthState } from '@/store/authStore';
-    import { popupCenter } from '@/services/popupService';
-    import MessageCard from '@/components/MessageCard.vue';
-    import ChatList from '@/components/ChatList.vue';
-    import ChatInput from '@/components/ChatInput.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import GroupManagement from '@/components/GroupManagement.vue';
-    import Dialog from '@/components/Dialog.vue';
-    import * as crypto from 'crypto-js';
-    import { useIntersectionObserver } from '@/lib/intersectionObserver';
-    import { useRoute, useRouter } from 'vue-router';
-    import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
-    import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
-    import MessageBox from '@/components/MessageBox.vue';
-    import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
-    import Button from '@/components/Button.vue';
 
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
-    import FileDropArea from '@/components/FileDropArea.vue';
-    import TimeContent from '@/components/TimeContent.vue';
-    import { XIcon } from '@heroicons/vue/outline';
-    import { FileType, getFilesInChat } from '@/store/fileBrowserStore';
-    import {
-      openBlockDialogFromOtherFile,
-      openDeleteDialogFromOtherFile,
-      rightClickItemAction, triggerWatchOnRightClickItem,
-      conversationComponentRerender
-    } from "@/store/contextmenuStore";
-    import { useOnline } from '@vueuse/core'
+const online = useOnline()
 
-    const online = useOnline()
+const route = useRoute();
+const selectedId = ref(<string>route.params.id);
 
-    const route = useRoute();
-    let selectedId = ref(<string>route.params.id);
-    
-    watch(
-        () => route.params.id,
-        id => {
-            selectedId.value = <string>id;
-            scrollToBottom(true);
-        }
-    );
+
+
+watch(
+    () => route.params.id,
+    id => {
+      selectedId.value = <string>id;
+    }
+);
+
+const messageBox = ref<HTMLElement>(null);
+
 
 
     const { retrievechats, sendFile } = usechatsActions();
@@ -390,26 +394,24 @@
         return value;
     };
 
-    const getMessagesSortedByUser = computed(() => {
-        let chatBlockIndex = 0;
-
-        return chat.value.messages.reduce((acc: any, message) => {
-            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
-                acc[chatBlockIndex].messages.push(message);
-                return acc;
-            } else {
-                chatBlockIndex++;
-            }
-
-            acc[chatBlockIndex] = {
-                user: <string>message.from,
-                messages: [],
-            };
+ const getMessagesSortedByUser = computed(() => {
+    let chatBlockIndex = 0;
+    return chat.value.messages.reduce((acc: any, message) => {
+        if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
             acc[chatBlockIndex].messages.push(message);
-
             return acc;
-        }, {});
-    });
+        } else {
+            chatBlockIndex++;
+        }
+        acc[chatBlockIndex] = {
+            user: <string>message.from,
+            messages: [],
+        };
+        acc[chatBlockIndex].messages.push(message);
+        return acc;
+    }, {});
+});
+
 
 
     const message = ref('');
@@ -550,12 +552,13 @@
     const { shiftScrollEvent } = useScrollActions();
 
     watch(scrollEvents, () => {
-        if (!scrollEvents || scrollEvents.length === 0) return;
-        nextTick(() => {
-            scrollToBottom(scrollEvents[0]);
-            shiftScrollEvent();
-        });
-    });
+  if (!scrollEvents || scrollEvents.length === 0) return;
+  nextTick(() => {
+    scrollToBottom(scrollEvents[0]);
+    shiftScrollEvent();
+  });
+});
+
 
     const blocked = computed(() => {
         if (!chat.value || chat.value.isGroup) return false;
