@@ -1,14 +1,13 @@
 <template>
-    <div class="h-full overflow-y-auto px-3">
-        <h1 class="p-2">Search results for {{ searchDirValue }}</h1>
+    <div class="h-full overflow-y-auto px-2">
         <div class="overflow-x-auto">
-            <div class="py-2 align-middle inline-block min-w-full">
-                <ViewSelect />
+            <div class="align-middle inline-block min-w-full">
+                <ViewSelect :searchDirValue="searchDirValue" />
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table
                         v-if="fileBrowserTypeView === 'LIST'"
                         :key="currentDirectory"
-                        class="min-w-full divide-y divide-gray-200 mx-4"
+                        class="min-w-full divide-y divide-gray-200"
                     >
                         <thead class="bg-gray-50">
                             <tr>

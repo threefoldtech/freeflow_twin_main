@@ -4,6 +4,7 @@
         <p v-if="sharedDir" class="pl-2">
           Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>
         </p>
+        <p v-if="searchDirValue?.split('')?.length > 0" class="pl-2">Search results for {{ searchDirValue }}</p>
       </div>
       <div class="flex items-center">
         <ViewListIcon
@@ -23,6 +24,9 @@
 <script setup lang="ts">
     import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
     import {fileBrowserTypeView, sharedDir, sharedWithMeCurrentFolder} from '@/store/fileBrowserStore';
+
+    const props = defineProps<{searchDirValue?: string}>()
+
 </script>
 
 <style scoped></style>

@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
-import { createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
-import { ProgressNotification } from '@/types/notifications';
+import { createNotification, createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
+import { Notification, ProgressNotification, Status } from '@/types/notifications';
 import { ContactInterface, FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
 import { accessDenied, currentDirectory, PathInfoModel } from '@/store/fileBrowserStore';
@@ -233,9 +233,15 @@ export const getShareByPath = async (path: string): Promise<SharedFileInterface>
 };
 
 export const downloadAttachment = async (message: any) => {
-    return (
-        await axios.get(`${endpoint}/attachment/download`, {
+    createNotification('Downloading attachment', `from ${message.from}`, Status.Info);
+    try {
+        const response = await axios.get(`${endpoint}/attachment/download`, {
             params: { owner: message.from, path: message.body.url, to: message.to, messageId: message.id },
-        })
-    ).data;
+        });
+        createNotification('Attachment successfully downloaded', `from ${message.from}`, Status.Success);
+        return response?.data;
+    } catch (ex) {
+        createNotification('Something went wrong during the download', `from ${message.from}`, Status.Error);
+        return;
+    }
 };

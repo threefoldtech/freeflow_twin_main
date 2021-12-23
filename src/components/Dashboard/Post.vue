@@ -1,7 +1,7 @@
 <template>
-  <div v-if="showImagePreview" class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8">
+  <div v-if="showImagePreview" @click="showImagePreview = false"  class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8">
       <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
-      <img  :src="imagePreviewSrc" class="pointer-events-none" />
+      <img  @click.stop :src="imagePreviewSrc" class="pointer-events-none" />
   </div>
   <SharePostDialog v-if="showShareDialog" />
   <div class="bg-white my-5 rounded">
@@ -210,7 +210,7 @@ import AvatarImg from '@/components/AvatarImg.vue';
 import {useAuthState, myYggdrasilAddress} from '@/store/authStore';
 import {ref, computed, onMounted, onBeforeMount} from 'vue';
 import moment from 'moment';
-import {Popover, PopoverButton, PopoverPanel} from '@headlessui/vue';
+import {Popover, PopoverButton, PopoverPanel, TransitionRoot} from '@headlessui/vue';
 import {ChevronDownIcon} from '@heroicons/vue/solid';
 import {showComingSoonToUhuru} from '@/services/dashboardService';
 import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue'

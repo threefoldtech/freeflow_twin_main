@@ -25,12 +25,27 @@
                 </div>
             </TabList>
             <TabPanels>
-                <TabPanel class="relative">
+                <TabPanel @wheel.prevent
+                          @touchmove.prevent
+                          @scroll.prevent class="relative">
+                  <TransitionRoot :show="isPublishingNewPost"
+                                  enter="transition-opacity duration-75"
+                                  enter-from="opacity-0"
+                                  enter-to="opacity-100"
+                                  leave="transition-opacity duration-150"
+                                  leave-from="opacity-100"
+                                  leave-to="opacity-0">
+                  <div class="absolute h-full w-full flex items-center justify-center z-50">
+                    <Spinner /><p class="ml-4 font-semibold text-accent-800">Creating post</p>
+                  </div>
+                  <div class="absolute h-full w-full flex items-center justify-center z-40 bg-white bg-opacity-50">
+                  </div>
+                  </TransitionRoot>
                     <FileDropArea @send-file="selectFiles">
                         <div class="p-4 flex items-start h-48">
                             <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
                             <textarea
-                                class="ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full"
+                                class="ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full focus:outline-none"
                                 placeholder="Write something about you"
                                 v-model="new_post_text"
                             />
@@ -89,11 +104,20 @@
             </TabPanels>
         </TabGroup>
     </div>
+  <TransitionRoot
+      :show="createPostModalStatus"
+      enter="transition-opacity duration-75"
+      enterFrom="opacity-0"
+      enterTo="opacity-100"
+      leave="transition-opacity duration-150"
+      leaveFrom="opacity-100"
+      leaveTo="opacity-0"
+  >
     <div
         @click="createPostModalStatus = false"
-        v-if="createPostModalStatus"
         class="w-full h-full inset-0 fixed z-40 bg-black opacity-10"
     ></div>
+  </TransitionRoot>
 </template>
 
 <script setup lang="ts">
@@ -107,14 +131,17 @@
     import ImageGrid from '@/components/Dashboard/ImageGrid.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
     import {createSocialPost, getAllPosts} from '@/services/socialService';
+    import { TransitionRoot } from '@headlessui/vue'
+    import Spinner from "@/components/Spinner.vue";
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
     const errorFileSize = ref<boolean>(false)
+    const isPublishingNewPost = ref<boolean>(false)
 
 
     const isAllowedToPost = computed(() => {
-        return new_post_images.value.length >= 1 || new_post_text.value !== '' ? true : false;
+        return new_post_images.value.length >= 1 || new_post_text.value !== '' || !isPublishingNewPost ? true : false;
     });
 
     const checkFileSize = (image: File) => {
@@ -159,10 +186,13 @@
     };
 
     const handleCreatePost = async () => {
+        if(!isAllowedToPost.value) return;
         errorFileSize.value = false;
+        isPublishingNewPost.value = true
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);
         await getAllPosts();
+        isPublishingNewPost.value = false
         new_post_images.value = [];
         new_post_text.value = '';
         createPostModalStatus.value = false

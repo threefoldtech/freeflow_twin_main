@@ -42,6 +42,8 @@ import {currentDirectoryContent, itemAction, savedAttachments, updateAttachments
 import {useAuthState} from "@/store/authStore";
 import {ref} from "vue";
 import Spinner from '@/components/Spinner.vue'
+import {createNotification} from "@/store/notificiationStore";
+import {Status} from "@/types/notifications";
 
 interface IProp {
     message: Object;
@@ -66,17 +68,20 @@ const openSharedFile = async (message: Message<MessageBodyType>, count: number =
     isLoadingFile.value = true
     if(count !== 0) await sleep(1500)
     count++;
-    loadingFileMessage.value = "Searching file"
+  createNotification('Searching attachment', `from ${message.from}`, Status.Info);
+  loadingFileMessage.value = "Searching file"
     updatedAttachments.value = (await updateAttachments(`/${message.from}`))?.data
     const file = updatedAttachments.value.find(item => item.fullName === message.body.filename)
     if(!file){
       if(count === 5) return;
+      createNotification('Downloading attachment', `from ${message.from}`, Status.Info);
       loadingFileMessage.value = "Downloading file"
       await downloadAttachmentToQuantum(message)
       isLoadingFile.value = false;
       await openSharedFile(message)
       return;
     }
+    createNotification('Trying to open file', `from ${message.from}`, Status.Info);
     savedAttachments.value = true
     //@ts-ignore
     await itemAction(file, undefined)
