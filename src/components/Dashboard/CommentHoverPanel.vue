@@ -3,7 +3,6 @@
       class="absolute -top-40 -left-10 mt-4 bg-white px-4 py-4 w-72 shadow rounded cursor-default z-50">
     <div class="flex space-x-3">
       <div class="flex flex-shrink-0">
-        {{ comment.avatar }}
         <img :src="avatar" alt="" class="h-16 w-16 object-fill rounded-full">
       </div>
       <div class="flex flex-col space-y-2">

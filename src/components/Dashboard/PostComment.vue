@@ -29,7 +29,7 @@
         </div>
         <div class="flex justify-start items-center text-xs w-full">
           <div class="font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1">
-            <a @click="likePost" class="hover:underline" href="#">
+            <a  class="hover:underline" href="#">
               <small>Like</small>
             </a>
             <small v-if="comment.type === MESSAGE_TYPE.COMMENT" class="self-center">.</small>
@@ -109,9 +109,6 @@ const commentsSorted = computed(() => {
   });
 })
 
-const likePost = async () => {
-  await likeComment()
-}
 
 const avatarImg = computed(() => {
   return calcExternalResourceLink(`http://[${props.comment.owner.location}]/api/user/avatar/default`)
