@@ -230,13 +230,14 @@
                       leave="transition-opacity duration-250"
                       leave-from="opacity-100"
                       leave-to="opacity-0">
-        <form v-if="showComments" class="px-2 py-2 flex items-center space-x-1"
+        <form v-if="showComments" class="px-2 py-2 flex items-center space-x-1" :class="{'opacity-50' : postingCommentInProgress}"
               @submit.prevent="handleAddComment(false)">
           <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
           <input :ref="inputRef" v-model="messageInput"
                  class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
                  placeholder="Type your message here"
                  type="text"
+                 :disabled="postingCommentInProgress"
                  @focus="focusInput"/>
           <input
               class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"
@@ -245,6 +246,7 @@
         </form>
         <CommentsContainer v-if="showComments && item.replies.length > 0"
                            :comments="item.replies" class="border-t-2 rounded-b-lg"
+                           :postingCommentInProgress="postingCommentInProgress"
                            @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"/>
       </TransitionRoot>
       <TransitionRoot :show="showIsUserTyping"
@@ -305,6 +307,7 @@ const showImagePreview = ref<boolean>(false)
 const imagePreviewSrc = ref<string | null>(null)
 const showShareDialog = ref<boolean>(false)
 const openPanel = ref<boolean>(false)
+const postingCommentInProgress = ref<boolean>(false)
 
 
 const {user} = useAuthState();
@@ -384,11 +387,14 @@ const timeAgo = time => {
 };
 
 const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
+  if(postingCommentInProgress.value) return
   const comment_value = isReplyToComment ? message : messageInput.value
   if (!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
+  postingCommentInProgress.value = true
   const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id)
   messageInput.value = "";
   const response = await getSinglePost(props.item.post.id, props.item.owner.location);
+  postingCommentInProgress.value = false
   emit('refreshPost', response)
 }
 

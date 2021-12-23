@@ -37,7 +37,7 @@
           <div class="mr-1 h-6 flex items-center flex-shrink-0">
             <img class="" src="/whisperbold.svg"/>
           </div>
-         {{ isPersonFriend }}
+          {{ isPersonFriend }}
         </a>
       </div>
       <div class="w-auto">
@@ -61,7 +61,7 @@ import {DotsHorizontalIcon} from "@heroicons/vue/solid";
 import {useRouter} from "vue-router";
 import {useContactsActions, useContactsState} from "@/store/contactStore";
 import {usechatsActions} from "@/store/chatStore";
-import {computed, onBeforeMount, ref} from "vue";
+import {computed, nextTick, onBeforeMount, ref} from "vue";
 import {myYggdrasilAddress} from "@/store/authStore";
 
 const {contacts} = useContactsState()
@@ -70,7 +70,7 @@ const {retrievechats} = usechatsActions()
 
 const props = defineProps<{ comment: object, avatar: string }>()
 const location = ref<string>()
-
+const router = useRouter()
 
 onBeforeMount(async () => {
   await retrievechats()
@@ -78,29 +78,22 @@ onBeforeMount(async () => {
 })
 
 const isPersonFriend = computed(() => {
-  if(location.value === props.comment.owner.location) return "Can't talk to yourself"
-  return contacts.some(item => item === props.comment.owner.id) ? "Add friend" : 'Whisper'
+  if (location.value === props.comment.owner.location) return "Can't talk to yourself"
+  return contacts.some(item => item.id === props.comment.owner.id) ? 'Whisper' : "Add friend"
 })
 
 
 const goToChat = async () => {
-  if(location.value === props.comment.owner.location) return false
-  if (contacts.some(item => item === props.comment.owner.id)) {
+  if (location.value === props.comment.owner.location) return false
+  if (!contacts.some(item => item.id === props.comment.owner.id)) {
     await retrievechats()
     await addContact(props.comment.owner.id, props.comment.owner.location)
     return false
   }
-  const router = useRouter()
-  console.log(await router.push({
-    name: 'single', params: {
-      id: String(props.comment.owner.id)
-    }
-  }))
-  router.push({
-    name: 'single', params: {
-      id: String(props.comment.owner.id)
-    }
-  })
+  await nextTick(async () => {
+    localStorage.setItem('lastOpenedChat', props.comment.owner.id)
+    router.push({name: 'whisper'})
+  });
 }
 
 

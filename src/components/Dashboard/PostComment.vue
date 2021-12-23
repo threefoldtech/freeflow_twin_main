@@ -69,7 +69,7 @@
                 :key="reply.id" :comment="reply"/>
   <form v-if="showReplyInput" class="relative flex items-center pl-20 flex-start w-full"
         @submit.prevent="handleReplyForm">
-    <div class="w-8 h-8 bg-red-400 rounded-full absolute left-20">
+    <div class="w-8 h-8 rounded-full absolute left-20">
       <img :src="myAvatar" class="h-8 rounded-full pointer-events-none">
     </div>
     <input v-model="replyInput" class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3"
