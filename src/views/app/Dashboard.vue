@@ -44,7 +44,7 @@
     import Post from '@/components/Dashboard/Post.vue';
     import FlowSidebar from '@/components/Dashboard/FlowSidebar.vue'
     import {nextTick, onBeforeMount, onMounted, ref, watch} from 'vue';
-    import { fetchPosts, posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
+    import { posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
     import {getAllPosts} from "@/services/socialService";
     import {allSocialPosts, isLoadingSocialPosts} from "@/store/socialStore";
     import {startFetchStatusLoop} from "@/store/statusStore";
@@ -59,7 +59,6 @@
     onBeforeMount(async () => {
       const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
-        await fetchPosts();
         await getAllPosts();
     });
 
