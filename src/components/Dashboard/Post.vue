@@ -197,7 +197,7 @@
                         leave-to="opacity-0">
           <HeartIconSolid v-if="localLike" class="w-6 text-red-500 mr-4"/>
         </TransitionRoot>
-        <p class="text-gray-500 w-7">
+        <p class="text-gray-500 w-11">
           {{ localLike ? 'Liked' : 'Like' }}
         </p>
 
@@ -292,7 +292,6 @@ import axios from "axios";
 import {calcExternalResourceLink} from "@/services/urlService";
 import {commentOnPost, getAllPosts, getSinglePost, likePost, setSomeoneIsTyping} from "@/services/socialService";
 import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue'
-import {TransitionRoot} from '@headlessui/vue'
 import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue'
 
 const props = defineProps<{ item: SOCIAL_POST }>();

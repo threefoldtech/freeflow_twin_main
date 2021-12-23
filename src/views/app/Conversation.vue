@@ -351,21 +351,13 @@ import {
 } from "@/store/contextmenuStore";
 import { useOnline } from '@vueuse/core'
 
+
+const online = useOnline()
+
 const route = useRoute();
 const selectedId = ref(<string>route.params.id);
 
-const viewAnchor = ref(null);
 
-const { isIntersecting } = useIntersectionObserver(viewAnchor);
-
-
-
-const scrollToBottom = (force = false) => {
-    if (!force && !isIntersecting.value) return;
-    nextTick(() => {
-
-    });
-};
 
 watch(
     () => route.params.id,

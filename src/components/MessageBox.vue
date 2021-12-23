@@ -165,7 +165,7 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
+    import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
     import { imageUploadQueue, usechatsActions, retrySendFile, usechatsState } from '@/store/chatStore';

@@ -2,8 +2,8 @@
     <Applayout>
       <div>
       <div ref="dashboardWindow" class="flex flex-row">
-        <div class="fixed flex justify-end hidden">
-          <nav class="mt-5 px-2 w-[300px] flex flex-col space-y-3 z-50">
+        <div v-if="false" class="fixed flex justify-end hidden">
+          <nav class="mt-5 px-2 w-full sm:w-[300px] flex flex-col space-y-3 z-50">
             <h1 class="font-semibold text-accent-800 text-lg">Flow</h1>
             <a href="#" class="group flex items-center px-6 py-4 text-base leading-6 font-semibold rounded-lg bg-accent-800 text-white transition duration-100">
               <HomeIcon class="mr-4 h-6 w-6" />
@@ -23,7 +23,7 @@
             </a>
           </nav>
         </div>
-      <div class="my-0 mx-auto p-4 w-[600px]">
+      <div class="my-0 mx-auto p-4 px-2 w-full sm:w-[600px]">
        <div v-if="isLoadingSocialPosts" class="fixed right-5 bottom-5 flex items-center">
         <p class="mr-4">Loading</p> <Spinner   />
       </div>
@@ -50,7 +50,7 @@
     import Post from '@/components/Dashboard/Post.vue';
     import FlowSidebar from '@/components/Dashboard/FlowSidebar.vue'
     import {nextTick, computed, onBeforeMount, ref} from 'vue';
-    import {fetchPosts, posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
+    import {posts, showComingSoonToUhuru ,createPostModalStatus } from '@/services/dashboardService';
     import {getAllPosts} from "@/services/socialService";
     import {allSocialPosts, isLoadingSocialPosts} from "@/store/socialStore";
     import {startFetchStatusLoop} from "@/store/statusStore";

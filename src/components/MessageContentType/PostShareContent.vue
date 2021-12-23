@@ -15,7 +15,7 @@
     </div>
   </div>
   </TransitionRoot>
-<div v-if="props.message.body.images.length === 0" @click="goToSocialPost" class="bg-white rounded-lg px-4 py-2 cursor-pointer">
+<div v-if="props.message.body.images.length === 0" @click="goToSocialPost" class="bg-white rounded-lg px-4 py-2 cursor-pointer z-40">
  <p class="text-lg font-semibold mb-2">Shared a post</p>
   <div class="flex items-center space-x-2">
     <img :src="avatarImg" class="w-8 h-8 rounded-full" />
