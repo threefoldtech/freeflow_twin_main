@@ -81,7 +81,18 @@ export const getAllPosts = async () => {
     allSocialPosts.value = sortPosts(posts);
 };
 
-export const likePost = async (postId: string, location: string) => {
+export const likePost = async (postId: string, location: string, commentId: string) => {
+    const myAddress = await myYggdrasilAddress();
+    return (
+        await axios.put<any>(`${endpoint}/like/${postId}`, {
+            liker_location: myAddress,
+            liker_id: user.id,
+            owner: location,
+        })
+    ).data;
+};
+
+export const likeComment = async (postId: string, location: string) => {
     const myAddress = await myYggdrasilAddress();
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {

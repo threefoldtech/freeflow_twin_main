@@ -29,7 +29,7 @@
         </div>
         <div class="flex justify-start items-center text-xs w-full">
           <div class="font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1">
-            <a class="hover:underline" href="#">
+            <a @click="likePost" class="hover:underline" href="#">
               <small>Like</small>
             </a>
             <small v-if="comment.type === MESSAGE_TYPE.COMMENT" class="self-center">.</small>
@@ -88,6 +88,7 @@ import {MESSAGE_TYPE} from "@/store/socialStore";
 import {calcExternalResourceLink} from "@/services/urlService";
 import {myYggdrasilAddress} from "@/store/authStore";
 import {TransitionRoot} from "@headlessui/vue";
+import {likeComment} from "@/services/socialService";
 
 const openPanel = ref<boolean>(false);
 const showComments = ref<boolean>(false);
@@ -107,6 +108,10 @@ const commentsSorted = computed(() => {
     return new Date(a.createdOn) - new Date(b.createdOn);
   });
 })
+
+const likePost = async () => {
+  await likeComment()
+}
 
 const avatarImg = computed(() => {
   return calcExternalResourceLink(`http://[${props.comment.owner.location}]/api/user/avatar/default`)
