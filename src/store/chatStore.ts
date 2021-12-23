@@ -1,6 +1,6 @@
 import { reactive } from '@vue/reactivity';
 import { nextTick, readonly, ref, toRefs } from 'vue';
-import axios from 'axios';
+import axios, { CancelToken, CancelTokenSource } from 'axios';
 import moment from 'moment';
 import {
     Chat,
@@ -225,6 +225,7 @@ function getMessage(chat: Chat, id) {
             message = found;
             return true;
         });
+
     }
 
     return message;
@@ -378,9 +379,11 @@ export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => 
     sendSocketMessage(chatId, message, isEdit);
 };
 
+export const imageUpload = ref([]);
+export const imageUploadQueue = ref([]);
+
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
     const { user } = useAuthState();
-    const id = uuidv4();
     let formData = new FormData();
     if (!isBlob) {
         formData.append('file', selectedFile);
@@ -391,42 +394,118 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     if (isRecording) formData.append('type', FileTypes.RECORDING);
     else formData.append('type', FileTypes.OTHER);
 
-    const msgToSend: Message<Object> = {
-        id,
-        body: 'Uploading file in progress ...',
-        from: user.id,
-        to: chatId,
-        timeStamp: new Date(),
-        type: 'MESSAGE',
-        replies: [],
-        subject: null,
-    };
-
-    addMessage(chatId, msgToSend);
+    const arr = new Uint8Array(await selectedFile.arrayBuffer());
+    const blob = new Blob([arr], { type: 'image/png' });
+    const uuid = uuidv4();
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
 
     try {
-        await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
+        imageUploadQueue.value.push({
+            id: uuid,
+            cancelToken: source,
+            error: false,
+            retry: false,
+            error_message: '',
+            type: selectedFile.type,
+            isImage: selectedFile.type.includes('image'),
+            title: selectedFile.name,
+            data: window.URL.createObjectURL(blob),
+            time: new Date(),
+            loaded: 0,
+            total: selectedFile.total,
+            chatId: chatId,
+            selectedFile: selectedFile
+        });
+
+        await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
+            cancelToken: source.token,
+            onUploadProgress: ({ loaded: progress, total }) => {
+                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                imageUploadQueue.value.splice(i, 1, {
+                    ...imageUploadQueue.value[i],
+                    loaded: progress,
+                    total: total,
+                })
+            },
         });
-        console.log('File uploaded.');
-    } catch (e) {
-        let errorBody = '';
-        if (e.message == 'Request failed with status code 413') {
-            errorBody = 'ERROR: File exceeds 100MB limit!';
-        } else {
-            errorBody = 'ERROR: File failed to send!';
-        }
-
-        const failedMsg = {
-            ...msgToSend,
-            body: errorBody,
-            type: 'STRING',
-        };
-        addMessage(chatId, failedMsg);
+            } catch (e) {
+        catchErrorsSendFile(e,uuid)
     }
 };
+
+const catchErrorsSendFile = (e,uuid) => {
+    const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+    if(e.message === 'Operation canceled by the user.') return;
+
+    if (e.message == 'Request failed with status code 413') {
+        //!TODO Upload limit
+
+        //errorBody = 'ERROR: File exceeds 20MB limit!';
+        imageUploadQueue.value.splice(i, 1, {
+            ...imageUploadQueue.value[i],
+            error_message: 'File exceeds 20MB limit!',
+            error: true
+        })
+        return;
+    }
+        //errorBody = 'ERROR: File failed to send!';
+        imageUploadQueue.value.splice(i, 1, {
+            ...imageUploadQueue.value[i],
+            error_message: 'File failed to send.',
+            error: true,
+            retry: true
+        })
+}
+
+
+
+export const retrySendFile = async (file) => {
+    //When a upload fails in chat and you retry
+
+    const {id:uuid, chatId, selectedFile} = file
+
+    let formData = new FormData();
+
+    formData.append('file', selectedFile);
+
+    const CancelToken = axios.CancelToken;
+    const source = CancelToken.source();
+
+    try {
+        const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+        imageUploadQueue.value.splice(i, 1, {
+            ...imageUploadQueue.value[i],
+            error_message: '',
+            loaded: 0,
+            retry: false,
+            error: false,
+            cancelToken: source
+        })
+
+        await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            cancelToken: source.token,
+            onUploadProgress: ({ loaded: progress, total }) => {
+                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                imageUploadQueue.value.splice(i, 1, {
+                    ...imageUploadQueue.value[i],
+                    loaded: progress,
+                    total: total,
+                    retry: false,
+                    error: false,
+                    error_message: ""})
+            },
+        });
+    } catch (e) {
+        catchErrorsSendFile(e, uuid)
+    }
+}
 
 const setLastMessage = (chatId: string, message: Message<String>) => {
     if (!state.chats) return;

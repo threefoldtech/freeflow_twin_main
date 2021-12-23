@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="flex flex-row my-4 items-center justify-between">
-            <div v-if="!sharedDir" class="mt-1 mx-2 relative rounded-md shadow-sm">
+            <div class="mt-1 mx-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
                 </div>
@@ -18,6 +18,8 @@
                     "
                     placeholder="Search"
                     type="text"
+                    :class="{'opacity-50' : route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir}"
+                    :disabled="route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir"
                     @input="debounceSearch"
                 />
                 <div
@@ -28,8 +30,8 @@
                     <i aria-hidden="true" class="fa fa-window-close h-5 w-5 text-gray-400" />
                 </div>
             </div>
-            <div class="flex flex-row items-center">
-                <SelectedOptions v-if="!sharedDir || selectedPaths.length > 0"></SelectedOptions>
+            <div v-if="!savedAttachments" class="flex flex-row items-center">
+                <SelectedOptions v-if="!sharedDir"></SelectedOptions>
                 <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
         </div>
@@ -40,20 +42,20 @@
 <script lang="ts" setup>
     import { computed, onBeforeMount, ref } from 'vue';
     import {
-        selectedPaths,
-        currentDirectory,
-        goToHome,
-        goToAPreviousDirectory,
-        goBack,
-        searchDir,
-        searchDirValue,
-        searchResults,
-        isDraggingFiles,
-        moveFiles,
-        selectedAction,
-        Action,
-        addShare,
-        sharedDir,
+      selectedPaths,
+      currentDirectory,
+      goToHome,
+      goToAPreviousDirectory,
+      goBack,
+      searchDir,
+      searchDirValue,
+      searchResults,
+      isDraggingFiles,
+      moveFiles,
+      selectedAction,
+      Action,
+      addShare,
+      sharedDir, savedAttachments,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
     import MainActionButtons from '@/components/fileBrowser/MainActionButtons.vue';
@@ -65,6 +67,11 @@
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import {useRoute} from "vue-router";
+
+
+
+    const route = useRoute();
 
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();

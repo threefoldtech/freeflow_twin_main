@@ -14,10 +14,8 @@ import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
-import { isArray } from 'lodash';
+import { create, isArray } from 'lodash';
 import { usechatsActions, usechatsState } from './chatStore';
-
-
 
 declare const Buffer;
 export enum FileType {
@@ -74,20 +72,20 @@ export const areFilesInChatReceived = ref(false);
 export const chatFiles = ref<File[]>();
 export const allSharedContent = ref<SharedFileInterface[]>([]);
 export const chatsWithFiles = ref<Chat[]>();
+export const chatsWithAttachments = ref<String[]>();
 
 export const fileBrowserTypeView = ref<string>('LIST');
 export const accessDenied = ref(false);
-export const chatFilesBreadcrumbs = ref([])
+export const chatFilesBreadcrumbs = ref([]);
+export const savedAttachmentsBreadcrumbs = ref([]);
 
 export const sharedItem = ref<PathInfoModel>();
-
-export const isQuantumChatFiles = ref<boolean>(false)
-
-export const sharedItemFromChat = ref<any>();
-
+export const isQuantumChatFiles = ref<boolean>(false);
 
 export const currentShare = ref<SharedFileInterface>(undefined);
 export const selectedTab = ref(0);
+export const savedAttachments = ref<boolean>(false);
+export const savedAttachmentsIsLoading = ref<boolean>(false);
 const { user } = useAuthState();
 
 watch([currentDirectory], () => {
@@ -112,9 +110,24 @@ export const getFile = async (fullPath: string): Promise<FullPathInfoModel> => {
 
 export const updateContent = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path);
+
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
     currentDirectoryContent.value = result.data.map(createModel);
+
+    savedAttachments.value = false;
+};
+
+export const updateAttachments = async (path = currentDirectory.value) => {
+    savedAttachmentsIsLoading.value = true;
+    const result = await Api.getDirectoryContent(path, true);
+    if (result.status !== 200 || !result.data) throw new Error('Could not get content');
+
+    // attachments.value = result.data.map(createModel);
+    currentDirectoryContent.value = result.data.map(createModel);
+    savedAttachments.value = true;
+    savedAttachmentsIsLoading.value = false;
+    return result;
 };
 
 export const createDirectory = async (name: string, path = currentDirectory.value) => {
@@ -159,9 +172,8 @@ const resetForFilesReceivedInChat = () => {
     searchDirValue.value = '';
     chatsWithFiles.value = [];
     chatFiles.value = [];
+    chatsWithAttachments.value = [];
 };
-
-
 
 export const goToFilesInChat = async (chat?: Chat) => {
     sharedFolderIsloading.value = true;
@@ -176,7 +188,7 @@ export const goToFilesInChat = async (chat?: Chat) => {
         });
         chatFiles.value = await chatFilesReceived(chat, received);
         sharedFolderIsloading.value = false;
-        chatFilesBreadcrumbs.value.push({name: chat.chatId})
+        chatFilesBreadcrumbs.value.push({ name: chat.chatId });
         return;
     }
 
@@ -188,11 +200,9 @@ export const goToFilesInChat = async (chat?: Chat) => {
     chatsWithFiles.value = getchatsWithFiles(received);
 };
 
-
-
 export const loadFilesReceivedNested = async () => {
     const { retrievechats } = usechatsActions();
-    const {chats} = usechatsState()
+    const { chats } = usechatsState();
     const chatId = router.currentRoute.value.params?.chatId;
     const received = router.currentRoute.value.meta.received as boolean;
     if (!chatId) {
@@ -201,7 +211,6 @@ export const loadFilesReceivedNested = async () => {
         return;
     }
 
-
     await retrievechats();
     const chat = chats.value.find(item => item.chatId === chatId);
     if (!chat) {
@@ -209,10 +218,13 @@ export const loadFilesReceivedNested = async () => {
         sharedFolderIsloading.value = false;
         return;
     }
-    chatFilesBreadcrumbs.value.push({name: received ? 'Received files in chat' : 'Sent files in chat', path: received ? '/quantum/received' : '/quantum/sent'})
-    chatFilesBreadcrumbs.value.push({name: chatId, path: router.currentRoute.value.path})
+    chatFilesBreadcrumbs.value.push({
+        name: received ? 'Received files in chat' : 'Sent files in chat',
+        path: received ? '/quantum/received' : '/quantum/sent',
+    });
+    chatFilesBreadcrumbs.value.push({ name: chatId, path: router.currentRoute.value.path });
+
     chatFiles.value = chatFilesReceived(chat, received);
-    chatsWithFiles.value = []
     sharedFolderIsloading.value = false;
 };
 
@@ -234,8 +246,6 @@ export const chatFilesReceived = (chat: Chat, received: boolean) => {
     const route = router.currentRoute.value;
 
     const currentChatFiles = getFilesInChat(chat);
-
-
 
     return received
         ? currentChatFiles.filter(el => el.from !== user.id)
@@ -284,17 +294,25 @@ export const downloadFileForPreview = async (path: string) => {
     setImageSrc(result);
 };
 
-export const goToFolderInCurrentDirectory = (item: PathInfoModel) => {
+export const goToFolderInCurrentDirectory = (item: PathInfoModel, attachment: boolean = false) => {
     let currentPath = currentDirectory.value;
     if (!currentPath || currentPath[currentPath.length - 1] !== rootDirectory) currentPath += '/';
     currentPath += item.name;
-
-    router.push({
-        name: 'quantumFolder',
-        params: {
-            folder: btoa(currentPath),
-        },
-    });
+    if (savedAttachments.value) {
+        router.push({
+            name: 'savedAttachments',
+            params: {
+                path: btoa(currentPath),
+            },
+        });
+    } else {
+        router.push({
+            name: 'quantumFolder',
+            params: {
+                folder: btoa(currentPath),
+            },
+        });
+    }
     currentDirectory.value = currentPath;
 };
 
@@ -447,12 +465,23 @@ export const deselectAll = () => {
 };
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
+    if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
+        router.push({
+            name: 'savedAttachmentsFromChat',
+            params: {
+                chatId: item.name,
+            },
+        });
+        return;
+    }
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;
     }
-
-    const result = router.resolve({ name: 'editfile', params: { path: btoa(item.path) } }); //
+    const result = router.resolve({
+        name: 'editfile',
+        params: { path: btoa(item.path), attachments: String(savedAttachments.value) },
+    });
 
     window.open(result.href, '_blank', 'noreferrer');
 };
@@ -760,17 +789,16 @@ export function stopTimer() {
 export const showSharedFolderErrorModal = ref(false);
 
 export const loadLocalFolder = () => {
+    if (router.currentRoute.value.params.attachment) updateAttachments(currentDirectory.value);
     const folderId = atob(<string>router.currentRoute.value.params.folder);
     currentDirectory.value = folderId.split('.').shift();
+    savedAttachments.value = false;
 };
 
 export const fetchBasedOnRoute = async () => {
     const route = router.currentRoute.value;
     //Starting lazy loader animation
     sharedFolderIsloading.value = true;
-    if(route.name === 'filesReceivedInChatNested' || route.name === 'filesSentInChatNested'){
-        return;
-    }
 
     if (route.name === 'quantum') {
         await getSharedContent();
@@ -786,9 +814,26 @@ export const fetchBasedOnRoute = async () => {
     if (route.name === 'sharedWithMe') {
         resetSharedFolder();
         sharedFolderIsloading.value = false;
+
         return;
     }
+    if (route.name === 'filesReceivedInChat') {
+        resetSharedFolder();
+        sharedFolderIsloading.value = false;
+        allSharedContent.value = [];
+        sharedContent.value = [];
 
+        return;
+    }
+    if (route.name === 'savedAttachments') {
+        resetSharedFolder();
+        sharedFolderIsloading.value = false;
+        allSharedContent.value = [];
+        sharedContent.value = [];
+        savedAttachments.value = true;
+
+        return;
+    }
 
     if (route.name === 'sharedWithMeItem') {
         const parent = allSharedContent.value.find(x => x.id === route.params.sharedId);
@@ -963,9 +1008,14 @@ export const fetchShareDetails = async (shareId: string) => {
     return shareDetails;
 };
 
-export const fetchFileAccessDetails = async (owner: ContactInterface, shareId: string, path: string) => {
+export const fetchFileAccessDetails = async (
+    owner: ContactInterface,
+    shareId: string,
+    path: string,
+    attachments: boolean
+) => {
     const { user } = useAuthState();
-    const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id, path);
+    const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id, path, attachments);
     return fileAccessDetails;
 };
 

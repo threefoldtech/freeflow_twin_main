@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ hidden: sharedDir }" class="mx-2">
+    <div :class="{ hidden: sharedDir || savedAttachments }" class="mx-2">
         <button
             class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
             @click="showCreateFolderDialog = true"
@@ -89,9 +89,10 @@
     import { defineComponent, ref, watch } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { createDirectory, uploadFiles, sharedDir } from '@/store/fileBrowserStore';
+    import {createDirectory, uploadFiles, sharedDir, savedAttachments} from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
+
 
     const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);

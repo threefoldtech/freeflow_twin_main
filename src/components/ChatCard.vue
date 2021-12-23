@@ -39,17 +39,7 @@
                 </span>
             </p>
             <div class="flex overflow-hidden">
-                <div v-if="getDraftMessage().length > 0" class="flex-0 col-end-13 col-span-2 overflow-ellipsis overflow-hidden text-xs">
-                    <div class="space-x-1 ...">
-                        <div class="inline-block ... text-red-500">[Draft]:</div>
-                        <div class="inline-block ... text-gray-400">{{ getDraftMessage() }}</div>
-                    </div>
-                </div>
-
-                <div
-                    v-else
-                    class="flex-0 col-end-13 col-span-2 text-gray-400 overflow-ellipsis overflow-hidden text-xs"
-                >
+                <div class="flex-0 col-end-13 col-span-2 text-gray-400 overflow-ellipsis overflow-hidden text-xs">
                     {{ lastMessageBody }}
                 </div>
             </div>
@@ -67,7 +57,6 @@ import { statusList } from '@/store/statusStore';
 import AvatarImg from '@/components/AvatarImg.vue';
 import { useRouter } from 'vue-router';
 import { isBlocked } from '@/store/blockStore';
-import { MessageAction } from '@/store/chatStore';
 
 interface IProps {
     chat: Chat;
@@ -97,15 +86,6 @@ const timeAgo = time => {
 const status = computed(() => {
     return statusList[props.chat.chatId];
 });
-
-const getDraftMessage = () => {
-    if(props.chat?.draft?.action === MessageAction.EDIT) return props.chat.draft.body.body.message;
-    if(props.chat?.draft?.action === MessageAction.REPLY) return  props.chat.draft.body.message;
-    if(props.chat?.draft) return props.chat.draft.body;
-    return "";
-}
-
-
 
 const router = useRouter();
 const currentRoute = computed(() => router.currentRoute.value);

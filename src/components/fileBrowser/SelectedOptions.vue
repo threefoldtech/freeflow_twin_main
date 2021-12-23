@@ -168,7 +168,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+import {computed, defineComponent, onBeforeMount, onMounted, ref, watch} from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -199,11 +199,46 @@
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
     import { showShareDialog } from '@/services/dialogService';
+import {
+  currentRightClickedItem,
+  RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
+  RIGHT_CLICK_TYPE,
+  rightClickItemAction, triggerWatchOnRightClickItem
+} from '@/store/contextmenuStore'
 
     const { chats } = usechatsState();
     const { retrievechats, sendMessage } = usechatsActions();
 
     const tabs = ['Create shares', 'Edit shares'];
+
+    watch(triggerWatchOnRightClickItem,async () => {
+      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE){
+        selectedPaths.value.length = 0;
+        //@ts-ignore
+        selectedPaths.value[0] = currentRightClickedItem.value.data
+        switch(rightClickItemAction.value){
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
+            showDeleteDialog.value = true;
+            break;
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
+            showRenameDialog.value = true;
+            newName.value = currentRightClickedItem.value.data.name
+            break;
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
+            await downloadFiles()
+            break;
+          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
+            showShareDialog.value = true;
+            break;
+          default:
+            break;
+        }
+      }
+      return;
+    }, {deep: true})
+
+    onMounted(() => {
+    })
 
     let debounce;
     const showDeleteDialog = ref(false);

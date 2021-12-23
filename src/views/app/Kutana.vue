@@ -14,16 +14,17 @@
     import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref } from 'vue';
     import { onMounted, onBeforeMount } from 'vue';
+    import {useAuthState} from "@/store/authStore";
 
     const iframeUrl = ref('');
+    const {user} = useAuthState()
 
     onMounted(() => {
         browse();
     });
 
     function browse() {
-        iframeUrl.value = `https://kutana.uhuru.me/`;
-
+        iframeUrl.value = `https://kutana.uhuru.me/?username=${user.id}`;
     }
 </script>
 

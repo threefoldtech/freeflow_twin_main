@@ -5,7 +5,17 @@ import {
     selectedPaths,
     goToFilesInChat,
     chatsWithFiles,
-    fetchSharedInChatFiles, chatFilesBreadcrumbs, isQuantumChatFiles,
+    fetchSharedInChatFiles,
+    chatFilesBreadcrumbs,
+    isQuantumChatFiles,
+    setChatsWithAttachments,
+    attachments,
+    chatsWithAttachments,
+    currentDirectoryContent,
+    updateAttachments,
+    savedAttachments,
+    savedAttachmentsBreadcrumbs,
+    savedAttachmentsIsLoading,
 } from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
@@ -40,7 +50,7 @@ import {
     goToFilesInChat,
     getchatsWithFiles,
     loadFilesReceivedNested,
-    isQuantumChatFiles
+    isQuantumChatFiles,
 } from '@/store/fileBrowserStore';
 import { usechatsActions } from '@/store/chatStore';
 
@@ -87,27 +97,8 @@ const routes: Array<RouteRecordRaw> = [
             },
         ],
     },
-    /*
     {
-        // fake security since the actual filebrowser has no security yet?
-
-        path: '/quantum', //btoa? /quantum/:path?
-        component: RouterView,
-        meta: { requiresAuth: true, app: AppType.Quantum },
-        children: [
-            {
-                // fake security since the actual filebrowser has no security yet?
-                name: 'quantum',
-                path: '/:path?', //btoa? /quantum/:path?
-                component: FileBrowser,
-                meta: { requiresAuth: true, app: AppType.Quantum },
-            },
-        ],
-    },
-    */
-
-    {
-        path: '/quantum/edit/:path/:shareId?',
+        path: '/quantum/edit/:path/:shareId?/:attachments',
         name: 'editfile',
         component: EditFile,
         meta: {
@@ -117,7 +108,7 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        path: '/quantum/options/:path/:shareId?',
+        path: '/quantum/options/:path/:shareId?/:attachments',
         name: 'editoptions',
         component: EditOptions,
         meta: {
@@ -147,7 +138,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: 'sent',
                 name: 'filesSentInChat',
                 component: FileBrowser,
-                meta: { sharedFolder: true,received : false, chatFiles: true, chatsWithFiles: true },
+                meta: { sharedFolder: true, received: false, chatFiles: true, chatsWithFiles: true },
                 children: [
                     {
                         component: FileBrowser,
@@ -159,10 +150,9 @@ const routes: Array<RouteRecordRaw> = [
                             sharedFolder: true,
                             received: false,
                             chatFiles: true,
-                            chatFilesNested: true
-                        }
+                            chatFilesNested: true,
+                        },
                     },
-
                 ],
             },
             {
@@ -173,7 +163,7 @@ const routes: Array<RouteRecordRaw> = [
                     sharedFolder: true,
                     received: true,
                     chatFiles: true,
-                    chatsWithFiles: true
+                    chatsWithFiles: true,
                 },
                 children: [
                     {
@@ -186,7 +176,24 @@ const routes: Array<RouteRecordRaw> = [
                             sharedFolder: true,
                             received: true,
                             chatFiles: true,
-                            chatFilesNested: true
+                            chatFilesNested: true,
+                        },
+                    },
+                ],
+            },
+            {
+                path: 'savedAttachments',
+                name: 'savedAttachments',
+                component: FileBrowser,
+                children: [
+                    {
+                        component: FileBrowser,
+                        ///quantum/savedAttachments/:chatId
+                        name: 'savedAttachmentsFromChat',
+                        path: ':chatId',
+                        meta: {
+                            sharedFolder: false,
+                            root_parent: 'quantum',
                         },
                     },
                 ],
@@ -301,9 +308,14 @@ router.afterEach(async (to, from) => {
     chatsWithFiles.value = [];
     selectedPaths.value = [];
     isQuantumChatFiles.value = false;
-    if (to.meta.root_parent === 'quantum' && to.name !== 'quantumFolder' && to.name !== 'quantum') {
+    savedAttachments.value = false;
+    if (
+        to.meta.root_parent === 'quantum' &&
+        to.name !== 'quantumFolder' &&
+        to.name !== 'quantum' &&
+        to.name !== 'savedAttachments'
+    ) {
         await fetchBasedOnRoute();
-
         loadSharedItems();
     } else {
         sharedFolderIsloading.value = false;
@@ -311,43 +323,37 @@ router.afterEach(async (to, from) => {
     }
     if (to.name === 'quantumFolder') {
         loadLocalFolder();
-
     }
-    if (to.meta.sharedFolder ) {
+    if (to.meta.sharedFolder) {
         sharedDir.value = true;
     }
-    if (to.name === 'sharedWithMe') {
+    if (to.name === 'savedAttachments') {
+        savedAttachmentsBreadcrumbs.value = [];
+        sharedDir.value = false;
+        savedAttachments.value = true;
+        isQuantumChatFiles.value = false;
+        savedAttachmentsBreadcrumbs.value.push({ name: 'Saved attachments', path: '/quantum/savedAttachments' });
+        await updateAttachments('/');
+        savedAttachmentsIsLoading.value = false;
     }
-    if (to.name === 'filesReceivedInChat') {
-        chatFilesBreadcrumbs.value = []
-        await retrievechats();
-        isQuantumChatFiles.value = true
-        fetchSharedInChatFiles(true);
-        chatFilesBreadcrumbs.value.push({name: 'Received files in chat', path: '/quantum/received'})
-    }
-    if (to.name === 'filesSentInChat') {
-        chatFilesBreadcrumbs.value = []
-        isQuantumChatFiles.value = true
-        chatFilesBreadcrumbs.value.push({name: 'Sent files in chat', path: '/quantum/sent'})
-        await retrievechats();
-        fetchSharedInChatFiles(false);
-    }
-    if (to.name === 'filesReceivedInChatNested' || to.name === 'filesSentInChatNested') {
-        chatFilesBreadcrumbs.value = []
-        isQuantumChatFiles.value = true
-       await loadFilesReceivedNested();
+    if (to.name === 'savedAttachmentsFromChat') {
+        savedAttachmentsIsLoading.value = true;
+        savedAttachmentsBreadcrumbs.value = [];
+        savedAttachments.value = true;
+        sharedDir.value = false;
+        isQuantumChatFiles.value = false;
+        savedAttachmentsBreadcrumbs.value.push({ name: 'Saved attachments', path: '/quantum/savedAttachments' });
+        await updateAttachments(`/${to.params.chatId}`);
+        savedAttachmentsBreadcrumbs.value.push({
+            name: to.params.chatId,
+            path: `/quantum/savedAttachments/${to.params.chatId}`,
+        });
+        savedAttachmentsIsLoading.value = false;
     }
     if (to.name === 'quantum') {
         sharedDir.value = false;
         currentDirectory.value = '/';
-
-    }
-    if(to.name === 'whisper'){
-        const lastChat = localStorage.getItem('lastOpenedChat');
-        if(!lastChat) return;
-        router.push({name: 'single', params: {
-            id: lastChat
-        }})
+        await updateContent('/');
     }
 });
 

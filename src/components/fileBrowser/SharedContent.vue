@@ -1,15 +1,11 @@
 <template>
-    <div class="h-full overflow-y-auto px-3">
-        <h1 v-if='!isQuantumChatFiles' class="p-2">
-            Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>
-        </h1>
-
+    <div class="h-full overflow-y-auto">
         <div v-if="sharedFolderIsloading" class="h-full w-full flex justify-center items-center z-50">
             <Spinner :xlarge="true" />
         </div>
         <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
-                <div class="py-2 align-middle inline-block min-w-full">
+                <div class="align-middle inline-block min-w-full">
                     <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table
@@ -50,97 +46,9 @@
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                                <tr v-if="chatsWithFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatsWithFiles && !$route.meta.chatFilesNested">
-                                    <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"></td>
-                                </tr>
-                                <tr v-if="chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles">
-                                    <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
-                                    <td class="px-6 py-4 whitespace-nowrap"></td>
-                                </tr>
-                                <!-- CHAT FILES -->
-                                <tr
-                                    v-if='isQuantumChatFiles'
-                                    v-for="item in chatFiles"
-                                    class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                                    :class="{
-                                        'bg-gray-100': isSelected(item),
-                                    }"
-                                    :key="item.name"
-                                >
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i
-                                                    :key="item.name"
-                                                    class="fa-2x"
-                                                    :class="
-                                                        getIconDirty(
-                                                            item.isFolder,
-                                                            getFileType(getExtension(item.body.filename))
-                                                        ) +
-                                                        ' ' +
-                                                        getIconColorDirty(
-                                                            item.isFolder,
-                                                            getFileType(getExtension(item.body.filename))
-                                                        )
-                                                    "
-                                                ></i>
-                                            </div>
-                                            <a
-                                                :href="calcExternalResourceLink(item.body.url)"
-                                                class="block outline-none border-none"
-                                            >
-                                                <div class="flex flex-col items-start py-1">
-                                                    <span class="text-md hover:underline cursor-pointer font-normal">
-                                                        {{ truncate(item.body.filename) }}
-                                                    </span>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-row items-center text-md">
-                                            <!-- {{ formatBytes(item.body.size, 2) }}                                             -->
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- CHATS WITH FILES -->
-                                <tr
-                                    v-for="item in chatsWithFiles"
-                                    v-if='isQuantumChatFiles'
-                                    class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                                    :class="{
-                                        'bg-gray-100': isSelected(item),
-                                    }"
-                                    @click="goToFilesInChat(item)"
-                                    :key="item.name"
-                                >
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-row items-center text-md">
-                                            <div class="mr-3 w-7 text-center">
-                                                <i
-                                                    :key="item.name"
-                                                    :class="{'text-gray-600 fa-2x fas fa-users': item.isGroup, 'text-gray-600 fa-2x fas fa-user': !item.isGroup}
-"
-                                                ></i>
-                                            </div>
-                                            <div class="flex flex-col items-start py-1">
-                                                <span class="text-md hover:underline cursor-pointer ml-3">
-                                                    {{ item.chatId }} <span class='text-gray-600' v-if='item.isGroup'>(Group)</span>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-row items-center text-md">
-                                            {{ chatFilesReceived(item, true).length }} files
-                                        </div>
-                                    </td>
-                                </tr>
                                 <tr
                                     v-for="item in sharedContent"
-                                    v-if='!isQuantumChatFiles'
+                                    v-if="!isQuantumChatFiles"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     :class="{
                                         'bg-gray-100': isSelected(item),
@@ -152,7 +60,6 @@
                                         <div class="flex flex-row items-center text-md">
                                             <div class="mr-3 w-7 text-center">
                                                 <i
-                                                    :key="item.name"
                                                     class="fa-2x"
                                                     :class="
                                                         getIconDirty(
@@ -183,10 +90,17 @@
                                         </div>
                                     </td>
                                 </tr>
+                                <tr
+                                    v-if="
+                                        sharedContent?.length === 0
+                                    "
+                                >
+                                  <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
+                                  <td class="px-6 py-4 whitespace-nowrap"></td>
+                                </tr>
                             </tbody>
                         </table>
                         <!-- GRID -->
-
                         <!-- SHARED -->
                         <ul
                             role="list"
@@ -212,133 +126,20 @@
                                     font-medium
                                     text-center text-gray-800
                                 "
-                                v-if="chatFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatFilesNested && !$route.meta.chatsWithFiles"
-                            >
-                                Nothing has been shared with you yet!
-                            </p>
-                            <p
-                                class="
-                                    px-6
-                                    py-4
-                                    whitespace-nowrap
-                                    col-span-12
-                                    text-base
-                                    font-medium
-                                    text-center text-gray-800
+                                v-if="
+                                    sharedContent?.length === 0
                                 "
-                                v-if="chatsWithFiles?.length === 0 && isQuantumChatFiles && $route.meta.chatsWithFiles && !$route.meta.chatFilesNested"
                             >
                                 Nothing has been shared with you yet!
                             </p>
 
-                            <li v-for="item in chatFiles" :key="item.name" :title="item.name" class="relative">
-                                <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        bg-white
-                                        border-2
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-4">
-                                        <i
-                                            :key="item.name"
-                                            class="fa-lg"
-                                            :class="
-                                                getIconDirty(
-                                                    item.isFolder,
-                                                    getFileType(getExtension(item.body.filename))
-                                                ) +
-                                                ' ' +
-                                                getIconColorDirty(
-                                                    item.isFolder,
-                                                    getFileType(getExtension(item.body.filename))
-                                                )
-                                            "
-                                        ></i>
-                                        <p class="block ml-4 text-sm font-medium text-gray-900 truncate">
-                                            <!-- {{ item.body.filename }} -->
-                                            <a
-                                                :href="calcExternalResourceLink(item.body.url)"
-                                                class="block outline-none border-none"
-                                            >
-                                                <div class="flex flex-col items-start py-1">
-                                                    <span class="text-md hover:underline cursor-pointer font-normal">
-                                                        {{ item.body.filename }}
-                                                    </span>
-                                                </div>
-                                            </a>
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="hidden block text-sm font-medium text-gray-500 pointer-events-none">
-                                    From: {{ item.chatId }}
-                                    <br />
-                                    {{ formatBytes(item.size, 2) }}
-                                </p>
-                            </li>
-                            <li v-for="item in chatsWithFiles" :key="item.name" :title="item.name" class="relative">
-                                <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        bg-white
-                                        border-2
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
-                                    @click="goToFilesInChat(item)"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-4">
-                                        <i
-                                            :key="item.name"
-                                            :class="{'text-gray-600 fa-lg fas fa-users': item.isGroup, 'text-gray-600 fa-lg fas fa-user': !item.isGroup}"
-                                        ></i>
-                                        <p
-                                            class="
-                                                block
-                                                ml-4
-                                                text-sm
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                            "
-                                        >
-                                            {{ item.name }} <span class='text-gray-600' v-if='item.isGroup'>(Group)</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="hidden block text-sm font-medium text-gray-500 pointer-events-none">
-                                    From: {{ item.chatId }}
-                                    <br />
-                                    {{ formatBytes(item.size, 2) }}
-                                </p>
-                            </li>
-                            <li v-for="item in sharedContent" v-if='!isQuantumChatFiles' :key="item.name" :title="item.name" class="relative">
+                            <li
+                                v-for="item in sharedContent"
+                                v-if="!isQuantumChatFiles"
+                                :key="item.name"
+                                :title="item.name"
+                                class="relative"
+                            >
                                 <div
                                     class="
                                         group
@@ -401,77 +202,77 @@
 </template>
 
 <script setup lang="ts">
-    import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-    import { calcExternalResourceLink } from '@/services/urlService';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
-    import {
-        FileType,
-        formatBytes,
-        getExtension,
-        getFileType,
-        getIcon,
-        getIconColor,
-        getFileSize,
-        getIconColorDirty,
-        getIconDirty,
-        getSharedContent,
-        getSharedFolderContent,
-        goIntoSharedFolder,
-        parseJwt,
-        PathInfoModel,
-        selectedPaths,
-        sharedContent,
-        goTo,
-        sharedBreadcrumbs,
-        clickBreadcrumb,
-        sharedFolderIsloading,
-        fileBrowserTypeView,
-        View,
-        allSharedContent,
-        loadSharedItems,
-        sharedWithMeCurrentFolder,
-        chatsWithFiles,
-        goToChatFiles,
-        chatFilesReceived,
-        goToFilesInChat,
-        isQuantumChatFiles,
-        chatFiles,
-    } from '@/store/fileBrowserStore';
-    import { SharedFileInterface } from '@/types';
-    import { cloneVNode, defineComponent } from '@vue/runtime-core';
-    import { onBeforeMount, watch, computed } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
-    import Spinner from '@/components/Spinner.vue';
-    import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
+import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
+import { calcExternalResourceLink } from '@/services/urlService';
+import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+import {
+    FileType,
+    formatBytes,
+    getExtension,
+    getFileType,
+    getIcon,
+    getIconColor,
+    getFileSize,
+    getIconColorDirty,
+    getIconDirty,
+    getSharedContent,
+    getSharedFolderContent,
+    goIntoSharedFolder,
+    parseJwt,
+    PathInfoModel,
+    selectedPaths,
+    sharedContent,
+    goTo,
+    sharedBreadcrumbs,
+    clickBreadcrumb,
+    sharedFolderIsloading,
+    fileBrowserTypeView,
+    View,
+    allSharedContent,
+    loadSharedItems,
+    sharedWithMeCurrentFolder,
+    chatsWithFiles,
+    goToChatFiles,
+    chatFilesReceived,
+    goToFilesInChat,
+    isQuantumChatFiles,
+    chatFiles,
+} from '@/store/fileBrowserStore';
+import { SharedFileInterface } from '@/types';
+import { cloneVNode, defineComponent } from '@vue/runtime-core';
+import { onBeforeMount, watch, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import Spinner from '@/components/Spinner.vue';
+import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
 
-    onBeforeMount(async () => {
-        sharedBreadcrumbs.value = [];
-    });
+onBeforeMount(async () => {
+    sharedBreadcrumbs.value = [];
+});
 
-    watch(sharedFolderIsloading, () => {});
+watch(sharedFolderIsloading, () => {});
 
-    const router = useRouter();
-    const route = useRoute();
+const router = useRouter();
+const route = useRoute();
 
-    const currentFolderName = computed(() => {
-        //@TODO add current folder
+const currentFolderName = computed(() => {
+    //@TODO add current folder
 
-        return '';
-    });
+    return '';
+});
 
-    const truncate = name => {
-        return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
-    };
+const truncate = name => {
+    return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+};
 
-    //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
+//const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
 
-    const epochToDate = epoch => {
-        let d = new Date(epoch).toLocaleDateString();
+const epochToDate = epoch => {
+    let d = new Date(epoch).toLocaleDateString();
 
-        return d === '1/20/1980' ? 'Never' : d;
-    };
+    return d === '1/20/1980' ? 'Never' : d;
+};
 
-    const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
+const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
 </script>
 
 <style scoped></style>
