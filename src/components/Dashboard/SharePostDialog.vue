@@ -118,7 +118,6 @@ const isAlreadySharedWWithPerson = (id: string) => {
 
 const cancelShare = (id: string) => {
   queue.value = queue.value.filter(item => item !== id)
-  console.log(queue.value)
 }
 
 const isInQueue = (id) => {
@@ -135,7 +134,6 @@ const avatarImg = computed(() => {
 
 onBeforeMount(async () => {
   await retrievechats()
-  console.log(chats.value)
 })
 
 

@@ -167,7 +167,7 @@ export const updateSomeoneIsTyping = (chatId: string) => {
             ...item,
         };
     });
-    setTimeout(() => destroySomeoneIsTyping(chatId, id), 2500);
+    setTimeout(() => destroySomeoneIsTyping(chatId, id), 5000);
 };
 
 export const destroySomeoneIsTyping = (chatId, queueId) => {

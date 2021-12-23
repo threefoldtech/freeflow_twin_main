@@ -213,7 +213,6 @@
         if (props.message.value != editMessageValue.value) {
             const { sendMessageObject } = usechatsActions();
             const oldmessage = props.message;
-            console.log(props.message);
             const updatedMessage: Message<StringMessageType> = {
                 id: oldmessage.id,
                 from: oldmessage.from,
@@ -225,8 +224,6 @@
                 subject: null,
             };
             sendMessageObject(props.chatId, updatedMessage);
-            console.log(props.chatId);
-            console.log(props.message);
             quoteMessageValue.value = '';
         }
         props.message.value = editMessageValue.value;
