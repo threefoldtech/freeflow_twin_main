@@ -2,12 +2,13 @@
   <transition name="fade">
     <div
         v-if="props.modelValue"
+        ref="dialogRef"
+        tabindex="-1"
         class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
         @click="$emit('update-model-value', false)"
         @keydown.esc="$emit('update-model-value', false)"
     >
       <div
-          ref="dialogRef"
           class="
                     form-container
                     z-50
@@ -22,8 +23,6 @@
                     sm:rounded
                     overflow-auto
                 "
-          tabindex="-1"
-          @keydown.esc="$emit('update-model-value', false)"
           @click.stop
       >
         <div class="flex justify-between">
@@ -81,16 +80,16 @@
   </transition>
 </template>
 <script lang="ts" setup>
-import {nextTick, onMounted, ref} from "vue";
+import {nextTick, onBeforeMount, onMounted, onUpdated, ref} from "vue";
 
 defineEmits(['update-model-value']);
 
 const dialogRef = ref<HTMLElement>(null)
 
-onMounted(() => {
-  console.log("mounted")
-  console.log(dialogRef.value)
+onUpdated(() => {
+  if(dialogRef.value) dialogRef.value.focus()
 })
+
 
 interface IProps {
   modelValue?: boolean;

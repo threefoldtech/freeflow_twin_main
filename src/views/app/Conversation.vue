@@ -475,7 +475,6 @@ const messageBox = ref<HTMLElement>(null);
             MessageTypes.SYSTEM
         );
 
-        console.log(user.id)
 
       popupCenter(`https://kutana.uhuru.me/?roomName=${id}&username=${user.id}`, 'video room', 800, 550, true);
 
