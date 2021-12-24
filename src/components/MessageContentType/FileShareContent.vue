@@ -72,6 +72,7 @@ const visitFileInMessage = (message: Message<FileShareMessageType>) => {
             params: {
                 path: btoa(sharedItem.value.path),
                 shareId: '',
+                attachments: "false"
             },
         });
         window.open(url.href, '_blank');

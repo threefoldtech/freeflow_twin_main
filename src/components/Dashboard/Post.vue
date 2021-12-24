@@ -1,7 +1,7 @@
 <template>
-  <div v-if="showImagePreview" @click="showImagePreview = false"  class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8">
-      <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
-      <img  @click.stop :src="imagePreviewSrc" class="pointer-events-none" />
+  <div v-if="showImagePreview" @click="showImagePreview = false"  class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-40 fixed p-8">
+      <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" />
+      <img  @click.stop :src="imagePreviewSrc" class="pointer-events-none z-50" />
   </div>
   <SharePostDialog v-if="showShareDialog" :avatarImg="avatarImg" :item="item" @close="showShareDialog = false"/>
   <div class="bg-white my-5 rounded">
@@ -28,7 +28,7 @@
               <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
             </div>
           </div>
-          <div class="group absolute right-0 top-0">
+          <div class="group absolute right-0 top-0 z-50">
             <Popover v-slot="{ open }" class="relative">
               <PopoverButton
                   :class="open ? '' : 'text-opacity-90'"
@@ -82,7 +82,7 @@
                                         left-1/2
                                                                            "
                 >
-                  <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                     <div class="relative grid gap-8 bg-white p-6">
                       <a
                           v-for="item in solutions"
