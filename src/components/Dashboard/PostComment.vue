@@ -41,7 +41,6 @@
               <small>{{ moment(comment.createdOn).fromNow() }}</small>
             </a>
           </div>
-
         </div>
       </div>
       <div v-if="comment.likes.length >= 1" class="absolute -bottom-1 -right-5 flex items-center">

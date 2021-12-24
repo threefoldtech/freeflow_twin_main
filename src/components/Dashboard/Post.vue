@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showImagePreview" class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-40 fixed p-8"
+  <div v-if="showImagePreview" class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
        @click="showImagePreview = false">
     <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="showImagePreview = false"/>
     <img :src="imagePreviewSrc" class="pointer-events-none z-50" @click.stop/>
@@ -16,7 +16,7 @@
                           leave="transition-opacity duration-250"
                           leave-from="opacity-100"
                           leave-to="opacity-0">
-            <CommentHoverPanel v-if="openPanel" :avatar="avatarImg" :comment="item" class="-top-30"
+            <CommentHoverPanel v-if="openPanel" :avatar="avatarImg" :comment="item" class="-top-30 z-50"
                                @mouseleave="openPanel = false"/>
           </TransitionRoot>
           <div class="flex items-center">
@@ -250,7 +250,7 @@
 
         <CommentsContainer v-if="showComments && item.replies.length > 0"
                            :comments="item.replies" :postingCommentInProgress="postingCommentInProgress"
-                           class="border-t-2 rounded-b-lg overflow-y-auto" :class="{' max-h-[35rem]' : $route.name === 'single'}"
+                           class="border-t-2 rounded-b-lg overflow-y-auto" :class="{'max-h-[35rem]' : $route.name === 'single'}"
                            @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"/>
       </TransitionRoot>
       <TransitionRoot :show="showIsUserTyping"
