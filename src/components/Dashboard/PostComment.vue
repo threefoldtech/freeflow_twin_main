@@ -112,11 +112,11 @@ const commentsSorted = computed(() => {
 
 const handleLikeComment = async () => {
   //await likeComment()
-  const {post, owner, id, isReplyToComment, replyTo} = props.comment
+/*  const {post, owner, id, isReplyToComment, replyTo} = props.comment
 
 console.log( props.comment)
   console.log(post.id, owner.location, id,isReplyToComment, replyTo)
-  await likeComment(post.id, owner.location, id,isReplyToComment, replyTo)
+  await likeComment(post.id, owner.location, id,isReplyToComment, replyTo)*/
 }
 
 const avatarImg = computed(() => {
