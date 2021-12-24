@@ -985,6 +985,7 @@ export const goTo = async (item: SharedFileInterface) => {
         params: {
             path: btoa(item.path),
             shareId: item.id,
+            attachments: 'false',
         },
     });
     window.open(url.href, '_blank');
