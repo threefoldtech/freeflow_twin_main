@@ -1,5 +1,5 @@
 <template>
-  <div class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-50 flex justify-center items-center"
+  <div  ref="dialogRef" class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-50 flex justify-center items-center" tabindex="0" @keydown.esc="$emit('close')"
        @click="$emit('close')">
     <div class="bg-white w-11/12 sm:w-9/12 lg:w-2/4 2xl:w-2/5 p-4 rounded-lg relative" @click.stop>
       <XIcon class="w-5 h-5 text-gray-500 absolute right-4 top-4 cursor-pointer" @click="$emit('close')"/>
@@ -73,7 +73,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {computed, onBeforeMount, ref} from "vue";
+import {computed, onBeforeMount, onMounted, ref} from "vue";
 import {usechatsActions, usechatsState} from "@/store/chatStore";
 import {SOCIAL_POST} from "@/store/socialStore";
 import {calcExternalResourceLink} from "@/services/urlService";
@@ -89,8 +89,13 @@ const {chats} = usechatsState();
 
 const queue = ref<string[]>([])
 const peopleIHaveSharedWith = ref<string[]>([])
+const dialogRef = ref<HTMLElement>(null)
 
 const props = defineProps<{ item: SOCIAL_POST, avatar: any }>();
+
+onMounted(() => {
+  dialogRef.value.focus()
+})
 
 const fetchPostImage = (image) => {
   return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)

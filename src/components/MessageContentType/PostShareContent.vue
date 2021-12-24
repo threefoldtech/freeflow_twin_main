@@ -8,9 +8,9 @@
       leave-from="opacity-100"
       leave-to="opacity-0"
   >
-  <div @click="showPost = false" class="z-50 inset-0 w-full h-full bg-opacity-25 bg-black fixed flex items-center justify-center drop-shadow-md">
+  <div @click="showPost = false"  ref="dialogRef" tabindex="0" @keydown.esc="showPost = false" class="z-50 inset-0 w-full h-full bg-opacity-25 bg-black fixed flex items-center justify-center drop-shadow-md">
     <XIcon class="w-12 h-12 absolute right-4 top-4 text-white cursor-pointer" />
-    <div @click.stop class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[80%] rounded-lg overflow-y-auto">
+    <div @click.stop class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[80%] rounded-lg">
       <Post @click.stop @refreshPost="refreshPost" :item="postData" />
     </div>
   </div>
@@ -39,7 +39,7 @@
 <script setup lang="ts">
 import {Message} from "@/types";
 import {MESSAGE_POST_SHARE_BODY, SOCIAL_POST} from "@/store/socialStore";
-import {computed, ref} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 import {calcExternalResourceLink} from "@/services/urlService";
 import {getSinglePost} from "@/services/socialService";
 import { TransitionRoot } from '@headlessui/vue'
@@ -49,10 +49,17 @@ import {XIcon} from "@heroicons/vue/solid";
 const props = defineProps<{message: Message<MESSAGE_POST_SHARE_BODY>}>()
 const showPost = ref<boolean>(false)
 const postData = ref<SOCIAL_POST | null>(null)
+const dialogRef = ref<HTMLElement>(null)
 
 const truncatedText = computed(() => {
   const text = props.message.body.post?.body;
   return `${props.message.body.post?.body.substring(0,255)}${text?.length > 255 ? '...': ''}`
+})
+
+watch(showPost, () => {
+  if(showPost.value) nextTick(() => {
+    dialogRef.value.focus()
+  })
 })
 
 const refreshPost = (post) => {
