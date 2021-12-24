@@ -183,6 +183,7 @@ export const getShared = async (shareStatus: string) => {
 export const getShareWithId = async (id: string) => {
     const params = new URLSearchParams();
     params.append('id', id);
+    params.append('attachments', 'false');
     const res = await axios.get(`${endpoint}/files/getShareWithId`, { params: params });
     if (res.data['message'] === 'ACCESS_DENIED') {
         accessDenied.value = true;

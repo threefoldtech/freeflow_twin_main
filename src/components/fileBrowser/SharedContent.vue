@@ -54,6 +54,7 @@
                                         'bg-gray-100': isSelected(item),
                                     }"
                                     @click="goTo(item)"
+                                    @dblclick="goTo(item)"
                                     :key="item.name"
                                 >
                                     <td class="px-6 py-4 whitespace-nowrap">

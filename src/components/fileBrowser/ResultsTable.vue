@@ -108,6 +108,7 @@
                                 }"
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 @click="handleSelect(item)"
+                                @dblclick="handleItemClick(item)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
                                     <input

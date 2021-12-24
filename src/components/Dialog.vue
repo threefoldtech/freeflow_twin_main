@@ -1,13 +1,15 @@
 <template>
-    <transition name="fade">
-        <div
-            v-if="props.modelValue"
-            class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
-            @click="$emit('update-model-value', false)"
-            @keydown.esc="$emit('update-model-value', false)"
-        >
-            <div
-                class="
+  <transition name="fade">
+    <div
+        v-if="props.modelValue"
+        ref="dialogRef"
+        tabindex="-1"
+        class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
+        @click="$emit('update-model-value', false)"
+        @keydown.esc="$emit('update-model-value', false)"
+    >
+      <div
+          class="
                     form-container
                     z-50
                     bg-white
@@ -21,12 +23,12 @@
                     sm:rounded
                     overflow-auto
                 "
-                @click.stop
-            >
-                <div class="flex justify-between">
-                    <slot name="title" />
-                    <div
-                        class="
+          @click.stop
+      >
+        <div class="flex justify-between">
+          <slot name="title"/>
+          <div
+              class="
                             w-6
                             h-6
                             bg-transparent
@@ -38,25 +40,25 @@
                             transition
                             duration-300
                         "
-                        @click="$emit('update-model-value', false)"
-                    >
-                        <button @click="$emit('update-model-value', false)">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="py-2 flex-col">
-                    <slot />
-                </div>
-                <div v-if="!noActions" class="flex justify-end mt-2">
-                    <button
-                        class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
-                        @click="$emit('update-model-value', false)"
-                    >
-                        {{ cancelButtonText }}
-                    </button>
-                    <button
-                        class="
+              @click="$emit('update-model-value', false)"
+          >
+            <button @click="$emit('update-model-value', false)">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+        <div class="py-2 flex-col">
+          <slot/>
+        </div>
+        <div v-if="!noActions" class="flex justify-end mt-2">
+          <button
+              class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+              @click="$emit('update-model-value', false)"
+          >
+            {{ cancelButtonText }}
+          </button>
+          <button
+              class="
                             py-2
                             px-4
                             ml-2
@@ -68,29 +70,38 @@
                             transition
                             duration-300
                         "
-                        @click="$emit('update-model-value', true)"
-                    >
-                        {{ okButtonText }}
-                    </button>
-                </div>
-            </div>
+              @click="$emit('update-model-value', true)"
+          >
+            {{ okButtonText }}
+          </button>
         </div>
-    </transition>
+      </div>
+    </div>
+  </transition>
 </template>
 <script lang="ts" setup>
-    defineEmits(['update-model-value']);
+import {nextTick, onBeforeMount, onMounted, onUpdated, ref} from "vue";
 
-    interface IProps {
-        modelValue?: boolean;
-        okButtonText?: string;
-        cancelButtonText?: string;
-        noActions: boolean;
-    }
+defineEmits(['update-model-value']);
 
-    const props = withDefaults(defineProps<IProps>(), {
-        modelValue: false,
-        noActions: true,
-        okButtonText: 'Ok',
-        cancelButtonText: 'Cancel',
-    });
+const dialogRef = ref<HTMLElement>(null)
+
+onUpdated(() => {
+  if(dialogRef.value) dialogRef.value.focus()
+})
+
+
+interface IProps {
+  modelValue?: boolean;
+  okButtonText?: string;
+  cancelButtonText?: string;
+  noActions: boolean;
+}
+
+const props = withDefaults(defineProps<IProps>(), {
+  modelValue: false,
+  noActions: true,
+  okButtonText: 'Ok',
+  cancelButtonText: 'Cancel',
+});
 </script>

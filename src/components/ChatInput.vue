@@ -367,6 +367,8 @@ nextTick(() => {
     const emojiPicker = document.querySelector('unicode-emoji-picker');
     emojiPicker.addEventListener('emoji-pick', event => {
         message.value.value = `${message.value.value}${event.detail.emoji}`;
+        const emoji = `${event.detail.emoji}`
+        messageInput.value = messageInput.value + emoji;
         message.value.focus();
     });
 });

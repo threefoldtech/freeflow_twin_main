@@ -1,9 +1,10 @@
 <template>
-  <div v-if="showImagePreview" @click="showImagePreview = false"  class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8">
-      <XIcon @click="showImagePreview = false" class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white" />
-      <img  @click.stop :src="imagePreviewSrc" class="pointer-events-none" />
+  <div v-if="showImagePreview" class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-40 fixed p-8"
+       @click="showImagePreview = false">
+    <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="showImagePreview = false"/>
+    <img :src="imagePreviewSrc" class="pointer-events-none z-50" @click.stop/>
   </div>
-  <SharePostDialog v-if="showShareDialog" :avatarImg="avatarImg" :item="item" @close="showShareDialog = false"/>
+  <SharePostDialog v-if="showShareDialog" :avatarImg="avatarImg" :item="item" @close="showShareDialog = false" class="z-50" />
   <div class="bg-white my-5 rounded">
     <div class="p-6">
       <div>
@@ -15,21 +16,23 @@
                           leave="transition-opacity duration-250"
                           leave-from="opacity-100"
                           leave-to="opacity-0">
-          <CommentHoverPanel v-if="openPanel" class="-top-30" :avatar="avatarImg" :comment="item" @mouseleave="openPanel = false"/>
+            <CommentHoverPanel v-if="openPanel" :avatar="avatarImg" :comment="item" class="-top-30"
+                               @mouseleave="openPanel = false"/>
           </TransitionRoot>
           <div class="flex items-center">
             <div class="relative mr-4">
               <img :src="avatarImg" class="w-12 h-12 rounded-full"/>
             </div>
             <div>
-              <p class="text-base font-medium cursor-pointer"  @mouseover="openPanel = true"  @click="showComingSoonToUhuru = true">
+              <p class="text-base font-medium cursor-pointer" @click="showComingSoonToUhuru = true"
+                 @mouseover="openPanel = true">
                 {{ item.owner.id }}
               </p>
               <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
             </div>
           </div>
-          <div class="group absolute right-0 top-0">
-            <Popover v-slot="{ open }" class="relative">
+          <div class="group absolute right-0 top-0 z-40">
+            <Popover v-slot="{ open }" class="relative z-40">
               <PopoverButton
                   :class="open ? '' : 'text-opacity-90'"
                   class="
@@ -74,7 +77,7 @@
                 <PopoverPanel
                     class="
                                         absolute
-                                        z-10
+                                        z-50
                                         w-64
                                         px-4
                                         transform
@@ -82,8 +85,8 @@
                                         left-1/2
                                                                            "
                 >
-                  <div class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                    <div class="relative grid gap-8 bg-white p-6">
+                  <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                    <div class="relative grid gap-8 bg-white p-6 rounded">
                       <a
                           v-for="item in solutions"
                           :key="item.name"
@@ -229,23 +232,25 @@
                       leave="transition-opacity duration-250"
                       leave-from="opacity-100"
                       leave-to="opacity-0">
-        <form v-if="showComments" class="px-2 py-2 flex items-center space-x-1" :class="{'opacity-50' : postingCommentInProgress}"
+        <form v-if="showComments" :class="{'opacity-50' : postingCommentInProgress}"
+              class="px-2 py-2 flex items-center space-x-1"
               @submit.prevent="handleAddComment(false)">
           <div class=""><img :src="myAvatar" class="h-10 rounded-full"></div>
           <input :ref="inputRef" v-model="messageInput"
+                 :disabled="postingCommentInProgress"
                  class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
                  placeholder="Type your message here"
                  type="text"
-                 :disabled="postingCommentInProgress"
                  @focus="focusInput"/>
           <input
               class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"
               type="submit"
               value="Send"/>
         </form>
+
         <CommentsContainer v-if="showComments && item.replies.length > 0"
-                           :comments="item.replies" class="border-t-2 rounded-b-lg"
-                           :postingCommentInProgress="postingCommentInProgress"
+                           :comments="item.replies" :postingCommentInProgress="postingCommentInProgress"
+                           class="border-t-2 rounded-b-lg overflow-y-auto" :class="{' max-h-[35rem]' : $route.name === 'single'}"
                            @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"/>
       </TransitionRoot>
       <TransitionRoot :show="showIsUserTyping"
@@ -385,7 +390,7 @@ const timeAgo = time => {
 };
 
 const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
-  if(postingCommentInProgress.value) return
+  if (postingCommentInProgress.value) return
   const comment_value = isReplyToComment ? message : messageInput.value
   if (!comment_value || comment_value === "" || !/\S/.test(comment_value)) return;
   postingCommentInProgress.value = true
