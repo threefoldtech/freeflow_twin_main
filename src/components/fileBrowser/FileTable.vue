@@ -140,7 +140,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <tr v-if="currentDirectory === '/' && !savedAttachments && $route.name === 'quantum'">
+                                <tr v-if="currentDirectory === '/' && !savedAttachments && $route.name === 'quantum'" class="hover:bg-gray-200 cursor-pointer" @dblclick="goToShared()">
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
                                         <div class="flex flex-row items-center text-md">
@@ -154,7 +154,7 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <tr v-if="currentDirectory === '/' && !savedAttachments  && $route.name === 'quantum'">
+                                <tr v-if="currentDirectory === '/' && !savedAttachments  && $route.name === 'quantum'" class="hover:bg-gray-200 cursor-pointer" @dblclick="router.push({ name: 'savedAttachments' })">
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap"
@@ -180,6 +180,7 @@
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                     draggable="true"
                                     @click="handleSelect(item)"
+                                    @dblclick="handleItemClick(item)"
                                     @dragover="event => onDragOver(event, item)"
                                     @dragstart="event => onDragStart(event, item)"
                                     @drop="() => onDrop(item)"

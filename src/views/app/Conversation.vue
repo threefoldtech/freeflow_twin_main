@@ -475,7 +475,9 @@ const messageBox = ref<HTMLElement>(null);
             MessageTypes.SYSTEM
         );
 
-        popupCenter(`https://kutana.uhuru.me/room/${id}`, 'video room', 800, 550, true);
+        console.log(user.id)
+
+        popupCenter(`https://kutana.uhuru.me/room/${id}&userName=${user.id}`, 'video room', 800, 550, true);
     };
 
     const deleteChat = () => {
