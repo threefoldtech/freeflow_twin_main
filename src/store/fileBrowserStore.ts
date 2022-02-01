@@ -131,12 +131,17 @@ export const updateAttachments = async (path = currentDirectory.value) => {
 };
 
 export const createDirectory = async (name: string, path = currentDirectory.value) => {
-    const result = await Api.createDirectory(path, name);
-    if ((result.status !== 200 && result.status !== 201) || !result.data)
-        throw new Error('Could not create new folder');
-
+    const result = await Api.createDirectory(path, name)
+    if ((result.status !== 200 && result.status !== 201) || !result.data) {
+        throw new Error('Could not create new folder')
+    }
+    if(result.data.error === 409){
+        return "Folder already exists"
+    }
+    
     currentDirectoryContent.value.push(createModel(result.data));
-    await updateContent();
+    await updateContent()
+    return false; // no errors
 };
 
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {

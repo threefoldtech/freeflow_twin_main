@@ -64,7 +64,7 @@ export const createDirectory = async (path: string, name: string): Promise<Axios
         path,
         name,
     };
-    return await axios.post<PathInfo>(`${endpoint}/directories`, body);
+        return await axios.post<PathInfo>(`${endpoint}/directories`, body);
 };
 
 export const getFileInfo = async (path: string, attachments: boolean): Promise<AxiosResponse<EditPathInfo>> => {

@@ -151,7 +151,7 @@
         manualContactAdd.value = '';
     });
 
-    const updateCreateFolderDialog = (val: boolean) => {
+    const updateCreateFolderDialog = async (val: boolean) => {
         createFolderErrors.value = [];
         if (!val) {
             showCreateFolderDialog.value = false;
@@ -174,8 +174,9 @@
 
         if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
 
-        createDirectory(newFolderInput.value.value);
-        showCreateFolderDialog.value = false;
+       const backendErrors = await createDirectory(newFolderInput.value.value);
+        if(backendErrors) createFolderErrors.value.push(backendErrors);
+        if(!backendErrors) showCreateFolderDialog.value = false;
     };
 
     const deleteFile = (file: File) => {
