@@ -207,7 +207,7 @@
                                                 <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
                                             </div>
                                             <span class="hover:underline" @click.stop="handleItemClick(item)">
-                                                {{ item.name }}
+                                               {{ truncate( item.name, 40) }}
                                             </span>
                                         </div>
                                     </td>
@@ -393,7 +393,7 @@
                                                 ml-4
                                             "
                                         >
-                                            {{ item.name
+                                            {{ truncate(item.name, 40)
                                             }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
                                         </p>
                                     </div>
@@ -547,6 +547,14 @@ const onDragEnd = () => {
 const goBack = () => {
     router.go(-1);
 };
+
+const truncate = (value, limit = 20) => {
+    if (value.length > limit) {
+        value = value.substring(0, limit - 3) + '...';
+    }
+    return value;
+};
+
 </script>
 
 <style scoped>
