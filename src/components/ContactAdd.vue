@@ -77,7 +77,7 @@
                                 >
                                     <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
+                                
                             </div>
                             <label class="block text-sm font-medium text-gray-700" for="manualContactAddLocation"
                                 >Location</label
@@ -108,6 +108,7 @@
                                     <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
                                 </div>
                             </div>
+                            <span class="text-red-600" v-if="error != ''"> {{ error }} </span>
                         </div>
                         <div class="w-full flex justify-end">
                             <button
@@ -180,7 +181,7 @@
                 <UserTableGroup
                     v-model="usernameInGroupAdd"
                     :data="contacts"
-                    :error="usernameAddError"
+                    :error="error"
                     :usersInGroup="usersInGroup"
                     placeholder="Search for user..."
                 ></UserTableGroup>
@@ -215,121 +216,131 @@
 </template>
 
 <script lang="ts" setup>
-    import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
-    import { defineComponent, ref, computed, nextTick, watch } from 'vue';
-    import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState, myYggdrasilAddress } from '../store/authStore';
-    import { Chat, Contact, Message } from '../types/index';
-    import axios from 'axios';
-    import config from '@/config';
-    import { uuidv4 } from '@/common';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import UserTable from '@/components/UserTable.vue';
-    import UserTableGroup from '@/components/UserTableGroup.vue';
-    import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
-    import { ChevronUpIcon } from '@heroicons/vue/solid';
+import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
+import { defineComponent, ref, computed, nextTick, watch } from 'vue';
+import { useContactsActions, useContactsState } from '../store/contactStore';
+import { useAuthState, myYggdrasilAddress } from '../store/authStore';
+import { Chat, Contact, Message } from '../types/index';
+import axios from 'axios';
+import config from '@/config';
+import { uuidv4 } from '@/common';
+import AvatarImg from '@/components/AvatarImg.vue';
+import UserTable from '@/components/UserTable.vue';
+import UserTableGroup from '@/components/UserTableGroup.vue';
+import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
+import { ChevronUpIcon } from '@heroicons/vue/solid';
+import { isNull } from 'lodash';
 
-    const emit = defineEmits(['closeDialog']);
-    const { contacts } = useContactsState();
-    //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
-    const addGroup = ref(false);
-    const userAddLocation = ref('');
-    const usernameAddError = ref('');
-    const groupnameAdd = ref('');
-    const groupnameAddError = ref('');
-    const usernameInGroupAdd = ref('');
-    const usersInGroup = ref<Contact[]>([]);
-    const possibleUsers = ref<Contact[]>([]);
-    const contactAddError = ref('');
+const emit = defineEmits(['closeDialog']);
+const { contacts } = useContactsState();
+//const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
+const addGroup = ref(false);
+const userAddLocation = ref('');
+const error = ref('');
+const groupnameAdd = ref('');
+const groupnameAddError = ref('');
+const usernameInGroupAdd = ref('');
+const usersInGroup = ref<Contact[]>([]);
+const possibleUsers = ref<Contact[]>([]);
+const contactAddError = ref('');
 
-    const manualContactAddUsername = ref<string>('');
-    const manualContactAddLocation = ref('');
+const manualContactAddUsername = ref<string>('');
+const manualContactAddLocation = ref('');
 
-    const navigation = ref([
-        { name: 'user', text: 'Add a user' },
-        { name: 'group', text: 'Create a group' },
-    ]);
+const navigation = ref([
+    { name: 'user', text: 'Add a user' },
+    { name: 'group', text: 'Create a group' },
+]);
 
-    const contactAdd = (contact: Contact) => {
-        const contactToAdd: Contact = {
-            id: contact?.id ? contact.id : manualContactAddUsername.value,
-            location: contact?.location ? contact.location : manualContactAddLocation.value,
-        };
-        try {
-            const { chats } = usechatsState();
-
-            if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
-                usernameAddError.value = 'Already added this user';
-                return;
-            }
-            const { addContact } = useContactsActions();
-            addContact(contactToAdd.id, contactToAdd.location);
-            manualContactAddUsername.value = undefined;
-            contactAddError.value = '';
-            emit('closeDialog');
-
-            //@todo: setTimeout is dirty should be removed
-            // next tick was not possible reason: chat was not loaded yet
-            setTimeout(() => {
-                selectedId.value = <string>contactToAdd.id;
-            }, 1000);
-        } catch (err) {
-            console.log('adding contact failed');
-            contactAddError.value = err;
-        }
+const contactAdd = async (contact: Contact) => {
+    const contactToAdd: Contact = {
+        id: contact?.id ? contact.id : manualContactAddUsername.value,
+        location: contact?.location ? contact.location : manualContactAddLocation.value,
     };
-
-    const handleClicked = item => {
-        userAddLocation.value = item.location;
-    };
-
-    const activeItem = ref('user');
-
-    const isActive = menuItem => {
-        return activeItem.value === menuItem;
-    };
-
-    const setActive = menuItem => {
-        activeItem.value = menuItem;
-        groupnameAddError.value = '';
-        usernameAddError.value = '';
-    };
-
-    const groupAdd = async () => {
-        const { addGroupchat } = usechatsActions();
-        const { user } = useAuthState();
+    try {
         const { chats } = usechatsState();
-        if (groupnameAdd.value == '') {
-            groupnameAddError.value = 'Please enter a group name';
-            return;
-        }
-        if (groupnameAdd.value.length > 20) {
-            groupnameAddError.value = "The name can't contain more than 20 characters";
-            return;
-        }
-        const mylocation = await myYggdrasilAddress();
-        usersInGroup.value.push({
-            id: user.id,
-            location: mylocation,
-        });
 
-        addGroupchat(groupnameAdd.value, usersInGroup.value);
+        if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
+            error.value = 'Already added this user';
+            return;
+        }
+
+        if (contactToAdd.location == '') {
+            error.value = 'Empty location';
+            return;
+        }
+        if (contactToAdd.location.toString() === await myYggdrasilAddress()) {
+            error.value = 'Not possible to connect to your self';
+            return;
+        }
+        const { addContact } = useContactsActions();
+        addContact(contactToAdd.id, contactToAdd.location);
+        manualContactAddUsername.value = undefined;
+        contactAddError.value = '';
+        emit('closeDialog');
+
         //@todo: setTimeout is dirty should be removed
         // next tick was not possible reason: chat was not loaded yet
         setTimeout(() => {
-            selectedId.value = groupnameAdd.value;
+            selectedId.value = <string>contactToAdd.id;
         }, 1000);
-        usersInGroup.value = [];
-        emit('closeDialog');
-    };
+    } catch (err) {
+        console.log('adding contact failed');
+        contactAddError.value = err;
+    }
+};
 
-    // @todo: config
-    axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
-        const { user } = useAuthState();
-        const posContacts = <Contact[]>r.data;
-        const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
-        possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
+const handleClicked = item => {
+    userAddLocation.value = item.location;
+};
+
+const activeItem = ref('user');
+
+const isActive = menuItem => {
+    return activeItem.value === menuItem;
+};
+
+const setActive = menuItem => {
+    activeItem.value = menuItem;
+    groupnameAddError.value = '';
+    error.value = '';
+};
+
+const groupAdd = async () => {
+    const { addGroupchat } = usechatsActions();
+    const { user } = useAuthState();
+    const { chats } = usechatsState();
+    if (groupnameAdd.value == '') {
+        groupnameAddError.value = 'Please enter a group name';
+        return;
+    }
+    if (groupnameAdd.value.length > 20) {
+        groupnameAddError.value = "The name can't contain more than 20 characters";
+        return;
+    }
+    const mylocation = await myYggdrasilAddress();
+    usersInGroup.value.push({
+        id: user.id,
+        location: mylocation,
     });
+
+    addGroupchat(groupnameAdd.value, usersInGroup.value);
+    //@todo: setTimeout is dirty should be removed
+    // next tick was not possible reason: chat was not loaded yet
+    setTimeout(() => {
+        selectedId.value = groupnameAdd.value;
+    }, 1000);
+    usersInGroup.value = [];
+    emit('closeDialog');
+};
+
+// @todo: config
+axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
+    const { user } = useAuthState();
+    const posContacts = <Contact[]>r.data;
+    const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
+    possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
+});
 </script>
 
 <style scoped></style>
