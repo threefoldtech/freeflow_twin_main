@@ -71,7 +71,7 @@ export const clearMessageAction = (chatId: string) => {
     };
 };
 
-const retrievechats = async () => {
+const retrieveChats = async () => {
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
@@ -166,7 +166,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 to: name,
                 body: {
                     message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
-                        ', '
+                        ', ',
                     )}`,
                 } as SystemBody,
                 timeStamp: new Date(),
@@ -239,7 +239,7 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined
+    lastMessageId: string | undefined,
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
     if (lastMessageId) params.append('fromId', lastMessageId);
@@ -415,7 +415,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             loaded: 0,
             total: selectedFile.total,
             chatId: chatId,
-            selectedFile: selectedFile
+            selectedFile: selectedFile,
         });
 
         await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
@@ -424,22 +424,22 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             },
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
-                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
                 imageUploadQueue.value.splice(i, 1, {
                     ...imageUploadQueue.value[i],
                     loaded: progress,
                     total: total,
-                })
+                });
             },
         });
-            } catch (e) {
-        catchErrorsSendFile(e,uuid)
+    } catch (e) {
+        catchErrorsSendFile(e, uuid);
     }
 };
 
-const catchErrorsSendFile = (e,uuid) => {
-    const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
-    if(e.message === 'Operation canceled by the user.') return;
+const catchErrorsSendFile = (e, uuid) => {
+    const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
+    if (e.message === 'Operation canceled by the user.') return;
 
     if (e.message == 'Request failed with status code 413') {
         //!TODO Upload limit
@@ -448,25 +448,24 @@ const catchErrorsSendFile = (e,uuid) => {
         imageUploadQueue.value.splice(i, 1, {
             ...imageUploadQueue.value[i],
             error_message: 'File exceeds 20MB limit!',
-            error: true
-        })
+            error: true,
+        });
         return;
     }
-        //errorBody = 'ERROR: File failed to send!';
-        imageUploadQueue.value.splice(i, 1, {
-            ...imageUploadQueue.value[i],
-            error_message: 'File failed to send.',
-            error: true,
-            retry: true
-        })
-}
-
+    //errorBody = 'ERROR: File failed to send!';
+    imageUploadQueue.value.splice(i, 1, {
+        ...imageUploadQueue.value[i],
+        error_message: 'File failed to send.',
+        error: true,
+        retry: true,
+    });
+};
 
 
 export const retrySendFile = async (file) => {
     //When a upload fails in chat and you retry
 
-    const {id:uuid, chatId, selectedFile} = file
+    const { id: uuid, chatId, selectedFile } = file;
 
     let formData = new FormData();
 
@@ -476,15 +475,15 @@ export const retrySendFile = async (file) => {
     const source = CancelToken.source();
 
     try {
-        const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+        const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
         imageUploadQueue.value.splice(i, 1, {
             ...imageUploadQueue.value[i],
             error_message: '',
             loaded: 0,
             retry: false,
             error: false,
-            cancelToken: source
-        })
+            cancelToken: source,
+        });
 
         await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
             headers: {
@@ -492,20 +491,21 @@ export const retrySendFile = async (file) => {
             },
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
-                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
                 imageUploadQueue.value.splice(i, 1, {
                     ...imageUploadQueue.value[i],
                     loaded: progress,
                     total: total,
                     retry: false,
                     error: false,
-                    error_message: ""})
+                    error_message: '',
+                });
             },
         });
     } catch (e) {
-        catchErrorsSendFile(e, uuid)
+        catchErrorsSendFile(e, uuid);
     }
-}
+};
 
 const setLastMessage = (chatId: string, message: Message<String>) => {
     if (!state.chats) return;
@@ -572,7 +572,7 @@ const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean)
     sendMessageObject(groupId, message);
 };
 
-export const usechatsState = () => {
+export const useChatsState = () => {
     return {
         ...toRefs(state),
     };
@@ -590,7 +590,7 @@ export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
 export const usechatsActions = () => {
     return {
         addChat,
-        retrievechats,
+        retrieveChats,
         sendMessage,
         addMessage,
         sendFile,
@@ -625,7 +625,7 @@ export const handleRead = (message: Message<string>) => {
 
     let chatId = message.to === user.id ? message.from : message.to;
 
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const chat = chats.value.find(c => c.chatId == chatId);
 
     const newRead = getMessage(chat, message.body);

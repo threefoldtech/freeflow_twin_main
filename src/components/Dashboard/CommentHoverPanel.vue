@@ -65,14 +65,14 @@ import {myYggdrasilAddress} from "@/store/authStore";
 
 const {contacts} = useContactsState()
 const {addContact} = useContactsActions()
-const {retrievechats} = usechatsActions()
+const {retrieveChats} = usechatsActions()
 
 const props = defineProps<{ comment: object, avatar: string }>()
 const location = ref<string>()
 const router = useRouter()
 
 onBeforeMount(async () => {
-  await retrievechats()
+  await retrieveChats()
   location.value = await myYggdrasilAddress();
 })
 
@@ -85,7 +85,7 @@ const isPersonFriend = computed(() => {
 const goToChat = async () => {
   if (location.value === props.comment.owner.location) return false
   if (!contacts.some(item => item.id === props.comment.owner.id)) {
-    await retrievechats()
+    await retrieveChats()
     await addContact(props.comment.owner.id, props.comment.owner.location)
     return false
   }

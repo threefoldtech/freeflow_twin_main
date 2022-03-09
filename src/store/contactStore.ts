@@ -6,7 +6,7 @@ import { Contact, MessageTypes, SystemBody, SystemMessageTypes } from '../types'
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
 import { Chat } from '../types';
-import { usechatsActions, usechatsState } from './chatStore';
+import { usechatsActions, useChatsState } from './chatStore';
 import { useAuthState } from './authStore';
 import { Message, PersonChat, DtId } from '../types/index';
 
@@ -61,7 +61,7 @@ const addContact = (username: DtId, location, dontCheck = false) => {
 };
 
 const calculateContacts = () => {
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const { user } = useAuthState();
     const contacts = chats.value
         .filter(chat => !chat.isGroup && chat.acceptedChat)

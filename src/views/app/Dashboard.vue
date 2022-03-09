@@ -70,10 +70,7 @@
 
     const showLoader = computed(() => {
       if(allSocialPosts.value.length >=1 ) return false
-      if(isLoadingSocialPosts.value){
-        return true
-      }
-      return false;
+      return !!isLoadingSocialPosts.value;
     })
 
 </script>
