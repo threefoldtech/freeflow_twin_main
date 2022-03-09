@@ -147,7 +147,7 @@
                     <v-contextmenu-item @click="() => {
                            triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
                            rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE
-                                  }">Delete user</v-contextmenu-item>
+                                  }">Delete chat</v-contextmenu-item>
                   </v-contextmenu>
                     <ChatCard
                         v-for="chat in filteredChats"
