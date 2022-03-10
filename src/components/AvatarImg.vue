@@ -29,19 +29,7 @@
 
         <div
             v-if="unreadMessagesAmount > 0"
-            class="
-                absolute
-                -top-1
-                -right-1
-                bg-accent-300
-                h-4
-                w-4
-                rounded-full
-                text-xs
-                z-10
-                align-middle
-                text-center text-white
-            "
+            class="absolute -top-1 -right-1 bg-accent-300 h-4 w-4 rounded-full text-xs z-10 align-middle text-center text-white"
         >
             {{ unreadMessagesAmount }}
         </div>
@@ -49,11 +37,10 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount} from 'vue';
-import {fetchStatus, startFetchStatusLoop, statusList} from '@/store/statusStore';
-import { calcExternalResourceLink } from '../services/urlService';
-import {useAuthState} from "@/store/authStore";
-
+    import { computed, onBeforeMount } from 'vue';
+    import { fetchStatus, statusList } from '@/store/statusStore';
+    import { calcExternalResourceLink } from '../services/urlService';
+    import { useAuthState } from '@/store/authStore';
 
     interface IProps {
         id: string;
@@ -65,9 +52,9 @@ import {useAuthState} from "@/store/authStore";
     }
 
     onBeforeMount(async () => {
-      const { user } = useAuthState();
-      await fetchStatus(user.id);
-    })
+        const { user } = useAuthState();
+        await fetchStatus(user.id);
+    });
 
     const props = withDefaults(defineProps<IProps>(), {
         showOnlineStatus: true,
@@ -79,8 +66,6 @@ import {useAuthState} from "@/store/authStore";
     const status = computed(() => {
         return statusList[<string>props.id];
     });
-
-
 
     const src = computed(() => {
         if (!status.value || !status.value.avatar) {

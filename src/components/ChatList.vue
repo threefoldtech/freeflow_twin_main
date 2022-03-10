@@ -9,30 +9,11 @@
     >
         <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
             <div
-                class="
-                    flex
-                    items-center
-                    collapsed-bar:flex-col-reverse
-                    justify-center
-                    collapsed-bar:mb-0
-                    mb-2
-                    flex-grow-0
-                "
+                class="flex items-center collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 mb-2 flex-grow-0"
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
-                        class="
-                            bg-primary
-                            hover:bg-accent-800
-                            transition
-                            duration:300
-                            rounded-full
-                            text-white
-                            w-8
-                            h-8
-                            mx-2
-                            collapsed-bar:w-10 collapsed-bar:h-10
-                        "
+                        class="bg-primary hover:bg-accent-800 transition duration:300 rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
                         @click="showAddUserDialog = true"
                     >
                         <i class="fas fa-plus"></i>
@@ -44,15 +25,7 @@
                         :class="{
                             'mr-2': !collapsed,
                         }"
-                        class="
-                            rounded-full
-                            w-8
-                            h-8
-                            collapsed-bar:w-10 collapsed-bar:h-10
-                            bg-gray-100
-                            flex
-                            justify-center
-                        "
+                        class="rounded-full w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10 bg-gray-100 flex justify-center"
                         @click="
                             collapsed = !collapsed;
                             searchValue = '';
@@ -67,21 +40,7 @@
                     </button>
                     <div
                         v-if="filteredChatRequests.length > 0"
-                        class="
-                            hidden
-                            collapsed-bar:block
-                            absolute
-                            -top-1
-                            right-1
-                            bg-accent-300
-                            h-4
-                            w-4
-                            rounded-full
-                            text-xs
-                            z-10
-                            align-middle
-                            text-center text-white
-                        "
+                        class="hidden collapsed-bar:block absolute -top-1 right-1 bg-accent-300 h-4 w-4 rounded-full text-xs z-10 align-middle text-center text-white"
                     >
                         {{ filteredChatRequests.length }}
                     </div>
@@ -93,15 +52,7 @@
                 </div>
                 <input
                     v-model="searchValue"
-                    class="
-                        focus:ring-primary focus:border-primary
-                        block
-                        w-full
-                        pl-10
-                        sm:text-sm
-                        border-gray-300
-                        rounded-md
-                    "
+                    class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                     placeholder="Search"
                     type="text"
                 />
@@ -135,34 +86,41 @@
                     v-if="filteredChats && filteredChats.length"
                     class="flex flex-col justify-center items-center pt-2 px-2 collapsed-bar:px-0"
                 >
-                  <v-contextmenu ref="contextmenu-chat-card">
-                    <v-contextmenu-item @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT;
-                                  }">Open chat</v-contextmenu-item>
-                    <v-contextmenu-item @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK;
-                                  }">Block user</v-contextmenu-item>
-                    <v-contextmenu-item @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE
-                                  }">Delete user</v-contextmenu-item>
-                  </v-contextmenu>
+                    <v-contextmenu ref="contextmenu-chat-card">
+                        <v-contextmenu-item
+                            @click="
+                                () => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT;
+                                }
+                            "
+                            >Open chat</v-contextmenu-item
+                        >
+                        <v-contextmenu-item
+                            @click="
+                                () => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK;
+                                }
+                            "
+                            >Block user</v-contextmenu-item
+                        >
+                        <v-contextmenu-item
+                            @click="
+                                () => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE;
+                                }
+                            "
+                            >Delete user</v-contextmenu-item
+                        >
+                    </v-contextmenu>
                     <ChatCard
                         v-for="chat in filteredChats"
                         :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
                         :chat="chat"
                         :collapsed="collapsed"
-                        class="
-                            w-full
-                            rounded-lg
-                            collapsed-bar:rounded-none
-                            p-1.5
-                            collapsed-bar:my-0
-                            my-1
-                            cursor-pointer
-                        "
+                        class="w-full rounded-lg collapsed-bar:rounded-none p-1.5 collapsed-bar:my-0 my-1 cursor-pointer"
                         @selectChat="setSelected(chat.chatId)"
                         @mousedown.right="setCurrentRightClickedItem(chat, RIGHT_CLICK_TYPE.CHAT_CARD)"
                         v-contextmenu:contextmenu-chat-card
@@ -173,7 +131,7 @@
 
         <Dialog
             :modelValue="showAddUserDialog"
-            :noActions='true'
+            :noActions="true"
             @closeDialog="sendUpdate(false)"
             @update-model-value="sendUpdate"
         >
@@ -190,11 +148,10 @@
 <script setup lang="ts">
     import moment from 'moment';
     import { useSocketActions } from '@/store/socketStore';
-    import {defineComponent, ref, computed, onBeforeMount, inject, watch} from 'vue';
-    import {usechatsState, usechatsActions, replyMessage, editMessage} from '@/store/chatStore';
-    import { useAuthState, useAuthActions } from '@/store/authStore';
+    import { ref, computed, onBeforeMount, watch } from 'vue';
+    import { usechatsState, usechatsActions } from '@/store/chatStore';
+    import { useAuthState } from '@/store/authStore';
     import AddContact from '@/components/ContactAdd.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
     import ChatRequestList from '@/components/ChatRequestList.vue';
     import Dialog from '@/components/Dialog.vue';
     import ChatCard from '@/components/ChatCard.vue';
@@ -203,20 +160,18 @@
     import { uniqBy } from 'lodash';
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
-    import { useScrollActions } from '@/store/scrollStore';
     import { SearchIcon } from '@heroicons/vue/solid';
-    import { Dialog as HeadlessUIDialog, DialogOverlay, TransitionRoot } from '@headlessui/vue';
     import {
-      triggerWatchOnRightClickItem,
-      RIGHT_CLICK_ACTIONS_CHAT_CARD,
-      rightClickItemAction,
-      currentRightClickedItem,
-      RIGHT_CLICK_TYPE,
-      setCurrentRightClickedItem,
-      RIGHT_CLICK_ACTIONS_MESSAGE,
-      openBlockDialogFromOtherFile,
-      openDeleteDialogFromOtherFile, conversationComponentRerender
-    } from '@/store/contextmenuStore'
+        triggerWatchOnRightClickItem,
+        RIGHT_CLICK_ACTIONS_CHAT_CARD,
+        rightClickItemAction,
+        currentRightClickedItem,
+        RIGHT_CLICK_TYPE,
+        setCurrentRightClickedItem,
+        openBlockDialogFromOtherFile,
+        openDeleteDialogFromOtherFile,
+        conversationComponentRerender,
+    } from '@/store/contextmenuStore';
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
@@ -231,43 +186,49 @@
 
     const { user } = useAuthState();
 
-
-
     const m = val => moment(val);
     const searchValue = ref('');
     let showContacts = ref(false);
 
     const router = useRouter();
 
-
-    watch(triggerWatchOnRightClickItem,async () => {
-      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.CHAT_CARD){
-        switch(rightClickItemAction.value){
-          case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
-              router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
-            break;
-          case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
-            openBlockDialogFromOtherFile.value = true
-              if(router.currentRoute.value.name === 'single'){
-                conversationComponentRerender.value = conversationComponentRerender.value++
-              }
-            await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
-            break;
-          case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
-            openDeleteDialogFromOtherFile.value = true;
-            if(router.currentRoute.value.name === 'single'){
-              conversationComponentRerender.value = conversationComponentRerender.value++
+    watch(
+        triggerWatchOnRightClickItem,
+        async () => {
+            if (currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.CHAT_CARD) {
+                switch (rightClickItemAction.value) {
+                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
+                        router.push({ name: 'single', params: { id: currentRightClickedItem?.value?.data?.chatId } });
+                        break;
+                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
+                        openBlockDialogFromOtherFile.value = true;
+                        if (router.currentRoute.value.name === 'single') {
+                            conversationComponentRerender.value = conversationComponentRerender.value++;
+                        }
+                        await router.push({
+                            name: 'single',
+                            params: { id: currentRightClickedItem?.value?.data?.chatId },
+                        });
+                        break;
+                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
+                        openDeleteDialogFromOtherFile.value = true;
+                        if (router.currentRoute.value.name === 'single') {
+                            conversationComponentRerender.value = conversationComponentRerender.value++;
+                        }
+                        await router.push({
+                            name: 'single',
+                            params: { id: currentRightClickedItem?.value?.data?.chatId },
+                        });
+                        break;
+                    default:
+                        break;
+                }
+                rightClickItemAction.value = null;
             }
-            await router.push({name: 'single', params: {id: currentRightClickedItem?.value?.data?.chatId}})
-            break;
-          default:
-            break;
-        }
-        rightClickItemAction.value = null;
-      }
-      return;
-    }, {deep: true})
-
+            return;
+        },
+        { deep: true }
+    );
 
     const setSelected = id => {
         router.push({ name: 'single', params: { id } });
@@ -297,7 +258,6 @@
     });
 
     const sendUpdate = newVal => {
-
         showAddUserDialog.value = newVal;
     };
 </script>

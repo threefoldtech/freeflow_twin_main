@@ -21,7 +21,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-    import { removeChat, usechatsActions } from '@/store/chatStore';
+    import { usechatsActions } from '@/store/chatStore';
     import Button from '@/components/Button.vue';
     import { Chat } from '@/types';
     import { sendRemoveChat } from '@/store/socketStore';
