@@ -2,7 +2,7 @@
     <div :class="{'ml-10': comment.type === MESSAGE_TYPE.COMMENT_REPLY}" class='flex items-center space-x-2 relative'>
         <div class='flex flex-shrink-0 self-start cursor-pointer'
              @mouseover='mouseFocussed = true;panelTimer()'
-             @mouseleave='mouseFocussed = false; openPanel = false'>
+             @mouseleave='mouseFocussed = false; panelTimer()'>
             <div class='w-10'>
                 <img :src='avatarImg' alt='' class=' object-cover rounded-full'>
             </div>
@@ -16,7 +16,8 @@
                         leave-from='opacity-100'
                         leave-to='opacity-0'>
             <CommentHoverPanel v-if='openPanel' :avatar='avatarImg' :comment='comment'
-                               @mouseleave='mouseFocussed = false; openPanel = false' />
+                               @mouseleave='mouseFocussed = false; openPanel = false'
+                               @mouseover='mouseFocussed = true' class='-top-56 -left-20' />
         </TransitionRoot>
         <div class='flex items-center justify-center space-x-2 relative'>
             <div class='block'>
@@ -24,7 +25,7 @@
                     <div class='font-medium'>
                         <a class='hover:underline text-sm' href='#'
                            @mouseover='mouseFocussed = true; panelTimer()'
-                           @mouseleave='mouseFocussed = false; openPanel = false'>
+                           @mouseleave='mouseFocussed = false; panelTimer()'>
                             <small>{{ comment.owner.id }}</small>
                         </a>
                     </div>
@@ -34,7 +35,7 @@
                 </div>
                 <div class='flex justify-start items-center text-xs w-full'>
                     <div class='font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1'>
-                        <a @click='handleLikeComment' class='hover:underline'>
+                        <a @click='handleLikeComment' class='hover:underline' href='#'>
                             <small>Like</small>
                         </a>
                         <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>
@@ -42,9 +43,7 @@
                             <small>Reply</small>
                         </a>
                         <small class='self-center'>.</small>
-                        <a class='hover:underline' href='#'>
-                            <small>{{ moment(comment.createdOn).fromNow() }}</small>
-                        </a>
+                        <small>{{ moment(comment.createdOn).fromNow() }}</small>
                     </div>
                 </div>
             </div>
@@ -113,12 +112,7 @@
     });
 
     //only shows user panel if mouse stays focussed for a moment
-    const panelTimer = () => {
-        setTimeout(() => {
-                console.log('test', mouseFocussed.value);
-                openPanel.value = mouseFocussed.value;
-            }, 600);
-    };
+    const panelTimer = () => setTimeout(() => openPanel.value = mouseFocussed.value, 600);
 
     const commentsSorted = computed(() => {
         return props.comment?.replies.sort(function(a, b) {
@@ -128,12 +122,11 @@
 
 
     const handleLikeComment = async () => {
-        //await likeComment()
-        /*  const {post, owner, id, isReplyToComment, replyTo} = props.comment
-
-        console.log( props.comment)
-          console.log(post.id, owner.location, id,isReplyToComment, replyTo)
-          await likeComment(post.id, owner.location, id,isReplyToComment, replyTo)*/
+        // await likeComment()
+        // const { post, owner, id, isReplyToComment, replyTo } = props.comment;
+        // console.log(props.comment);
+        // console.log(post.id, owner.location, id, isReplyToComment, replyTo);
+        // await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
     };
 
     const avatarImg = computed(() => {
