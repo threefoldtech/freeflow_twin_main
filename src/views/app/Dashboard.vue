@@ -64,14 +64,17 @@
     import Spinner from '@/components/Spinner.vue';
     import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
+    import { usechatsActions } from '@/store/chatStore';
 
     const { user } = useAuthState();
+    const { retrievechats } = usechatsActions();
     const dashboardWindow = ref<HTMLElement>(null);
 
     onBeforeMount(async () => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
         await getAllPosts();
+        await retrievechats();
     });
 
     const showLoader = computed(() => {

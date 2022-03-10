@@ -1,14 +1,10 @@
-import { reactive } from '@vue/reactivity';
-import { toRefs } from 'vue';
 import axios from 'axios';
-import moment from 'moment';
-import { Contact, MessageTypes, SystemBody, SystemMessageTypes } from '../types';
+import { MessageTypes, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
-import { Chat } from '../types';
 import { usechatsActions, usechatsState } from './chatStore';
 import { useAuthState } from './authStore';
-import { Message, PersonChat, DtId } from '../types/index';
+import { Message, DtId } from '../types/index';
 
 // const state = reactive<State>({
 //     contacts:[]
@@ -57,7 +53,8 @@ const addContact = (username: DtId, location, dontCheck = false) => {
             location,
             message: addMessage,
         })
-        .then(res => {});
+        .then(res => {
+        });
 };
 
 const calculateContacts = () => {
@@ -70,7 +67,7 @@ const calculateContacts = () => {
 };
 
 export const useContactsState = () => {
-    return {
+    return{
         contacts: calculateContacts(),
         // ...toRefs(state),
     };
