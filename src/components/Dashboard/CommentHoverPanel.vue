@@ -82,7 +82,7 @@
 
     const isPersonFriend = computed(() => {
         if (location.value === props.comment.owner.location) return 'Can\'t talk to yourself';
-        return contacts.some(item => item.id === props.comment.owner.id) ? 'Whisper' : 'Add friend';
+        return contacts.some(item => item.id === props.comment.owner.id) ? 'Whisper' : 'Add chat';
     });
 
 
