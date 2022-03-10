@@ -250,7 +250,7 @@
 
         <CommentsContainer v-if="showComments && item.replies.length > 0"
                            :comments="item.replies" :postingCommentInProgress="postingCommentInProgress"
-                           class="border-t-2 rounded-b-lg overflow-y-auto" :class="{'max-h-[35rem]' : $route.name === 'single'}"
+                           class="border-t-2 rounded-b-lg" :class="{'max-h-[35rem]' : $route.name === 'single'}"
                            @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"/>
       </TransitionRoot>
       <TransitionRoot :show="showIsUserTyping"

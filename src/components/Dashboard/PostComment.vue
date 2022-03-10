@@ -7,6 +7,7 @@
       </div>
     </div>
     <TransitionRoot :show="openPanel"
+                    as='template'
                     enter="transition-opacity duration-150"
                     enter-from="opacity-0"
                     enter-to="opacity-100"
