@@ -148,7 +148,7 @@
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
     import Toggle from '@/components/Toggle.vue';
     import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';

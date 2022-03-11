@@ -168,7 +168,7 @@
     import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
-    import { imageUploadQueue, usechatsActions, retrySendFile, usechatsState } from '@/store/chatStore';
+    import { imageUploadQueue, usechatsActions, retrySendFile, useChatsState } from '@/store/chatStore';
     import { XCircleIcon, ExclamationIcon } from '@heroicons/vue/solid';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
@@ -191,7 +191,7 @@
         chat: Chat;
     }
 
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const { user } = useAuthState();
 
 

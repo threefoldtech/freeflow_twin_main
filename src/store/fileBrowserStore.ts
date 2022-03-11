@@ -15,7 +15,7 @@ import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
 import { create, isArray } from 'lodash';
-import { usechatsActions, usechatsState } from './chatStore';
+import { usechatsActions, useChatsState } from './chatStore';
 
 declare const Buffer;
 export enum FileType {
@@ -152,7 +152,7 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
     );
 };
 
-const { chats } = usechatsState();
+const { chats } = useChatsState();
 
 export const goToShared = async () => {
     sharedDir.value = true;
@@ -201,8 +201,8 @@ export const goToFilesInChat = async (chat?: Chat) => {
 };
 
 export const loadFilesReceivedNested = async () => {
-    const { retrievechats } = usechatsActions();
-    const { chats } = usechatsState();
+    const { retrieveChats } = usechatsActions();
+    const { chats } = useChatsState();
     const chatId = router.currentRoute.value.params?.chatId;
     const received = router.currentRoute.value.meta.received as boolean;
     if (!chatId) {
@@ -211,7 +211,7 @@ export const loadFilesReceivedNested = async () => {
         return;
     }
 
-    await retrievechats();
+    await retrieveChats();
     const chat = chats.value.find(item => item.chatId === chatId);
     if (!chat) {
         router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });

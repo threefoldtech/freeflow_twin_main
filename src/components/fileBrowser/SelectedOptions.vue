@@ -192,7 +192,7 @@ import {computed, defineComponent, onBeforeMount, onMounted, ref, watch} from 'v
     import Button from '@/components/Button.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
     import { useSocketActions } from '@/store/socketStore';
     import Avatar from '@/components/Avatar.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -206,8 +206,8 @@ import {
   rightClickItemAction, triggerWatchOnRightClickItem
 } from '@/store/contextmenuStore'
 
-    const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
+    const { chats } = useChatsState();
+    const { retrieveChats, sendMessage } = usechatsActions();
 
     const tabs = ['Create shares', 'Edit shares'];
 
@@ -248,7 +248,7 @@ import {
     const writeRights = ref(false);
 
     onBeforeMount(() => {
-        retrievechats();
+        retrieveChats();
     });
     const debounceSearch = event => {
         clearTimeout(debounce);

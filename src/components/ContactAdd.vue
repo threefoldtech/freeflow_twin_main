@@ -215,7 +215,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { defineComponent, ref, computed, nextTick, watch } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
     import { useAuthState, myYggdrasilAddress } from '../store/authStore';
@@ -256,7 +256,7 @@
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
         try {
-            const { chats } = usechatsState();
+            const { chats } = useChatsState();
 
             if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
                 usernameAddError.value = 'Already added this user';
@@ -298,7 +298,7 @@
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
         const { user } = useAuthState();
-        const { chats } = usechatsState();
+        const { chats } = useChatsState();
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';
             return;
