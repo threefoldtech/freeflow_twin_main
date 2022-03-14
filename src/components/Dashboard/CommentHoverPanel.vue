@@ -29,14 +29,14 @@
             </div>
         </div>
         <div class='flex space-x-3 mt-4'>
-            <div class='w-auto'>
+            <div class='w-auto' v-if='isPersonFriend !== null'>
                 <a class='text-xs text-accent-600 hover:bg-opacity-60 font-semibold flex items-center justify-center px-3 py-2 bg-accent-300 bg-opacity-50 rounded-lg'
                    href='#'
                    @click='goToChat'>
                     <div class='mr-1 h-6 flex items-center flex-shrink-0'>
                         <img class='' src='/whisperbold.svg' alt='whisper' />
                     </div>
-                    {{ isPersonFriend }}
+                    {{ isPersonFriend ? 'Whisper' : 'Add chat' }}
                 </a>
             </div>
             <div class='w-auto'>
@@ -81,8 +81,8 @@
     });
 
     const isPersonFriend = computed(() => {
-        if (location.value === props.comment.owner.location) return 'Can\'t talk to yourself';
-        return contacts.some(item => item.id === props.comment.owner.id) ? 'Whisper' : 'Add chat';
+        if (location.value === props.comment.owner.location) return null;
+        return contacts.some(item => item.id === props.comment.owner.id);
     });
 
 
@@ -102,9 +102,9 @@
     const goToKutana = async (e) => {
         e.preventDefault;
         await nextTick(async () => {
-            await router.push({name: 'kutana'})
-        })
-    }
+            await router.push({ name: 'kutana' });
+        });
+    };
 
 
 </script>
