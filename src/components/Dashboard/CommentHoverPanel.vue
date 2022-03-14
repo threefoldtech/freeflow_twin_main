@@ -66,7 +66,7 @@
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
-    const { retrievechats } = usechatsActions();
+    const { retrieveChats } = usechatsActions();
 
     const props = defineProps<{
         comment: SOCIAL_POST,
@@ -76,7 +76,7 @@
     const router = useRouter();
 
     onBeforeMount(async () => {
-        await retrievechats();
+        await retrieveChats();
         location.value = await myYggdrasilAddress();
     });
 
@@ -90,7 +90,7 @@
         e.preventDefault();
         if (location.value === props.comment.owner.location) return;
         if (!contacts.some(item => item.id === props.comment.owner.id)) {
-            await retrievechats();
+            await retrieveChats();
             addContact(props.comment.owner.id, props.comment.owner.location);
         }
         await nextTick(async () => {

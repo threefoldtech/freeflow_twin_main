@@ -36,7 +36,7 @@
 
 <script lang="ts" setup>
     import { popupCenter } from '@/services/popupService';
-    import { usechatsActions, usechatsState } from '@/store/chatStore';
+    import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { useRoute } from 'vue-router';
     import { computed, defineComponent, ref } from 'vue';
     import { useAuthState } from '@/store/authStore';
@@ -50,7 +50,7 @@
     const props = defineProps<IProp>();
     const route = useRoute();
     let selectedId = ref(<string>route.params.id);
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const { sendMessage } = usechatsActions();
     const { user } = useAuthState();
     const chat = computed(() => {

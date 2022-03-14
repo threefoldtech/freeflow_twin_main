@@ -147,7 +147,7 @@
                     <v-contextmenu-item @click="() => {
                            triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
                            rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE
-                                  }">Delete user</v-contextmenu-item>
+                                  }">Delete chat</v-contextmenu-item>
                   </v-contextmenu>
                     <ChatCard
                         v-for="chat in filteredChats"
@@ -191,7 +191,7 @@
     import moment from 'moment';
     import { useSocketActions } from '@/store/socketStore';
     import {defineComponent, ref, computed, onBeforeMount, inject, watch} from 'vue';
-    import {usechatsState, usechatsActions, replyMessage, editMessage} from '@/store/chatStore';
+    import {useChatsState, usechatsActions, replyMessage, editMessage} from '@/store/chatStore';
     import { useAuthState, useAuthActions } from '@/store/authStore';
     import AddContact from '@/components/ContactAdd.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -220,8 +220,8 @@
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
-    const { chats, chatRequests } = usechatsState();
-    const { retrievechats } = usechatsActions();
+    const { chats, chatRequests } = useChatsState();
+    const { retrieveChats } = usechatsActions();
     const collapsed = ref(false);
     let selectedId = ref('');
 
@@ -282,7 +282,7 @@
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
-        retrievechats();
+        retrieveChats();
     });
 
     const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));

@@ -88,7 +88,7 @@
 
             <div class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-delete')">
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete conversation</p>
+                <p class="m-3 text-xs">Delete chat</p>
             </div>
         </div>
         <div class="flex-grow-0 w-full h-full"></div>
@@ -191,7 +191,7 @@
             <h1 class="text-center">Remove User</h1>
         </template>
         <div>
-            Do you really want to Remove <b>{{ toBeRemovedUser.id }}</b> from the conversation?
+            Do you really want to Remove <b>{{ toBeRemovedUser.id }}</b> from the group?
         </div>
         <div class="flex justify-end mt-2">
             <button

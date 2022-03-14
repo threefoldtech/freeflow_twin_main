@@ -67,14 +67,14 @@
     import { usechatsActions } from '@/store/chatStore';
 
     const { user } = useAuthState();
-    const { retrievechats } = usechatsActions();
+    const { retrieveChats } = usechatsActions();
     const dashboardWindow = ref<HTMLElement>(null);
 
     onBeforeMount(async () => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
         await getAllPosts();
-        await retrievechats();
+        await retrieveChats();
     });
 
     const showLoader = computed(() => {

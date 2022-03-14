@@ -2,7 +2,8 @@ import axios from 'axios';
 import { MessageTypes, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
-import { usechatsActions, usechatsState } from './chatStore';
+import { Chat } from '../types';
+import { usechatsActions, useChatsState } from './chatStore';
 import { useAuthState } from './authStore';
 import { Message, DtId } from '../types/index';
 
@@ -53,12 +54,11 @@ const addContact = (username: DtId, location, dontCheck = false) => {
             location,
             message: addMessage,
         })
-        .then(res => {
-        });
+        .then(res => {});
 };
 
 const calculateContacts = () => {
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const { user } = useAuthState();
     const contacts = chats.value
         .filter(chat => !chat.isGroup && chat.acceptedChat)
