@@ -12,8 +12,6 @@ import {
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
-import { calcExternalResourceLink } from '@/services/urlService';
-import { destroyNotification } from '@/store/notificiationStore';
 
 const endpoint = `${config.baseUrl}api/posts`;
 const { user } = useAuthState();
@@ -37,7 +35,7 @@ export interface socialPostModel extends socialMeta {
 
 type createPostModel = Omit<socialPostModel, 'images', 'owner', 'likes', 'replies'>;
 
-export const createSocialPost = async (text?: string, files?: File[] = []) => {
+export const createSocialPost = async (text?: string, files: File[] = []) => {
     const formData = new FormData();
 
     files?.forEach((file, key) => {
@@ -65,7 +63,7 @@ export const createSocialPost = async (text?: string, files?: File[] = []) => {
 export const sortPosts = posts => {
     if (!posts) {
         allSocialPosts.value.sort(function (a, b) {
-            return new Date(b.post.createdOn) - new Date(a.post.createdOn);
+            return new Date(b.post.createdOn).getTime() - new Date(a.post.createdOn).getTime();
         });
         return;
     }

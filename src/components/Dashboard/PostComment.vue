@@ -3,8 +3,8 @@
         <div class='flex flex-shrink-0 self-start cursor-pointer'
              @mouseover='mouseFocussed = true;panelTimer()'
              @mouseleave='mouseFocussed = false; panelTimer()'>
-            <div class='w-10'>
-                <img :src='avatarImg' alt='' class=' object-cover rounded-full'>
+            <div>
+                <AvatarImg :id='comment.owner.id' :showOnlineStatus='false' :small='true' alt='avatar' />
             </div>
         </div>
         <TransitionRoot :show='openPanel'
@@ -75,8 +75,8 @@
                   :key='reply.id' :comment='reply' />
     <form v-if='showReplyInput' class='relative flex items-center pl-20 flex-start w-full'
           @submit.prevent='handleReplyForm'>
-        <div class='w-8 h-8 rounded-full absolute left-20'>
-            <img :src='myAvatar' class='h-8 rounded-full pointer-events-none'>
+        <div class='pr-1'>
+            <AvatarImg :id='user.id' :showOnlineStatus='false' :xsmall='true' />
         </div>
         <input v-model='replyInput'
                class='text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3'
@@ -93,9 +93,10 @@
     import { ThumbUpIcon } from '@heroicons/vue/solid';
     import { MESSAGE_TYPE } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { myYggdrasilAddress } from '@/store/authStore';
+    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import { TransitionRoot } from '@headlessui/vue';
     import { likeComment } from '@/services/socialService';
+    import AvatarImg from '@/components/AvatarImg.vue';
 
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
@@ -104,6 +105,7 @@
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
     const myLocation = ref<string>('');
+    const { user } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
 
@@ -116,7 +118,7 @@
 
     const commentsSorted = computed(() => {
         return props.comment?.replies.sort(function(a, b) {
-            return new Date(a.createdOn) - new Date(b.createdOn);
+            return new Date(a.createdOn).getTime() - new Date(b.createdOn).getTime();
         });
     });
 

@@ -22,16 +22,18 @@
                                     leave-to='opacity-0'>
                         <CommentHoverPanel v-if='openPanel' :avatar='avatarImg' :comment='item'
                                            @mouseleave='mouseFocussed = false; openPanel = false'
-                                           @mouseover='mouseFocussed = true;panelTimer()'/>
+                                           @mouseover='mouseFocussed = true;panelTimer()' />
                     </TransitionRoot>
                     <div class='flex items-center'>
                         <div class='relative mr-4 cursor-pointer'
                              @mouseover='mouseFocussed = true;panelTimer()'
                              @mouseleave='mouseFocussed = false; panelTimer()'>
-                            <img :src='avatarImg' class='w-12 h-12 rounded-full' alt='avatar' />
+                            <AvatarImg :id='item.owner.id' :showOnlineStatus='false' class='w-12 h-12 rounded-full'
+                                       alt='avatar' />
                         </div>
                         <div>
-                            <p class='text-base font-medium cursor-pointer hover:underline' @click='showComingSoonToUhuru = true'
+                            <p class='text-base font-medium cursor-pointer hover:underline'
+                               @click='showComingSoonToUhuru = true'
                                @mouseover='mouseFocussed = true;panelTimer()'
                                @mouseleave='mouseFocussed = false; panelTimer()'>
                                 {{ item.owner.id }}
@@ -201,7 +203,9 @@
                 <form v-if='showComments' :class="{'opacity-50' : postingCommentInProgress}"
                       class='px-2 py-2 flex items-center space-x-1'
                       @submit.prevent='handleAddComment(false)'>
-                    <div class=''><img :src='myAvatar' class='h-10 rounded-full' alt='avatar'></div>
+                    <div>
+                        <AvatarImg :id='user.id' :showOnlineStatus='false' :small='true' alt='avatar' />
+                    </div>
                     <input :ref='inputRef' v-model='messageInput'
                            :disabled='postingCommentInProgress'
                            class='text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow'
@@ -241,16 +245,12 @@
 
 <script lang='ts' setup>
     import {
-        PhotographIcon,
-        PencilAltIcon,
-        FilmIcon,
-        DotsVerticalIcon,
-        HeartIcon as HeartIconSolid, XIcon,
+        DotsVerticalIcon, HeartIcon as HeartIconSolid, XIcon,
     } from '@heroicons/vue/solid';
     import { HeartIcon, ChatAltIcon, ShareIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState, myYggdrasilAddress } from '@/store/authStore';
-    import { ref, computed, onMounted, onBeforeMount, watch } from 'vue';
+    import { ref, computed, onBeforeMount, watch } from 'vue';
     import moment from 'moment';
     import { Popover, PopoverButton, PopoverPanel, TransitionRoot } from '@headlessui/vue';
     import { ChevronDownIcon } from '@heroicons/vue/solid';
@@ -259,9 +259,8 @@
     import MarkdownIt from 'markdown-it';
     import { uuidv4 } from '@/common';
     import { SOCIAL_POST, LIKE_STATUS } from '@/store/socialStore';
-    import axios from 'axios';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { commentOnPost, getAllPosts, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
+    import { commentOnPost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
     import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
 
@@ -343,6 +342,8 @@
     const avatarImg = computed(() => {
         return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`);
     });
+
+    console.log(props.item.owner.id);
 
     const myAvatar = computed(() => {
         return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`);
