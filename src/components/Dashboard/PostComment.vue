@@ -35,14 +35,15 @@
                 </div>
                 <div class='flex justify-start items-center text-xs w-full'>
                     <div class='font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1'>
-                        <a @click='handleLikeComment' class='hover:underline' href='#'>
-                            <small>Like</small>
-                        </a>
-                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>
+                        <!--                        <a @click='handleLikeComment' class='hover:underline' href='#'>-->
+                        <!--                            <small>Like</small>-->
+                        <!--                        </a>-->
+                        <!--                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>-->
                         <a v-if='comment.type === MESSAGE_TYPE.COMMENT' class='hover:underline' href='#' @click='reply'>
                             <small>Reply</small>
                         </a>
-                        <small class='self-center'>.</small>
+                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>
+                        <!--                        <small class='self-center'>.</small>-->
                         <small>{{ moment(comment.createdOn).fromNow() }}</small>
                     </div>
                 </div>
@@ -91,7 +92,7 @@
     import ReplyComment from '@/components/Dashboard/PostComment.vue';
     import moment from 'moment';
     import { ThumbUpIcon } from '@heroicons/vue/solid';
-    import { MESSAGE_TYPE } from '@/store/socialStore';
+    import { COMMENT_MODEL, MESSAGE_TYPE } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress } from '@/store/authStore';
     import { TransitionRoot } from '@headlessui/vue';
@@ -100,7 +101,7 @@
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
     const showComments = ref<boolean>(false);
-    const props = defineProps<{ comment: any }>();
+    const props = defineProps<{ comment: COMMENT_MODEL }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
     const myLocation = ref<string>('');
@@ -121,12 +122,10 @@
     });
 
 
-    const handleLikeComment = async () => {
-        // await likeComment()
-        // const { post, owner, id, isReplyToComment, replyTo } = props.comment;
-        // console.log(props.comment);
-        // console.log(post.id, owner.location, id, isReplyToComment, replyTo);
-        // await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
+    const handleLikeComment = async (e) => {
+        e.preventDefault();
+        const { post, owner, id, isReplyToComment, replyTo } = props.comment;
+        await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
     };
 
     const avatarImg = computed(() => {
