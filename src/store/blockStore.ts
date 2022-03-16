@@ -20,6 +20,6 @@ export const addUserToBlockList = (userId: string) => {
 export const isBlocked = (userId: string) => blocklist.value.includes(userId);
 
 export const deleteBlockedEntry = async (user: string) => {
-    await axios.delete(`${config.baseUrl}api/blocked/${user}/`);
+    await axios.delete(`${config.baseUrl}nest/blocked/${user}/`);
     blocklist.value = blocklist.value.filter(x => x !== user);
 };
