@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang='ts'>
-    import { defineComponent, ref, watch } from 'vue';
+    import { ref, watch } from 'vue';
     import Sidebar from '@/components/Sidebar.vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
     import Topbar from '@/components/Topbar.vue';
@@ -48,6 +48,7 @@
 
     window.onresize = () => {
         smallScreen.value = window.innerWidth < 768;
+        if (window.innerWidth > 768) showNav.value = false;
     };
 
     watch(notification, (newNot: any, oldNot: any) => {
@@ -64,9 +65,6 @@
         audio.play();
     });
 
-    watch(showNav, (val) => {
-        console.log('changed', val);
-    })
 </script>
 
 <style scoped>

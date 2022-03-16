@@ -7,7 +7,6 @@
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <!--                    <img alt="Threefold logo" src="../../public/Symbol_secundary_color.png" width="65" />-->
                     <svg class="sm:w-10 w-8  mt-5" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient
@@ -124,10 +123,7 @@
     const { user } = useAuthState();
 
     const toggleShowUserConfigDialog = () => {
-        console.log('Showing user config dialog: ', showUserConfigDialog.value);
         showUserConfigDialog.value = !showUserConfigDialog.value;
-
-        console.log('Showing user config dialog: ', showUserConfigDialog.value);
     };
 </script>
 
