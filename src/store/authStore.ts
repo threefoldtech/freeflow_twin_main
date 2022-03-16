@@ -3,7 +3,7 @@ import axios from 'axios';
 import { User } from '../types';
 
 export const getMyStatus = async () => {
-    const res = await axios.get(`${window.location.origin}/api/user/getStatus`);
+    const res = await axios.get(`${window.location.origin}/nest/user/status`);
     return res.data.status;
 };
 
@@ -22,7 +22,7 @@ const authState = reactive<AuthState>({
 export const loginName = window.location.host.split('.')[0];
 
 export const myYggdrasilAddress = async () => {
-    const res = await axios.get(`${window.location.origin}/api/yggdrasil_address`);
+    const res = await axios.get(`${window.location.origin}/nest/locations/yggdrasil`);
     return res.data;
 };
 
