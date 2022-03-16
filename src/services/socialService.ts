@@ -183,8 +183,8 @@ export const destroySomeoneIsTyping = (chatId, queueId) => {
     allSocialPosts.value = allSocialPosts?.value?.map((item, idx) => {
         if (item.post.id === chatId) {
             const filteredArray = item?.isTyping
-                .filter(item => item !== queueId)
-                .filter(function (x) {
+                ?.filter(item => item !== queueId)
+                ?.filter(function (x) {
                     return x !== undefined;
                 });
             return {
