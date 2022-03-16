@@ -22,7 +22,7 @@
                                     leave-to='opacity-0'>
                         <CommentHoverPanel v-if='openPanel' :avatar='avatarImg' :comment='item'
                                            @mouseleave='mouseFocussed = false; openPanel = false'
-                                           @mouseover='mouseFocussed = true;panelTimer()'/>
+                                           @mouseover='mouseFocussed = true;panelTimer()' />
                     </TransitionRoot>
                     <div class='flex items-center'>
                         <div class='relative mr-4 cursor-pointer'
@@ -31,7 +31,8 @@
                             <img :src='avatarImg' class='w-12 h-12 rounded-full' alt='avatar' />
                         </div>
                         <div>
-                            <p class='text-base font-medium cursor-pointer hover:underline' @click='showComingSoonToUhuru = true'
+                            <p class='text-base font-medium cursor-pointer hover:underline'
+                               @click='showComingSoonToUhuru = true'
                                @mouseover='mouseFocussed = true;panelTimer()'
                                @mouseleave='mouseFocussed = false; panelTimer()'>
                                 {{ item.owner.id }}
@@ -138,7 +139,7 @@
                             }}</p>
                     </div>
                     <p class='text-gray-600 mr-0 ml-auto cursor-pointer text-md' @click='showComments = !showComments'>
-                        {{ item.replies.length }} Comments
+                        {{ countComments() }} Comments
                     </p>
                 </div>
             </div>
@@ -296,6 +297,14 @@
 
     const renderMarkdown = content => {
         return md.render(content);
+    };
+
+    const countComments = (total = 0, comments = props.item.replies) => {
+        for (let comment of comments) {
+            total++;
+            total = countComments(total, comment.replies);
+        }
+        return total;
     };
 
     const showIsUserTyping = computed(() => {
