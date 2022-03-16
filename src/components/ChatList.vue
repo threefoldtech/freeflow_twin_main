@@ -130,11 +130,10 @@
 <script setup lang='ts'>
     import moment from 'moment';
     import { useSocketActions } from '@/store/socketStore';
-    import { defineComponent, ref, computed, onBeforeMount, inject, watch } from 'vue';
-    import { useChatsState, usechatsActions, replyMessage, editMessage } from '@/store/chatStore';
-    import { useAuthState, useAuthActions } from '@/store/authStore';
+    import { ref, computed, onBeforeMount, watch } from 'vue';
+    import { useChatsState, usechatsActions } from '@/store/chatStore';
+    import { useAuthState } from '@/store/authStore';
     import AddContact from '@/components/ContactAdd.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
     import ChatRequestList from '@/components/ChatRequestList.vue';
     import Dialog from '@/components/Dialog.vue';
     import ChatCard from '@/components/ChatCard.vue';
@@ -143,9 +142,7 @@
     import { uniqBy } from 'lodash';
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
-    import { useScrollActions } from '@/store/scrollStore';
     import { SearchIcon } from '@heroicons/vue/solid';
-    import { Dialog as HeadlessUIDialog, DialogOverlay, TransitionRoot } from '@headlessui/vue';
     import {
         triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_CHAT_CARD,
@@ -153,7 +150,6 @@
         currentRightClickedItem,
         RIGHT_CLICK_TYPE,
         setCurrentRightClickedItem,
-        RIGHT_CLICK_ACTIONS_MESSAGE,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile, conversationComponentRerender,
     } from '@/store/contextmenuStore';
@@ -189,7 +185,6 @@
                     await router.push({ name: 'single', params: { id: chatId } });
                     break;
                 case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
-                    openBlockDialogFromOtherFile.value = true;
                     if (router.currentRoute.value.name === 'single') {
                         conversationComponentRerender.value = conversationComponentRerender.value++;
                     }
@@ -197,6 +192,7 @@
                         await deleteBlockedEntry(chatId);
                         break;
                     }
+                    openBlockDialogFromOtherFile.value = true;
                     await router.push({ name: 'single', params: { id: chatId } });
                     break;
                 case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
