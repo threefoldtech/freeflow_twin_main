@@ -88,7 +88,7 @@
 
             <div class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-delete')">
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete chat</p>
+                <p class="m-3 text-xs">Delete user</p>
             </div>
         </div>
         <div class="flex-grow-0 w-full h-full"></div>

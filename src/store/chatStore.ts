@@ -76,10 +76,10 @@ const retrieveChats = async () => {
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
     await axios.get(`${config.baseUrl}api/chats`, { params: params }).then(response => {
-        const incommingchats = response.data;
+        const incomingchats = response.data;
 
         // debugger
-        incommingchats.forEach(chat => {
+        incomingchats.forEach(chat => {
             addChat(chat);
         });
         sortChats();
