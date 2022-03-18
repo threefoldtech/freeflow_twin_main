@@ -21,7 +21,7 @@
                     </p>
                 </div>
                 <div class="btns col-span-2">
-                    <button v-if="isAdmin" @click="removeFromGroup(contact)">
+                    <button v-if="isAdmin && chat.adminId !== contact.id" @click="removeFromGroup(contact)">
                         <i class="fas fa-times text-red-500"></i>
                     </button>
                 </div>
