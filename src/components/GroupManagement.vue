@@ -88,7 +88,7 @@
 
             <div class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-delete')">
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete user</p>
+                <p class="m-3 text-xs">{{chat.isGroup ? 'Leave group' : 'Delete user'}}</p>
             </div>
         </div>
         <div class="flex-grow-0 w-full h-full"></div>
@@ -210,7 +210,7 @@
     </Dialog>
 </template>
 <script setup lang="ts">
-    import { computed, ref, watch, onMounted } from 'vue';
+    import { computed, ref, onMounted } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
@@ -218,13 +218,13 @@
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
-    import { getIconColor, getIcon, getFileType, getIconDirty } from '@/store/fileBrowserStore';
+    import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import {MessageTypes} from "@/types";
+    import { Chat, MessageTypes } from '@/types';
 
     interface IProps {
-        chat: any;
+        chat: Chat;
     }
 
 

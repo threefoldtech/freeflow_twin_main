@@ -183,11 +183,16 @@
         <Dialog v-model='showDeleteDialog' class='max-w-10' :noActions='true'
                 @update-model-value='showDeleteDialog = false'>
             <template v-slot:title class='center'>
-                <h1 class='text-center'>Deleting Chat</h1>
+                <h1 class='text-center'>{{chat?.isGroup ? 'Leaving group' : 'Deleting User'}}</h1>
             </template>
-            <div>
-                Do you really want to delete the chat with
-                <b> {{ chat?.name }} </b>?
+            <div v-if='chat?.isGroup'>
+                Do you really want to leave the group
+                <b>{{chat?.name}}</b>?
+            </div>
+            <div v-else>
+                Do you really want to delete
+                <b> {{ chat?.name }} </b>
+                from your connections?
             </div>
             <div class='flex justify-end mt-2'>
                 <button

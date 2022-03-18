@@ -1,4 +1,5 @@
 import { ref, watch } from 'vue';
+import { Chat } from '@/types';
 
 /************
  *
@@ -46,7 +47,7 @@ export enum RIGHT_CLICK_TYPE {
 
 interface ICurrentRightClickItem {
     type: RIGHT_CLICK_TYPE;
-    data: object;
+    data: Chat;
 }
 
 export const currentRightClickedItem = ref<ICurrentRightClickItem | null>(null);
@@ -58,7 +59,7 @@ export const openDeleteDialogFromOtherFile = ref<boolean>(false);
 //This is so used to rerender a component
 export const conversationComponentRerender = ref<number>(0);
 
-export const setCurrentRightClickedItem = (item, type: RIGHT_CLICK_TYPE) => {
+export const setCurrentRightClickedItem = (item: Chat, type: RIGHT_CLICK_TYPE) => {
     triggerWatchOnRightClickItem.value = !triggerWatchOnRightClickItem;
     currentRightClickedItem.value = {
         type: type,
