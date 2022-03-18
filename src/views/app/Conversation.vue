@@ -351,6 +351,7 @@
 
     const doDeleteChat = () => {
         sendRemoveChat(chat.value.chatId);
+        localStorage.setItem('lastOpenedChat', '');
         router.push({ name: 'whisper' });
     };
 

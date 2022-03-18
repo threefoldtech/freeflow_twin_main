@@ -182,6 +182,7 @@
 
             switch (rightClickItemAction.value) {
                 case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
+                    localStorage.setItem('lastOpenedChat', chatId);
                     await router.push({ name: 'single', params: { id: chatId } });
                     break;
                 case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
@@ -212,6 +213,7 @@
 
 
     const setSelected = id => {
+        localStorage.setItem('lastOpenedChat', id);
         router.push({ name: 'single', params: { id } });
     };
 
