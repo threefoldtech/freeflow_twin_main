@@ -187,7 +187,7 @@
             </template>
             <div>
                 Do you really want to delete the chat with
-                <b> {{ chat.name }} </b>?
+                <b> {{ chat?.name }} </b>?
             </div>
             <div class='flex justify-end mt-2'>
                 <button
