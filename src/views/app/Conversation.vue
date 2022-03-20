@@ -183,11 +183,11 @@
         <Dialog v-model='showDeleteDialog' class='max-w-10' :noActions='true'
                 @update-model-value='showDeleteDialog = false'>
             <template v-slot:title class='center'>
-                <h1 class='text-center'>{{chat?.isGroup ? 'Leaving group' : 'Deleting User'}}</h1>
+                <h1 class='text-center'>{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
             </template>
             <div v-if='chat?.isGroup'>
                 Do you really want to leave the group
-                <b>{{chat?.name}}</b>?
+                <b>{{ chat?.name }}</b>?
             </div>
             <div v-else>
                 Do you really want to delete
@@ -201,7 +201,8 @@
                 >
                     Cancel
                 </button>
-                <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred' @click='doDeleteChat'>
+                <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred'
+                        @click='doDeleteChat'>
                     Delete
                 </button>
             </div>
@@ -259,7 +260,6 @@
     const showDialog = ref(false);
     const showDeleteDialog = ref(false);
     const showRemoveUserDialog = ref(false);
-    const toBeRemovedUser = ref();
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
 
     watch(() => route.params.id, id => {
@@ -294,7 +294,12 @@
     });
 
     const chat = computed(() => {
-        return chats.value.find(c => c.chatId == selectedId.value);
+        const currentChat = chats.value.find(c => c.chatId == selectedId.value);
+        if(!currentChat) {
+            localStorage.setItem('lastOpenedChat', '');
+            router.push({ name: 'whisper' });
+        }
+        return currentChat
     });
 
     const getChatStatus = computed(() => {
@@ -396,7 +401,6 @@
         openBlockDialogFromOtherFile.value = false;
     });
 
-
     onUpdated(() => {
         //For when component is already mounted
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
@@ -425,23 +429,6 @@
         return isBlocked(<string>chat.value.chatId);
     });
 
-    const removeFromGroup = contact => {
-        showRemoveUserDialog.value = true;
-        toBeRemovedUser.value = contact;
-    };
-    const doRemoveFromGroup = () => {
-        const { updateContactsInGroup } = usechatsActions();
-        //@ts-ignore
-        updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
-    };
-
-    const isAdmin = computed(() => {
-        const { user } = useAuthState();
-        //@ts-ignore
-        console.log(chat.value.adminId);
-        return chat.value.adminId == user.id;
-    });
-
     let activeItem = ref('edit');
     const isActive = menuItem => {
         return activeItem.value === menuItem;
@@ -451,11 +438,6 @@
         activeItem.value = menuItem;
     };
 
-    const addToGroup = contact => {
-        const { updateContactsInGroup } = usechatsActions();
-        //@ts-ignore
-        updateContactsInGroup(chat.value.chatId, contact, false);
-    };
     const filteredContacts = computed(() => {
         return contacts.filter(
             //@ts-ignore
