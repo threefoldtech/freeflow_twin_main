@@ -83,7 +83,7 @@
                                                     duration-300
                                                 "
                                             >
-                                                Invite to group
+                                                Add to group
                                             </button>
                                         </div>
                                     </div>
