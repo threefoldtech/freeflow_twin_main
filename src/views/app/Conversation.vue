@@ -307,7 +307,6 @@
         if (chat.value.isGroup) {
             let message = `${chat.value.contacts.length} members`;
             const onlineMembers = chat.value.contacts
-                .filter(c => c.id != user.id)
                 .map(c => ({
                     ...c,
                     isOnline: statusList[<string>c.id]?.isOnline ?? false,
