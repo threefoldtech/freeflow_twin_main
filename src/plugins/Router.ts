@@ -37,8 +37,6 @@ import {
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
 
-const { retrieveChats } = usechatsActions();
-
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
