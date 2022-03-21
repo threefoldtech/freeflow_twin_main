@@ -235,7 +235,7 @@
     startFetchStatusLoop(user);
 
     const filteredChatRequests = computed(() => {
-        const filteredChats = chatRequests.value.filter(cr => cr?.isGroup && !cr.isGroup)
+        const filteredChats = chatRequests.value.filter(cr => 'isGroup' in cr && !cr.isGroup)
             .filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
         return uniqBy(filteredChats, c => c.chatId);
     });
