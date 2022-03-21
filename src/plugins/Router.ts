@@ -1,17 +1,8 @@
 import {
     currentDirectory,
-    sharedContent,
-    sharedBreadcrumbs,
     selectedPaths,
-    goToFilesInChat,
     chatsWithFiles,
-    fetchSharedInChatFiles,
-    chatFilesBreadcrumbs,
     isQuantumChatFiles,
-    setChatsWithAttachments,
-    attachments,
-    chatsWithAttachments,
-    currentDirectoryContent,
     updateAttachments,
     savedAttachments,
     savedAttachmentsBreadcrumbs,
@@ -24,7 +15,6 @@ import VideoRoom from '@/views/app/VideoRoom.vue';
 import Forum from '@/views/app/Forum.vue';
 import Browser from '@/views/app/Browser.vue';
 import Kutana from '@/views/app/Kutana.vue';
-import Basic from '@/layout/Basic.vue';
 import Chat from '@/views/app/Chat.vue';
 import Conversation from '@/views/app/Conversation.vue';
 import Callback from '@/views/Callback.vue';
@@ -34,7 +24,6 @@ import EditOptions from '@/views/app/EditOptions.vue';
 import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
-import config from '@/config';
 import { disableSidebar } from '@/services/sidebarService';
 import Dashboard from '@/views/app/Dashboard.vue';
 
@@ -47,16 +36,9 @@ import {
     loadLocalFolder,
     updateContent,
     stopTimer,
-    goToFilesInChat,
-    getchatsWithFiles,
-    loadFilesReceivedNested,
-    isQuantumChatFiles,
 } from '@/store/fileBrowserStore';
-import { usechatsActions } from '@/store/chatStore';
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
-
-const { retrievechats } = usechatsActions();
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -250,6 +232,7 @@ const routes: Array<RouteRecordRaw> = [
         component: Dashboard,
         meta: {
             app: AppType.Dashboard,
+            requiresAuth: true,
         },
     },
     {
