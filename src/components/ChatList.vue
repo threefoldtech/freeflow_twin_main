@@ -86,35 +86,20 @@
                     v-if="filteredChats && filteredChats.length"
                     class="flex flex-col justify-center items-center pt-2 px-2 collapsed-bar:px-0"
                 >
-                    <v-contextmenu ref="contextmenu-chat-card">
-                        <v-contextmenu-item
-                            @click="
-                                () => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT;
-                                }
-                            "
-                            >Open chat</v-contextmenu-item
-                        >
-                        <v-contextmenu-item
-                            @click="
-                                () => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK;
-                                }
-                            "
-                            >Block user</v-contextmenu-item
-                        >
-                        <v-contextmenu-item
-                            @click="
-                                () => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE;
-                                }
-                            "
-                            >Delete user</v-contextmenu-item
-                        >
-                    </v-contextmenu>
+                  <v-contextmenu ref="contextmenu-chat-card">
+                    <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT;
+                                  }">Open chat</v-contextmenu-item>
+                    <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK;
+                                  }">Block user</v-contextmenu-item>
+                    <v-contextmenu-item @click="() => {
+                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                           rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE
+                                  }">Delete chat</v-contextmenu-item>
+                  </v-contextmenu>
                     <ChatCard
                         v-for="chat in filteredChats"
                         :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
@@ -175,8 +160,8 @@
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
-    const { chats, chatRequests } = usechatsState();
-    const { retrievechats } = usechatsActions();
+    const { chats, chatRequests } = useChatsState();
+    const { retrieveChats } = usechatsActions();
     const collapsed = ref(false);
     let selectedId = ref('');
 
@@ -243,7 +228,7 @@
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
-        retrievechats();
+        retrieveChats();
     });
 
     const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));

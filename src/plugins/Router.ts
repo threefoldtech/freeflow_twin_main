@@ -1,13 +1,3 @@
-import {
-    currentDirectory,
-    selectedPaths,
-    chatsWithFiles,
-    isQuantumChatFiles,
-    updateAttachments,
-    savedAttachments,
-    savedAttachmentsBreadcrumbs,
-    savedAttachmentsIsLoading,
-} from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
@@ -26,9 +16,16 @@ import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
 import { disableSidebar } from '@/services/sidebarService';
 import Dashboard from '@/views/app/Dashboard.vue';
-
 import {
     loadSharedItems,
+    currentDirectory,
+    selectedPaths,
+    chatsWithFiles,
+    isQuantumChatFiles,
+    updateAttachments,
+    savedAttachments,
+    savedAttachmentsBreadcrumbs,
+    savedAttachmentsIsLoading,
     fetchBasedOnRoute,
     sharedFolderIsloading,
     sharedDir,
@@ -39,6 +36,8 @@ import {
 } from '@/store/fileBrowserStore';
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
+
+const { retrieveChats } = usechatsActions();
 
 const routes: Array<RouteRecordRaw> = [
     {

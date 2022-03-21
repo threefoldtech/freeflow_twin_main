@@ -74,7 +74,7 @@
 </template>
 <script lang="ts" setup>
 import {computed, onBeforeMount, onMounted, ref} from "vue";
-import {usechatsActions, usechatsState} from "@/store/chatStore";
+import {usechatsActions, useChatsState} from "@/store/chatStore";
 import {SOCIAL_POST} from "@/store/socialStore";
 import {calcExternalResourceLink} from "@/services/urlService";
 import Spinner from '@/components/Spinner.vue'
@@ -84,8 +84,8 @@ import {sendMessageSharePost} from "@/services/socialService";
 
 const emit = defineEmits(['close'])
 
-const {retrievechats} = usechatsActions();
-const {chats} = usechatsState();
+const {retrieveChats} = usechatsActions();
+const {chats} = useChatsState();
 
 const queue = ref<string[]>([])
 const peopleIHaveSharedWith = ref<string[]>([])
@@ -138,7 +138,7 @@ const avatarImg = computed(() => {
 })
 
 onBeforeMount(async () => {
-  await retrievechats()
+  await retrieveChats()
 })
 
 

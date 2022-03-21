@@ -62,7 +62,7 @@
     import Breadcrumbs from '@/components/fileBrowser/Breadcrumbs.vue';
     import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
     import Button from '@/components/Button.vue';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
     import { useSocketActions } from '@/store/socketStore';
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
@@ -73,14 +73,14 @@
 
     const route = useRoute();
 
-    const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
+    const { chats } = useChatsState();
+    const { retrieveChats, sendMessage } = usechatsActions();
 
     let debounce;
     const parts = computed(() => currentDirectory.value.split('/'));
 
     onBeforeMount(() => {
-        retrievechats();
+        retrieveChats();
     });
 
     function debounceSearch(event) {
