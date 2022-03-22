@@ -6,8 +6,9 @@ import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
-import { login } from '@/services/authService';
 import { updateSomeoneIsTyping } from '@/services/socialService';
+import { getSharedContent } from '@/store/fileBrowserStore';
+
 const state = reactive<State>({
     socket: '',
     notification: {
@@ -62,6 +63,7 @@ const initializeSocket = (username: string) => {
         addChat(newContactRequest);
     });
     state.socket.on('chat_updated', chat => {
+        console.log('chat updated');
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });
@@ -75,8 +77,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
-    state.socket.on('shares_updated', share => {
-        //@todo implement this
+    state.socket.on('shares_updated', shares => {
+        console.log('shares updated');
+        getSharedContent()
     });
 };
 

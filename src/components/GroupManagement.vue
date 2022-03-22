@@ -218,7 +218,7 @@
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
-    import { getIconColor, getIcon, getFileType, getIconDirty } from '@/store/fileBrowserStore';
+    import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
     import {MessageTypes} from "@/types";

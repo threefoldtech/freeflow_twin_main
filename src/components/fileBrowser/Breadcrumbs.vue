@@ -91,8 +91,6 @@
     import {
       clickBreadcrumb,
       currentDirectory,
-      FileType,
-      getFileType,
       goToAPreviousDirectory,
       goToHome,
       isDraggingFiles,
