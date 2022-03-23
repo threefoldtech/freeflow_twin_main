@@ -53,7 +53,7 @@
                                 <div class='w-8'>
                                     <i class='fas fa-trash'></i>
                                 </div>
-                                <span class='ml-1 text-left'>Delete chat</span>
+                                <span class='ml-1 text-left'>Delete user</span>
                             </button>
                         </div>
                     </div>
@@ -183,11 +183,16 @@
         <Dialog v-model='showDeleteDialog' class='max-w-10' :noActions='true'
                 @update-model-value='showDeleteDialog = false'>
             <template v-slot:title class='center'>
-                <h1 class='text-center'>Deleting Chat</h1>
+                <h1 class='text-center'>{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
             </template>
-            <div>
-                Do you really want to delete the chat with
-                <b> {{ chat.name }} </b>?
+            <div v-if='chat?.isGroup'>
+                Do you really want to leave the group
+                <b>{{ chat?.name }}</b>?
+            </div>
+            <div v-else>
+                Do you really want to delete
+                <b> {{ chat?.name }} </b>
+                from your connections?
             </div>
             <div class='flex justify-end mt-2'>
                 <button
@@ -196,7 +201,8 @@
                 >
                     Cancel
                 </button>
-                <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred' @click='doDeleteChat'>
+                <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred'
+                        @click='doDeleteChat'>
                     Delete
                 </button>
             </div>
@@ -254,7 +260,6 @@
     const showDialog = ref(false);
     const showDeleteDialog = ref(false);
     const showRemoveUserDialog = ref(false);
-    const toBeRemovedUser = ref();
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
 
     watch(() => route.params.id, id => {
@@ -289,7 +294,12 @@
     });
 
     const chat = computed(() => {
-        return chats.value.find(c => c.chatId == selectedId.value);
+        const currentChat = chats.value.find(c => c.chatId == selectedId.value);
+        if(!currentChat) {
+            localStorage.setItem('lastOpenedChat', '');
+            router.push({ name: 'whisper' });
+        }
+        return currentChat
     });
 
     const getChatStatus = computed(() => {
@@ -297,7 +307,6 @@
         if (chat.value.isGroup) {
             let message = `${chat.value.contacts.length} members`;
             const onlineMembers = chat.value.contacts
-                .filter(c => c.id != user.id)
                 .map(c => ({
                     ...c,
                     isOnline: statusList[<string>c.id]?.isOnline ?? false,
@@ -351,6 +360,7 @@
 
     const doDeleteChat = () => {
         sendRemoveChat(chat.value.chatId);
+        localStorage.setItem('lastOpenedChat', '');
         router.push({ name: 'whisper' });
     };
 
@@ -390,7 +400,6 @@
         openBlockDialogFromOtherFile.value = false;
     });
 
-
     onUpdated(() => {
         //For when component is already mounted
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
@@ -419,23 +428,6 @@
         return isBlocked(<string>chat.value.chatId);
     });
 
-    const removeFromGroup = contact => {
-        showRemoveUserDialog.value = true;
-        toBeRemovedUser.value = contact;
-    };
-    const doRemoveFromGroup = () => {
-        const { updateContactsInGroup } = usechatsActions();
-        //@ts-ignore
-        updateContactsInGroup(chat.value.chatId, toBeRemovedUser, true);
-    };
-
-    const isAdmin = computed(() => {
-        const { user } = useAuthState();
-        //@ts-ignore
-        console.log(chat.value.adminId);
-        return chat.value.adminId == user.id;
-    });
-
     let activeItem = ref('edit');
     const isActive = menuItem => {
         return activeItem.value === menuItem;
@@ -445,11 +437,6 @@
         activeItem.value = menuItem;
     };
 
-    const addToGroup = contact => {
-        const { updateContactsInGroup } = usechatsActions();
-        //@ts-ignore
-        updateContactsInGroup(chat.value.chatId, contact, false);
-    };
     const filteredContacts = computed(() => {
         return contacts.filter(
             //@ts-ignore

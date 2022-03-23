@@ -3,11 +3,11 @@
         :class="{
             'debug-screens': isDev,
         }"
-        class="h-screen"
+        class='h-screen'
     >
-        <template v-if="false">
+        <template v-if='false'>
             <div
-                class="
+                class='
                     fixed
                     left-0
                     top-0
@@ -23,7 +23,7 @@
                     translate-y-2
                     opacity-50
                     pointer-events-none
-                "
+                '
             >
                 Beta
             </div>
@@ -34,15 +34,15 @@
 <!--        <Browser v-show="hasBrowserBeenStartedOnce" />-->
 
         <div
-            v-if="isDev && location"
-            class="fixed text-white bg-black -right-px -bottom-0.5 border border-white px-2 text-xs"
+            v-if='isDev && location'
+            class='fixed text-white bg-black -right-px -bottom-0.5 border border-white px-2 text-xs'
         >
             {{ location }}
         </div>
     </div>
 </template>
 
-<script lang="ts" setup>
+<script lang='ts' setup>
     import version from '../public/config/version';
     import { myYggdrasilAddress } from '@/store/authStore';
     import { ref } from 'vue';
@@ -62,15 +62,18 @@
 </script>
 
 <style>
-.v-contextmenu{
+    .v-contextmenu {
 
-}
-.v-contextmenu-inner{
+    }
 
-}
-.v-contextmenu-item{
-}
-.v-contextmenu-item--hover{
-  background-color: #2e266f !important;
-}
+    .v-contextmenu-inner {
+
+    }
+
+    .v-contextmenu-item {
+    }
+
+    .v-contextmenu-item--hover {
+        background-color: #2e266f !important;
+    }
 </style>

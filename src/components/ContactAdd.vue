@@ -138,10 +138,14 @@
             </Disclosure>
         </div>
         <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent="groupAdd">
-            <div class="flex place-items-center mx-1">
+            <div class="flex place-items-center mx-1 mb-4">
                 <div class="w-full">
+                    <br />
+                    <span v-if="groupnameAddError !== ''" class="text-red-600">
+                        {{ groupnameAddError }}
+                    </span>
                     <div>
-                        <label for="groupname" class="block text-sm font-medium text-gray-700 mt-2">Group name</label>
+                        <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
                         <div class="relative">
                             <input
                                 id="groupname"
@@ -170,10 +174,6 @@
                             </div>
                         </div>
                     </div>
-                    <br />
-                    <span v-if="groupnameAddError != ''" class="text-red-600">
-                        {{ groupnameAddError }}
-                    </span>
                 </div>
             </div>
             <div>
