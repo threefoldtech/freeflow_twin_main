@@ -44,28 +44,17 @@
     import {
       selectedPaths,
       currentDirectory,
-      goToHome,
-      goToAPreviousDirectory,
-      goBack,
       searchDir,
       searchDirValue,
       searchResults,
       isDraggingFiles,
       moveFiles,
-      selectedAction,
-      Action,
-      addShare,
       sharedDir, savedAttachments,
     } from '@/store/fileBrowserStore';
-    import Dialog from '@/components/Dialog.vue';
     import MainActionButtons from '@/components/fileBrowser/MainActionButtons.vue';
     import Breadcrumbs from '@/components/fileBrowser/Breadcrumbs.vue';
     import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
-    import Button from '@/components/Button.vue';
-    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { useSocketActions } from '@/store/socketStore';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-    import { createNotification } from '@/store/notificiationStore';
+    import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { SearchIcon } from '@heroicons/vue/solid';
     import {useRoute} from "vue-router";
 

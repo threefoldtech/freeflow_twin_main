@@ -28,12 +28,10 @@
                 Beta
             </div>
         </template>
-        <router-view />
-
-
-        <!--        <suspense> <router-view v-if="$route.path !== '/glass'" /> </suspense>-->
+        <router-view/>
+<!--        <suspense> <router-view v-if="$route.path !== '/glass'" /> </suspense>-->
         <!-- Hot loading the browser, puts this component under the body. Issue needs to be revisited for more effecient way -->
-        <!--        <Browser v-show="hasBrowserBeenStartedOnce" />-->
+<!--        <Browser v-show="hasBrowserBeenStartedOnce" />-->
 
         <div
             v-if='isDev && location'
@@ -47,16 +45,14 @@
 <script lang='ts' setup>
     import version from '../public/config/version';
     import { myYggdrasilAddress } from '@/store/authStore';
-    import { ref, watch } from 'vue';
+    import { ref } from 'vue';
     import config from '@/config';
-    import Browser from '@/views/app/Browser.vue';
-    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
-
-    //const {hasBrowserBeenStartedOnce} = useBrowserState()
+    // import Browser from '@/views/app/Browser.vue';
+    // import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
 
     console.log('Version: ' + version);
 
-    document.querySelector('body').classList.add('overflow-y-hidden');
+    // document.querySelector('body').classList.add('overflow-y-hidden');
 
     //@ts-ignore
     const isDev = import.meta.env.DEV;

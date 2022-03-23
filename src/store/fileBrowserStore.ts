@@ -1,8 +1,7 @@
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
 import { getShareWithId } from '@/services/fileBrowserService';
-import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
@@ -14,7 +13,6 @@ import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
-import { create, isArray } from 'lodash';
 import { usechatsActions, useChatsState } from './chatStore';
 
 declare const Buffer;
@@ -160,9 +158,7 @@ export const goToShared = async () => {
     searchResults.value = [];
     searchDirValue.value = '';
 
-    router.push({
-        name: 'sharedWithMe',
-    });
+    await router.push({ name: 'sharedWithMe', });
     await getSharedContent();
 };
 
@@ -1001,7 +997,7 @@ export const parseJwt = token => {
 };
 
 export const getExtension = filename => {
-    return filename.substring(filename.lastIndexOf('.') + 1);
+    return filename?.substring(filename.lastIndexOf('.') + 1);
 };
 
 export const fetchShareDetails = async (shareId: string) => {

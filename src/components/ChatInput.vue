@@ -119,8 +119,6 @@ import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType 
 import { uuidv4 } from '@/common';
 import { useScrollActions } from '@/store/scrollStore';
 import { EmojiPickerElement } from 'unicode-emoji-picker';
-import { selectItem } from '@/store/fileBrowserStore';
-import { isUndefined } from 'lodash';
 
 const emit = defineEmits(['messageSend']);
 
