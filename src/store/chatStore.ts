@@ -75,7 +75,7 @@ const retrieveChats = async () => {
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
-    await axios.get(`${config.baseUrl}api/chats`, { params: params }).then(response => {
+    await axios.get(`${config.baseUrl}api/v1/chats`, { params: params }).then(response => {
         const incommingchats = response.data;
 
         // debugger
@@ -166,7 +166,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 to: name,
                 body: {
                     message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
-                        ', ',
+                        ', '
                     )}`,
                 } as SystemBody,
                 timeStamp: new Date(),
@@ -182,7 +182,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
         acceptedChat: true,
     };
     axios
-        .put(`${config.baseUrl}api/group`, newGroupchat)
+        .put(`${config.baseUrl}api/v1/group`, newGroupchat)
         .then(res => {
             console.log(res);
         })
@@ -193,7 +193,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
 
 const acceptChat = id => {
     axios
-        .post(`${config.baseUrl}api/chats?id=${id}`)
+        .post(`${config.baseUrl}api/v1/chats?id=${id}`)
         .then(() => {
             const index = state.chatRequests.findIndex(c => c.chatId == id);
             state.chatRequests[index].acceptedChat = true;
@@ -225,7 +225,6 @@ function getMessage(chat: Chat, id) {
             message = found;
             return true;
         });
-
     }
 
     return message;
@@ -239,13 +238,13 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined,
+    lastMessageId: string | undefined
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
     if (lastMessageId) params.append('fromId', lastMessageId);
     params.append('limit', limit.toString());
 
-    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/messages/${chatId}`, {
+    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/v1/messages/${chatId}`, {
         params: params,
     });
 
@@ -418,7 +417,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             selectedFile: selectedFile,
         });
 
-        await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
+        await axios.post(`${config.baseUrl}api/v1/files/${chatId}/${uuid}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -461,8 +460,7 @@ const catchErrorsSendFile = (e, uuid) => {
     });
 };
 
-
-export const retrySendFile = async (file) => {
+export const retrySendFile = async file => {
     //When a upload fails in chat and you retry
 
     const { id: uuid, chatId, selectedFile } = file;
@@ -485,7 +483,7 @@ export const retrySendFile = async (file) => {
             cancelToken: source,
         });
 
-        await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
+        await axios.post(`${config.baseUrl}api/v1/files/${chatId}/${uuid}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -580,7 +578,7 @@ export const useChatsState = () => {
 
 export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
     getChat(chatId).draft = message;
-    axios.post(`${config.baseUrl}api/updateDraft`, {
+    axios.post(`${config.baseUrl}api/v1/updateDraft`, {
         params: {
             draftMessage: message,
         },

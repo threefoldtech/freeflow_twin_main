@@ -15,7 +15,7 @@ import { sendMessageObject } from '@/store/chatStore';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { destroyNotification } from '@/store/notificiationStore';
 
-const endpoint = `${config.baseUrl}api/posts`;
+const endpoint = `${config.baseUrl}api/v1/posts`;
 const { user } = useAuthState();
 
 interface socialMeta {

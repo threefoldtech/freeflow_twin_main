@@ -1022,7 +1022,7 @@ export const fetchFileAccessDetails = async (
 
 export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
     let params = { shareId: shareId, token: token };
-    const locationApiEndpoint = `/api/browse/files/info?params=${btoa(JSON.stringify(params))}`;
+    const locationApiEndpoint = `/api/v1/browse/files/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';
     if (digitalTwinId == user.id) {
         location = `${window.location.origin}${locationApiEndpoint}`;

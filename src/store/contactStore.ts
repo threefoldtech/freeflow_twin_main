@@ -49,7 +49,7 @@ const addContact = (username: DtId, location, dontCheck = false) => {
     };
     const chatname: String = username;
     axios
-        .post(`${config.baseUrl}api/contacts`, {
+        .post(`${config.baseUrl}api/v1/contacts`, {
             id: username,
             location,
             message: addMessage,
@@ -67,7 +67,7 @@ const calculateContacts = () => {
 };
 
 export const useContactsState = () => {
-    return{
+    return {
         contacts: calculateContacts(),
         // ...toRefs(state),
     };

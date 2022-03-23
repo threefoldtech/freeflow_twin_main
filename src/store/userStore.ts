@@ -4,7 +4,7 @@ import config from '@/config';
 export const setNewAvatar = async selectedFile => {
     var formData = new FormData();
     formData.append('file', selectedFile);
-    const url = `${config.baseUrl}api/user/avatar`;
+    const url = `${config.baseUrl}api/v1/user/avatar`;
     try {
         const result = await axios.post(url, formData, {
             headers: {
@@ -18,7 +18,7 @@ export const setNewAvatar = async selectedFile => {
 };
 
 export const isUserAuthenticated = async () => {
-    const url = `${config.baseUrl}nest/auth/authenticated`;
+    const url = `${config.baseUrl}api/v2/auth/authenticated`;
     try {
         const result = await axios.get(url);
         return result.data;
