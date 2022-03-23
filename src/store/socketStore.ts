@@ -59,7 +59,6 @@ const initializeSocket = (username: string) => {
         const { addChat } = usechatsActions();
         const { contacts } = useContactsState();
         const { user } = useAuthState();
-        console.log('connectionrequest');
         addChat(newContactRequest);
     });
     state.socket.on('chat_updated', chat => {
