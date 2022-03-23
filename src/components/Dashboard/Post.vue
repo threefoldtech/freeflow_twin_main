@@ -343,7 +343,6 @@
         return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`);
     });
 
-    console.log(props.item.owner.id);
 
     const myAvatar = computed(() => {
         return calcExternalResourceLink(`http://[${myLocation.value}]/api/user/avatar/default`);
