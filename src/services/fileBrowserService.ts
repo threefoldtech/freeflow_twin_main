@@ -7,7 +7,7 @@ import { calcExternalResourceLink } from './urlService';
 import { accessDenied, currentDirectory, PathInfoModel } from '@/store/fileBrowserStore';
 import { isUndefined } from 'lodash';
 
-const endpoint = `${config.baseUrl}api/browse`;
+const endpoint = `${config.baseUrl}api/v1/browse`;
 
 export interface PathInfo {
     isFile: boolean;
@@ -204,7 +204,7 @@ export const getFileAccessDetails = async (
 
     path = encodeURIComponent(path);
 
-    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
+    let apiEndPointToCall = `/api/v1/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
     externalUrl = externalUrl + apiEndPointToCall;
@@ -221,7 +221,7 @@ export const getSharedFolderContent = async (
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
-    let apiEndPointToCall = `/api/browse/share/${shareId}/folder?path=${path}`;
+    let apiEndPointToCall = `/api/v1/browse/share/${shareId}/folder?path=${path}`;
 
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
     externalUrl = externalUrl + apiEndPointToCall;
