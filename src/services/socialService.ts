@@ -95,11 +95,11 @@ export const likeComment = async (
     location: string,
     commentId: string,
     isReplyToComment: boolean,
-    replyTo: boolean
+    replyTo: string
 ) => {
     const myAddress = await myYggdrasilAddress();
     return (
-        await axios.put<any>(`${endpoint}/comments/like`, {
+        await axios.put(`${endpoint}/comments/like`, {
             liker_id: user.id,
             postId,
             owner: location,
