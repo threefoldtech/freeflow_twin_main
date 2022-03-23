@@ -3,8 +3,8 @@
         <div class='flex flex-shrink-0 self-start cursor-pointer'
              @mouseover='mouseFocussed = true;panelTimer()'
              @mouseleave='mouseFocussed = false; panelTimer()'>
-            <div class='w-10'>
-                <img :src='avatarImg' alt='' class=' object-cover rounded-full'>
+            <div>
+                <AvatarImg :id='comment.owner.id' :showOnlineStatus='false' :small='true' alt='avatar' />
             </div>
         </div>
         <TransitionRoot :show='openPanel'
@@ -35,14 +35,15 @@
                 </div>
                 <div class='flex justify-start items-center text-xs w-full'>
                     <div class='font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1'>
-                        <a @click='handleLikeComment' class='hover:underline' href='#'>
-                            <small>Like</small>
-                        </a>
-                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>
+                        <!--                        <a @click='handleLikeComment' class='hover:underline' href='#'>-->
+                        <!--                            <small>Like</small>-->
+                        <!--                        </a>-->
+                        <!--                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>-->
                         <a v-if='comment.type === MESSAGE_TYPE.COMMENT' class='hover:underline' href='#' @click='reply'>
                             <small>Reply</small>
                         </a>
-                        <small class='self-center'>.</small>
+                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>
+                        <!--                        <small class='self-center'>.</small>-->
                         <small>{{ moment(comment.createdOn).fromNow() }}</small>
                     </div>
                 </div>
@@ -75,8 +76,8 @@
                   :key='reply.id' :comment='reply' />
     <form v-if='showReplyInput' class='relative flex items-center pl-20 flex-start w-full'
           @submit.prevent='handleReplyForm'>
-        <div class='w-8 h-8 rounded-full absolute left-20'>
-            <img :src='myAvatar' class='h-8 rounded-full pointer-events-none'>
+        <div class='pr-1'>
+            <AvatarImg :id='user.id' :showOnlineStatus='false' :xsmall='true' />
         </div>
         <input v-model='replyInput'
                class='text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3'
@@ -91,19 +92,21 @@
     import ReplyComment from '@/components/Dashboard/PostComment.vue';
     import moment from 'moment';
     import { ThumbUpIcon } from '@heroicons/vue/solid';
-    import { MESSAGE_TYPE } from '@/store/socialStore';
+    import { COMMENT_MODEL, MESSAGE_TYPE } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { myYggdrasilAddress } from '@/store/authStore';
+    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import { TransitionRoot } from '@headlessui/vue';
     import { likeComment } from '@/services/socialService';
+    import AvatarImg from '@/components/AvatarImg.vue';
 
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
     const showComments = ref<boolean>(false);
-    const props = defineProps<{ comment: any }>();
+    const props = defineProps<{ comment: COMMENT_MODEL }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
     const myLocation = ref<string>('');
+    const { user } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
 
@@ -116,17 +119,15 @@
 
     const commentsSorted = computed(() => {
         return props.comment?.replies.sort(function(a, b) {
-            return new Date(a.createdOn) - new Date(b.createdOn);
+            return new Date(a.createdOn).getTime() - new Date(b.createdOn).getTime();
         });
     });
 
 
-    const handleLikeComment = async () => {
-        // await likeComment()
-        // const { post, owner, id, isReplyToComment, replyTo } = props.comment;
-        // console.log(props.comment);
-        // console.log(post.id, owner.location, id, isReplyToComment, replyTo);
-        // await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
+    const handleLikeComment = async (e) => {
+        e.preventDefault();
+        const { post, owner, id, isReplyToComment, replyTo } = props.comment;
+        await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
     };
 
     const avatarImg = computed(() => {

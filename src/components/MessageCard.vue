@@ -147,25 +147,19 @@
 </template>
 
 <script setup lang="ts">
-import {computed, defineComponent, nextTick, onMounted, ref, watch} from 'vue';
-    import moment from 'moment';
+import { onMounted, ref, watch} from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
     import { Message, MessageBodyType, QuoteBodyType, StringMessageType, MessageTypes } from '@/types';
-    import { uuidv4 } from '@/common';
     import { useAuthState } from '@/store/authStore';
     import {
-        clearMessageAction,
-        MessageAction,
         sendMessageObject,
-        setMessageAction,
         usechatsActions,
         selectedMessageId,
         editMessage,
         replyMessage,
     } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
-    import { clock } from '@/services/clockService';
     import Time from '@/components/Time.vue';
 
 import {
@@ -174,11 +168,7 @@ import {
   rightClickItemAction,
   triggerWatchOnRightClickItem
 } from "@/store/contextmenuStore";
-import {downloadFiles, selectedPaths} from "@/store/fileBrowserStore";
 import {downloadAttachment} from '@/services/fileBrowserService'
-import {showShareDialog} from "@/services/dialogService";
-import {createNotification} from "@/store/notificiationStore";
-import {Status} from "@/types/notifications";
 
 
     interface IProps {

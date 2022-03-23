@@ -3,7 +3,7 @@
         <div class="flex flex-row items-center w-full rounded-lg mb-2 py-2 align-middle">
             <span v-if="chat.isGroup" class="truncate flex-1"> {{ chat.admin }} invited you to {{ chat.name }}</span>
             <span v-else class="truncate flex-1">
-                <b>{{ chat.name }}</b> wants to have a chat
+                <b>{{ chat.name }}</b> wants to have a chat.
             </span>
             <button
                 class="flex items-center rounded-xl py-1 px-2 m-2 bg-red-500 text-white btn disabled:bg-gray-300"

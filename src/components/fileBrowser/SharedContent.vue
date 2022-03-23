@@ -80,7 +80,7 @@
                                                     {{ item.name }}
                                                 </span>
                                                 <span class="text-xs opacity-50 cursor-pointer hover:underline">
-                                                    From: {{ item.owner.id }}
+                                                    From: {{ item?.owner?.id }}
                                                 </span>
                                             </div>
                                         </div>
@@ -203,51 +203,33 @@
 </template>
 
 <script setup lang="ts">
-import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-import { calcExternalResourceLink } from '@/services/urlService';
 import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
 import {
-    FileType,
     formatBytes,
     getExtension,
     getFileType,
-    getIcon,
-    getIconColor,
-    getFileSize,
     getIconColorDirty,
     getIconDirty,
-    getSharedContent,
-    getSharedFolderContent,
-    goIntoSharedFolder,
-    parseJwt,
     PathInfoModel,
     selectedPaths,
     sharedContent,
     goTo,
     sharedBreadcrumbs,
-    clickBreadcrumb,
     sharedFolderIsloading,
     fileBrowserTypeView,
-    View,
-    allSharedContent,
-    loadSharedItems,
-    sharedWithMeCurrentFolder,
-    chatsWithFiles,
-    goToChatFiles,
-    chatFilesReceived,
-    goToFilesInChat,
     isQuantumChatFiles,
-    chatFiles,
 } from '@/store/fileBrowserStore';
-import { SharedFileInterface } from '@/types';
-import { cloneVNode, defineComponent } from '@vue/runtime-core';
 import { onBeforeMount, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import Spinner from '@/components/Spinner.vue';
-import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
+import { useSocketActions } from '@/store/socketStore';
+import { useAuthState } from '@/store/authStore';
 
 onBeforeMount(async () => {
     sharedBreadcrumbs.value = [];
+    const { initializeSocket } = useSocketActions();
+    const { user } = useAuthState();
+    initializeSocket(user.id.toString());
 });
 
 watch(sharedFolderIsloading, () => {});
