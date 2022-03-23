@@ -71,6 +71,7 @@ export interface SOCIAL_POST {
     owner: POST_OWNER;
     likes: LIKE_MODEL[];
     images: POST_IMAGE[];
+    replies: COMMENT_MODEL[];
     isTyping?: String[];
 }
 

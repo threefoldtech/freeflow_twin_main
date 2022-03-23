@@ -79,7 +79,7 @@ const retrieveChats = async () => {
         const incommingchats = response.data;
 
         // debugger
-        incommingchats.forEach(chat => {
+        incomingchats.forEach(chat => {
             addChat(chat);
         });
         sortChats();

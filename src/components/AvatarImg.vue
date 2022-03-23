@@ -3,8 +3,8 @@
         :class="{
             'h-16 w-16': large,
             'h-12 w-12': !small && !xsmall && !large,
-            'h-8 w-8': small,
-            'h-6 w-6': xsmall,
+            'h-10 w-10': small,
+            'h-8 w-8': xsmall,
         }"
         class="grid relative"
     >
@@ -12,8 +12,8 @@
             :class="{
                 'h-16 w-16': large,
                 'h-12 w-12': !small && !xsmall && !large,
-                'h-8 w-8': small,
-                'h-6 w-6': xsmall,
+                'h-10 w-10': small,
+                'h-8 w-8': xsmall,
             }"
             :style="`background:url(${src}) no-repeat center/cover`"
             class="bg-icon rounded-full"

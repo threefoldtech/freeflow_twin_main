@@ -2,27 +2,26 @@
     <suspense>
         <UserConfigDialog></UserConfigDialog>
     </suspense>
-    <div class="bg-gray-100 h-full overflow-hidden relative text-sm">
+    <div class='bg-gray-100 h-full relative text-sm'>
         <NotificationSection />
-        <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
-            <div class="top h-20 md:hidden">
-                <Topbar>
+        <div class='pl-0 relative h-full w-full maingrid md:bigmaingrid'>
+            <div class='top h-20 md:hidden'>
+                <Topbar @clicked='showNav = !showNav'>
                     <template v-slot:default>
-                        <slot name="top"> </slot>
+                        <slot name='top'></slot>
                     </template>
                     <template v-slot:actions>
-                        <slot name="actions"> </slot>
+                        <slot name='actions'></slot>
                     </template>
                 </Topbar>
             </div>
-            <div class="side hidden md:block">
-                <slot name="side">
-                    <Sidebar class="bg-accent-800 md:block h-full"></Sidebar>
-                </slot>
-            </div>
-            <div class="content w-full h-full overflow-y-auto relative flex flex-col">
-                <div class="relative w-full h-full overflow-y-auto">
-                    <div class="absolute w-full h-full">
+            <slot name='side'>
+                <Sidebar class='bg-accent-800 md:block'
+                         :class='[showNav ? "" : "hidden", smallScreen ? "top" : "side"]'></Sidebar>
+            </slot>
+            <div class='content w-full h-full overflow-y-auto relative flex flex-col'>
+                <div class='relative w-full h-full overflow-y-auto'>
+                    <div class='absolute w-full h-full'>
                         <ImagePreview />
                         <slot></slot>
                     </div>
@@ -32,8 +31,8 @@
     </div>
 </template>
 
-<script setup lang="ts">
-    import { defineComponent, watch } from 'vue';
+<script setup lang='ts'>
+    import { ref, watch } from 'vue';
     import Sidebar from '@/components/Sidebar.vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
     import Topbar from '@/components/Topbar.vue';
@@ -42,11 +41,18 @@
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
 
     const { notification } = useSocketState();
+    const showNav = ref(false);
+    const smallScreen = ref(window.innerWidth < 768);
 
     let audio = null;
 
+    window.onresize = () => {
+        smallScreen.value = window.innerWidth < 768;
+        if (window.innerWidth > 768) showNav.value = false;
+    };
+
     watch(notification, (newNot: any, oldNot: any) => {
-        var focused = document.hasFocus();
+        const focused = document.hasFocus();
 
         if (focused) {
             return;
@@ -58,15 +64,18 @@
 
         audio.play();
     });
+
 </script>
 
 <style scoped>
     .top {
         grid-area: top;
     }
+
     .side {
         grid-area: side;
     }
+
     .content {
         grid-area: content;
     }
