@@ -54,7 +54,7 @@ export interface GroupUpdate extends MessageBodyType {
 }
 
 export interface Chat {
-    chatId: Id;
+    chatId: string;
     messages: Message<MessageBodyType>[];
     read: {
         [key: string]: string;
@@ -63,7 +63,7 @@ export interface Chat {
     acceptedChat: boolean;
     name: string;
     isGroup: boolean;
-    adminId: Id;
+    adminId: string;
     draft: Message<MessageBodyType>;
 }
 export interface PersonChat extends Chat {}

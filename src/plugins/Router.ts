@@ -34,11 +34,8 @@ import {
     updateContent,
     stopTimer,
 } from '@/store/fileBrowserStore';
-import { usechatsActions } from '@/store/chatStore';
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
-
-const { retrieveChats } = usechatsActions();
 
 const routes: Array<RouteRecordRaw> = [
     {

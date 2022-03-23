@@ -13,7 +13,7 @@ export const showUserOfflineMessage = ref<boolean>(false);
 
 export const fetchStatus = async (digitalTwinId: DtId) => {
     const { user } = useAuthState();
-    const locationApiEndpoint = '/api/user/getStatus';
+    const locationApiEndpoint = '/nest/user/status';
     let location = '';
     if (digitalTwinId == user.id) {
         location = `${window.location.origin}${locationApiEndpoint}`;

@@ -47,7 +47,7 @@
                     v-model='searchValue'
                     class='focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md'
                     placeholder='Search'
-                    type='text' />
+                    type='text' />>>>>>>> development
                 <div
                     v-if='!!searchValue'
                     @click="searchValue = ''"
@@ -169,7 +169,6 @@
 
     const { user } = useAuthState();
 
-
     const m = val => moment(val);
     const searchValue = ref('');
     let showContacts = ref(false);
@@ -212,7 +211,6 @@
         return;
     }, { deep: true });
 
-
     const setSelected = id => {
         localStorage.setItem('lastOpenedChat', id);
         router.push({ name: 'single', params: { id } });
@@ -241,7 +239,6 @@
     });
 
     const sendUpdate = newVal => {
-
         showAddUserDialog.value = newVal;
     };
 </script>
