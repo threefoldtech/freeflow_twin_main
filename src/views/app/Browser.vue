@@ -19,7 +19,7 @@
     import { AppType } from '@/types/apps';
 
     const iframeUrl = ref('');
-    const appName = ref('');
+    const appName = ref('glass');
 
     onMounted(() => {
         browse();

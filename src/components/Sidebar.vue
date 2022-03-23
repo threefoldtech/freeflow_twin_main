@@ -1,14 +1,13 @@
 <template>
     <nav>
-        <div class="flex flex-col h-full items-center">
-            <div class="mb-4 grid text-center text-white cursor-pointer">
+        <div class="flex flex-col h-screen overflow-y-auto items-center">
+            <div class="md:mb-4 mb-2 grid text-center text-white cursor-pointer">
                 <div
-                    class="h-20 w-20 rounded-full grid place-items-center mb-1"
+                    class="rounded-full grid place-items-center"
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <!--                    <img alt="Threefold logo" src="../../public/Symbol_secundary_color.png" width="65" />-->
-                    <svg class="w-12 mt-6" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="sm:w-10 w-8  mt-5" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient
                                 id="mainGradientLogo"
@@ -50,16 +49,16 @@
                 class="mb-4 grid"
             >
                 <div
-                    class="h-20 w-20 rounded-full grid place-items-center mb-1"
+                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center mb-1"
                     style="position: relative"
                     @click="changePage(app.name)"
                 >
                     <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
             </div>
-            <div class="flex-grow"></div>
+            <div class="md:flex-grow flex-grow-0"></div>
             <div
-                class="w-20 h-20 mb-2 grid cursor-pointer items-center justify-center justify-items-center"
+                class="w-20 h-20 mb-5 grid cursor-pointer content-end items-center justify-center justify-items-center"
                 @click="toggleShowUserConfigDialog"
             >
                 <AvatarImg :id="user.id" />
@@ -124,10 +123,7 @@
     const { user } = useAuthState();
 
     const toggleShowUserConfigDialog = () => {
-        console.log('Showing user config dialog: ', showUserConfigDialog.value);
         showUserConfigDialog.value = !showUserConfigDialog.value;
-
-        console.log('Showing user config dialog: ', showUserConfigDialog.value);
     };
 </script>
 
