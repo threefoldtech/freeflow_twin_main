@@ -140,7 +140,7 @@
                             }}</p>
                     </div>
                     <p class='text-gray-600 mr-0 ml-auto cursor-pointer text-md' @click='showComments = !showComments'>
-                        {{ item.replies.length }} Comments
+                        {{ countComments() }} Comments
                     </p>
                 </div>
             </div>
@@ -295,6 +295,14 @@
 
     const renderMarkdown = content => {
         return md.render(content);
+    };
+
+    const countComments = (total = 0, comments = props.item.replies) => {
+        for (let comment of comments) {
+            total++;
+            total = countComments(total, comment.replies);
+        }
+        return total;
     };
 
     const showIsUserTyping = computed(() => {
