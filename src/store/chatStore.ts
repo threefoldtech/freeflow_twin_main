@@ -1,6 +1,6 @@
 import { reactive } from '@vue/reactivity';
 import { nextTick, readonly, ref, toRefs } from 'vue';
-import axios, { CancelToken, CancelTokenSource } from 'axios';
+import axios from 'axios';
 import moment from 'moment';
 import {
     Chat,
@@ -76,7 +76,7 @@ const retrieveChats = async () => {
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
     await axios.get(`${config.baseUrl}api/v1/chats`, { params: params }).then(response => {
-        const incommingchats = response.data;
+        const incomingchats = response.data;
 
         // debugger
         incomingchats.forEach(chat => {
