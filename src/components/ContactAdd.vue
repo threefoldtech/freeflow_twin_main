@@ -184,9 +184,7 @@
             id: contact?.id ? contact.id : manualContactAddUsername.value,
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
-        console.log(`contactToAdd: ${JSON.stringify(contactToAdd)}`);
         const { chats } = useChatsState();
-        console.log(`chats: ${chats}`);
         try {
             if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
                 usernameAddError.value = 'Already added this user';
