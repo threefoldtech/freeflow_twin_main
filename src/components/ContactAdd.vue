@@ -147,7 +147,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
     import { useAuthState, myYggdrasilAddress } from '../store/authStore';
@@ -184,9 +184,10 @@
             id: contact?.id ? contact.id : manualContactAddUsername.value,
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
+        console.log(`contactToAdd: ${JSON.stringify(contactToAdd)}`);
+        const { chats } = useChatsState();
+        console.log(`chats: ${chats}`);
         try {
-            const { chats } = useChatsState();
-
             if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
                 usernameAddError.value = 'Already added this user';
                 return;
@@ -228,7 +229,7 @@
         const { addGroupchat } = usechatsActions();
         const { user } = useAuthState();
         const { chats } = useChatsState();
-        
+
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';
             return;
