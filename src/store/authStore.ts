@@ -3,7 +3,7 @@ import axios from 'axios';
 import { User } from '../types';
 
 export const getMyStatus = async () => {
-    const res = await axios.get(`${window.location.origin}/api/v2/user/status`);
+    const res = await axios.get(`${window.location.origin}/api/v1/user/getStatus`);
     return res.data.status;
 };
 
