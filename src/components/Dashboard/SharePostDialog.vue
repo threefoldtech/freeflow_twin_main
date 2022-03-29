@@ -130,11 +130,11 @@ const isInQueue = (id) => {
 }
 
 const getAvatar = (location: string) => {
-  return calcExternalResourceLink(`http://[${location}]/api/user/avatar/default`)
+  return calcExternalResourceLink(`http://[${location}]/api/v1/user/avatar/default`)
 }
 
 const avatarImg = computed(() => {
-  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/user/avatar/default`)
+  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/user/avatar/default`)
 })
 
 onBeforeMount(async () => {

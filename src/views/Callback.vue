@@ -11,7 +11,7 @@
 
     const user = {
         name,
-        image: `${window.location.origin}/api/user/avatar`,
+        image: `${window.location.origin}/api/v1/user/avatar`,
         email: `${name.replace(/ /g, '')}@domain.com`,
     };
 
