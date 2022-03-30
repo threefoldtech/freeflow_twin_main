@@ -47,7 +47,7 @@
                         <div class="p-4 flex items-start h-48">
                             <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
                             <textarea
-                                class="no-resize ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full focus:outline-none"
+                                class="resize-none ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full focus:outline-none"
                                 placeholder="Write something about you"
                                 v-model="new_post_text"
                             />

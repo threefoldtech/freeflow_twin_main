@@ -110,9 +110,9 @@
                                     </p>
                                     <p v-if="!blocked" class="font-thin">
                                         {{ getChatStatus.message }}
-                                        <span v-if="getChatStatus?.lastSeen" class="group-chat:hidden">
-                                            ,active <TimeContent :time="getChatStatus.lastSeen.toDate()" />
-                                        </span>
+                                        <span v-if="getChatStatus?.lastSeen" class="group-chat:hidden"
+                                            >, active <TimeContent :time="getChatStatus.lastSeen.toDate()"
+                                        /></span>
                                     </p>
                                     <p v-if="blocked" class="text-red-500">BLOCKED</p>
                                 </div>
