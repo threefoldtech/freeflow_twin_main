@@ -382,7 +382,7 @@
 
     watch(messageInput, async (n, o) => {
         if (n.length > o.length) {
-            await setSomeoneIsTyping(props.item.post.id, props.item.owner.location);
+            await setSomeoneIsTyping(props.item.post.id, props.item.owner.location, user.id.toString());
         }
     });
 

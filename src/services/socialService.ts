@@ -62,12 +62,12 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
 
 export const sortPosts = posts => {
     if (!posts) {
-        allSocialPosts.value.sort(function (a, b) {
+        allSocialPosts.value.sort(function(a, b) {
             return new Date(b.post.createdOn).getTime() - new Date(a.post.createdOn).getTime();
         });
         return;
     }
-    return posts.sort(function (a, b) {
+    return posts.sort(function(a, b) {
         return new Date(b.post.createdOn) - new Date(a.post.createdOn);
     });
 };
@@ -95,7 +95,7 @@ export const likeComment = async (
     location: string,
     commentId: string,
     isReplyToComment: boolean,
-    replyTo: string
+    replyTo: string,
 ) => {
     const myAddress = await myYggdrasilAddress();
     return (
@@ -123,10 +123,11 @@ export const getSinglePost = async (postId: string, location: string) => {
     return response;
 };
 
-export const setSomeoneIsTyping = async (postId, location) => {
+export const setSomeoneIsTyping = async (postId, location, userId: string) => {
     await axios.put(`${endpoint}/typing`, {
         postId: postId,
         location: location,
+        userId,
     });
 };
 
@@ -134,7 +135,7 @@ export const commentOnPost = async (
     message: string,
     item: SOCIAL_POST,
     isReplyToComment: boolean,
-    comment_id?: string
+    comment_id?: string,
 ) => {
     const myAddress = await myYggdrasilAddress();
     const data: COMMENT_MODEL = {
@@ -161,10 +162,11 @@ export const commentOnPost = async (
     return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
 };
 
-export const updateSomeoneIsTyping = (chatId: string) => {
+export const updateSomeoneIsTyping = (postId: string, userId: string) => {
+    if (user.id.toString() === userId) return;
     const id = uuidv4();
     allSocialPosts.value = allSocialPosts.value.map((item, idx) => {
-        if (item.post.id === chatId) {
+        if (item.post.id === postId) {
             return {
                 ...item,
                 isTyping: [allSocialPosts.value[idx].isTyping, id].flat(Infinity),
@@ -174,7 +176,7 @@ export const updateSomeoneIsTyping = (chatId: string) => {
             ...item,
         };
     });
-    setTimeout(() => destroySomeoneIsTyping(chatId, id), 5000);
+    setTimeout(() => destroySomeoneIsTyping(postId, id), 5000);
 };
 
 export const destroySomeoneIsTyping = (chatId, queueId) => {
@@ -182,7 +184,7 @@ export const destroySomeoneIsTyping = (chatId, queueId) => {
         if (item.post.id === chatId) {
             const filteredArray = item?.isTyping
                 ?.filter(item => item !== queueId)
-                ?.filter(function (x) {
+                ?.filter(function(x) {
                     return x !== undefined;
                 });
             return {

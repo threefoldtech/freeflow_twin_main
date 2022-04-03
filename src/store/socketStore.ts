@@ -71,8 +71,8 @@ const initializeSocket = (username: string) => {
         const { addChat } = usechatsActions();
         addChat(chat);
     });
-    state.socket.on('post_typing', chatId => {
-        updateSomeoneIsTyping(chatId);
+    state.socket.on('post_typing', data => {
+        updateSomeoneIsTyping(data.post, data.user);
     });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
