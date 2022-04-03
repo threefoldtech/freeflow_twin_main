@@ -86,6 +86,7 @@
 
     const renderPermissionsData = async () => {
         currentShare.value = await getShareByPath(props.selectedFile.path);
+        if (!currentShare.value) return;
         currentShare.value.permissions = currentShare.value?.permissions?.map(item => {
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.chatId;
