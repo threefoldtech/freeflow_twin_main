@@ -79,7 +79,7 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('shares_updated', shares => {
         console.log('shares updated');
-        getSharedContent()
+        getSharedContent();
     });
 };
 
