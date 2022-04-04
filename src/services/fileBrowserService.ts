@@ -1,11 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
 import { createNotification, createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
-import { Notification, ProgressNotification, Status } from '@/types/notifications';
-import { ContactInterface, FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
+import { ProgressNotification, Status } from '@/types/notifications';
+import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
-import { accessDenied, currentDirectory, PathInfoModel } from '@/store/fileBrowserStore';
-import { isUndefined } from 'lodash';
+import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
 
 const endpoint = `${config.baseUrl}api/v1/browse`;
 

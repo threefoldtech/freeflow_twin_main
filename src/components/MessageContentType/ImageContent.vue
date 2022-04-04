@@ -14,7 +14,11 @@
 
     const props = defineProps<IProp>();
     const { addScrollEvent } = useScrollActions();
-    const src = calcExternalResourceLink(props.message.body.url);
+    const msgUrl = props.message.body.url;
+    const txtToFind = `/api`;
+    const apiIdx = msgUrl.indexOf(txtToFind);
+    const urlV1 = `${msgUrl.substring(0, apiIdx)}/api/v1${msgUrl.substring(apiIdx + txtToFind.length, msgUrl.length)}`;
+    const src = calcExternalResourceLink(urlV1);
     const imageLoaded = () => {
         addScrollEvent();
     };
