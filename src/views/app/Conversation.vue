@@ -79,7 +79,7 @@
                                 <div class="w-8">
                                     <i class="fas fa-trash"></i>
                                 </div>
-                                <span class="ml-1 text-left">Delete user</span>
+                                <span class="ml-1 text-left">Delete chat</span>
                             </button>
                         </div>
                     </div>
