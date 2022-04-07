@@ -1,7 +1,7 @@
 <template>
     <div
         @click="createPostModalStatus = true"
-        class="z-50 bg-white relative"
+        class="z-40 bg-white relative"
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>

@@ -73,7 +73,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {computed, onBeforeMount, onMounted, ref} from "vue";
+import {computed, onBeforeMount, onMounted, onBeforeUnmount, ref} from "vue";
 import {usechatsActions, useChatsState} from "@/store/chatStore";
 import {SOCIAL_POST} from "@/store/socialStore";
 import {calcExternalResourceLink} from "@/services/urlService";
@@ -90,6 +90,7 @@ const {chats} = useChatsState();
 const queue = ref<string[]>([])
 const peopleIHaveSharedWith = ref<string[]>([])
 const dialogRef = ref<HTMLElement>(null)
+let escListener = null;
 
 const props = defineProps<{ item: SOCIAL_POST, avatar: any }>();
 
@@ -138,8 +139,21 @@ const avatarImg = computed(() => {
 })
 
 onBeforeMount(async () => {
-  await retrieveChats()
-})
+  await retrieveChats();
+
+ escListener = e => {
+    if (e.key !== 'Escape') {
+      return;
+    }
+    emit('close');
+  };
+  document.addEventListener('keyup', escListener);
+});
+
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keyup', escListener);
+});
 
 
 </script>
