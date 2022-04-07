@@ -25,17 +25,19 @@
             leave-from="opacity-100"
             leave-to="opacity-0"
         >
-            <CommentHoverPanel
-                v-if="openPanel"
-                :avatar="avatarImg"
-                :comment="comment"
-                @mouseleave="
-                    mouseFocussed = false;
-                    openPanel = false;
-                "
-                @mouseover="mouseFocussed = true"
-                class="-top-56 -left-20"
-            />
+            <keep-alive>
+                <CommentHoverPanel
+                    v-if="openPanel"
+                    :avatar="avatarImg"
+                    :comment="comment"
+                    @mouseleave="
+                        mouseFocussed = false;
+                        openPanel = false;
+                    "
+                    @mouseover="mouseFocussed = true"
+                    class="-top-56 -left-20"
+                />
+            </keep-alive>
         </TransitionRoot>
         <div class="flex items-center justify-center space-x-2 relative">
             <div class="block">

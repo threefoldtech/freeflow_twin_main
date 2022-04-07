@@ -31,19 +31,21 @@
                         leave-from="opacity-100"
                         leave-to="opacity-0"
                     >
-                        <CommentHoverPanel
-                            v-if="openPanel"
-                            :avatar="avatarImg"
-                            :comment="item"
-                            @mouseleave="
-                                mouseFocussed = false;
-                                openPanel = false;
-                            "
-                            @mouseover="
-                                mouseFocussed = true;
-                                panelTimer();
-                            "
-                        />
+                        <keep-alive>
+                            <CommentHoverPanel
+                                v-if="openPanel"
+                                :avatar="avatarImg"
+                                :comment="item"
+                                @mouseleave="
+                                    mouseFocussed = false;
+                                    openPanel = false;
+                                "
+                                @mouseover="
+                                    mouseFocussed = true;
+                                    panelTimer();
+                                "
+                            />
+                        </keep-alive>
                     </TransitionRoot>
                     <div class="flex items-center">
                         <div

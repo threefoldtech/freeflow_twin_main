@@ -12,8 +12,10 @@
                 </div>
 
                 <div class="flex justify-start items-center space-x-2">
-                    <div class="w-auto text-sm leading-none">
-                        <small> Friends since <span class="font-medium">21 November</span> </small>
+                    <div class="w-auto text-sm leading-none" v-if="friendsSince">
+                        <small>
+                            Friends since <span class="font-medium">{{ friendsSince }}</span>
+                        </small>
                     </div>
                 </div>
                 <div class="flex justify-start items-center space-x-2">
@@ -76,21 +78,33 @@
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
-    const { retrieveChats } = usechatsActions();
+    const { retrieveChats, getChat } = usechatsActions();
 
     const props = defineProps<{
         comment: SOCIAL_POST;
         avatar: string;
     }>();
     const location = ref<string>();
+    const friendsSince = ref<string>();
     const online = ref<boolean>();
     const router = useRouter();
 
     onBeforeMount(async () => {
         await retrieveChats();
         location.value = await myYggdrasilAddress();
-        const { isOnline } = await fetchStatus(props.comment.owner.id);
+        const userId = props.comment.owner.id;
+        const { isOnline } = await fetchStatus(userId);
         online.value = isOnline;
+        const chat = getChat(userId);
+        if (chat && chat.createdAt) {
+            const options = {
+                year: '2-digit',
+                month: 'long',
+                day: 'numeric',
+            };
+            const formattedDate = new Date(chat.createdAt).toLocaleDateString('nl-BE', options);
+            friendsSince.value = formattedDate;
+        }
     });
 
     const isPersonFriend = computed(() => {
