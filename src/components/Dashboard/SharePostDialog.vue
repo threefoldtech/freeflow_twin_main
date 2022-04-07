@@ -98,7 +98,7 @@ onMounted(() => {
 })
 
 const fetchPostImage = (image) => {
-  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/posts/download/${btoa(image.path)}`)
+  return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/posts/download/${btoa(image.path)}`)
 }
 
 const sharePostWithFriend = async (id: string) => {
