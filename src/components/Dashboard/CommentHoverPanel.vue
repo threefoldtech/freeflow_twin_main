@@ -78,7 +78,7 @@
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
-    const { retrieveChats, getChat } = usechatsActions();
+    const { getChat } = usechatsActions();
 
     const props = defineProps<{
         comment: SOCIAL_POST;
@@ -90,7 +90,6 @@
     const router = useRouter();
 
     onBeforeMount(async () => {
-        await retrieveChats();
         location.value = await myYggdrasilAddress();
         const userId = props.comment.owner.id;
         const { isOnline } = await fetchStatus(userId);
