@@ -47,7 +47,7 @@
                     <p class="flex justify-center my-8" v-if="isLoadingSocialPosts">Loading posts</p>
                     <Post :item="item" v-for="(item, idx) in allSocialPosts" :key="item.post.id" />
 
-                    <div
+                    <!-- <div
                         v-if="showComingSoonToUhuru"
                         @click="showComingSoonToUhuru = false"
                         class="w-full h-full inset-0 bg-black bg-opacity-75 fixed z-50 flex justify-center items-center flex-col"
@@ -59,7 +59,7 @@
                         >
                             Close dialog
                         </button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div></div>
