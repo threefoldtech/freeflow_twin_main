@@ -6,7 +6,7 @@ import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
-import { updateSomeoneIsTyping } from '@/services/socialService';
+import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 
 const state = reactive<State>({
@@ -74,6 +74,10 @@ const initializeSocket = (username: string) => {
     state.socket.on('post_typing', data => {
         updateSomeoneIsTyping(data.post, data.user);
     });
+    state.socket.on('posts_updated', () => {
+        console.log('posts updated');
+        getAllPosts();
+    })
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
