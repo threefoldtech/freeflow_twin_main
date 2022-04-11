@@ -13,7 +13,7 @@
             @click="fileBrowserTypeView = 'LIST'"
         />
         <ViewGridIcon
-            class="h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
+            class="hidden h-6 w-6 text-gray-400 hover:text-primary transition duration-100 cursor-pointer"
             :class="{ 'text-primary': fileBrowserTypeView === 'GRID' }"
             @click="fileBrowserTypeView = 'GRID'"
         />

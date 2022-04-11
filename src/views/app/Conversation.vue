@@ -337,7 +337,9 @@
         }
     );
 
-    onBeforeMount(retrieveChats);
+    onBeforeMount(async () => {
+        await retrieveChats();
+    })
 
     const truncate = (value, limit = 20) => {
         if (value.length > limit) {
@@ -364,12 +366,14 @@
         }, {});
     });
 
+    const loadedOnce = ref(false);
     const chat = computed(() => {
         const currentChat = chats.value.find(c => c.chatId == selectedId.value);
-        if (!currentChat) {
+        if (!currentChat && loadedOnce.value) {
             localStorage.setItem('lastOpenedChat', '');
             router.push({ name: 'whisper' });
         }
+        loadedOnce.value = true;
         return currentChat;
     });
 
