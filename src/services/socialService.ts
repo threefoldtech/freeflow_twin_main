@@ -221,3 +221,8 @@ export const sendMessageSharePost = async (chatId: string, post: SOCIAL_POST) =>
     const newMessage: Message<MESSAGE_POST_SHARE_BODY> = await createMessage(chatId, post);
     sendMessageObject(chatId, newMessage);
 };
+
+export const deletePost = async (item: SOCIAL_POST) => {
+    const post = item.post.id;
+    return await axios.delete(`${endpoint}/${post}`)
+}

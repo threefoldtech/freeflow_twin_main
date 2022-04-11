@@ -38,7 +38,7 @@
             >
                 Cancel
             </button>
-            <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred' @click='deletePost'>
+            <button class='py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred' @click='doDeletePost'>
                 Delete
             </button>
         </div>
@@ -264,7 +264,8 @@
                 <ShareIcon class='w-6 text-gray-500 mr-4' />
                 <p class='text-gray-500'>Share</p>
             </div>
-            <div class='flex items-center cursor-pointer' @click='showDeletePostDialog = true'>
+            <div v-if='props.item.owner.id === user.id.toString()'
+                class='flex items-center cursor-pointer' @click='showDeletePostDialog = true'>
                 <TrashIcon class='w-6 text-gray-500 mr-4' />
                 <p class='text-gray-500'>Delete</p>
             </div>
@@ -350,7 +351,7 @@
     import { uuidv4 } from '@/common';
     import { SOCIAL_POST, LIKE_STATUS } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { commentOnPost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
+    import { commentOnPost, deletePost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
     import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import Dialog from '@/components/Dialog.vue';
@@ -390,8 +391,8 @@
         return md.render(content);
     };
 
-    const deletePost = () => {
-        console.log('delete ', props.item);
+    const doDeletePost = () => {
+        deletePost(props.item);
         showDeletePostDialog.value = false;
     };
 
