@@ -199,7 +199,15 @@
     const props = defineProps<IProps>();
 
     const sidebarFileList = computed(() => {
-        return props.chat.messages.filter(msg => msg.type === MessageTypes.FILE);
+        const files = props.chat.messages.filter(msg => msg.type === MessageTypes.FILE);
+        files.map(file => {
+            const txtToFind = `/api`;
+            const url = file.body.url;
+            const apiIdx = url.indexOf(txtToFind);
+            const urlV1 = `${url.substring(0, apiIdx)}/api/v1${url.substring(apiIdx + txtToFind.length, url.length)}`;
+            file.body.url = urlV1;
+        });
+        return files;
     });
 
     defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);

@@ -1,4 +1,4 @@
-export const calculateBaseUrl = userId => {
+export const calculateBaseUrl = (userId: string) => {
     let location = '';
     if (window.location.origin === 'http://localhost:8080') {
         return (location = 'http://localhost:3000');
@@ -8,6 +8,6 @@ export const calculateBaseUrl = userId => {
     return (location = `https://${userId}.${url.join('.')}`);
 };
 
-export const calcExternalResourceLink = location => {
+export const calcExternalResourceLink = (location: string) => {
     return `${window.location.origin}/api/v1/getExternalResource?resource=${location}`;
 };
