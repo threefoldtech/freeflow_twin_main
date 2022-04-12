@@ -46,6 +46,8 @@
 
     console.log('Version: ' + version);
 
+    document.querySelector('body').classList.add('overflow-y-hidden');
+
     const isDev = import.meta.env.DEV;
     const location = ref();
     myYggdrasilAddress().then(v => (location.value = v));
