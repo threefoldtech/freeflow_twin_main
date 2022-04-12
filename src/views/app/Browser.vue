@@ -1,20 +1,19 @@
 <template>
     <app-layout>
         <iframe
-            v-if='hasBrowserBeenStartedOnce && appName === AppType.Glass'
-            class='relative h-full w-full'
-            title='forum'
-            id='forum-iframe'
-            :src='iframeUrl'
-            allow='geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;'
+            v-if="appName === AppType.Glass"
+            class="relative h-full w-full"
+            title="forum"
+            id="forum-iframe"
+            :src="iframeUrl"
+            allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;"
         />
     </app-layout>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
     import { ref, onMounted, watch } from 'vue';
-    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
     import { useRouter } from 'vue-router';
     import { AppType } from '@/types/apps';
 
@@ -26,13 +25,14 @@
     });
 
     function browse() {
+        console.log(`CALLED`);
         iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
     }
 
-    watch(useRouter().currentRoute, (currentRoute) => {
+    watch(useRouter().currentRoute, currentRoute => {
         const routerApp = currentRoute.meta?.app;
         if (typeof routerApp === 'string') appName.value = routerApp;
     });
 </script>
 
-<style scoped type='text/css'></style>
+<style scoped type="text/css"></style>
