@@ -63,7 +63,7 @@ const initializeSocket = (username: string) => {
         addChat(newContactRequest);
     });
     state.socket.on('chat_updated', chat => {
-        console.log('chat updated');
+        console.log('chat updated', chat);
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });

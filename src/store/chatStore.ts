@@ -166,7 +166,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 to: name,
                 body: {
                     message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
-                        ', '
+                        ', ',
                     )}`,
                 } as SystemBody,
                 timeStamp: new Date(),
@@ -238,7 +238,7 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined
+    lastMessageId: string | undefined,
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
     if (lastMessageId) params.append('fromId', lastMessageId);
@@ -548,17 +548,26 @@ const readMessage = (chatId, messageId) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
+const updateContactsInGroup = async (groupId, contact: Contact, type: SystemMessageTypes) => {
     const { user } = useAuthState();
-    const myLocation = await myYggdrasilAddress();
+    const chat = getChat(groupId);
+    const admin = chat.contacts.find(c => c.id === chat.adminId);
+    if (!('location' in admin)) return;
+    const adminLocation = admin.location;
+
+    let msg = `${contact.id} has been removed from the group`;
+    if(type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
+    if(type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
+
+
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
         from: user.id,
         to: groupId,
         body: {
-            type: remove ? SystemMessageTypes.REMOVE_USER : SystemMessageTypes.ADD_USER,
-            message: `${contact.id} has been ${remove ? 'removed from' : 'added to'} the group`,
-            adminLocation: myLocation,
+            type,
+            message: msg,
+            adminLocation,
             contact,
         },
         timeStamp: new Date(),
