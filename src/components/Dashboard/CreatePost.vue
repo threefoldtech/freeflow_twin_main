@@ -192,6 +192,7 @@
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
         errorFileSize.value = false;
+        if (new_post_text.value.trim() === '') return
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);
