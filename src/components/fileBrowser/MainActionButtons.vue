@@ -13,7 +13,11 @@
             <i class="fas fa-plus"></i> Upload File(s)
         </button>
     </div>
-    <Dialog :model-value="showCreateFolderDialog" :noActions='false' @update-model-value="val => updateCreateFolderDialog(val)">
+    <Dialog
+        :model-value="showCreateFolderDialog"
+        :noActions="false"
+        @update-model-value="val => updateCreateFolderDialog(val)"
+    >
         <template v-slot:title>
             <h1>Create folder</h1>
         </template>
@@ -27,16 +31,7 @@
                     id="newFolder"
                     ref="newFolderInput"
                     v-model="manualContactAdd"
-                    class="
-                        shadow-sm
-                        focus:ring-primary focus:border-primary
-                        block
-                        w-full
-                        sm:text-sm
-                        border-gray-300
-                        rounded-md
-                        mt-1
-                    "
+                    class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1"
                     name="newFolder"
                     placeholder="New folder name"
                     type="text"
@@ -48,7 +43,11 @@
         </div>
     </Dialog>
 
-    <Dialog :model-value="showCreateFileDialog" :noActions='false' @update-model-value="val => updateCreateFileDialog(val)">
+    <Dialog
+        :model-value="showCreateFileDialog"
+        :noActions="false"
+        @update-model-value="val => updateCreateFileDialog(val)"
+    >
         <template v-slot:title>
             <h1>Add files</h1>
         </template>
@@ -86,13 +85,12 @@
 </template>
 
 <script lang="ts" setup>
-    import { defineComponent, ref, watch } from 'vue';
+    import { ref, watch } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import {createDirectory, uploadFiles, sharedDir, savedAttachments} from '@/store/fileBrowserStore';
+    import { createDirectory, uploadFiles, sharedDir, savedAttachments } from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
-
 
     const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);
@@ -103,9 +101,13 @@
     const createFolderErrors = ref<string[]>([]);
     const manualContactAdd = ref<string>('');
     const fileUploadErrors = ref<string[]>([]);
+    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
 
     watch(manualContactAdd, () => {
         createFolderErrors.value = [];
+        if (format.test(manualContactAdd.value))
+            createFolderErrors.value.push('No special characters allowed in folder names.');
+
         if (manualContactAdd.value.includes('/')) {
             createFolderErrors.value.push("'/' is not allowed in folder names.");
         }
@@ -165,14 +167,13 @@
             return;
         }
 
-        if (manualContactAdd.value.includes('/')) {
-            createFolderErrors.value.push("'/' is not allowed in folder names.");
-        }
+        if (format.test(manualContactAdd.value))
+            createFolderErrors.value.push('No special characters allowed in folder names.');
         if (manualContactAdd.value.length >= 50) {
             createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
         }
 
-        if (manualContactAdd.value.includes('/') || manualContactAdd.value.length >= 50) return;
+        if (format.test(manualContactAdd.value) || manualContactAdd.value.length >= 50) return;
 
         createDirectory(newFolderInput.value.value);
         showCreateFolderDialog.value = false;
