@@ -53,6 +53,7 @@ const initializeSocket = (username: string) => {
             notify({ id: message.id });
         }
         const { addMessage } = usechatsActions();
+        console.log('message', message);
 
         addMessage(message.to === user.id ? message.from : message.to, message);
     });

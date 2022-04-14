@@ -436,10 +436,11 @@
         if (chat.value.isGroup) {
             const { updateContactsInGroup } = usechatsActions();
             await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP);
+        } else {
+            await sendRemoveChat(chat.value.chatId);
+            localStorage.setItem('lastOpenedChat', '');
+            router.push({ name: 'whisper' });
         }
-        await sendRemoveChat(chat.value.chatId);
-        localStorage.setItem('lastOpenedChat', '');
-        router.push({ name: 'whisper' });
     };
 
     const blockChat = () => (showDialog.value = true);
