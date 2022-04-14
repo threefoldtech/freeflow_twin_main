@@ -207,6 +207,7 @@
 
     const scroll = () => {
         if (!messageBoxLocal.value) return;
+        console.log('yeet');
         messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
     };
 
@@ -295,15 +296,15 @@
     });
 
 
-    watch(props.chat.messages, () => {
+    watch(() => props.chat.messages, () => {
         nextTick(() => {
             const myName = window.location.host.split('.')[0];
             const lastItem = props.chat.messages[props.chat.messages.length - 1].from;
-
-            if (myName !== lastItem) return;
+            
+            //if (myName !== lastItem) return;
             messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
-
         });
+        
     });
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
