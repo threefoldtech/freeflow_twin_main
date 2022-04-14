@@ -207,7 +207,6 @@
 
     const scroll = () => {
         if (!messageBoxLocal.value) return;
-        console.log('yeet');
         messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
     };
 
