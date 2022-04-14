@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" :noActions='true'>
+    <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" :noActions="true">
         <template v-slot:title>
             <h1>Profile settings</h1>
         </template>
@@ -31,24 +31,7 @@
             <div class="relative w-full h-full">
                 <button
                     v-if="!isEditingStatus"
-                    class="
-                        absolute
-                        top-0
-                        mt-2
-                        mr-2
-                        right-0
-                        px-2
-                        py-1
-                        flex flex-row
-                        text-white
-                        font-bold
-                        bg-primary
-                        border-2 border-primary
-                        hover:text-primary hover:bg-white
-                        rounded-md
-                        cursor-pointer
-                        items-center
-                    "
+                    class="absolute top-0 mt-2 mr-2 right-0 px-2 py-1 flex flex-row text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer items-center"
                     @click="setEditStatus(true)"
                 >
                     <i class="fas fa-pen fa-xs mr-1 align-middle"></i>
@@ -57,25 +40,7 @@
 
                 <button
                     v-if="isEditingStatus"
-                    class="
-                        absolute
-                        top-1
-                        mt-2
-                        mr-2
-                        right-0
-                        px-2
-                        py-1
-                        flex flex-row
-                        ml-1
-                        text-white
-                        font-bold
-                        bg-primary
-                        border-2 border-primary
-                        hover:text-primary hover:bg-white
-                        rounded-md
-                        cursor-pointer
-                        items-center
-                    "
+                    class="absolute top-1 mt-2 mr-2 right-0 px-2 py-1 flex flex-row ml-1 text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer items-center"
                     @click="sendNewStatus"
                 >
                     <i class="fas fa-check fa-xs mr-1 align-middle"></i>
@@ -86,22 +51,7 @@
                     <textarea
                         v-model="userStatus"
                         style="resize: none"
-                        class="
-                            w-full
-                            autoexpand
-                            tracking-wide
-                            py-2
-                            px-4
-                            mb-3
-                            leading-relaxed
-                            appearance-none
-                            block
-                            w-full
-                            bg-gray-200
-                            border border-gray-200
-                            rounded
-                            focus:outline-none focus:bg-white focus:border-gray-500
-                        "
+                        class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
                         :disabled="!isEditingStatus"
                         :placeholder="myStatus"
                         maxlength="150"
@@ -122,22 +72,7 @@
                         <li class="flex flex-row justify-between items-center mt-2 pb-2 border-b">
                             <span>{{ blockedUser }}</span>
                             <button
-                                class="
-                                    px-4
-                                    py-2
-                                    text-base
-                                    font-medium
-                                    rounded-md
-                                    text-white
-                                    bg-primary
-                                    hover:bg-primary
-                                    focus:border-primary
-                                    active:bg-primary
-                                    ease-in-out
-                                    duration-150
-                                    cursor-pointer
-                                    uppercase
-                                "
+                                class="px-4 py-2 text-base font-medium rounded-md text-white bg-primary hover:bg-primary focus:border-primary active:bg-primary ease-in-out duration-150 cursor-pointer uppercase"
                                 @click="unblockUser(blockedUser)"
                             >
                                 unblock
@@ -156,7 +91,7 @@
                 </ul>
             </div>
         </div>
-        <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" :noActions='true'>
+        <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" :noActions="true">
             <template v-slot:title>
                 <h1>Avatar</h1>
             </template>
@@ -182,7 +117,9 @@
                     >
                         Cancel
                     </button>
-                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary">Save image</button>
+                    <button @click="saveNewAvatar" class="text-white py-2 px-4 rounded-md bg-primary">
+                        Save image
+                    </button>
                 </div>
             </div>
         </Dialog>
@@ -222,9 +159,9 @@
     const isHoveringAvatar = ref(false);
     const showEditAvatar = ref(false);
 
-    onBeforeMount(async() => {
-      await initBlocklist()
-    })
+    onBeforeMount(async () => {
+        await initBlocklist();
+    });
 
     watch(showEditAvatar, () => {
         if (showEditAvatar.value) {

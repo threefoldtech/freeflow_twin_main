@@ -27,50 +27,17 @@
                         <thead class="bg-gray-100">
                             <tr>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                        sticky
-                                        top-0
-                                        z-50
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 z-50"
                                     scope="col"
                                 >
                                     Chats
                                 </th>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                        sticky
-                                        top-0
-                                        z-50
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 z-50"
                                     scope="col"
                                 ></th>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                        sticky
-                                        top-0
-                                        z-50
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 z-50"
                                     scope="col"
                                 ></th>
                             </tr>
@@ -91,17 +58,7 @@
                                 </td>
                                 <td>
                                     <div
-                                        class="
-                                            cursor-pointer
-                                            rounded-xl
-                                            bg-gray-50
-                                            border border-gray-200
-                                            w-28
-                                            justify-between
-                                            flex
-                                            content-center
-                                            items-center
-                                        "
+                                        class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center"
                                     >
                                         <span
                                             :class="{ 'bg-primary text-white': !item.canWrite }"

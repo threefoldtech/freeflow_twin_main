@@ -42,12 +42,12 @@
             </footer>
         </div>
         <div class="hidden lg:block lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-<!--            <img  Alternative image-->
-<!--                class="absolute inset-0 h-full w-full object-cover"-->
-<!--                src="https://images.unsplash.com/photo-1531771686035-25f47595c87a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=930&q=80"-->
-<!--                alt="computer"-->
-<!--            />-->
-          <img
+            <!--            <img  Alternative image-->
+            <!--                class="absolute inset-0 h-full w-full object-cover"-->
+            <!--                src="https://images.unsplash.com/photo-1531771686035-25f47595c87a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=930&q=80"-->
+            <!--                alt="computer"-->
+            <!--            />-->
+            <img
                 class="absolute inset-0 h-full w-full object-cover"
                 src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1472&q=80"
                 alt="computer"

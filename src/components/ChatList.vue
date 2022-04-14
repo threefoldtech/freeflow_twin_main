@@ -79,12 +79,25 @@
                     v-if="filteredChatRequests.length === 0 && filteredChats.length == 0"
                     class="text-center collapsed-bar:hidden mt-4"
                 >
-                    <p>No messages yet</p>
-                    <button class="mt-2 border rounded-full px-4" @click="sendUpdate(true)">Add a contact</button>
+                    <div class="text-center">
+                        <ChatIcon class="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No messages yet</h3>
+                        <p class="mt-1 text-sm text-gray-500">Start chatting by adding a contact</p>
+                        <div class="mt-6">
+                            <button
+                                type="button"
+                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none"
+                                @click="sendUpdate(true)"
+                            >
+                                <PlusIcon class="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+                                Add a contact
+                            </button>
+                        </div>
+                    </div>
                 </div>
                 <div
                     v-if="filteredChats && filteredChats.length"
-                    class="flex flex-col justify-center items-center pt-2 px-2 collapsed-bar:px-0"
+                    class="flex flex-col justify-center items-center pt-2 collapsed-bar:px-0"
                 >
                     <v-contextmenu ref="contextmenu-chat-card">
                         <v-contextmenu-item
@@ -117,16 +130,17 @@
                             >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete chat' }}
                         </v-contextmenu-item>
                     </v-contextmenu>
-                    <ChatCard
-                        v-for="chat in filteredChats"
-                        :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
-                        :chat="chat"
-                        :collapsed="collapsed"
-                        class="w-full rounded-lg collapsed-bar:rounded-none p-1.5 collapsed-bar:my-0 my-1 cursor-pointer"
-                        @selectChat="setSelected(chat.chatId)"
-                        @mousedown.right="setCurrentRightClickedItem(chat, RIGHT_CLICK_TYPE.CHAT_CARD)"
-                        v-contextmenu:contextmenu-chat-card
-                    />
+                    <ul role="list" class="divide-y divide-gray-200 border-t border-gray-200 w-full">
+                        <ChatCard
+                            v-for="chat in filteredChats"
+                            :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
+                            :chat="chat"
+                            :collapsed="collapsed"
+                            @selectChat="setSelected(chat.chatId)"
+                            @mousedown.right="setCurrentRightClickedItem(chat, RIGHT_CLICK_TYPE.CHAT_CARD)"
+                            v-contextmenu:contextmenu-chat-card
+                        />
+                    </ul>
                 </div>
             </div>
         </div>
@@ -163,7 +177,8 @@
     import { uniqBy } from 'lodash';
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
-    import { SearchIcon } from '@heroicons/vue/solid';
+    import { SearchIcon, PlusIcon } from '@heroicons/vue/solid';
+    import { ChatIcon } from '@heroicons/vue/outline';
     import {
         triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_CHAT_CARD,

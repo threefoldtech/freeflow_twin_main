@@ -10,18 +10,7 @@
             <i class="underline">{{ message.body.message }}</i>
         </div>
         <button
-            class="
-                text-xs text
-                bg-accent-800
-                focus:outline-none focus:ring-2
-                ring-accent-800 ring-offset-2 ring-offset-2
-                text-white
-                px-4
-                py-2
-                m-0
-                rounded-full
-                ml-6
-            "
+            class="text-xs text bg-accent-800 focus:outline-none focus:ring-2 ring-accent-800 ring-offset-2 ring-offset-2 text-white px-4 py-2 m-0 rounded-full ml-6"
         >
             <i class="fas fa-video mr-3"></i>
             JOIN

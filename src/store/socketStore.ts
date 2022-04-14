@@ -77,7 +77,7 @@ const initializeSocket = (username: string) => {
     state.socket.on('posts_updated', () => {
         console.log('posts updated');
         getAllPosts();
-    })
+    });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });

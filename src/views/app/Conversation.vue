@@ -190,7 +190,9 @@
                             </button>
                         </div>
                         <div class="max-w-full w-full bg-white border flex flex-col flex-grow">
-                            <div class="bg-white pb-4 w-full mb-4 p-6 flex min-h-64 justify-start relative">
+                            <div
+                                class="bg-white pb-4 w-full p-4 flex border-b-8 border-gray-100 justify-start relative"
+                            >
                                 <XIcon
                                     class="w-5 h-5 absolute right-5 top-5 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-100 hidden xl:inline"
                                     @click="disableSidebar"
@@ -211,7 +213,6 @@
                                     </p>
                                 </div>
                             </div>
-                            <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
                             <group-management
                                 :chat="chat"
                                 @app-call="popupMeeting"
@@ -339,7 +340,7 @@
 
     onBeforeMount(async () => {
         await retrieveChats();
-    })
+    });
 
     const truncate = (value, limit = 20) => {
         if (value.length > limit) {

@@ -158,7 +158,7 @@ export const goToShared = async () => {
     searchResults.value = [];
     searchDirValue.value = '';
 
-    await router.push({ name: 'sharedWithMe', });
+    await router.push({ name: 'sharedWithMe' });
     await getSharedContent();
 };
 

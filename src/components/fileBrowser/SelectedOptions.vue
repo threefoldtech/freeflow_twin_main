@@ -42,20 +42,7 @@
         </div>
         <div
             v-if="copiedFiles.length > 0"
-            class="
-                mx-2
-                px-2
-                py-1
-                text-white
-                font-bold
-                bg-primary
-                border-2 border-primary
-                hover:text-primary hover:bg-white
-                rounded-md
-                cursor-pointer
-                flex
-                fex-row
-            "
+            class="mx-2 px-2 py-1 text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer flex fex-row"
             @click="copyPasteSelected"
         >
             <p>Paste {{ copiedFiles.length }} file(s)</p>
@@ -66,7 +53,7 @@
         <Dialog
             :modelValue="showDeleteDialog"
             @update-model-value="showDeleteDialog = false"
-            :noActions='true'
+            :noActions="true"
             class="max-w-10"
         >
             <template v-slot:title class="center">
@@ -94,7 +81,7 @@
                 </button>
             </div>
         </Dialog>
-        <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" :noActions='true'>
+        <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" :noActions="true">
             <template v-slot:title class="center">
                 <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
@@ -105,15 +92,7 @@
                     v-model="newName"
                     name="rename"
                     id="rename"
-                    class="
-                        shadow-sm
-                        focus:ring-primary focus:border-primary
-                        block
-                        w-full
-                        sm:text-sm
-                        border-gray-300
-                        rounded-md
-                    "
+                    class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md"
                     :placeholder="selectedPaths[0].name"
                 />
                 <div
@@ -146,7 +125,7 @@
                 </button>
             </div>
         </Dialog>
-        <Dialog :modelValue="showShareDialog" @update-model-value="resetShareDialog" :noActions='true'>
+        <Dialog :modelValue="showShareDialog" @update-model-value="resetShareDialog" :noActions="true">
             <template v-slot:title>
                 <h1 class="text-center">Share files</h1>
             </template>
@@ -168,7 +147,7 @@
 </template>
 
 <script setup lang="ts">
-import {computed, defineComponent, onBeforeMount, onMounted, ref, watch} from 'vue';
+    import { computed, defineComponent, onBeforeMount, onMounted, ref, watch } from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -199,46 +178,50 @@ import {computed, defineComponent, onBeforeMount, onMounted, ref, watch} from 'v
     import { SystemMessageTypes, MessageTypes } from '@/types';
     import { createNotification } from '@/store/notificiationStore';
     import { showShareDialog } from '@/services/dialogService';
-import {
-  currentRightClickedItem,
-  RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
-  RIGHT_CLICK_TYPE,
-  rightClickItemAction, triggerWatchOnRightClickItem
-} from '@/store/contextmenuStore'
+    import {
+        currentRightClickedItem,
+        RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
+        RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        triggerWatchOnRightClickItem,
+    } from '@/store/contextmenuStore';
 
     const { chats } = useChatsState();
     const { retrieveChats, sendMessage } = usechatsActions();
 
     const tabs = ['Create shares', 'Edit shares'];
 
-    watch(triggerWatchOnRightClickItem,async () => {
-      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE){
-        selectedPaths.value.length = 0;
-        //@ts-ignore
-        selectedPaths.value[0] = currentRightClickedItem.value.data
-        switch(rightClickItemAction.value){
-          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
-            showDeleteDialog.value = true;
-            break;
-          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
-            showRenameDialog.value = true;
-            newName.value = currentRightClickedItem.value.data.name
-            break;
-          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
-            await downloadFiles()
-            break;
-          case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
-            showShareDialog.value = true;
-            break;
-          default:
-            break;
-        }
-      }
-      return;
-    }, {deep: true})
+    watch(
+        triggerWatchOnRightClickItem,
+        async () => {
+            if (currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE) {
+                selectedPaths.value.length = 0;
+                //@ts-ignore
+                selectedPaths.value[0] = currentRightClickedItem.value.data;
+                switch (rightClickItemAction.value) {
+                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
+                        showDeleteDialog.value = true;
+                        break;
+                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
+                        showRenameDialog.value = true;
+                        newName.value = currentRightClickedItem.value.data.name;
+                        break;
+                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
+                        await downloadFiles();
+                        break;
+                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
+                        showShareDialog.value = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return;
+        },
+        { deep: true }
+    );
 
-    onMounted(() => {
-    })
+    onMounted(() => {});
 
     let debounce;
     const showDeleteDialog = ref(false);

@@ -24,7 +24,7 @@
                 'bg-red-500': status && !status.isOnline,
                 'bg-green-500': status && status.isOnline,
             }"
-            class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
+            class="h-3 w-3 bg-gray-300 rounded-full absolute ring-2 ring-white bottom-0 right-0 transition-all"
         ></div>
 
         <div
