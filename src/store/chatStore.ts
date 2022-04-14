@@ -165,7 +165,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
+                    message: `Group created by ${user.id} with the following initial member: ${contactInGroup.join(
                         ', '
                     )}`,
                 } as SystemBody,
