@@ -1,26 +1,46 @@
 <template>
-  <v-contextmenu ref="contextmenu-filebrowser-item-local">
-    <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
-                                  }">Share</v-contextmenu-item>
-    <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
-                                  }">Download</v-contextmenu-item>
-    <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME
-                                  }">Rename</v-contextmenu-item>
-    <v-contextmenu-item @click="() => {
-                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE
-                                  }">Delete</v-contextmenu-item>
-  </v-contextmenu>
+    <v-contextmenu ref="contextmenu-filebrowser-item-local">
+        <v-contextmenu-item
+            @click="
+                () => {
+                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
+                }
+            "
+            >Share</v-contextmenu-item
+        >
+        <v-contextmenu-item
+            @click="
+                () => {
+                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
+                }
+            "
+            >Download</v-contextmenu-item
+        >
+        <v-contextmenu-item
+            @click="
+                () => {
+                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME;
+                }
+            "
+            >Rename</v-contextmenu-item
+        >
+        <v-contextmenu-item
+            @click="
+                () => {
+                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE;
+                }
+            "
+            >Delete</v-contextmenu-item
+        >
+    </v-contextmenu>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
-              <ViewSelect />
+                <ViewSelect />
                 <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
@@ -28,9 +48,9 @@
                                 Moving {{ selectedPaths.length }} selected File(s)
                             </div>
                         </div>
-                      <div v-if="savedAttachmentsIsLoading" class="w-full h-36 flex justify-center items-center">
-                        <Spinner  />
-                      </div>
+                        <div v-if="savedAttachmentsIsLoading" class="w-full h-36 flex justify-center items-center">
+                            <Spinner />
+                        </div>
                         <table
                             v-if="fileBrowserTypeView === 'LIST' && !savedAttachmentsIsLoading"
                             :key="currentDirectory"
@@ -41,16 +61,7 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th
-                                        class="
-                                            hidden
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                         scope="col"
                                     >
                                         <input
@@ -65,15 +76,7 @@
                                     </th>
                                     <th
                                         :class="{ active: 'name' === currentSort }"
-                                        class="
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                                         scope="col"
                                         @click="sortAction('name')"
                                     >
@@ -82,15 +85,7 @@
                                     </th>
                                     <th
                                         :class="{ active: 'extension' === currentSort }"
-                                        class="
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                                         scope="col"
                                         @click="sortAction('extension')"
                                     >
@@ -99,15 +94,7 @@
                                     </th>
                                     <th
                                         :class="{ active: 'size' === currentSort }"
-                                        class="
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                                         scope="col"
                                         @click="sortAction('size')"
                                     >
@@ -116,15 +103,7 @@
                                     </th>
                                     <th
                                         :class="{ active: 'lastModified' === currentSort }"
-                                        class="
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                                         scope="col"
                                         @click="sortAction('lastModified')"
                                     >
@@ -140,7 +119,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <tr v-if="currentDirectory === '/' && !savedAttachments && $route.name === 'quantum'" class="hover:bg-gray-200 cursor-pointer" @dblclick="goToShared()">
+                                <tr
+                                    v-if="currentDirectory === '/' && !savedAttachments && $route.name === 'quantum'"
+                                    class="hover:bg-gray-200 cursor-pointer"
+                                    @dblclick="goToShared()"
+                                >
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td class="px-6 py-4 whitespace-nowrap" @click="goToShared()">
                                         <div class="flex flex-row items-center text-md">
@@ -154,7 +137,11 @@
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
                                 </tr>
-                                <tr v-if="currentDirectory === '/' && !savedAttachments  && $route.name === 'quantum'" class="hover:bg-gray-200 cursor-pointer" @dblclick="router.push({ name: 'savedAttachments' })">
+                                <tr
+                                    v-if="currentDirectory === '/' && !savedAttachments && $route.name === 'quantum'"
+                                    class="hover:bg-gray-200 cursor-pointer"
+                                    @dblclick="router.push({ name: 'savedAttachments' })"
+                                >
                                     <td class="px-6 py-4 whitespace-nowrap hidden"></td>
                                     <td
                                         class="px-6 py-4 whitespace-nowrap"
@@ -164,7 +151,7 @@
                                             <div class="mr-3 w-7 text-center">
                                                 <i class="fas fa-share-alt-square fa-2x text-blue-400"></i>
                                             </div>
-                                            <span class="hover:underline cursor-pointer">Saved attachments</span>                                       
+                                            <span class="hover:underline cursor-pointer">Saved attachments</span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">-</td>
@@ -227,71 +214,25 @@
                         <!-- Local filebrowser -->
                         <ul
                             v-if="fileBrowserTypeView === 'GRID' && !savedAttachmentsIsLoading"
-                            class="
-                                grid grid-cols-2
-                                gap-x-2 gap-y-4
-                                sm:grid-cols-4 sm:gap-x-4
-                                lg:grid-cols-6
-                                xl:grid-cols-8
-                                2xl:grid-cols-10
-                                xl:gap-x-6
-                                mt-4
-                            "
+                            class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
                             role="list"
                         >
                             <p
                                 v-if="sortContent().length === 0"
-                                class="
-                                    px-6
-                                    py-4
-                                    whitespace-nowrap
-                                    col-span-12
-                                    text-base
-                                    font-medium
-                                    text-center text-gray-800
-                                    flex
-                                    justify-center
-                                    flex-col
-                                "
+                                class="px-6 py-4 whitespace-nowrap col-span-12 text-base font-medium text-center text-gray-800 flex justify-center flex-col"
                             >
                                 No items in this folder
                                 <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
                             </p>
                             <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
+                                    class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
                                     @click="goToShared()"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
                                         <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
                                         <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
+                                            class="block text-sm font-medium text-gray-900 truncate pointer-events-none ml-4"
                                         >
                                             Shared with me
                                         </p>
@@ -301,39 +242,13 @@
                             </li>
                             <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        border-2
-                                        bg-white
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
+                                    class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
                                     @click="router.push({ name: 'savedAttachments' })"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
                                         <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
                                         <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
+                                            class="block text-sm font-medium text-gray-900 truncate pointer-events-none ml-4"
                                         >
                                             Saved attachments
                                         </p>
@@ -357,24 +272,7 @@
                             >
                                 <div
                                     :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        rounded-lg
-                                        border-2
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-center
-                                        items-center
-                                    "
+                                    class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
@@ -383,15 +281,7 @@
                                             class="fa-lg"
                                         ></i>
                                         <p
-                                            class="
-                                                block
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                                ml-4
-                                            "
+                                            class="block text-sm font-medium text-gray-900 truncate pointer-events-none ml-4"
                                         >
                                             {{ item.name
                                             }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
@@ -411,64 +301,64 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, onBeforeMount, ref} from 'vue';
-import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
-import {
-  currentDirectory,
-  currentDirectoryContent,
-  currentSort,
-  itemAction,
-  PathInfoModel,
-  selectItem,
-  deselectAll,
-  deselectItem,
-  sortContent,
-  sortAction,
-  currentSortDir,
-  getFileLastModified,
-  getFileExtension,
-  getFileSize,
-  selectedPaths,
+    import { computed, onBeforeMount, ref } from 'vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+    import {
+        currentDirectory,
+        currentDirectoryContent,
+        currentSort,
+        itemAction,
+        PathInfoModel,
+        selectItem,
+        deselectAll,
+        deselectItem,
+        sortContent,
+        sortAction,
+        currentSortDir,
+        getFileLastModified,
+        getFileExtension,
+        getFileSize,
+        selectedPaths,
+        selectAll,
+        getIconColor,
+        getIcon,
+        uploadFiles,
+        equals,
+        moveFiles,
+        sharedDir,
+        sharedContent,
+        getSharedContent,
+        searchResults,
+        searchDirValue,
+        currentShare,
+        isDraggingFiles,
+        goToShared,
+        fileBrowserTypeView,
+        goToFilesInChat,
+        savedAttachments,
+        savedAttachmentsIsLoading,
+    } from '@/store/fileBrowserStore';
+    import { useRouter, useRoute } from 'vue-router';
+    import FileDropArea from '@/components/FileDropArea.vue';
+    import { useSocketActions } from '@/store/socketStore';
+    import { useAuthState } from '@/store/authStore';
+    import {
+        currentRightClickedItem,
+        rightClickItemAction,
+        triggerWatchOnRightClickItem,
+        RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
+        RIGHT_CLICK_TYPE,
+    } from '@/store/contextmenuStore';
+    import Spinner from '@/components/Spinner.vue';
 
-  selectAll,
-  getIconColor,
-  getIcon,
-  uploadFiles,
-  equals,
-  moveFiles,
-  sharedDir,
-  sharedContent,
-  getSharedContent,
-  searchResults,
-  searchDirValue,
-  currentShare,
-  isDraggingFiles,
-  goToShared,
-  fileBrowserTypeView,
-  goToFilesInChat,
-  savedAttachments, savedAttachmentsIsLoading,
-} from '@/store/fileBrowserStore';
-import {useRouter, useRoute} from 'vue-router';
-import FileDropArea from '@/components/FileDropArea.vue';
-import {useSocketActions} from '@/store/socketStore';
-import {useAuthState} from '@/store/authStore';
-import {
-  currentRightClickedItem,
-  rightClickItemAction,
-  triggerWatchOnRightClickItem,
-  RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
-  RIGHT_CLICK_TYPE,
-  } from '@/store/contextmenuStore'
-import Spinner from "@/components/Spinner.vue";
-
-const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
+    const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
     const ghostImage = ref<HTMLDivElement>();
     const dragOverItem = ref<PathInfoModel>();
     let tempCounter = 0;
     const route = useRoute();
     const router = useRouter();
-    
+
     const { user } = useAuthState();
 
     onBeforeMount(() => {
@@ -476,106 +366,106 @@ const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' 
         initializeSocket(user.id.toString());
     });
 
-    const setCurrentRightClickedItem = (item) => {
-      currentRightClickedItem.value = {
-        type: RIGHT_CLICK_TYPE.LOCAL_FILE,
-        data: item
-      }
-    }
+    const setCurrentRightClickedItem = item => {
+        currentRightClickedItem.value = {
+            type: RIGHT_CLICK_TYPE.LOCAL_FILE,
+            data: item,
+        };
+    };
 
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) selectItem(item);
         else deselectItem(item);
     };
 
-const isSelected = (item: PathInfoModel) => {
-    if (!selectedPaths.value.includes(item)) return false;
-    else return true;
-};
+    const isSelected = (item: PathInfoModel) => {
+        if (!selectedPaths.value.includes(item)) return false;
+        else return true;
+    };
 
-const handleAllSelect = (val: any) => {
-    if (val.target.checked) selectAll();
-    else deselectAll();
-};
+    const handleAllSelect = (val: any) => {
+        if (val.target.checked) selectAll();
+        else deselectAll();
+    };
 
-const handleItemClick = (item: PathInfoModel) => {
-    itemAction(item, router);
-};
+    const handleItemClick = (item: PathInfoModel) => {
+        itemAction(item, router);
+    };
 
-const onDragStart = (event, item) => {
-    isDraggingFiles.value = true;
-    if (!selectedPaths.value.includes(item)) selectItem(item);
-    event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
-};
+    const onDragStart = (event, item) => {
+        isDraggingFiles.value = true;
+        if (!selectedPaths.value.includes(item)) selectItem(item);
+        event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
+    };
 
-const onDragOver = (event: Event, item: PathInfoModel) => {
-    dragOverItem.value = item;
-};
+    const onDragOver = (event: Event, item: PathInfoModel) => {
+        dragOverItem.value = item;
+    };
 
-const canBeDropped = (item: PathInfoModel) => {
-    return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
-};
+    const canBeDropped = (item: PathInfoModel) => {
+        return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
+    };
 
-const onDragLeaveParent = () => {
-    tempCounter--;
-    if (tempCounter === 0) dragOverItem.value = undefined;
-};
+    const onDragLeaveParent = () => {
+        tempCounter--;
+        if (tempCounter === 0) dragOverItem.value = undefined;
+    };
 
-const onDragEnterParent = () => {
-    tempCounter++;
-};
+    const onDragEnterParent = () => {
+        tempCounter++;
+    };
 
-const highlight = (item: PathInfoModel) => {
-    return equals(item, dragOverItem.value) && canBeDropped(item);
-};
+    const highlight = (item: PathInfoModel) => {
+        return equals(item, dragOverItem.value) && canBeDropped(item);
+    };
 
-const onDrop = (item: PathInfoModel) => {
-    tempCounter = 0;
-    if (!canBeDropped(item)) return;
-    dragOverItem.value = undefined;
-    moveFiles(
-        item.path,
-        selectedPaths.value.map(x => x.path)
-    );
-    selectedPaths.value = [];
-};
+    const onDrop = (item: PathInfoModel) => {
+        tempCounter = 0;
+        if (!canBeDropped(item)) return;
+        dragOverItem.value = undefined;
+        moveFiles(
+            item.path,
+            selectedPaths.value.map(x => x.path)
+        );
+        selectedPaths.value = [];
+    };
 
-const onDragEnd = () => {
-    isDraggingFiles.value = false;
-};
+    const onDragEnd = () => {
+        isDraggingFiles.value = false;
+    };
 
-const goBack = () => {
-    router.go(-1);
-};
+    const goBack = () => {
+        router.go(-1);
+    };
 </script>
 
 <style scoped>
-th.active .arrow {
-    opacity: 1;
-}
+    th.active .arrow {
+        opacity: 1;
+    }
 
-.arrow {
-    display: inline-block;
-    vertical-align: middle;
-    width: 0;
-    height: 0;
-    margin-left: 5px;
-    opacity: 0;
-}
+    .arrow {
+        display: inline-block;
+        vertical-align: middle;
+        width: 0;
+        height: 0;
+        margin-left: 5px;
+        opacity: 0;
+    }
 
-.arrow.asc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-bottom: 4px solid #1f0f5b;
-}
+    .arrow.asc {
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-bottom: 4px solid #1f0f5b;
+    }
 
-.arrow.desc {
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid #1f0f5b;
-}
+    .arrow.desc {
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 4px solid #1f0f5b;
+    }
 
-.hiddenItems {
-    z-index: -20;
-}
+    .hiddenItems {
+        z-index: -20;
+    }
 </style>
