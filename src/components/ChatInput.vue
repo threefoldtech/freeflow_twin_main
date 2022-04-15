@@ -120,7 +120,7 @@ import { uuidv4 } from '@/common';
 import { useScrollActions } from '@/store/scrollStore';
 import { EmojiPickerElement } from 'unicode-emoji-picker';
 
-const emit = defineEmits(['messageSend']);
+const emit = defineEmits(['messageSend', 'failed']);
 
 interface IProps {
     chat: Chat;
@@ -289,8 +289,12 @@ const chatsend = async e => {
     }
 
     if (attachment.value) {
-        sendFile(selectedId, attachment.value);
+        const success = await sendFile(selectedId, attachment.value);
         removeFile();
+        if(!success) {
+            emit('failed')
+            return
+        }
     }
     emit('messageSend');
 
