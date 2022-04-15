@@ -382,7 +382,7 @@ export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
-    if (selectedFile.size > 25000000) return false;
+    if (selectedFile.size > 20000000) return false;
     const { user } = useAuthState();
     let formData = new FormData();
     if (!isBlob) {

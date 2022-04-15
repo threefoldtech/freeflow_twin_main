@@ -158,7 +158,7 @@
                                     ></div>
                                 </template>
                             </MessageBox>
-                            <ChatInput v-if='!blocked' :chat='chat' @failed='showFileToBig'
+                            <ChatInput v-if='!blocked' :chat='chat' @failed='showError = true;'
                                        @messageSend='scrollToBottom(true)' />
                         </FileDropArea>
                     </div>
@@ -287,7 +287,7 @@
                 <h1 class='text-center'>Failed to send file</h1>
             </template>
             <div>
-                The file was to big, the maximum supported size is 25MB.
+                The file was to big, the maximum supported size is 20MB.
             </div>
         </Dialog>
     </div>
@@ -366,17 +366,13 @@
         for (const f of files) {
             const success = await sendFile(chat.value.chatId, f);
             if (!success) {
-                showFileToBig();
+                showError.value = true;
                 return;
             }
         }
     };
 
     const showError = ref(false);
-    const showFileToBig = () => {
-        showError.value = true;
-        console.log('fileToBig');
-    };
 
     const getMessagesSortedByUser = computed(() => {
         let chatBlockIndex = 0;
