@@ -166,7 +166,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 to: name,
                 body: {
                     message: `Group created by ${user.id} with the following initial member: ${contactInGroup.join(
-                        ', '
+                        ', ',
                     )}`,
                 } as SystemBody,
                 timeStamp: new Date(),
@@ -238,7 +238,7 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined
+    lastMessageId: string | undefined,
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
     if (lastMessageId) params.append('fromId', lastMessageId);
@@ -382,6 +382,7 @@ export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
+    if (selectedFile.size > 20000000) return false;
     const { user } = useAuthState();
     let formData = new FormData();
     if (!isBlob) {
@@ -431,6 +432,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                 });
             },
         });
+        return true;
     } catch (e) {
         catchErrorsSendFile(e, uuid);
     }
