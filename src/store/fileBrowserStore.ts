@@ -383,7 +383,13 @@ export const searchDir = async () => {
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {
-    if (!name) return;
+    const characterLimit = 50;
+    if (!name || name.length === 0 || name.length > characterLimit) {
+        createNotification('Failed to rename file',
+            `Filename cannot be empty or longer than ${characterLimit} characters`,
+            Status.Error);
+        return;
+    }
     const oldPath = item.path;
     let newPath = pathJoin([currentDirectory.value, name]);
     if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
