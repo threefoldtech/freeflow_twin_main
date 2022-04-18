@@ -291,9 +291,7 @@ export const downloadFileForPreview = async (path: string) => {
 };
 
 export const goToFolderInCurrentDirectory = (item: PathInfoModel, attachment: boolean = false) => {
-    let currentPath = currentDirectory.value;
-    if (!currentPath || currentPath[currentPath.length - 1] !== rootDirectory) currentPath += '/';
-    currentPath += item.name;
+    const currentPath = item.path;
     if (savedAttachments.value) {
         router.push({
             name: 'savedAttachments',
@@ -462,7 +460,7 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
     if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
-        router.push({
+        await router.push({
             name: 'savedAttachmentsFromChat',
             params: {
                 chatId: item.name,
