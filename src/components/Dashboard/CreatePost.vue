@@ -118,7 +118,7 @@
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
     >
-        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-40 bg-black opacity-10"></div>
+        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-30 bg-black opacity-10"></div>
     </TransitionRoot>
 </template>
 
