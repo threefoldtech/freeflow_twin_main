@@ -96,7 +96,7 @@
                     >
                         <FileDropArea
                             class='h-full flex flex-col'
-                            @send-file='doSendFiles'
+                            @send-file='files => files.forEach(f => sendFile(chat.chatId, f))'
                         >
                             <div
                                 class='topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden md:flex'
@@ -158,8 +158,7 @@
                                     ></div>
                                 </template>
                             </MessageBox>
-                            <ChatInput v-if='!blocked' :chat='chat' @failed='showError = true;'
-                                       @messageSend='scrollToBottom(true)' />
+                            <ChatInput v-if='!blocked' :chat='chat' @messageSend='scrollToBottom(true)' />
                         </FileDropArea>
                     </div>
                     <div v-else class='grid h-full w-full place-items-center'>
@@ -297,11 +296,11 @@
     import { useScrollActions, useScrollState } from '@/store/scrollStore';
     import AppLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
-    import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
+    import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
     import { useContactsState } from '@/store/contactStore';
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
-    import { useChatsState, usechatsActions, isLoading } from '@/store/chatStore';
+    import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
@@ -323,9 +322,9 @@
     import { XIcon } from '@heroicons/vue/outline';
     import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
     import {
+        conversationComponentRerender,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
-        conversationComponentRerender,
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
 
@@ -458,10 +457,15 @@
 
     const deleteChat = () => (showDeleteDialog.value = true);
 
-    const doDeleteChat = () => {
-        sendRemoveChat(chat.value.chatId);
-        localStorage.setItem('lastOpenedChat', '');
-        router.push({ name: 'whisper' });
+    const doDeleteChat = async () => {
+        if (chat.value.isGroup) {
+            const { updateContactsInGroup } = usechatsActions();
+            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP);
+        } else {
+            await sendRemoveChat(chat.value.chatId);
+            localStorage.setItem('lastOpenedChat', '');
+            router.push({ name: 'whisper' });
+        }
     };
 
     const blockChat = () => (showDialog.value = true);

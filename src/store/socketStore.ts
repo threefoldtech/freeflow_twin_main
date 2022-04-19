@@ -53,6 +53,7 @@ const initializeSocket = (username: string) => {
             notify({ id: message.id });
         }
         const { addMessage } = usechatsActions();
+        console.log('message', message);
 
         addMessage(message.to === user.id ? message.from : message.to, message);
     });
@@ -63,7 +64,7 @@ const initializeSocket = (username: string) => {
         addChat(newContactRequest);
     });
     state.socket.on('chat_updated', chat => {
-        console.log('chat updated');
+        console.log('chat updated', chat);
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });
