@@ -149,12 +149,10 @@ const { addScrollEvent } = useScrollActions();
 
 if (props.chat.draft) {
    if(props.chat.draft?.action === "EDIT"){
-       messageState.actions[props.chat.draft.id]
-        messageInput.value = String(props.chat.draft.body.body.message)
+       messageInput.value = String(props.chat.draft.body.body)
        editMessage(props.chat.draft.to, props.chat.draft.body)
    }
    if(props.chat.draft?.action === "REPLY"){
-    messageState.actions[props.chat.draft.id]
        messageInput.value = String(props.chat.draft.body.message)
        replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage)
    }
@@ -394,11 +392,13 @@ const onPaste = (e: ClipboardEvent) => {
 };
 
 const getActionMessage = computed(() => {
+    const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
+    if(!message) return 'Message not found'
     switch (action.value.message.type) {
         case MessageTypes.QUOTE:
             return (action.value.message.body as QuoteBodyType).message;
         case MessageTypes.STRING:
-            return action.value.message.body;
+            return message.body;
         case MessageTypes.FILE:
             if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
             return action.value.message.type;
