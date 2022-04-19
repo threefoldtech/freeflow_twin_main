@@ -291,9 +291,7 @@ export const downloadFileForPreview = async (path: string) => {
 };
 
 export const goToFolderInCurrentDirectory = (item: PathInfoModel, attachment: boolean = false) => {
-    let currentPath = currentDirectory.value;
-    if (!currentPath || currentPath[currentPath.length - 1] !== rootDirectory) currentPath += '/';
-    currentPath += item.name;
+    const currentPath = item.path;
     if (savedAttachments.value) {
         router.push({
             name: 'savedAttachments',
@@ -385,7 +383,13 @@ export const searchDir = async () => {
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {
-    if (!name) return;
+    const characterLimit = 50;
+    if (!name || name.length === 0 || name.length > characterLimit) {
+        createNotification('Failed to rename file',
+            `Filename cannot be empty or longer than ${characterLimit} characters`,
+            Status.Error);
+        return;
+    }
     const oldPath = item.path;
     let newPath = pathJoin([currentDirectory.value, name]);
     if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
@@ -462,7 +466,7 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
     if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
-        router.push({
+        await router.push({
             name: 'savedAttachmentsFromChat',
             params: {
                 chatId: item.name,

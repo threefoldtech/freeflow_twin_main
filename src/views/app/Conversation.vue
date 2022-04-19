@@ -276,6 +276,19 @@
                 </button>
             </div>
         </Dialog>
+        <Dialog
+            v-model='showError'
+            class='max-w-10'
+            :noActions='true'
+            @update-model-value='showError = false'
+        >
+            <template v-slot:title class='center'>
+                <h1 class='text-center'>Failed to send file</h1>
+            </template>
+            <div>
+                The file was to big, the maximum supported size is 20MB.
+            </div>
+        </Dialog>
     </div>
 </template>
 
@@ -347,6 +360,18 @@
         }
         return value;
     };
+
+    const doSendFiles = async (files: []) => {
+        for (const f of files) {
+            const success = await sendFile(chat.value.chatId, f);
+            if (!success) {
+                showError.value = true;
+                return;
+            }
+        }
+    };
+
+    const showError = ref(false);
 
     const getMessagesSortedByUser = computed(() => {
         let chatBlockIndex = 0;
