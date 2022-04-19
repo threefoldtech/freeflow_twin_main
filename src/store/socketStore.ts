@@ -1,8 +1,7 @@
-import { Id, Message } from '@/types';
+import { Chat, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
-import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
@@ -33,14 +32,13 @@ const initializeSocket = (username: string) => {
     state.socket.emit('identify', {
         name: username,
     });
-    state.socket.on('chat_removed', chatId => {
-        console.log('chat_removed');
+    state.socket.on('chat_removed', (chatId: string) => {
         removeChat(chatId);
     });
-    state.socket.on('chat_blocked', chatId => {
+    state.socket.on('chat_blocked', (chatId: string) => {
         addUserToBlockList(chatId);
     });
-    state.socket.on('message', message => {
+    state.socket.on('message', (message: Message<any>) => {
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
@@ -53,37 +51,31 @@ const initializeSocket = (username: string) => {
             notify({ id: message.id });
         }
         const { addMessage } = usechatsActions();
-        console.log('message', message);
 
         addMessage(message.to === user.id ? message.from : message.to, message);
     });
-    state.socket.on('connectionRequest', newContactRequest => {
+    state.socket.on('connectionRequest', (newContactRequest: Chat) => {
         const { addChat } = usechatsActions();
-        const { contacts } = useContactsState();
-        const { user } = useAuthState();
         addChat(newContactRequest);
     });
-    state.socket.on('chat_updated', chat => {
-        console.log('chat updated', chat);
+    state.socket.on('chat_updated', (chat: Chat) => {
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });
-    state.socket.on('new_chat', chat => {
+    state.socket.on('new_chat', (chat: Chat) => {
         const { addChat } = usechatsActions();
         addChat(chat);
     });
-    state.socket.on('post_typing', data => {
+    state.socket.on('post_typing', (data: { post: string; user: string }) => {
         updateSomeoneIsTyping(data.post, data.user);
     });
     state.socket.on('posts_updated', () => {
-        console.log('posts updated');
         getAllPosts();
-    })
+    });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
-    state.socket.on('shares_updated', shares => {
-        console.log('shares updated');
+    state.socket.on('shares_updated', () => {
         getSharedContent();
     });
 };
@@ -109,10 +101,6 @@ const sendSocketUserStatus = async (status: string) => {
         status,
     };
     state.socket.emit('status_update', data);
-};
-
-const getSocket = () => {
-    return state.socket;
 };
 
 export const useSocketActions = () => {

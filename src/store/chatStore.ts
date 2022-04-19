@@ -138,7 +138,7 @@ const addChat = (chat: Chat) => {
     sortChats();
 };
 
-export const removeChat = chatId => {
+export const removeChat = (chatId: string) => {
     state.chats = state.chats.filter(c => c.chatId !== chatId);
     state.chatRequests = state.chatRequests.filter(c => c.chatId !== chatId);
     sortChats();
@@ -166,7 +166,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 to: name,
                 body: {
                     message: `Group created by ${user.id} with the following initial member: ${contactInGroup.join(
-                        ', ',
+                        ', '
                     )}`,
                 } as SystemBody,
                 timeStamp: new Date(),
@@ -238,7 +238,7 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined,
+    lastMessageId: string | undefined
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
     if (lastMessageId) params.append('fromId', lastMessageId);
@@ -558,9 +558,8 @@ const updateContactsInGroup = async (groupId, contact: Contact, type: SystemMess
     const adminLocation = admin.location;
 
     let msg = `${contact.id} has been removed from the group`;
-    if(type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
-    if(type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
-
+    if (type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
+    if (type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
 
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
