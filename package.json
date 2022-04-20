@@ -6,7 +6,7 @@
         "dev": "vite",
         "build": "vite build",
         "prepare": "husky install",
-        "pretty": "prettier --write \"./**/*.{js,jsx,json,vue,ts}\""
+        "pretty": "prettier --write --ignore-path .gitignore --check --plugin-search-dir=. ."
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
