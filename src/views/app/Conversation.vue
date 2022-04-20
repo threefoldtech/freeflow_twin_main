@@ -402,9 +402,6 @@
         if (!chat.value) return;
         if (chat.value.isGroup) {
             let message = `${chat.value.contacts.length} members`;
-            chat.value.contacts.forEach(c => {
-                console.log(`Contact: ${JSON.stringify(c)}`, statusList[<string>c.id]?.isOnline);
-            });
             const onlineMembers = chat.value.contacts.filter(c => statusList[<string>c.id]?.isOnline).length;
 
             if (onlineMembers > 0) {
