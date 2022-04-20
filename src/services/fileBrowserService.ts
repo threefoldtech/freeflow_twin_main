@@ -66,7 +66,7 @@ export const createDirectory = async (path: string, name: string): Promise<Axios
     return await axios.post<PathInfo>(`${endpoint}/directories`, body);
 };
 
-export const getFileInfo = async (path: string, attachments: boolean): Promise<AxiosResponse<EditPathInfo>> => {
+export const getFileInfo = async (path: string, attachments: boolean = false): Promise<AxiosResponse<EditPathInfo>> => {
     const params = new URLSearchParams();
     params.append('path', path);
     params.append('attachments', String(attachments));
@@ -214,7 +214,7 @@ export const getFileAccessDetails = async (
 export const getSharedFolderContent = async (
     owner: ContactInterface,
     shareId: string,
-    userId: string,
+    _userId: string,
     path: string
 ) => {
     let externalUrl = `http://[${owner.location}]`;
@@ -236,14 +236,8 @@ export const downloadAttachment = async (message: any) => {
     createNotification('Downloading attachment', `from ${message.from}`, Status.Info);
     try {
         const msgUrl = message.body.url;
-        const txtToFind = `/api`;
-        const apiIdx = msgUrl.indexOf(txtToFind);
-        const urlV1 = `${msgUrl.substring(0, apiIdx)}/api/v1${msgUrl.substring(
-            apiIdx + txtToFind.length,
-            msgUrl.length
-        )}`;
         const response = await axios.get(`${endpoint}/attachment/download`, {
-            params: { owner: message.from, path: urlV1, to: message.to, messageId: message.id },
+            params: { owner: message.from, path: msgUrl, to: message.to, messageId: message.id },
         });
         createNotification('Attachment successfully downloaded', `from ${message.from}`, Status.Success);
         return response?.data;

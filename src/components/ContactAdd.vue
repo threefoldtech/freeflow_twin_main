@@ -226,10 +226,14 @@
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
         const { user } = useAuthState();
-        const { chats } = useChatsState();
+        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
 
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';
+            return;
+        }
+        if (format.test(groupnameAdd.value)) {
+            groupnameAddError.value = 'No special characters allowed in group names.';
             return;
         }
         if (groupnameAdd.value.length > 20) {

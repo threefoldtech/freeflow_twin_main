@@ -1,7 +1,7 @@
 <template>
     <div
         @click="createPostModalStatus = true"
-        class="z-50 bg-white relative"
+        class="z-40 bg-white relative"
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
@@ -77,7 +77,7 @@
                             type="file"
                             multiple="multiple"
                             ref="create_post_file_upload"
-                            accept="image/png, image/gif, image/jpeg"
+                            accept="image/png, image/jpeg"
                             class="hidden border-none outline-none ring-0"
                         />
                         <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
@@ -127,17 +127,17 @@
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
     >
-        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-40 bg-black opacity-10"></div>
+        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-30 bg-black opacity-10"></div>
     </TransitionRoot>
 </template>
 
 <script setup lang="ts">
-    import { PhotographIcon, XIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
+    import { XIcon, PencilAltIcon } from '@heroicons/vue/solid';
     import { CameraIcon, HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { computed, ref } from 'vue';
-    import { showComingSoonToUhuru, createPostModalStatus } from '@/services/dashboardService';
+    import { createPostModalStatus } from '@/services/dashboardService';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
     import ImageGrid from '@/components/Dashboard/ImageGrid.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
@@ -201,6 +201,7 @@
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
         errorFileSize.value = false;
+        if (new_post_text.value.trim() === '') return;
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);

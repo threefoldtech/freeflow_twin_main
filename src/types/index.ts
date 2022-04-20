@@ -91,6 +91,7 @@ export enum SystemMessageTypes {
     ADD_USER = 'ADDUSER',
     JOINED_VIDEOROOM = 'JOINED_VIDEOROOM',
     CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND',
+    USER_LEFT_GROUP = 'USER_LEFT_GROUP',
 }
 
 export enum FileTypes {
@@ -99,7 +100,7 @@ export enum FileTypes {
 }
 
 export interface GroupManagementBody extends SystemBody {
-    adminLocation: any;
+    adminLocation: string;
     contact: Contact;
 }
 export interface JoinedVideoRoomBody extends SystemBody {

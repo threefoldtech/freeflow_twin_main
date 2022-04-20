@@ -18,7 +18,7 @@ export const setNewAvatar = async selectedFile => {
 };
 
 export const isUserAuthenticated = async () => {
-    const url = `${config.baseUrl}api/v2/auth/authenticated`;
+    const url = `${config.baseUrl}api/v1/auth/authenticated`;
     try {
         const result = await axios.get(url);
         return result.data;

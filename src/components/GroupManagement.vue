@@ -181,7 +181,7 @@
     </Dialog>
 </template>
 <script setup lang="ts">
-    import { computed, ref, onMounted } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
@@ -193,7 +193,7 @@
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import { Chat, MessageTypes } from '@/types';
+    import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
 
     interface IProps {
         chat: Chat;
@@ -204,11 +204,8 @@
     const sidebarFileList = computed(() => {
         const files = props.chat.messages.filter(msg => msg.type === MessageTypes.FILE);
         files.map(file => {
-            const txtToFind = `/api`;
             const url = file.body.url;
-            const apiIdx = url.indexOf(txtToFind);
-            const urlV1 = `${url.substring(0, apiIdx)}/api/v1${url.substring(apiIdx + txtToFind.length, url.length)}`;
-            file.body.url = urlV1;
+            file.body.url = url;
         });
         return files;
     });
@@ -252,14 +249,14 @@
     };
     const doRemoveFromGroup = () => {
         const { updateContactsInGroup } = usechatsActions();
-        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, true);
+        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
         toBeRemovedUser.value = null;
     };
     const addToGroup = contact => {
         const { updateContactsInGroup } = usechatsActions();
         //@ts-ignore
-        updateContactsInGroup(props.chat.chatId, contact, false);
+        updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
     const filteredContacts = computed(() => {
         return contacts.filter(

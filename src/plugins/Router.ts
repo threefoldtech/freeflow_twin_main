@@ -3,7 +3,6 @@ import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
 import VideoRoom from '@/views/app/VideoRoom.vue';
 import Forum from '@/views/app/Forum.vue';
-import Browser from '@/views/app/Browser.vue';
 import Kutana from '@/views/app/Kutana.vue';
 import Chat from '@/views/app/Chat.vue';
 import Conversation from '@/views/app/Conversation.vue';
@@ -34,6 +33,9 @@ import {
     updateContent,
     stopTimer,
 } from '@/store/fileBrowserStore';
+
+// Browser needs to be lazy loaded
+const Browser = () => import('@/views/app/Browser.vue');
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
 
@@ -268,7 +270,7 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
@@ -282,7 +284,7 @@ router.beforeEach(async (to, from, next) => {
     next();
 });
 
-router.afterEach(async (to, from) => {
+router.afterEach(async (to, _from) => {
     //If file takes too long to load, if you switch page you still get the error modal. Now it doesn't
     stopTimer();
     chatsWithFiles.value = [];
@@ -337,7 +339,7 @@ router.afterEach(async (to, from) => {
     }
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (_to, _from, next) => {
     if (document.body.clientWidth < 1280) {
         disableSidebar();
     }

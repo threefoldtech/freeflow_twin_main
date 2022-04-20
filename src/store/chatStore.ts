@@ -138,7 +138,7 @@ const addChat = (chat: Chat) => {
     sortChats();
 };
 
-export const removeChat = chatId => {
+export const removeChat = (chatId: string) => {
     state.chats = state.chats.filter(c => c.chatId !== chatId);
     state.chatRequests = state.chatRequests.filter(c => c.chatId !== chatId);
     sortChats();
@@ -165,7 +165,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
+                    message: `Group created by ${user.id} with the following initial member: ${contactInGroup.join(
                         ', '
                     )}`,
                 } as SystemBody,
@@ -382,6 +382,7 @@ export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
 const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
+    if (selectedFile.size > 20000000) return false;
     const { user } = useAuthState();
     let formData = new FormData();
     if (!isBlob) {
@@ -431,6 +432,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
                 });
             },
         });
+        return true;
     } catch (e) {
         catchErrorsSendFile(e, uuid);
     }
@@ -548,17 +550,25 @@ const readMessage = (chatId, messageId) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
+const updateContactsInGroup = async (groupId, contact: Contact, type: SystemMessageTypes) => {
     const { user } = useAuthState();
-    const myLocation = await myYggdrasilAddress();
+    const chat = getChat(groupId);
+    const admin = chat.contacts.find(c => c.id === chat.adminId);
+    if (!('location' in admin)) return;
+    const adminLocation = admin.location;
+
+    let msg = `${contact.id} has been removed from the group`;
+    if (type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
+    if (type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
+
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
         from: user.id,
         to: groupId,
         body: {
-            type: remove ? SystemMessageTypes.REMOVE_USER : SystemMessageTypes.ADD_USER,
-            message: `${contact.id} has been ${remove ? 'removed from' : 'added to'} the group`,
-            adminLocation: myLocation,
+            type,
+            message: msg,
+            adminLocation,
             contact,
         },
         timeStamp: new Date(),

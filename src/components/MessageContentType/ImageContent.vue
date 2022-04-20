@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts" setup>
-    import { defineComponent } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { useScrollActions } from '@/store/scrollStore';
     import { setImageSrc } from '@/store/imageStore';
@@ -15,10 +14,7 @@
     const props = defineProps<IProp>();
     const { addScrollEvent } = useScrollActions();
     const msgUrl = props.message.body.url;
-    const txtToFind = `/api`;
-    const apiIdx = msgUrl.indexOf(txtToFind);
-    const urlV1 = `${msgUrl.substring(0, apiIdx)}/api/v1${msgUrl.substring(apiIdx + txtToFind.length, msgUrl.length)}`;
-    const src = calcExternalResourceLink(urlV1);
+    const src = calcExternalResourceLink(msgUrl);
     const imageLoaded = () => {
         addScrollEvent();
     };
