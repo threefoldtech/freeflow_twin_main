@@ -26,7 +26,6 @@
                 />
             </div>
         </app-layout>
-
         <div
             v-if="isDev && location"
             class="fixed text-white bg-black -right-px -bottom-0.5 border border-white px-2 text-xs"

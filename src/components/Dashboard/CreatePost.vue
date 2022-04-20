@@ -46,11 +46,20 @@
                     <FileDropArea @send-file="selectFiles">
                         <div class="p-4 flex items-start h-48">
                             <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
-                            <textarea
-                                class="resize-none ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full focus:outline-none"
-                                placeholder="Write something about you"
-                                v-model="new_post_text"
-                            />
+                            <div class="flex flex-col w-full h-full py-2 px-4">
+                                <textarea
+                                    class="resize-none ml-4 text-base text-gray-800 outline-none block w-full border-none h-full focus:outline-none"
+                                    placeholder="Write something about you"
+                                    v-model="new_post_text"
+                                    maxlength="2000"
+                                />
+                                <p
+                                    :class="new_post_text.length >= 2000 ? ['text-red-600'] : ''"
+                                    class="text-sm text-gray-500 self-end"
+                                >
+                                    {{ new_post_text.length }}/2000
+                                </p>
+                            </div>
                         </div>
                         <div class="flex flex-col" v-if="errorFileSize">
                             <small class="px-4 text-gray-500">File size limit is 20MB per image</small>

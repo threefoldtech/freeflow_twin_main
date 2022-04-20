@@ -189,6 +189,7 @@
                                 <div class='h-full flex items-center justify-center'><i class='fa fa-times'></i></div>
                             </button>
                         </div>
+
                         <div class='max-w-full w-full bg-white border flex flex-col flex-grow'>
                             <div class='bg-white pb-4 w-full mb-4 p-6 flex min-h-64 justify-start relative'>
                                 <XIcon
@@ -211,7 +212,9 @@
                                     </p>
                                 </div>
                             </div>
+
                             <div id='spacer' class='bg-gray-100 h-2 w-full'></div>
+
                             <group-management
                                 :chat='chat'
                                 @app-call='popupMeeting'

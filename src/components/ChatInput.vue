@@ -76,14 +76,7 @@
                 <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                     <input
                         v-model="messageInput"
-                        class="
-                            block
-                            w-full
-                            pl-1
-                            border-0 border-b-2 border-transparent
-                            focus:border-primary focus:ring-0
-                            sm:text-sm
-                        "
+                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
                         autofocus
                         type="text"
                         ref="message"
@@ -161,132 +154,131 @@ if (props.chat.draft) {
     if(!props.chat.draft.action){
          messageInput.value = String(props.chat.draft.body);
     }
-}
-const selectedId = String(props.chat.chatId);
 
-const action = computed(() => {
-    if (!selectedId) {
-        return;
-    }
-    return messageState?.actions[selectedId];
-});
+    const props = defineProps<IProps>();
 
-const clearAction = () => {
-    clearMessageAction(selectedId);
-};
+    // Not actually a vue component but CustomElement ShadowRoot. I know vue doesnt really like it and gives a warning.
+    new EmojiPickerElement();
 
-watch(action, () => {
-    if (action.value && message.value) {
-        message.value.focus();
-    }
-    draftMessage(selectedId, createMessage())
-});
+    const { sendMessage, sendFile } = usechatsActions();
 
-watch(messageInput, () => {
-    draftMessage(selectedId, createMessage());
-});
+    const message = ref(null);
+    const messageBox = ref(null);
+    const messageInput = ref('');
+    const fileinput = ref();
+    const emojipicker = ref();
+    const attachment = ref();
 
-const createEditBody = action => {
-    let newBody = action.message.body;
-    //space for later types
-    switch (action.message.type) {
-        case MessageTypes.QUOTE:
-            newBody.message = message.value.value;
-            break;
+    const stopRecording = ref(null);
+    const showEmoji = ref(false);
 
-        default:
-            newBody = message.value.value;
-            break;
-    }
-    return newBody;
-};
+    const { addScrollEvent } = useScrollActions();
 
-const createMessage = () => {
-    const { user } = useAuthState();
-
-    switch (action?.value?.type) {
-        case MessageAction.REPLY: {
-            return {
-                id: uuidv4(),
-                from: user.id,
-                to: <string>selectedId,
-                body: <QuoteBodyType>{
-                    message: message.value.value,
-                    quotedMessage: action.value.message as Message<MessageBodyType>,
-                },
-                timeStamp: new Date(),
-                type: MessageTypes.QUOTE,
-                replies: [],
-                subject: null,
-                action: MessageAction.REPLY,
-            };
+    if (props.chat.draft) {
+        if (props.chat.draft?.action === 'EDIT') {
+            messageState.actions[props.chat.draft.id];
+            messageInput.value = String(props.chat.draft.body.body.message);
+            editMessage(props.chat.draft.to, props.chat.draft.body);
         }
-
-        case MessageAction.EDIT: {
-            const newBody = createEditBody(action.value);
-
-            const editMessage = {
-                id: <string>action.value.message.id,
-                from: user.id,
-                to: <string>selectedId,
-                body: newBody,
-                timeStamp: action.value.message.timeStamp,
-                type: action.value.message.type,
-                replies: action.value.message.replies,
-                subject: null,
-                updated: new Date(),
-                action: MessageAction.EDIT,
-            };
-            const editWrapperMessage = {
-                id: uuidv4(),
-                from: user.id,
-                to: <string>selectedId,
-                body: editMessage,
-                timeStamp: new Date(),
-                type: MessageTypes.EDIT,
-                replies: [],
-                subject: null,
-                action: MessageAction.EDIT,
-            };
-
-
-            return editWrapperMessage;
+        if (props.chat.draft?.action === 'REPLY') {
+            messageState.actions[props.chat.draft.id];
+            messageInput.value = String(props.chat.draft.body.message);
+            replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
+        }
+        if (!props.chat.draft.action) {
+            messageInput.value = String(props.chat.draft.body);
         }
     }
+    const selectedId = String(props.chat.chatId);
 
-    return {
-        id: uuidv4(),
-        from: user.id,
-        to: <string>selectedId,
-        body: message.value.value,
-        timeStamp: new Date(),
-        type: 'STRING',
-        replies: [],
-        subject: null,
+    const action = computed(() => {
+        if (!selectedId) {
+            return;
+        }
+        return messageState?.actions[selectedId];
+    });
+
+    const clearAction = () => {
+        clearMessageAction(selectedId);
     };
-};
 
-const clearMessage = () => {
-    message.value.value = '';
-};
+    watch(action, () => {
+        if (action.value && message.value) {
+            message.value.focus();
+        }
+        draftMessage(selectedId, createMessage());
+    });
 
-const chatsend = async e => {
-    messageInput.value = "";
-    const { sendMessageObject } = usechatsActions();
+    watch(messageInput, () => {
+        draftMessage(selectedId, createMessage());
+    });
 
-    if (action.value) {
-        const newMessage = createMessage();
-        sendMessageObject(selectedId, newMessage);
-        clearAction();
-        clearMessage();
-        addScrollEvent();
-        return;
-    }
+    const createEditBody = action => {
+        let newBody = action.message.body;
+        //space for later types
+        switch (action.message.type) {
+            case MessageTypes.QUOTE:
+                newBody.message = message.value.value;
+                break;
 
-    if (message.value.value != '') {
-        sendMessage(selectedId, message.value.value);
-        clearMessage();
-    }
+            default:
+                newBody = message.value.value;
+                break;
+        }
+        return newBody;
+    };
+
+    const createMessage = () => {
+        const { user } = useAuthState();
+
+        switch (action?.value?.type) {
+            case MessageAction.REPLY: {
+                return {
+                    id: uuidv4(),
+                    from: user.id,
+                    to: <string>selectedId,
+                    body: <QuoteBodyType>{
+                        message: message.value.value,
+                        quotedMessage: action.value.message as Message<MessageBodyType>,
+                    },
+                    timeStamp: new Date(),
+                    type: MessageTypes.QUOTE,
+                    replies: [],
+                    subject: null,
+                    action: MessageAction.REPLY,
+                };
+            }
+
+            case MessageAction.EDIT: {
+                const newBody = createEditBody(action.value);
+
+                const editMessage = {
+                    id: <string>action.value.message.id,
+                    from: user.id,
+                    to: <string>selectedId,
+                    body: newBody,
+                    timeStamp: action.value.message.timeStamp,
+                    type: action.value.message.type,
+                    replies: action.value.message.replies,
+                    subject: null,
+                    updated: new Date(),
+                    action: MessageAction.EDIT,
+                };
+                const editWrapperMessage = {
+                    id: uuidv4(),
+                    from: user.id,
+                    to: <string>selectedId,
+                    body: editMessage,
+                    timeStamp: new Date(),
+                    type: MessageTypes.EDIT,
+                    replies: [],
+                    subject: null,
+                    action: MessageAction.EDIT,
+                };
+
+                return editWrapperMessage;
+            }
+        }
 
     if (attachment.value) {
         const success = await sendFile(selectedId, attachment.value);
@@ -298,120 +290,148 @@ const chatsend = async e => {
     }
     emit('messageSend');
 
-    showEmoji.value = false;
-};
-
-const selectFile = () => {
-    fileinput.value.click();
-};
-
-const changeFile = () => {
-    attachment.value = fileinput.value?.files[0];
-    message.value.focus();
-};
-
-const removeFile = () => {
-    attachment.value = null;
-};
-
-const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-    });
-
-    const mediaRecorder = new MediaRecorder(stream);
-    const audioChunks = [];
-
-    mediaRecorder.addEventListener('dataavailable', event => {
-        audioChunks.push(event.data);
-    });
-
-    mediaRecorder.start();
-
-    stopRecording.value = () => {
-        mediaRecorder.addEventListener('stop', async () => {
-            const audioBlob = new Blob(audioChunks);
-            sendFile(selectedId, audioBlob, true, true);
-            stopRecording.value = null;
-        });
-
-        mediaRecorder.stop();
-        stream.getAudioTracks().forEach(at => at.stop());
+    const clearMessage = () => {
+        message.value.value = '';
     };
-};
-const toggleEmoji = () => {
-    showEmoji.value = !showEmoji.value;
-};
-const hideEmoji = () => {
-    if (!showEmoji) {
-        return;
-    }
-    showEmoji.value = false;
-};
 
-const showGif = ref(false);
-const toggleGif = () => {
-    showGif.value = !showGif.value;
-};
-const sendGif = async gif => {
-    showGif.value = false;
-    const { sendMessage } = usechatsActions();
-    sendMessage(selectedId, gif, 'GIF');
-    emit('messageSend');
-    addScrollEvent();
-};
-const hideGif = async gif => {
-    showGif.value = false;
-};
+    const chatsend = async e => {
+        messageInput.value = '';
+        const { sendMessageObject } = usechatsActions();
 
-nextTick(() => {
-    message.value.focus();
-    const emojiPicker = document.querySelector('unicode-emoji-picker');
-    emojiPicker.addEventListener('emoji-pick', event => {
-        message.value.value = `${message.value.value}${event.detail.emoji}`;
-        const emoji = `${event.detail.emoji}`
-        messageInput.value = messageInput.value + emoji;
-        message.value.focus();
-    });
-});
-
-const onPaste = (e: ClipboardEvent) => {
-    if (!e.clipboardData) {
-        return;
-    }
-
-    var items = e.clipboardData.items;
-
-    if (!items) {
-        return;
-    }
-
-    for (var i = 0; i < items.length; i++) {
-        if (items[i].type.indexOf('image') == -1) {
-            continue;
+        if (action.value) {
+            const newMessage = createMessage();
+            sendMessageObject(selectedId, newMessage);
+            clearAction();
+            clearMessage();
+            addScrollEvent();
+            return;
         }
 
-        var pastedImage: File = items[i].getAsFile();
-        attachment.value = pastedImage;
+        if (message.value.value != '') {
+            sendMessage(selectedId, message.value.value);
+            clearMessage();
+        }
+
+        if (attachment.value) {
+            sendFile(selectedId, attachment.value);
+            removeFile();
+        }
+        emit('messageSend');
+
+        showEmoji.value = false;
+    };
+
+    const selectFile = () => {
+        fileinput.value.click();
+    };
+
+    const changeFile = () => {
+        attachment.value = fileinput.value?.files[0];
         message.value.focus();
-    }
-};
+    };
 
-const getActionMessage = computed(() => {
-    switch (action.value.message.type) {
-        case MessageTypes.QUOTE:
-            return (action.value.message.body as QuoteBodyType).message;
-        case MessageTypes.STRING:
-            return action.value.message.body;
-        case MessageTypes.FILE:
-            if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
-            return action.value.message.type;
-        default:
-            return action.value.message.type;
-    }
-});
+    const removeFile = () => {
+        attachment.value = null;
+    };
 
-const collapsed = ref(true);
+    const startRecording = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+        });
+
+        const mediaRecorder = new MediaRecorder(stream);
+        const audioChunks = [];
+
+        mediaRecorder.addEventListener('dataavailable', event => {
+            audioChunks.push(event.data);
+        });
+
+        mediaRecorder.start();
+
+        stopRecording.value = () => {
+            mediaRecorder.addEventListener('stop', async () => {
+                const audioBlob = new Blob(audioChunks);
+                sendFile(selectedId, audioBlob, true, true);
+                stopRecording.value = null;
+            });
+
+            mediaRecorder.stop();
+            stream.getAudioTracks().forEach(at => at.stop());
+        };
+    };
+    const toggleEmoji = () => {
+        showEmoji.value = !showEmoji.value;
+    };
+    const hideEmoji = () => {
+        if (!showEmoji) {
+            return;
+        }
+        showEmoji.value = false;
+    };
+
+    const showGif = ref(false);
+    const toggleGif = () => {
+        showGif.value = !showGif.value;
+    };
+    const sendGif = async gif => {
+        showGif.value = false;
+        const { sendMessage } = usechatsActions();
+        sendMessage(selectedId, gif, 'GIF');
+        emit('messageSend');
+        addScrollEvent();
+    };
+    const hideGif = async gif => {
+        showGif.value = false;
+    };
+
+    nextTick(() => {
+        message.value.focus();
+        const emojiPicker = document.querySelector('unicode-emoji-picker');
+        emojiPicker.addEventListener('emoji-pick', event => {
+            message.value.value = `${message.value.value}${event.detail.emoji}`;
+            const emoji = `${event.detail.emoji}`;
+            messageInput.value = messageInput.value + emoji;
+            message.value.focus();
+        });
+    });
+
+    const onPaste = (e: ClipboardEvent) => {
+        if (!e.clipboardData) {
+            return;
+        }
+
+        var items = e.clipboardData.items;
+
+        if (!items) {
+            return;
+        }
+
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].type.indexOf('image') == -1) {
+                continue;
+            }
+
+            var pastedImage: File = items[i].getAsFile();
+            attachment.value = pastedImage;
+            message.value.focus();
+        }
+    };
+
+    const getActionMessage = computed(() => {
+        switch (action.value.message.type) {
+            case MessageTypes.QUOTE:
+                return (action.value.message.body as QuoteBodyType).message;
+            case MessageTypes.STRING:
+                return action.value.message.body;
+            case MessageTypes.FILE:
+                if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
+                return action.value.message.type;
+            default:
+                return action.value.message.type;
+        }
+    });
+
+    const collapsed = ref(true);
 </script>
 
 <style scoped></style>

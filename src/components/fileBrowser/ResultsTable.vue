@@ -12,16 +12,7 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th
-                                    class="
-                                        hidden
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
+                                    class="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
                                 >
                                     <input
@@ -35,57 +26,25 @@
                                     />
                                 </th>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
                                 >
                                     Name
                                 </th>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
                                 >
                                     Extension
                                 </th>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
                                 >
                                     Size
                                 </th>
                                 <th
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
                                 >
                                     Last Modified
@@ -162,32 +121,12 @@
                     <!-- Local filebrowser -->
                     <ul
                         v-else
-                        class="
-                            grid grid-cols-2
-                            gap-x-2 gap-y-4
-                            sm:grid-cols-4 sm:gap-x-4
-                            lg:grid-cols-6
-                            xl:grid-cols-8
-                            2xl:grid-cols-10
-                            xl:gap-x-6
-                            mt-4
-                        "
+                        class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
                         role="list"
                     >
                         <p
                             v-if="searchResults === 'None'"
-                            class="
-                                px-6
-                                py-4
-                                whitespace-nowrap
-                                col-span-12
-                                text-base
-                                font-medium
-                                text-center text-gray-800
-                                flex
-                                justify-center
-                                flex-col
-                            "
+                            class="px-6 py-4 whitespace-nowrap col-span-12 text-base font-medium text-center text-gray-800 flex justify-center flex-col"
                         >
                             No items in this folder
                             <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
@@ -207,24 +146,7 @@
                         >
                             <div
                                 :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
-                                class="
-                                    group
-                                    w-full
-                                    aspect-w-12 aspect-h-4
-                                    rounded-lg
-                                    border-2
-                                    hover:bg-gray-200
-                                    transition
-                                    duration:200
-                                    focus-within:ring-2
-                                    focus-within:ring-offset-2
-                                    focus-within:ring-offset-gray-100
-                                    focus-within:ring-indigo-500
-                                    overflow-hidden
-                                    flex
-                                    justify-center
-                                    items-center
-                                "
+                                class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
                             >
                                 <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i

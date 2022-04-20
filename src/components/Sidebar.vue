@@ -7,7 +7,7 @@
                     style="position: relative"
                     @click="changePage('chat')"
                 >
-                    <svg class="sm:w-10 w-8  mt-5" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="sm:w-10 w-8 mt-5" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <linearGradient
                                 id="mainGradientLogo"

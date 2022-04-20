@@ -14,10 +14,10 @@
     import AppLayout from '../../layout/AppLayout.vue';
     import { defineComponent, ref } from 'vue';
     import { onMounted, onBeforeMount } from 'vue';
-    import {useAuthState} from "@/store/authStore";
+    import { useAuthState } from '@/store/authStore';
 
     const iframeUrl = ref('');
-    const {user} = useAuthState()
+    const { user } = useAuthState();
 
     onMounted(() => {
         browse();

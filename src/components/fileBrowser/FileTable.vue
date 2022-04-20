@@ -54,7 +54,7 @@
                         <table
                             v-if="fileBrowserTypeView === 'LIST' && !savedAttachmentsIsLoading"
                             :key="currentDirectory"
-                            class="min-w-full divide-y divide-gray-200 shadow"
+                            class="min-w-full divide-y divide-gray-300 shadow border border-gray-300 sm:rounded-lg"
                             @dragenter="onDragEnterParent"
                             @dragleave="onDragLeaveParent"
                         >
@@ -77,6 +77,7 @@
                                     <th
                                         :class="{ active: 'name' === currentSort }"
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+
                                         scope="col"
                                         @click="sortAction('name')"
                                     >
@@ -85,7 +86,9 @@
                                     </th>
                                     <th
                                         :class="{ active: 'extension' === currentSort }"
+
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+
                                         scope="col"
                                         @click="sortAction('extension')"
                                     >
@@ -94,7 +97,9 @@
                                     </th>
                                     <th
                                         :class="{ active: 'size' === currentSort }"
+
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+
                                         scope="col"
                                         @click="sortAction('size')"
                                     >
@@ -103,7 +108,9 @@
                                     </th>
                                     <th
                                         :class="{ active: 'lastModified' === currentSort }"
+
                                         class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
+
                                         scope="col"
                                         @click="sortAction('lastModified')"
                                     >
@@ -214,7 +221,9 @@
                         <!-- Local filebrowser -->
                         <ul
                             v-if="fileBrowserTypeView === 'GRID' && !savedAttachmentsIsLoading"
+
                             class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+
                             role="list"
                         >
                             <p
@@ -226,7 +235,9 @@
                             </p>
                             <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
+
                                     class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
+
                                     @click="goToShared()"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
@@ -242,7 +253,9 @@
                             </li>
                             <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
+
                                     class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
+
                                     @click="router.push({ name: 'savedAttachments' })"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
@@ -272,7 +285,9 @@
                             >
                                 <div
                                     :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
+
                                     class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
+
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
