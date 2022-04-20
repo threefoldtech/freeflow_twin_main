@@ -203,7 +203,6 @@
 
     const createMessage = () => {
         const { user } = useAuthState();
-        console.log(action?.value?.type);
 
         switch (action?.value?.type) {
             case MessageAction.REPLY: {
