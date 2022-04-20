@@ -7,6 +7,7 @@ import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
+import { allSocialPosts } from '@/store/socialStore';
 
 const state = reactive<State>({
     socket: '',
@@ -72,6 +73,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('posts_updated', () => {
         getAllPosts();
     });
+    state.socket.on('post_deleted', (postId: string) => {
+        allSocialPosts.value = allSocialPosts.value.filter(p => p.post.id !== postId);
+    })
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
