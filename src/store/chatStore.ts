@@ -22,7 +22,6 @@ import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
-import { myYggdrasilAddress } from '@/store/authStore';
 import { blocklist } from '@/store/blockStore';
 
 const messageLimit = 50;
@@ -79,7 +78,7 @@ const retrieveChats = async () => {
         const incomingchats = response.data;
 
         // debugger
-        incomingchats.forEach(chat => {
+        incomingchats.forEach((chat: Chat) => {
             addChat(chat);
         });
         sortChats();
@@ -87,7 +86,7 @@ const retrieveChats = async () => {
     });
 };
 
-export const editMessage = (chatId, message) => {
+export const editMessage = (chatId: string, message: any) => {
     clearMessageAction(chatId);
     //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
     nextTick(() => {
@@ -95,7 +94,7 @@ export const editMessage = (chatId, message) => {
     });
 };
 
-export const replyMessage = (chatId, message) => {
+export const replyMessage = (chatId: string, message: any) => {
     clearMessageAction(chatId);
     //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
     nextTick(() => {
@@ -177,9 +176,10 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
             },
         ],
         name: name,
-        adminId: user.id,
+        adminId: user.id.toString(),
         read: {},
         acceptedChat: true,
+        draft: null,
     };
     axios
         .put(`${config.baseUrl}api/v1/group`, newGroupchat)
@@ -191,7 +191,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
         });
 };
 
-const acceptChat = id => {
+const acceptChat = (id: string) => {
     axios
         .post(`${config.baseUrl}api/v1/chats?id=${id}`)
         .then(() => {
@@ -212,7 +212,7 @@ const updateChat = (chat: Chat) => {
     addChat(chat);
 };
 
-function getMessage(chat: Chat, id) {
+function getMessage(chat: Chat, id: string) {
     let message = chat.messages.find(m => m.id === id);
 
     if (!message) {
@@ -277,7 +277,7 @@ const getNewMessages = async (chatId: string) => {
     }
 };
 
-const addMessage = (chatId, message) => {
+const addMessage = (chatId: string, message: any) => {
     const { addScrollEvent } = useScrollActions();
     if (message.type === 'READ') {
         const chat: Chat = getChat(chatId);
@@ -345,7 +345,7 @@ const addMessage = (chatId, message) => {
     addScrollEvent();
 };
 
-const sendMessage = (chatId, message, type: string = 'STRING') => {
+const sendMessage = (chatId: string, message: any, type: string = 'STRING') => {
     const { sendSocketMessage } = useSocketActions();
     const { user } = useAuthState();
 
@@ -355,7 +355,7 @@ const sendMessage = (chatId, message, type: string = 'STRING') => {
         from: user.id,
         to: chatId,
         timeStamp: new Date(),
-        type: type,
+        type,
         replies: [],
         subject: null,
     };
@@ -363,11 +363,11 @@ const sendMessage = (chatId, message, type: string = 'STRING') => {
     sendSocketMessage(chatId, msg);
 };
 
-const sendSystemMessage = (chatId, message: string) => {
+const sendSystemMessage = (chatId: string, message: string) => {
     sendMessage(chatId, { message: message } as SystemBody, MessageTypes.SYSTEM);
 };
 
-export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
+export const sendMessageObject = (chatId: string, message: Message<MessageBodyType>) => {
     const { sendSocketMessage } = useSocketActions();
     // console.log(chatId, message);
     // @TODO when doing add message on SYSTEM/groupupdate results in  max call stack exeeded
@@ -381,9 +381,8 @@ export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => 
 export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
-const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
+const sendFile = async (chatId: string, selectedFile: File, isBlob = false, isRecording = false) => {
     if (selectedFile.size > 20000000) return false;
-    const { user } = useAuthState();
     let formData = new FormData();
     if (!isBlob) {
         formData.append('file', selectedFile);
@@ -413,7 +412,6 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             data: window.URL.createObjectURL(blob),
             time: new Date(),
             loaded: 0,
-            total: selectedFile.total,
             chatId: chatId,
             selectedFile: selectedFile,
         });
@@ -438,7 +436,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
     }
 };
 
-const catchErrorsSendFile = (e, uuid) => {
+const catchErrorsSendFile = (e: { message: string }, uuid: string) => {
     const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
     if (e.message === 'Operation canceled by the user.') return;
 
@@ -462,7 +460,7 @@ const catchErrorsSendFile = (e, uuid) => {
     });
 };
 
-export const retrySendFile = async file => {
+export const retrySendFile = async (file: { id: string; uuid: string; chatId: string; selectedFile: File }) => {
     //When a upload fails in chat and you retry
 
     const { id: uuid, chatId, selectedFile } = file;
@@ -507,7 +505,7 @@ export const retrySendFile = async file => {
     }
 };
 
-const setLastMessage = (chatId: string, message: Message<String>) => {
+const setLastMessage = (chatId: string, _message: Message<String>) => {
     if (!state.chats) return;
     const chat = state.chats.find(c => c.chatId == chatId);
     if (!chat) return;
@@ -534,7 +532,7 @@ const sortChats = () => {
     });
 };
 
-const readMessage = (chatId, messageId) => {
+const readMessage = (chatId: string, messageId: string) => {
     const { user } = useAuthState();
 
     const newMessage: Message<string> = {
@@ -550,7 +548,7 @@ const readMessage = (chatId, messageId) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = async (groupId, contact: Contact, type: SystemMessageTypes) => {
+const updateContactsInGroup = async (groupId: string, contact: Contact, type: SystemMessageTypes) => {
     const { user } = useAuthState();
     const chat = getChat(groupId);
     const admin = chat.contacts.find(c => c.id === chat.adminId);
@@ -586,7 +584,7 @@ export const useChatsState = () => {
     };
 };
 
-export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
+export const draftMessage = (chatId: string, message: Message<MessageBodyType>) => {
     getChat(chatId).draft = message;
     axios.post(`${config.baseUrl}api/v1/updateDraft`, {
         params: {

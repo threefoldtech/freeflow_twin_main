@@ -104,55 +104,27 @@
     ></div>
 </template>
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from 'vue';
-import { clearMessageAction, draftMessage, editMessage, MessageAction, messageState, replyMessage, usechatsActions } from '@/store/chatStore';
-import GifSelector from '@/components/GifSelector.vue';
-import { useAuthState } from '@/store/authStore';
-import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
-import { uuidv4 } from '@/common';
-import { useScrollActions } from '@/store/scrollStore';
-import { EmojiPickerElement } from 'unicode-emoji-picker';
+    import { computed, nextTick, ref, watch } from 'vue';
+    import {
+        clearMessageAction,
+        draftMessage,
+        editMessage,
+        MessageAction,
+        messageState,
+        replyMessage,
+        usechatsActions,
+    } from '@/store/chatStore';
+    import GifSelector from '@/components/GifSelector.vue';
+    import { useAuthState } from '@/store/authStore';
+    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
+    import { uuidv4 } from '@/common';
+    import { useScrollActions } from '@/store/scrollStore';
+    import { EmojiPickerElement } from 'unicode-emoji-picker';
 
-const emit = defineEmits(['messageSend', 'failed']);
+    const emit = defineEmits(['messageSend', 'failed']);
 
-interface IProps {
-    chat: Chat;
-}
-
-const props = defineProps<IProps>();
-
-// Not actually a vue component but CustomElement ShadowRoot. I know vue doesnt really like it and gives a warning.
-new EmojiPickerElement();
-
-const { sendMessage, sendFile } = usechatsActions();
-
-const message = ref(null);
-const messageBox = ref(null);
-const messageInput = ref('');
-const fileinput = ref();
-const emojipicker = ref();
-const attachment = ref();
-
-const stopRecording = ref(null);
-const showEmoji = ref(false);
-
-const { addScrollEvent } = useScrollActions();
-
-
-
-if (props.chat.draft) {
-   if(props.chat.draft?.action === "EDIT"){
-       messageState.actions[props.chat.draft.id]
-        messageInput.value = String(props.chat.draft.body.body.message)
-       editMessage(props.chat.draft.to, props.chat.draft.body)
-   }
-   if(props.chat.draft?.action === "REPLY"){
-    messageState.actions[props.chat.draft.id]
-       messageInput.value = String(props.chat.draft.body.message)
-       replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage)
-   }
-    if(!props.chat.draft.action){
-         messageInput.value = String(props.chat.draft.body);
+    interface IProps {
+        chat: Chat;
     }
 
     const props = defineProps<IProps>();
@@ -163,10 +135,8 @@ if (props.chat.draft) {
     const { sendMessage, sendFile } = usechatsActions();
 
     const message = ref(null);
-    const messageBox = ref(null);
     const messageInput = ref('');
     const fileinput = ref();
-    const emojipicker = ref();
     const attachment = ref();
 
     const stopRecording = ref(null);
@@ -176,14 +146,14 @@ if (props.chat.draft) {
 
     if (props.chat.draft) {
         if (props.chat.draft?.action === 'EDIT') {
-            messageState.actions[props.chat.draft.id];
-            messageInput.value = String(props.chat.draft.body.body.message);
+            messageState.actions[<string>props.chat.draft.id];
+            messageInput.value = (props.chat.draft.body as { body: { message: string } }).body.message;
             editMessage(props.chat.draft.to, props.chat.draft.body);
         }
         if (props.chat.draft?.action === 'REPLY') {
-            messageState.actions[props.chat.draft.id];
-            messageInput.value = String(props.chat.draft.body.message);
-            replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
+            messageState.actions[<string>props.chat.draft.id];
+            messageInput.value = (props.chat.draft.body as { message: string }).message;
+            replyMessage(props.chat.draft.to, (props.chat.draft.body as { quotedMessage: string }).quotedMessage);
         }
         if (!props.chat.draft.action) {
             messageInput.value = String(props.chat.draft.body);
@@ -213,7 +183,7 @@ if (props.chat.draft) {
         draftMessage(selectedId, createMessage());
     });
 
-    const createEditBody = action => {
+    const createEditBody = (action: { message: { body: { message: string }; type: MessageBodyType } }) => {
         let newBody = action.message.body;
         //space for later types
         switch (action.message.type) {
@@ -279,22 +249,13 @@ if (props.chat.draft) {
                 return editWrapperMessage;
             }
         }
-
-    if (attachment.value) {
-        const success = await sendFile(selectedId, attachment.value);
-        removeFile();
-        if(!success) {
-            emit('failed')
-            return
-        }
-    }
-    emit('messageSend');
+    };
 
     const clearMessage = () => {
         message.value.value = '';
     };
 
-    const chatsend = async e => {
+    const chatsend = async () => {
         messageInput.value = '';
         const { sendMessageObject } = usechatsActions();
 
@@ -313,8 +274,12 @@ if (props.chat.draft) {
         }
 
         if (attachment.value) {
-            sendFile(selectedId, attachment.value);
+            const success = await sendFile(selectedId, attachment.value);
             removeFile();
+            if (!success) {
+                emit('failed');
+                return;
+            }
         }
         emit('messageSend');
 
@@ -380,7 +345,7 @@ if (props.chat.draft) {
         emit('messageSend');
         addScrollEvent();
     };
-    const hideGif = async gif => {
+    const hideGif = () => {
         showGif.value = false;
     };
 
