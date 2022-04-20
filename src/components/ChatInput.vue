@@ -148,12 +148,15 @@
         if (props.chat.draft?.action === 'EDIT') {
             messageState.actions[<string>props.chat.draft.id];
             messageInput.value = (props.chat.draft.body as { body: { message: string } }).body.message;
-            editMessage(props.chat.draft.to, props.chat.draft.body);
+            editMessage(<string>props.chat.draft.to, props.chat.draft.body);
         }
         if (props.chat.draft?.action === 'REPLY') {
             messageState.actions[<string>props.chat.draft.id];
             messageInput.value = (props.chat.draft.body as { message: string }).message;
-            replyMessage(props.chat.draft.to, (props.chat.draft.body as { quotedMessage: string }).quotedMessage);
+            replyMessage(
+                <string>props.chat.draft.to,
+                (props.chat.draft.body as { quotedMessage: string }).quotedMessage
+            );
         }
         if (!props.chat.draft.action) {
             messageInput.value = String(props.chat.draft.body);
@@ -200,6 +203,7 @@
 
     const createMessage = () => {
         const { user } = useAuthState();
+        console.log(action?.value?.type);
 
         switch (action?.value?.type) {
             case MessageAction.REPLY: {
@@ -247,6 +251,20 @@
                 };
 
                 return editWrapperMessage;
+            }
+
+            default: {
+                return {
+                    id: uuidv4(),
+                    from: user.id,
+                    to: <string>selectedId,
+                    body: message.value.value,
+                    timeStamp: new Date(),
+                    type: MessageTypes.STRING,
+                    replies: [],
+                    subject: null,
+                    action: null,
+                };
             }
         }
     };

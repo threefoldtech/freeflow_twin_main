@@ -381,7 +381,7 @@ export const sendMessageObject = (chatId: string, message: Message<MessageBodyTy
 export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
-const sendFile = async (chatId: string, selectedFile: File, isBlob = false, isRecording = false) => {
+const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRecording = false) => {
     if (selectedFile.size > 20000000) return false;
     let formData = new FormData();
     if (!isBlob) {
@@ -412,6 +412,7 @@ const sendFile = async (chatId: string, selectedFile: File, isBlob = false, isRe
             data: window.URL.createObjectURL(blob),
             time: new Date(),
             loaded: 0,
+            total: selectedFile.total,
             chatId: chatId,
             selectedFile: selectedFile,
         });
@@ -584,7 +585,8 @@ export const useChatsState = () => {
     };
 };
 
-export const draftMessage = (chatId: string, message: Message<MessageBodyType>) => {
+export const draftMessage = (chatId: string, message: any) => {
+    console.log(message);
     getChat(chatId).draft = message;
     axios.post(`${config.baseUrl}api/v1/updateDraft`, {
         params: {
