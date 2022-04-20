@@ -5,7 +5,7 @@
             ref="dialogRef"
             tabindex="-1"
             class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
-            style="zindex: 60"
+            style="z-index: 60"
             @click="$emit('update-model-value', false)"
             @keydown.esc="$emit('update-model-value', false)"
         >
