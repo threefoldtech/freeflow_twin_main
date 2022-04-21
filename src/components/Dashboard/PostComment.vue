@@ -82,7 +82,7 @@
         class="relative flex items-center pl-20 flex-start w-full"
         @submit.prevent="handleReplyForm"
     >
-        <div class="pr-1 bg">
+        <div class="pr-1">
             <AvatarImg :id="user.id" :showOnlineStatus="false" :xsmall="true" />
         </div>
         <input
