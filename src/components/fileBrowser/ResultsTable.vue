@@ -2,7 +2,6 @@
     <div class="h-full overflow-y-auto px-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
-                <ViewSelect :searchDirValue="searchDirValue" />
                 <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <table
                         v-if="fileBrowserTypeView === 'LIST'"
