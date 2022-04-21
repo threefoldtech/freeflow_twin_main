@@ -269,7 +269,7 @@ export const deleteFiles = async (list: PathInfoModel[]) => {
             if (result.status !== 200 && result.status !== 201) throw new Error('Could not delete file');
             selectedPaths.value = [];
             await updateContent();
-        }),
+        })
     );
 };
 export const downloadFiles = async () => {
@@ -281,7 +281,7 @@ export const downloadFiles = async () => {
             if (f.isDirectory) itemName += '.zip';
             fileDownload(result.data, itemName);
             selectedPaths.value = [];
-        }),
+        })
     );
 };
 
@@ -352,7 +352,7 @@ export const copyPasteSelected = async () => {
     if (selectedAction.value === Action.COPY) {
         const result = await Api.copyFiles(
             copiedFiles.value.map(x => x.path),
-            currentDirectory.value,
+            currentDirectory.value
         );
         if (result.status !== 200 && result.status !== 201) throw new Error('Could not copy files');
     }
@@ -360,7 +360,7 @@ export const copyPasteSelected = async () => {
     if (selectedAction.value === Action.CUT) {
         await moveFiles(
             currentDirectory.value,
-            copiedFiles.value.map(x => x.path),
+            copiedFiles.value.map(x => x.path)
         );
     }
     await clearClipboard();
@@ -386,9 +386,11 @@ export const searchDir = async () => {
 export const renameFile = async (item: PathInfoModel, name: string) => {
     const characterLimit = 50;
     if (!name || name.length === 0 || name.length > characterLimit) {
-        createNotification('Failed to rename file',
+        createNotification(
+            'Failed to rename file',
             `Filename cannot be empty or longer than ${characterLimit} characters`,
-            Status.Error);
+            Status.Error
+        );
         return;
     }
     const oldPath = item.path;
@@ -503,7 +505,7 @@ export const sortContent = () => {
     });
 };
 
-export const sortAction = function(s) {
+export const sortAction = function (s) {
     if (s === currentSort.value) {
         currentSortDir.value = currentSortDir.value === 'asc' ? 'desc' : 'asc';
     }
@@ -665,7 +667,7 @@ export const getFileSize = (val: any) => {
     }
     return '-';
 };
-export const formatBytes = function(bytes, decimals) {
+export const formatBytes = function (bytes, decimals) {
     if (bytes == 0) return '0 Bytes';
     let k = 1024,
         dm = decimals || 2,
@@ -750,7 +752,7 @@ export const clickBreadcrumb = async (item, breadcrumbs, idx) => {
     const params = router.currentRoute.value.params;
     let splitted = String(params.path).split('/').slice(0);
     //Deleting all empty values
-    splitted = splitted.filter(function(element) {
+    splitted = splitted.filter(function (element) {
         return element !== '';
     });
 
@@ -779,7 +781,7 @@ const resetSharedFolder = () => {
 let timer;
 
 function startTimer(milliseconds) {
-    timer = setTimeout(function() {
+    timer = setTimeout(function () {
         router.push({ name: 'sharedWithMe' });
         showSharedFolderErrorModal.value = true;
     }, milliseconds);
@@ -893,7 +895,7 @@ export const fetchBasedOnRoute = async () => {
             const items = await getSharedFolderContent(
                 parent.owner,
                 parent.id,
-                '/' + `/${folderTree.slice(1).join('/')}`,
+                '/' + `/${folderTree.slice(1).join('/')}`
             );
 
             sharedContent.value = items.map(item => {
@@ -1017,7 +1019,7 @@ export const fetchFileAccessDetails = async (
     owner: ContactInterface,
     shareId: string,
     path: string,
-    attachments: boolean,
+    attachments: boolean
 ) => {
     const { user } = useAuthState();
     const fileAccessDetails = await Api.getFileAccessDetails(owner, shareId, <string>user.id, path, attachments);
@@ -1032,7 +1034,7 @@ export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, sh
         location = `${window.location.origin}${locationApiEndpoint}`;
     } else {
         location = calcExternalResourceLink(
-            `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`,
+            `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
     // TODO: url encoding

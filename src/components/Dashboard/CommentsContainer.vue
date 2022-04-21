@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white w-full h-auto px-3 py-2 flex flex-col space-y-2">
+    <div class="bg-white w-full max-h-96 overflow-y-auto px-3 py-2 flex flex-col space-y-2">
         <PostComment
             @replyToComment="e => $emit('replyToComment', e)"
             :key="comment.id"

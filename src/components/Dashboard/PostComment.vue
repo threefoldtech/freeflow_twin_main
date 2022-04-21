@@ -1,44 +1,14 @@
 <template>
     <div :class="{ 'ml-10': comment.type === MESSAGE_TYPE.COMMENT_REPLY }" class="flex items-center space-x-2 relative">
-        <div
-            class="flex flex-shrink-0 self-start cursor-pointer"
-            @mouseover="
-                mouseFocussed = true;
-                panelTimer();
-            "
-            @mouseleave="
-                mouseFocussed = false;
-                panelTimer();
-            "
-        >
-            <div>
-                <AvatarImg :id="comment.owner.id" :showOnlineStatus="false" :small="true" alt="avatar" />
-            </div>
-        </div>
-        <TransitionRoot
-            :show="openPanel"
-            class="absolute z-50"
-            enter="transition-opacity duration-150"
-            enter-from="opacity-0"
-            enter-to="opacity-100"
-            leave="transition-opacity duration-250"
-            leave-from="opacity-100"
-            leave-to="opacity-0"
-        >
-            <keep-alive>
-                <CommentHoverPanel
-                    v-if="openPanel"
-                    :avatar="avatarImg"
-                    :comment="comment"
-                    @mouseleave="
-                        mouseFocussed = false;
-                        openPanel = false;
-                    "
-                    @mouseover="mouseFocussed = true"
-                    class="-top-56 -left-20"
-                />
-            </keep-alive>
-        </TransitionRoot>
+        <VMenu placement="top">
+            <AvatarImg :id="comment.owner.id" :showOnlineStatus="false" :small="true" alt="avatar" />
+
+            <template #popper>
+                <keep-alive>
+                    <CommentHoverPanel :avatar="avatarImg" :comment="comment" />
+                </keep-alive>
+            </template>
+        </VMenu>
         <div class="flex items-center justify-center space-x-2 relative">
             <div class="block">
                 <div class="bg-gray-100 w-auto rounded-xl px-2 pb-2">
@@ -46,14 +16,6 @@
                         <a
                             class="hover:underline text-sm"
                             href="#"
-                            @mouseover="
-                                mouseFocussed = true;
-                                panelTimer();
-                            "
-                            @mouseleave="
-                                mouseFocussed = false;
-                                panelTimer();
-                            "
                         >
                             <small>{{ comment.owner.id }}</small>
                         </a>
@@ -120,7 +82,7 @@
         class="relative flex items-center pl-20 flex-start w-full"
         @submit.prevent="handleReplyForm"
     >
-        <div class="pr-1">
+        <div class="pr-1 bg">
             <AvatarImg :id="user.id" :showOnlineStatus="false" :xsmall="true" />
         </div>
         <input
@@ -128,6 +90,7 @@
             class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3"
             placeholder="Type your message here"
             type="text"
+            maxlength="500"
         />
     </form>
 </template>
@@ -200,4 +163,12 @@
     };
 </script>
 
-<style scoped></style>
+<style>
+    .v-popper--theme-menu .v-popper__inner {
+        background-color: transparent !important;
+        border-color: transparent !important;
+    }
+    .v-popper__arrow-container {
+        opacity: 0;
+    }
+</style>

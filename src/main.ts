@@ -11,13 +11,17 @@ import config from '@/config';
 import MessageContent from '@/components/MessageContent.vue';
 import { clickOutside } from '@/plugins/ClickOutside';
 import axios from 'axios';
-
+import FloatingVue from 'floating-vue';
+import 'floating-vue/dist/style.css';
 // console.log(Socketio)
 // const a = Socketio.install
+
+FloatingVue.options.themes.menu.delay.hide = 0;
 
 const app = createApp(App)
     .directive('click-outside', clickOutside)
     .use(router)
+    .use(FloatingVue)
     .use(socketIo, {
         connection: config.baseUrl,
         options: {
