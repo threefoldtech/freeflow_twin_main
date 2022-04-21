@@ -17,6 +17,7 @@ import 'floating-vue/dist/style.css';
 // const a = Socketio.install
 
 FloatingVue.options.themes.menu.delay.hide = 0;
+FloatingVue.options.themes.menu.delay.show = 600;
 
 const app = createApp(App)
     .directive('click-outside', clickOutside)
