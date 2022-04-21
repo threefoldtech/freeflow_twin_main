@@ -285,7 +285,7 @@
             return;
         }
 
-        if (message.value.value != '') {
+        if (message.value.value.trim() != '') {
             sendMessage(selectedId, message.value.value);
             clearMessage();
         }
