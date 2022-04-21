@@ -16,7 +16,7 @@
                 </Topbar>
             </div>
             <slot name="side">
-                <Sidebar
+                <Sidebar @clicked='showNav = false'
                     class="bg-accent-800 md:block"
                     :class="[showNav ? '' : 'hidden', smallScreen ? 'top' : 'side']"
                 ></Sidebar>
