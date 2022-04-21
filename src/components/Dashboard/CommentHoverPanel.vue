@@ -1,11 +1,11 @@
 <template>
-    <div class="absolute mt-4 bg-white px-4 py-4 w-72 shadow rounded cursor-default z-50">
+    <div class="mt-4 bg-white px-4 py-4 w-72 shadow rounded cursor-default z-50">
         <div class="flex space-x-3">
             <div class="flex flex-shrink-0">
                 <img :src="avatar" alt="" class="h-16 w-16 object-fill rounded-full" />
             </div>
             <div class="flex flex-col space-y-2">
-                <div class="font-semibold text-base">
+                <div class="font-semibold text-base text-black">
                     <a class="hover:underline" href="#">
                         {{ comment.owner.id }}
                     </a>
