@@ -1,13 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
 import { createNotification, createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
-import { Notification, ProgressNotification, Status } from '@/types/notifications';
-import { ContactInterface, FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
+import { ProgressNotification, Status } from '@/types/notifications';
+import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
-import { accessDenied, currentDirectory, PathInfoModel } from '@/store/fileBrowserStore';
-import { isUndefined } from 'lodash';
+import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
 
-const endpoint = `${config.baseUrl}api/browse`;
+const endpoint = `${config.baseUrl}api/v1/browse`;
 
 export interface PathInfo {
     isFile: boolean;
@@ -67,7 +66,7 @@ export const createDirectory = async (path: string, name: string): Promise<Axios
     return await axios.post<PathInfo>(`${endpoint}/directories`, body);
 };
 
-export const getFileInfo = async (path: string, attachments: boolean): Promise<AxiosResponse<EditPathInfo>> => {
+export const getFileInfo = async (path: string, attachments: boolean = false): Promise<AxiosResponse<EditPathInfo>> => {
     const params = new URLSearchParams();
     params.append('path', path);
     params.append('attachments', String(attachments));
@@ -204,7 +203,7 @@ export const getFileAccessDetails = async (
 
     path = encodeURIComponent(path);
 
-    let apiEndPointToCall = `/api/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
+    let apiEndPointToCall = `/api/v1/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
     externalUrl = externalUrl + apiEndPointToCall;
@@ -215,13 +214,13 @@ export const getFileAccessDetails = async (
 export const getSharedFolderContent = async (
     owner: ContactInterface,
     shareId: string,
-    userId: string,
+    _userId: string,
     path: string
 ) => {
     let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
-    let apiEndPointToCall = `/api/browse/share/${shareId}/folder?path=${path}`;
+    let apiEndPointToCall = `/api/v1/browse/share/${shareId}/folder?path=${path}`;
 
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
     externalUrl = externalUrl + apiEndPointToCall;
@@ -236,8 +235,9 @@ export const getShareByPath = async (path: string): Promise<SharedFileInterface>
 export const downloadAttachment = async (message: any) => {
     createNotification('Downloading attachment', `from ${message.from}`, Status.Info);
     try {
+        const msgUrl = message.body.url;
         const response = await axios.get(`${endpoint}/attachment/download`, {
-            params: { owner: message.from, path: message.body.url, to: message.to, messageId: message.id },
+            params: { owner: message.from, path: msgUrl, to: message.to, messageId: message.id },
         });
         createNotification('Attachment successfully downloaded', `from ${message.from}`, Status.Success);
         return response?.data;

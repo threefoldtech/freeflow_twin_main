@@ -19,27 +19,11 @@
         />
         <div class="flex-1">
             <div
-                class="
-                    flex flex-row flex-wrap
-                    my-message:flex-row-reverse my-message:md:flex-row
-                    lg:my-message:flex-row-reverse
-                    xl:my-message:flex-row
-                "
+                class="flex flex-row flex-wrap my-message:flex-row-reverse my-message:md:flex-row lg:my-message:flex-row-reverse xl:my-message:flex-row"
             >
                 <div
                     tabindex="0"
-                    class="
-                        flex flex-col
-                        rounded-md rounded-r-xl
-                        mb-1
-                        bg-white
-                        shadow
-                        relative
-                        overflow-hidden
-                        my-message:bg-accent-200
-                        focus:outline-none focus:ring-4
-                        ring-accent-500 ring-offset-2
-                    "
+                    class="flex flex-col rounded-md rounded-r-xl mb-1 bg-white shadow relative overflow-hidden my-message:bg-accent-200 focus:outline-none focus:ring-4 ring-accent-500 ring-offset-2"
                     :class="{
                         'rounded-tl-xl': isFirstMessage,
                         'rounded-bl-xl': isLastMessage,
@@ -49,7 +33,11 @@
                         {{ message.from }}
                     </header>
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
-                        <MessageContent :message="message" :key="message.type"  :isDownloadingAttachment="isDownloadingAttachment"></MessageContent>
+                        <MessageContent
+                            :message="message"
+                            :key="message.type"
+                            :isDownloadingAttachment="isDownloadingAttachment"
+                        ></MessageContent>
                     </main>
                     <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
                         <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
@@ -95,9 +83,9 @@
                     </span>
                     <span
                         v-if="message.type === MessageTypes.FILE"
-                      class="reply text-xs pr-4 cursor-pointer hover:underline"
-                      @click="downloadAttachmentToQuantum(message)"
-                  >
+                        class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        @click="downloadAttachmentToQuantum(message)"
+                    >
                         <i class="fa fa-reply"></i>
                         <span class="text-gray-600 pl-2">Download</span>
                     </span>
@@ -120,7 +108,10 @@
                         }"
                     >
                         <main class="max-w-[750px] break-all flex justify-between">
-                            <MessageContent :message="reply" :isDownloadingAttachment="isDownloadingAttachment"></MessageContent>
+                            <MessageContent
+                                :message="reply"
+                                :isDownloadingAttachment="isDownloadingAttachment"
+                            ></MessageContent>
                         </main>
                     </div>
 
@@ -147,39 +138,30 @@
 </template>
 
 <script setup lang="ts">
-import {computed, defineComponent, nextTick, onMounted, ref, watch} from 'vue';
-    import moment from 'moment';
+    import { onMounted, ref, watch } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
     import { Message, MessageBodyType, QuoteBodyType, StringMessageType, MessageTypes } from '@/types';
-    import { uuidv4 } from '@/common';
     import { useAuthState } from '@/store/authStore';
     import {
-        clearMessageAction,
-        MessageAction,
         sendMessageObject,
-        setMessageAction,
         usechatsActions,
         selectedMessageId,
         editMessage,
         replyMessage,
     } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
-    import { clock } from '@/services/clockService';
     import Time from '@/components/Time.vue';
 
-import {
-  currentRightClickedItem, RIGHT_CLICK_ACTIONS, RIGHT_CLICK_ACTIONS_MESSAGE,
-  RIGHT_CLICK_TYPE,
-  rightClickItemAction,
-  triggerWatchOnRightClickItem
-} from "@/store/contextmenuStore";
-import {downloadFiles, selectedPaths} from "@/store/fileBrowserStore";
-import {downloadAttachment} from '@/services/fileBrowserService'
-import {showShareDialog} from "@/services/dialogService";
-import {createNotification} from "@/store/notificiationStore";
-import {Status} from "@/types/notifications";
-
+    import {
+        currentRightClickedItem,
+        RIGHT_CLICK_ACTIONS,
+        RIGHT_CLICK_ACTIONS_MESSAGE,
+        RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        triggerWatchOnRightClickItem,
+    } from '@/store/contextmenuStore';
+    import { downloadAttachment } from '@/services/fileBrowserService';
 
     interface IProps {
         message: object;
@@ -192,33 +174,39 @@ import {Status} from "@/types/notifications";
         isLastMessage: boolean;
     }
 
-    const isDownloadingAttachment = ref<boolean>(false)
+    const isDownloadingAttachment = ref<boolean>(false);
     const props = defineProps<IProps>();
 
     const emit = defineEmits(['openEditShare']);
 
-
     const { user } = useAuthState();
 
-    watch(triggerWatchOnRightClickItem,async () => {
-      if(currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE && currentRightClickedItem.value.data.id === props.message.id){
-        switch(rightClickItemAction.value){
-          case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
-            replyMessage(props.chatId, props.message)
-            break;
-          case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
-            editMessage(props.chatId, props.message)
-            break;
-          case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
-            deleteMessage(props.message)
-            break;
-          default:
-            break;
-        }
-        rightClickItemAction.value = null;
-      }
-      return;
-    }, {deep: true})
+    watch(
+        triggerWatchOnRightClickItem,
+        async () => {
+            if (
+                currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE &&
+                currentRightClickedItem.value.data.id === props.message.id
+            ) {
+                switch (rightClickItemAction.value) {
+                    case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
+                        replyMessage(props.chatId, props.message);
+                        break;
+                    case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
+                        editMessage(props.chatId, props.message);
+                        break;
+                    case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
+                        deleteMessage(props.message);
+                        break;
+                    default:
+                        break;
+                }
+                rightClickItemAction.value = null;
+            }
+            return;
+        },
+        { deep: true }
+    );
 
     const toggleSendForwardMessage = () => {
         console.log('toggleSendForwardMessage');
@@ -255,7 +243,7 @@ import {Status} from "@/types/notifications";
     };
 
     function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 
     const deleteReply = (message, reply) => {
@@ -274,17 +262,17 @@ import {Status} from "@/types/notifications";
     };
 
     const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
-      if(count >= 4){
+        if (count >= 4) {
+            isDownloadingAttachment.value = false;
+            console.log("Couldn't download attachments");
+            return;
+        }
+        isDownloadingAttachment.value = true;
+        const response = await downloadAttachment(message);
+        count++;
+        if (response !== 'OK') await downloadAttachmentToQuantum(message);
+        await sleep(1500);
         isDownloadingAttachment.value = false;
-        console.log("Couldn't download attachments")
-        return;
-      }
-      isDownloadingAttachment.value = true;
-      const response = await downloadAttachment(message);
-      count++;
-      if(response !== "OK") await downloadAttachmentToQuantum(message);
-      await sleep(1500)
-      isDownloadingAttachment.value = false;
     };
 </script>
 <style lang="css" scoped></style>

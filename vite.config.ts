@@ -8,7 +8,8 @@ export default defineConfig({
         port: 8080,
         hmr: {
             host: process.env.BaseURL,
-            port: 443,
+            port: 8080,
+            clientPort: 443,
             protocol: 'wss',
         },
     },

@@ -1,5 +1,5 @@
 <template>
-    <div v-if="chat.isGroup" class="bg-whitew-full relative rounded-lg mb-4 md:grid grid-cols-1">
+    <div v-if="chat.isGroup" class="bg-white w-full relative rounded-lg md:grid grid-cols-1">
         <div class="flex justify-between items-center mb-6 mt-4 mx-4">
             <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
             <UserAddIcon
@@ -8,46 +8,34 @@
                 @click="openAddUserToGroup = true"
             />
         </div>
-        <div v-for="(contact, idx) in chat.contacts" :key="contact.id + chat.contacts.length" class="w-full">
-            <div class="chatcard relative grid grid-cols-12 py-3">
-                <div class="md:col-span-2 col-span-2 place-items-center grid relative">
+        <ul role="list" class="divide-y divide-gray-200 w-full border-t">
+            <li
+                v-for="(contact, idx) in chat.contacts"
+                :key="contact.id + chat.contacts.length"
+                class="py-3 px-4 sm:px-6 grid grid-cols-2 items-center"
+            >
+                <div class="flex items-center justify-self-start overflow-hidden overflow-ellipsis">
                     <AvatarImg :id="contact.id" small />
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
+                    </div>
                 </div>
-                <div class="md:col-span-8 col-span-8 pl-2">
-                    <p class="flex place-content-between">
-                        <span class="font-bold overflow-hidden overflow-ellipsis">
-                            {{ contact.id }}
-                        </span>
-                    </p>
-                </div>
-                <div class="btns col-span-2">
-                    <button v-if="isAdmin" @click="removeFromGroup(contact)">
-                        <i class="fas fa-times text-red-500"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
+                <button
+                    v-if="isAdmin && chat.adminId !== contact.id"
+                    @click="removeFromGroup(contact)"
+                    class="inline-flex items-center border border-red-500 px-3 py-2 shadow-sm text-sm font-medium cursor-pointer rounded-md w-min justify-self-end"
+                >
+                    <TrashIcon class="h-4 w-4 text-red-500" />
+                </button>
+            </li>
+        </ul>
+        <div id="spacer" class="bg-gray-100 h-2 w-full mt-2"></div>
     </div>
-    <div v-if="sidebarFileList?.length !== 0" class="p-2">
+    <div v-if="sidebarFileList?.length !== 0" class="px-2">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Files</h3>
         <ul class="space-y-2 max-h-64 overflow-y-auto">
-
             <li
-                class="
-                    flex
-                    items-center
-                    rounded
-                    justify-start
-                    w-full
-                    py-2
-                    px-4
-                    cursor-pointer
-                    hover:bg-gray-100
-                    rounded
-                    transition
-                    duration-100
-                "
+                class="flex items-center rounded justify-start w-full py-2 px-4 cursor-pointer hover:bg-gray-100 rounded transition duration-100"
                 v-for="file in sidebarFileList"
             >
                 <a :href="calcExternalResourceLink(file.body.url)" class="block outline-none border-none"
@@ -59,14 +47,16 @@
             </li>
         </ul>
     </div>
-    <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
+    <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full"></div>
     <div class="bg-white p-2 w-full h-full flex flex-col justify-start">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
         <div class="flex items-center flex-col w-full">
-            <div class="call bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-call')">
+            <div
+                class="call bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
+                @click="$emit('app-call')"
+            >
                 <i class="fas fa-video m-3"></i>
                 <p class="m-3 text-xs">Join video room</p>
-
             </div>
             <div
                 v-if="!chat.isGroup && !blocked"
@@ -74,7 +64,7 @@
                 @click="$emit('app-block')"
             >
                 <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3 text-xs ">Block user</p>
+                <p class="m-3 text-xs">Block user</p>
             </div>
 
             <div
@@ -86,9 +76,12 @@
                 <p class="m-3 text-xs">Unblock user</p>
             </div>
 
-            <div class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer" @click="$emit('app-delete')">
+            <div
+                class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
+                @click="$emit('app-delete')"
+            >
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete conversation</p>
+                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete chat' }}</p>
             </div>
         </div>
         <div class="flex-grow-0 w-full h-full"></div>
@@ -108,30 +101,12 @@
                     <h2 class="text-gray-800 text-lg font-medium text-left">Add new members to the group</h2>
                     <XIcon
                         @click="openAddUserToGroup = false"
-                        class="
-                            w-6
-                            h-6
-                            cursor-pointer
-                            text-gray-500
-                            hover:text-gray-600
-                            transition
-                            duration-75
-                            absolute
-                            right-2
-                        "
+                        class="w-6 h-6 cursor-pointer text-gray-500 hover:text-gray-600 transition duration-75 absolute right-2"
                     />
                 </div>
                 <div class="mt-5 mb-2 border-2 py-1 px-2 flex justify-between items-center rounded-md relative w-full">
                     <input
-                        class="
-                            flex-grow
-                            outline-none
-                            ring-o
-                            text-gray-600
-                            focus:outline-none focus:ring-0 focus:text-gray-600
-                            border-none
-                            text-xs
-                        "
+                        class="flex-grow outline-none ring-o text-gray-600 focus:outline-none focus:ring-0 focus:text-gray-600 border-none text-xs"
                         type="text"
                         placeholder="Search users..."
                         v-model="searchInput"
@@ -145,32 +120,28 @@
             </div>
             <div class="flex flex-col relative max-h-82 p-4">
                 <div v-if="!filteredMembers.length">
-                    <p class="text-gray-400 text-center py-4">Not able to add any contacts to this group</p>
+                    <p class="text-gray-400 text-center py-4 leading-7">
+                        You don't have any contacts that are not already in the group. <br />
+                        You can only add contacts from your connections list.
+                    </p>
                 </div>
                 <div
                     v-for="(contact, i) in filteredMembers"
                     :key="i"
-                    class="grid grid-cols-12 py-2 w-full px-4"
+                    @click="addToGroup(contact)"
+                    class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
                     :class="{ 'bg-gray-100': i % 2 === 0, 'bg-gray-50': i % 2 !== 0 }"
                 >
-                    <div class="col-span-2 place-items-center grid rounded-full border flex-shrink-0 w-10 h-10">
+                    <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
                         <AvatarImg :id="contact.id" small />
                     </div>
                     <p
-                        class="
-                            col-span-8
-                            pl-4
-                            flex-col
-                            justify-center
-                            overflow-hidden overflow-ellipsis
-                            w-full
-                            font-semibold
-                        "
+                        class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"
                     >
                         {{ contact.id }}
                     </p>
                     <div class="col-span-2 place-items-center grid">
-                        <button class="h-12 rounded-full" @click="addToGroup(contact)">
+                        <button class="rounded-full">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
@@ -181,7 +152,7 @@
     <Dialog
         v-model="showRemoveUserDialog"
         class="max-w-10"
-        :noActions='true'
+        :noActions="true"
         @update-model-value="
             showRemoveUserDialog = false;
             toBeRemovedUser = null;
@@ -191,7 +162,7 @@
             <h1 class="text-center">Remove User</h1>
         </template>
         <div>
-            Do you really want to Remove <b>{{ toBeRemovedUser.id }}</b> from the conversation?
+            Do you really want to remove <b>{{ toBeRemovedUser.id }}</b> from the group?
         </div>
         <div class="flex justify-end mt-2">
             <button
@@ -210,7 +181,7 @@
     </Dialog>
 </template>
 <script setup lang="ts">
-    import { computed, ref, watch, onMounted } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
@@ -218,22 +189,26 @@
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
-    import { getIconColor, getIcon, getFileType, getIconDirty } from '@/store/fileBrowserStore';
+    import { TrashIcon } from '@heroicons/vue/solid';
+    import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import {MessageTypes} from "@/types";
+    import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
 
     interface IProps {
-        chat: any;
+        chat: Chat;
     }
-
-
 
     const props = defineProps<IProps>();
 
     const sidebarFileList = computed(() => {
-          return props.chat.messages.filter(msg => msg.type === MessageTypes.FILE)
-    })
+        const files = props.chat.messages.filter(msg => msg.type === MessageTypes.FILE);
+        files.map(file => {
+            const url = file.body.url;
+            file.body.url = url;
+        });
+        return files;
+    });
 
     defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);
 
@@ -243,9 +218,9 @@
     const { contacts } = useContactsState();
 
     const filteredMembers = computed(() => {
-        return contacts.filter(item => {
-            return item.id.toLowerCase().includes(searchInput.value.toLowerCase());
-        });
+        return contacts
+            .filter(con => !props.chat.contacts.some(c => c.id === con.id))
+            .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()));
     });
 
     const showRemoveUserDialog = ref(false);
@@ -274,14 +249,14 @@
     };
     const doRemoveFromGroup = () => {
         const { updateContactsInGroup } = usechatsActions();
-        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, true);
+        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
         toBeRemovedUser.value = null;
     };
     const addToGroup = contact => {
         const { updateContactsInGroup } = usechatsActions();
         //@ts-ignore
-        updateContactsInGroup(props.chat.chatId, contact, false);
+        updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
     const filteredContacts = computed(() => {
         return contacts.filter(
@@ -298,7 +273,7 @@
 
     const blocked = computed(() => {
         if (!props.chat || props.chat.isGroup) return false;
-        return isBlocked(props.chat.chatId);
+        return isBlocked(props.chat.chatId.toString());
     });
 </script>
 

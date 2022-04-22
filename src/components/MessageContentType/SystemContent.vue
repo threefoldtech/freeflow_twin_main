@@ -10,18 +10,7 @@
             <i class="underline">{{ message.body.message }}</i>
         </div>
         <button
-            class="
-                text-xs text
-                bg-accent-800
-                focus:outline-none focus:ring-2
-                ring-accent-800 ring-offset-2 ring-offset-2
-                text-white
-                px-4
-                py-2
-                m-0
-                rounded-full
-                ml-6
-            "
+            class="text-xs text bg-accent-800 focus:outline-none focus:ring-2 ring-accent-800 ring-offset-2 ring-offset-2 text-white px-4 py-2 m-0 rounded-full ml-6"
         >
             <i class="fas fa-video mr-3"></i>
             JOIN
@@ -36,7 +25,7 @@
 
 <script lang="ts" setup>
     import { popupCenter } from '@/services/popupService';
-    import { usechatsActions, usechatsState } from '@/store/chatStore';
+    import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { useRoute } from 'vue-router';
     import { computed, defineComponent, ref } from 'vue';
     import { useAuthState } from '@/store/authStore';
@@ -50,7 +39,7 @@
     const props = defineProps<IProp>();
     const route = useRoute();
     let selectedId = ref(<string>route.params.id);
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const { sendMessage } = usechatsActions();
     const { user } = useAuthState();
     const chat = computed(() => {

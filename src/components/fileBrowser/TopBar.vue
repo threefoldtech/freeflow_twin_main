@@ -7,19 +7,16 @@
                 </div>
                 <input
                     v-model="searchDirValue"
-                    class="
-                        focus:ring-primary focus:border-primary
-                        block
-                        w-full
-                        pl-10
-                        sm:text-sm
-                        border-gray-300
-                        rounded-md
-                    "
+                    class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                     placeholder="Search"
                     type="text"
-                    :class="{'opacity-50' : route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir}"
-                    :disabled="route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir"
+                    :class="{
+                        'opacity-50':
+                            route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir,
+                    }"
+                    :disabled="
+                        route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir
+                    "
                     @input="debounceSearch"
                 />
                 <div
@@ -35,52 +32,44 @@
                 <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
         </div>
-        <Breadcrumbs></Breadcrumbs>
+        <div class="flex items-center justify-between px-2">
+            <Breadcrumbs></Breadcrumbs>
+            <ViewSelect />
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
     import { computed, onBeforeMount, ref } from 'vue';
     import {
-      selectedPaths,
-      currentDirectory,
-      goToHome,
-      goToAPreviousDirectory,
-      goBack,
-      searchDir,
-      searchDirValue,
-      searchResults,
-      isDraggingFiles,
-      moveFiles,
-      selectedAction,
-      Action,
-      addShare,
-      sharedDir, savedAttachments,
+        selectedPaths,
+        currentDirectory,
+        searchDir,
+        searchDirValue,
+        searchResults,
+        isDraggingFiles,
+        moveFiles,
+        sharedDir,
+        savedAttachments,
     } from '@/store/fileBrowserStore';
-    import Dialog from '@/components/Dialog.vue';
     import MainActionButtons from '@/components/fileBrowser/MainActionButtons.vue';
     import Breadcrumbs from '@/components/fileBrowser/Breadcrumbs.vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
-    import Button from '@/components/Button.vue';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
-    import { useSocketActions } from '@/store/socketStore';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-    import { createNotification } from '@/store/notificiationStore';
+    import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { SearchIcon } from '@heroicons/vue/solid';
-    import {useRoute} from "vue-router";
-
-
+    import { useRoute } from 'vue-router';
 
     const route = useRoute();
 
-    const { chats } = usechatsState();
-    const { retrievechats, sendMessage } = usechatsActions();
+    const { chats } = useChatsState();
+    const { retrieveChats, sendMessage } = usechatsActions();
 
     let debounce;
     const parts = computed(() => currentDirectory.value.split('/'));
 
     onBeforeMount(() => {
-        retrievechats();
+        retrieveChats();
     });
 
     function debounceSearch(event) {

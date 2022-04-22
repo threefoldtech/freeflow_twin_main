@@ -1,6 +1,6 @@
 import { reactive } from '@vue/reactivity';
 import { nextTick, readonly, ref, toRefs } from 'vue';
-import axios, { CancelToken, CancelTokenSource } from 'axios';
+import axios from 'axios';
 import moment from 'moment';
 import {
     Chat,
@@ -22,7 +22,6 @@ import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
-import { myYggdrasilAddress } from '@/store/authStore';
 import { blocklist } from '@/store/blockStore';
 
 const messageLimit = 50;
@@ -71,15 +70,15 @@ export const clearMessageAction = (chatId: string) => {
     };
 };
 
-const retrievechats = async () => {
+const retrieveChats = async () => {
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
-    await axios.get(`${config.baseUrl}api/chats`, { params: params }).then(response => {
-        const incommingchats = response.data;
+    await axios.get(`${config.baseUrl}api/v1/chats`, { params: params }).then(response => {
+        const incomingchats = response.data;
 
         // debugger
-        incommingchats.forEach(chat => {
+        incomingchats.forEach((chat: Chat) => {
             addChat(chat);
         });
         sortChats();
@@ -87,7 +86,7 @@ const retrievechats = async () => {
     });
 };
 
-export const editMessage = (chatId, message) => {
+export const editMessage = (chatId: string, message: any) => {
     clearMessageAction(chatId);
     //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
     nextTick(() => {
@@ -95,7 +94,7 @@ export const editMessage = (chatId, message) => {
     });
 };
 
-export const replyMessage = (chatId, message) => {
+export const replyMessage = (chatId: string, message: any) => {
     clearMessageAction(chatId);
     //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
     nextTick(() => {
@@ -103,7 +102,7 @@ export const replyMessage = (chatId, message) => {
     });
 };
 
-const getChat = chatId => state.chats.find(x => x.chatId === chatId);
+const getChat = (chatId: string) => state.chats.find(x => x.chatId === chatId);
 const setChatHasMoreMessages = (chatId: string, hasMore: boolean): void => {
     state.chatInfo[chatId] = {
         ...(state.chatInfo[chatId] ?? { isLoading: false }),
@@ -138,7 +137,7 @@ const addChat = (chat: Chat) => {
     sortChats();
 };
 
-export const removeChat = chatId => {
+export const removeChat = (chatId: string) => {
     state.chats = state.chats.filter(c => c.chatId !== chatId);
     state.chatRequests = state.chatRequests.filter(c => c.chatId !== chatId);
     sortChats();
@@ -165,7 +164,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 from: user.id,
                 to: name,
                 body: {
-                    message: `Group created by ${user.id} with the following inital member: ${contactInGroup.join(
+                    message: `Group created by ${user.id} with the following initial member: ${contactInGroup.join(
                         ', '
                     )}`,
                 } as SystemBody,
@@ -177,12 +176,13 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
             },
         ],
         name: name,
-        adminId: user.id,
+        adminId: user.id.toString(),
         read: {},
         acceptedChat: true,
+        draft: null,
     };
     axios
-        .put(`${config.baseUrl}api/group`, newGroupchat)
+        .put(`${config.baseUrl}api/v1/group`, newGroupchat)
         .then(res => {
             console.log(res);
         })
@@ -191,9 +191,9 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
         });
 };
 
-const acceptChat = id => {
+const acceptChat = (id: string) => {
     axios
-        .post(`${config.baseUrl}api/chats?id=${id}`)
+        .post(`${config.baseUrl}api/v1/chats?id=${id}`)
         .then(() => {
             const index = state.chatRequests.findIndex(c => c.chatId == id);
             state.chatRequests[index].acceptedChat = true;
@@ -212,7 +212,7 @@ const updateChat = (chat: Chat) => {
     addChat(chat);
 };
 
-function getMessage(chat: Chat, id) {
+function getMessage(chat: Chat, id: string) {
     let message = chat.messages.find(m => m.id === id);
 
     if (!message) {
@@ -225,7 +225,6 @@ function getMessage(chat: Chat, id) {
             message = found;
             return true;
         });
-
     }
 
     return message;
@@ -245,7 +244,7 @@ const fetchMessages = async (
     if (lastMessageId) params.append('fromId', lastMessageId);
     params.append('limit', limit.toString());
 
-    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/messages/${chatId}`, {
+    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/v1/messages/${chatId}`, {
         params: params,
     });
 
@@ -278,7 +277,7 @@ const getNewMessages = async (chatId: string) => {
     }
 };
 
-const addMessage = (chatId, message) => {
+const addMessage = (chatId: string, message: any) => {
     const { addScrollEvent } = useScrollActions();
     if (message.type === 'READ') {
         const chat: Chat = getChat(chatId);
@@ -346,7 +345,7 @@ const addMessage = (chatId, message) => {
     addScrollEvent();
 };
 
-const sendMessage = (chatId, message, type: string = 'STRING') => {
+const sendMessage = (chatId: string, message: any, type: string = 'STRING') => {
     const { sendSocketMessage } = useSocketActions();
     const { user } = useAuthState();
 
@@ -356,7 +355,7 @@ const sendMessage = (chatId, message, type: string = 'STRING') => {
         from: user.id,
         to: chatId,
         timeStamp: new Date(),
-        type: type,
+        type,
         replies: [],
         subject: null,
     };
@@ -364,11 +363,11 @@ const sendMessage = (chatId, message, type: string = 'STRING') => {
     sendSocketMessage(chatId, msg);
 };
 
-const sendSystemMessage = (chatId, message: string) => {
+const sendSystemMessage = (chatId: string, message: string) => {
     sendMessage(chatId, { message: message } as SystemBody, MessageTypes.SYSTEM);
 };
 
-export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
+export const sendMessageObject = (chatId: string, message: Message<MessageBodyType>) => {
     const { sendSocketMessage } = useSocketActions();
     // console.log(chatId, message);
     // @TODO when doing add message on SYSTEM/groupupdate results in  max call stack exeeded
@@ -382,8 +381,8 @@ export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => 
 export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
-const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = false) => {
-    const { user } = useAuthState();
+const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRecording = false) => {
+    if (selectedFile.size > 20000000) return false;
     let formData = new FormData();
     if (!isBlob) {
         formData.append('file', selectedFile);
@@ -415,31 +414,32 @@ const sendFile = async (chatId, selectedFile, isBlob = false, isRecording = fals
             loaded: 0,
             total: selectedFile.total,
             chatId: chatId,
-            selectedFile: selectedFile
+            selectedFile: selectedFile,
         });
 
-        await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
+        await axios.post(`${config.baseUrl}api/v1/files/${chatId}/${uuid}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
-                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
                 imageUploadQueue.value.splice(i, 1, {
                     ...imageUploadQueue.value[i],
                     loaded: progress,
                     total: total,
-                })
+                });
             },
         });
-            } catch (e) {
-        catchErrorsSendFile(e,uuid)
+        return true;
+    } catch (e) {
+        catchErrorsSendFile(e, uuid);
     }
 };
 
-const catchErrorsSendFile = (e,uuid) => {
-    const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
-    if(e.message === 'Operation canceled by the user.') return;
+const catchErrorsSendFile = (e: { message: string }, uuid: string) => {
+    const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
+    if (e.message === 'Operation canceled by the user.') return;
 
     if (e.message == 'Request failed with status code 413') {
         //!TODO Upload limit
@@ -448,25 +448,23 @@ const catchErrorsSendFile = (e,uuid) => {
         imageUploadQueue.value.splice(i, 1, {
             ...imageUploadQueue.value[i],
             error_message: 'File exceeds 20MB limit!',
-            error: true
-        })
+            error: true,
+        });
         return;
     }
-        //errorBody = 'ERROR: File failed to send!';
-        imageUploadQueue.value.splice(i, 1, {
-            ...imageUploadQueue.value[i],
-            error_message: 'File failed to send.',
-            error: true,
-            retry: true
-        })
-}
+    //errorBody = 'ERROR: File failed to send!';
+    imageUploadQueue.value.splice(i, 1, {
+        ...imageUploadQueue.value[i],
+        error_message: 'File failed to send.',
+        error: true,
+        retry: true,
+    });
+};
 
-
-
-export const retrySendFile = async (file) => {
+export const retrySendFile = async (file: { id: string; uuid: string; chatId: string; selectedFile: File }) => {
     //When a upload fails in chat and you retry
 
-    const {id:uuid, chatId, selectedFile} = file
+    const { id: uuid, chatId, selectedFile } = file;
 
     let formData = new FormData();
 
@@ -476,38 +474,39 @@ export const retrySendFile = async (file) => {
     const source = CancelToken.source();
 
     try {
-        const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+        const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
         imageUploadQueue.value.splice(i, 1, {
             ...imageUploadQueue.value[i],
             error_message: '',
             loaded: 0,
             retry: false,
             error: false,
-            cancelToken: source
-        })
+            cancelToken: source,
+        });
 
-        await axios.post(`${config.baseUrl}api/files/${chatId}/${uuid}`, formData, {
+        await axios.post(`${config.baseUrl}api/v1/files/${chatId}/${uuid}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
             cancelToken: source.token,
             onUploadProgress: ({ loaded: progress, total }) => {
-                const i =  imageUploadQueue.value.findIndex(el => el.id === uuid);
+                const i = imageUploadQueue.value.findIndex(el => el.id === uuid);
                 imageUploadQueue.value.splice(i, 1, {
                     ...imageUploadQueue.value[i],
                     loaded: progress,
                     total: total,
                     retry: false,
                     error: false,
-                    error_message: ""})
+                    error_message: '',
+                });
             },
         });
     } catch (e) {
-        catchErrorsSendFile(e, uuid)
+        catchErrorsSendFile(e, uuid);
     }
-}
+};
 
-const setLastMessage = (chatId: string, message: Message<String>) => {
+const setLastMessage = (chatId: string, _message: Message<String>) => {
     if (!state.chats) return;
     const chat = state.chats.find(c => c.chatId == chatId);
     if (!chat) return;
@@ -534,7 +533,7 @@ const sortChats = () => {
     });
 };
 
-const readMessage = (chatId, messageId) => {
+const readMessage = (chatId: string, messageId: string) => {
     const { user } = useAuthState();
 
     const newMessage: Message<string> = {
@@ -550,17 +549,25 @@ const readMessage = (chatId, messageId) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
+const updateContactsInGroup = async (groupId: string, contact: Contact, type: SystemMessageTypes) => {
     const { user } = useAuthState();
-    const myLocation = await myYggdrasilAddress();
+    const chat = getChat(groupId);
+    const admin = chat.contacts.find(c => c.id === chat.adminId);
+    if (!('location' in admin)) return;
+    const adminLocation = admin.location;
+
+    let msg = `${contact.id} has been removed from the group`;
+    if (type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
+    if (type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
+
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
         from: user.id,
         to: groupId,
         body: {
-            type: remove ? SystemMessageTypes.REMOVE_USER : SystemMessageTypes.ADD_USER,
-            message: `${contact.id} has been ${remove ? 'removed from' : 'added to'} the group`,
-            adminLocation: myLocation,
+            type,
+            message: msg,
+            adminLocation,
             contact,
         },
         timeStamp: new Date(),
@@ -572,15 +579,15 @@ const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean)
     sendMessageObject(groupId, message);
 };
 
-export const usechatsState = () => {
+export const useChatsState = () => {
     return {
         ...toRefs(state),
     };
 };
 
-export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
+export const draftMessage = (chatId: string, message: any) => {
     getChat(chatId).draft = message;
-    axios.post(`${config.baseUrl}api/updateDraft`, {
+    axios.post(`${config.baseUrl}api/v1/updateDraft`, {
         params: {
             draftMessage: message,
         },
@@ -590,7 +597,7 @@ export const draftMessage = (chatId, message: Message<MessageBodyType>) => {
 export const usechatsActions = () => {
     return {
         addChat,
-        retrievechats,
+        retrieveChats,
         sendMessage,
         addMessage,
         sendFile,
@@ -603,6 +610,7 @@ export const usechatsActions = () => {
         updateChat,
         getNewMessages,
         getChatInfo,
+        getChat,
         draftMessage,
     };
 };
@@ -625,7 +633,7 @@ export const handleRead = (message: Message<string>) => {
 
     let chatId = message.to === user.id ? message.from : message.to;
 
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const chat = chats.value.find(c => c.chatId == chatId);
 
     const newRead = getMessage(chat, message.body);

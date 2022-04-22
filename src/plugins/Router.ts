@@ -1,30 +1,9 @@
-import {
-    currentDirectory,
-    sharedContent,
-    sharedBreadcrumbs,
-    selectedPaths,
-    goToFilesInChat,
-    chatsWithFiles,
-    fetchSharedInChatFiles,
-    chatFilesBreadcrumbs,
-    isQuantumChatFiles,
-    setChatsWithAttachments,
-    attachments,
-    chatsWithAttachments,
-    currentDirectoryContent,
-    updateAttachments,
-    savedAttachments,
-    savedAttachmentsBreadcrumbs,
-    savedAttachmentsIsLoading,
-} from './../store/fileBrowserStore';
 import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-router';
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
 import VideoRoom from '@/views/app/VideoRoom.vue';
 import Forum from '@/views/app/Forum.vue';
-import Browser from '@/views/app/Browser.vue';
 import Kutana from '@/views/app/Kutana.vue';
-import Basic from '@/layout/Basic.vue';
 import Chat from '@/views/app/Chat.vue';
 import Conversation from '@/views/app/Conversation.vue';
 import Callback from '@/views/Callback.vue';
@@ -34,12 +13,18 @@ import EditOptions from '@/views/app/EditOptions.vue';
 import { isUserAuthenticated } from '@/store/userStore';
 import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
-import config from '@/config';
 import { disableSidebar } from '@/services/sidebarService';
 import Dashboard from '@/views/app/Dashboard.vue';
-
 import {
     loadSharedItems,
+    currentDirectory,
+    selectedPaths,
+    chatsWithFiles,
+    isQuantumChatFiles,
+    updateAttachments,
+    savedAttachments,
+    savedAttachmentsBreadcrumbs,
+    savedAttachmentsIsLoading,
     fetchBasedOnRoute,
     sharedFolderIsloading,
     sharedDir,
@@ -47,16 +32,12 @@ import {
     loadLocalFolder,
     updateContent,
     stopTimer,
-    goToFilesInChat,
-    getchatsWithFiles,
-    loadFilesReceivedNested,
-    isQuantumChatFiles,
 } from '@/store/fileBrowserStore';
-import { usechatsActions } from '@/store/chatStore';
+
+// Browser needs to be lazy loaded
+const Browser = () => import('@/views/app/Browser.vue');
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
-
-const { retrievechats } = usechatsActions();
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -250,6 +231,7 @@ const routes: Array<RouteRecordRaw> = [
         component: Dashboard,
         meta: {
             app: AppType.Dashboard,
+            requiresAuth: true,
         },
     },
     {
@@ -288,7 +270,7 @@ const router = createRouter({
     routes,
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
     }
@@ -302,7 +284,7 @@ router.beforeEach(async (to, from, next) => {
     next();
 });
 
-router.afterEach(async (to, from) => {
+router.afterEach(async (to, _from) => {
     //If file takes too long to load, if you switch page you still get the error modal. Now it doesn't
     stopTimer();
     chatsWithFiles.value = [];
@@ -357,7 +339,7 @@ router.afterEach(async (to, from) => {
     }
 });
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (_to, _from, next) => {
     if (document.body.clientWidth < 1280) {
         disableSidebar();
     }

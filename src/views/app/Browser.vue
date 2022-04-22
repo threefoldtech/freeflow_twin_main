@@ -1,30 +1,17 @@
 <template>
-    <app-layout>
-        <iframe
-            v-if="hasBrowserBeenStartedOnce"
-            class="relative h-full w-full"
-            title="forum"
-            id="forum-iframe"
-            :src="iframeUrl"
-            allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;"
-        />
-    </app-layout>
+    <slot></slot>
 </template>
 
 <script setup lang="ts">
-    import AppLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, ref, onMounted } from 'vue';
-    import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    import { ref, watch } from 'vue';
+    import { useRouter } from 'vue-router';
 
-    const iframeUrl = ref('');
+    const appName = ref('glass');
 
-    onMounted(() => {
-        browse();
+    watch(useRouter().currentRoute, currentRoute => {
+        const routerApp = currentRoute.meta?.app;
+        if (typeof routerApp === 'string') appName.value = routerApp;
     });
-
-    function browse() {
-        iframeUrl.value = `https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/`;
-    }
 </script>
 
 <style scoped type="text/css"></style>

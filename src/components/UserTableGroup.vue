@@ -29,15 +29,7 @@
                             <tr>
                                 <th
                                     scope="col"
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                 >
                                     Users
                                 </th>
@@ -71,19 +63,9 @@
                                             <button
                                                 v-if="!userIsInGroup(item)"
                                                 @click="usersInGroup.push(item)"
-                                                class="
-                                                    text-white
-                                                    py-2
-                                                    px-4
-                                                    rounded-md
-                                                    justify-self-end
-                                                    bg-primary
-                                                    hover:bg-accent-700
-                                                    transition
-                                                    duration-300
-                                                "
+                                                class="text-white py-2 px-4 rounded-md justify-self-end bg-primary hover:bg-accent-700 transition duration-300"
                                             >
-                                                Invite to group
+                                                Add to group
                                             </button>
                                         </div>
                                     </div>

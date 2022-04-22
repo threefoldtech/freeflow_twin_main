@@ -1,17 +1,9 @@
 <template>
     <div class="flex items-center p-2 pb-6">
-        <audio ref="audiofile" :src="src" class="hidden" preload="auto"></audio>
+        <audio ref="audiofile" :src="props.src" class="hidden" preload="auto"></audio>
         <button
             v-if="isPlaying"
-            class="
-                ml-0.5
-                bg-white
-                p-1.5
-                rounded-full
-                text-gray-400
-                hover:text-accent-400
-                focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500
-            "
+            class="ml-0.5 bg-white p-1.5 rounded-full text-gray-400 hover:text-accent-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500"
             type="button"
             @click="isPlaying = false"
         >
@@ -20,15 +12,7 @@
         </button>
         <button
             v-else
-            class="
-                ml-0.5
-                bg-white
-                p-1.5
-                rounded-full
-                text-gray-400
-                hover:text-accent-400
-                focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500
-            "
+            class="ml-0.5 bg-white p-1.5 rounded-full text-gray-400 hover:text-accent-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-accent-500"
             type="button"
             @click="isPlaying = true"
         >
@@ -75,8 +59,9 @@
             progress.value = number;
         });
     });
-    const updatePlayback = e => {
-        const newValue = Math.round(e.target.value / 100);
+    const updatePlayback = (e: Event) => {
+        const value = (<HTMLInputElement>e.target).value;
+        const newValue = Math.round(+value / 100);
         audiofile.value.currentTime = Math.round(audiofile.value?.duration * newValue);
         progress.value = newValue;
     };

@@ -1,8 +1,7 @@
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
 import { getShareWithId } from '@/services/fileBrowserService';
-import { Router, useRoute } from 'vue-router';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
@@ -14,10 +13,10 @@ import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
-import { create, isArray } from 'lodash';
-import { usechatsActions, usechatsState } from './chatStore';
+import { usechatsActions, useChatsState } from './chatStore';
 
 declare const Buffer;
+
 export enum FileType {
     Unknown,
     Word,
@@ -140,8 +139,8 @@ export const createDirectory = async (name: string, path = currentDirectory.valu
 };
 
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {
-    await Promise.all(
-        files.map(async f => {
+    Promise.all(
+        files.map(async (f): Promise<void> => {
             const result = await Api.uploadFile(path, f);
             if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
                 throw new Error('Could not create new folder');
@@ -152,7 +151,7 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
     );
 };
 
-const { chats } = usechatsState();
+const { chats } = useChatsState();
 
 export const goToShared = async () => {
     sharedDir.value = true;
@@ -160,9 +159,7 @@ export const goToShared = async () => {
     searchResults.value = [];
     searchDirValue.value = '';
 
-    router.push({
-        name: 'sharedWithMe',
-    });
+    await router.push({ name: 'sharedWithMe' });
     await getSharedContent();
 };
 
@@ -201,8 +198,8 @@ export const goToFilesInChat = async (chat?: Chat) => {
 };
 
 export const loadFilesReceivedNested = async () => {
-    const { retrievechats } = usechatsActions();
-    const { chats } = usechatsState();
+    const { retrieveChats } = usechatsActions();
+    const { chats } = useChatsState();
     const chatId = router.currentRoute.value.params?.chatId;
     const received = router.currentRoute.value.meta.received as boolean;
     if (!chatId) {
@@ -211,7 +208,7 @@ export const loadFilesReceivedNested = async () => {
         return;
     }
 
-    await retrievechats();
+    await retrieveChats();
     const chat = chats.value.find(item => item.chatId === chatId);
     if (!chat) {
         router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
@@ -295,9 +292,7 @@ export const downloadFileForPreview = async (path: string) => {
 };
 
 export const goToFolderInCurrentDirectory = (item: PathInfoModel, attachment: boolean = false) => {
-    let currentPath = currentDirectory.value;
-    if (!currentPath || currentPath[currentPath.length - 1] !== rootDirectory) currentPath += '/';
-    currentPath += item.name;
+    const currentPath = item.path;
     if (savedAttachments.value) {
         router.push({
             name: 'savedAttachments',
@@ -389,7 +384,15 @@ export const searchDir = async () => {
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {
-    if (!name) return;
+    const characterLimit = 50;
+    if (!name || name.length === 0 || name.length > characterLimit) {
+        createNotification(
+            'Failed to rename file',
+            `Filename cannot be empty or longer than ${characterLimit} characters`,
+            Status.Error
+        );
+        return;
+    }
     const oldPath = item.path;
     let newPath = pathJoin([currentDirectory.value, name]);
     if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
@@ -466,7 +469,7 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
     if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
-        router.push({
+        await router.push({
             name: 'savedAttachmentsFromChat',
             params: {
                 chatId: item.name,
@@ -776,15 +779,18 @@ const resetSharedFolder = () => {
 //This timer is used for if a folder has been trying to load for too long.
 //If it takes too long => redirect to sharedwithme page
 let timer;
+
 function startTimer(milliseconds) {
     timer = setTimeout(function () {
         router.push({ name: 'sharedWithMe' });
         showSharedFolderErrorModal.value = true;
     }, milliseconds);
 }
+
 export function stopTimer() {
     clearTimeout(timer);
 }
+
 //Error dialog
 export const showSharedFolderErrorModal = ref(false);
 
@@ -1001,7 +1007,7 @@ export const parseJwt = token => {
 };
 
 export const getExtension = filename => {
-    return filename.substring(filename.lastIndexOf('.') + 1);
+    return filename?.substring(filename.lastIndexOf('.') + 1);
 };
 
 export const fetchShareDetails = async (shareId: string) => {
@@ -1022,7 +1028,7 @@ export const fetchFileAccessDetails = async (
 
 export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
     let params = { shareId: shareId, token: token };
-    const locationApiEndpoint = `/api/browse/files/info?params=${btoa(JSON.stringify(params))}`;
+    const locationApiEndpoint = `/api/v1/browse/files/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';
     if (digitalTwinId == user.id) {
         location = `${window.location.origin}${locationApiEndpoint}`;

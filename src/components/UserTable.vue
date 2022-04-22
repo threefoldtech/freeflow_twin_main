@@ -6,15 +6,13 @@
         <input
             type="text"
             v-model="searchTerm"
-            @focus="handleInput"
-            @input="handleInput"
             class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
             :placeholder="placeholder"
             v-focus
         />
         <div
             v-if="!!searchTerm"
-            @click="searchTerm = ''"
+            @click="reset"
             class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
         >
             <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -29,16 +27,7 @@
                             <tr class="block">
                                 <th
                                     scope="col"
-                                    class="
-                                        px-6
-                                        py-3
-                                        text-left text-xs
-                                        font-medium
-                                        text-gray-500
-                                        uppercase
-                                        tracking-wider
-                                        block
-                                    "
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider block"
                                 >
                                     Users
                                 </th>
@@ -74,17 +63,7 @@
                                         </div>
                                         <button
                                             @click="handleClick(item)"
-                                            class="
-                                                text-white
-                                                py-2
-                                                px-4
-                                                rounded-md
-                                                justify-self-end
-                                                bg-primary
-                                                hover:bg-accent-700
-                                                transition
-                                                duration-300
-                                            "
+                                            class="text-white py-2 px-4 rounded-md justify-self-end bg-primary hover:bg-accent-700 transition duration-300"
                                         >
                                             Invite to chat
                                         </button>
@@ -104,9 +83,9 @@
 
 <script setup lang="ts">
     import { Contact } from '@/types';
-    import { defineComponent, ref, computed, onMounted, PropType } from 'vue';
+    import { ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { SearchIcon, LocationMarkerIcon } from '@heroicons/vue/solid';
+    import { SearchIcon } from '@heroicons/vue/solid';
 
     interface IProps {
         placeholder?: string;

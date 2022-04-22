@@ -300,7 +300,7 @@
     const fromId = props.message.from.replace('localhost:8080', 'localhost:3000');
     const baseurl = calculateBaseUrl(fromId);
     const fileUrl = props.message.body?.filename
-        ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}`
+        ? `${baseurl}/api/v1/files/${props.message.to}/${props.message.body.filename}`
         : false;
 
     const { user } = useAuthState();

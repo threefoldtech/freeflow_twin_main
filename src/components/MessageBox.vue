@@ -25,19 +25,36 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
-      <v-contextmenu v-if="currentRightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
-        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id && currentRightClickedItem.data.type === 'STRING'" @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
-                                  }">Edit message</v-contextmenu-item>
-        <v-contextmenu-item v-if="currentRightClickedItem?.data?.from === user.id" @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE;
-                                  }">Delete</v-contextmenu-item>
-        <v-contextmenu-item @click="() => {
-                           triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                           rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY;
-                                  }">Reply</v-contextmenu-item>
+        <v-contextmenu v-if="currentRightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
+            <v-contextmenu-item
+                v-if="currentRightClickedItem?.data?.from === user.id && currentRightClickedItem.data.type === 'STRING'"
+                @click="
+                    () => {
+                        triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                        rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
+                    }
+                "
+                >Edit message
+            </v-contextmenu-item>
+            <v-contextmenu-item
+                v-if="currentRightClickedItem?.data?.from === user.id"
+                @click="
+                    () => {
+                        triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                        rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE;
+                    }
+                "
+                >Delete
+            </v-contextmenu-item>
+            <v-contextmenu-item
+                @click="
+                    () => {
+                        triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                        rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY;
+                    }
+                "
+                >Reply
+            </v-contextmenu-item>
         </v-contextmenu>
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
@@ -67,7 +84,7 @@
             </div>
             <slot name="viewAnchor" />
         </div>
-           <div
+        <div
             v-if="imageUploadQueue.length >= 1"
             class="flex flex-row overflow-x-auto relative w-full h-64 whitespace-no-wrap"
         >
@@ -75,40 +92,10 @@
                 <div
                     v-for="(image, idx) in imageUploadQueue"
                     :key="idx"
-                    class="
-                        hover:shadow-lg
-                        transition
-                        duration-300
-                        bg-gray-200
-                        rounded
-                        w-40
-                        h-50
-                        relative
-                        flex
-                        justify-center
-                        items-center
-                        mr-2
-                        mb-2
-                        mt-4
-                        group
-
-                    "
+                    class="hover:shadow-lg transition duration-300 bg-gray-200 rounded w-40 h-50 relative flex justify-center items-center mr-2 mb-2 mt-4 group"
                 >
                     <XCircleIcon
-                        class="
-                            invisible
-                            w-8
-                            h-8
-                            absolute
-                            -right-4
-                            -top-4
-                            text-gray-600
-                            group-hover:visible
-                            cursor-pointer
-                            hover:text-accent-800
-                            z-50
-                            drop-shadow-md
-                        "
+                        class="invisible w-8 h-8 absolute -right-4 -top-4 text-gray-600 group-hover:visible cursor-pointer hover:text-accent-800 z-50 drop-shadow-md"
                         @click="cancelUpload(image)"
                     />
                     <div class="z-40 absolute flex flex-col items-center justify-center" :title="image.title">
@@ -130,9 +117,9 @@
                                 r="30"
                             ></circle>
                         </svg>
-                        <ExclamationIcon v-if="image.error" class="w-8 h-8 text-white drop-shadow-md"  />
+                        <ExclamationIcon v-if="image.error" class="w-8 h-8 text-white drop-shadow-md" />
                         <p
-                            v-if='image.retry'
+                            v-if="image.retry"
                             @click="retry(image)"
                             class="text-white font-semibold cursor-pointer mt-4 drop-shadow-md"
                         >
@@ -142,7 +129,10 @@
                         <p
                             v-if="image.error"
                             class="font-medium mt-4 text-center"
-                            :class="{ 'text-white': image.isImage, 'text-white font-semibold drop-shadow-md': !image.isImage }"
+                            :class="{
+                                'text-white': image.isImage,
+                                'text-white font-semibold drop-shadow-md': !image.isImage,
+                            }"
                         >
                             {{ image.error_message }}
                         </p>
@@ -168,7 +158,7 @@
     import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
     import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
-    import { imageUploadQueue, usechatsActions, retrySendFile, usechatsState } from '@/store/chatStore';
+    import { imageUploadQueue, usechatsActions, retrySendFile, useChatsState } from '@/store/chatStore';
     import { XCircleIcon, ExclamationIcon } from '@heroicons/vue/solid';
     import { useScrollActions } from '@/store/scrollStore';
     import Spinner from '@/components/Spinner.vue';
@@ -178,22 +168,20 @@
     import EditShare from '@/components/fileBrowser/EditShare.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import {
-      rightClickItemAction,
-      currentRightClickedItem,
-      triggerWatchOnRightClickItem,
-      RIGHT_CLICK_ACTIONS_MESSAGE,
-      RIGHT_CLICK_ACTIONS_CHAT_CARD,
-      RIGHT_CLICK_TYPE
-    } from '@/store/contextmenuStore'
-
+        rightClickItemAction,
+        currentRightClickedItem,
+        triggerWatchOnRightClickItem,
+        RIGHT_CLICK_ACTIONS_MESSAGE,
+        RIGHT_CLICK_ACTIONS_CHAT_CARD,
+        RIGHT_CLICK_TYPE,
+    } from '@/store/contextmenuStore';
 
     interface IProps {
         chat: Chat;
     }
 
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     const { user } = useAuthState();
-
 
     const tabs = ['Create shares', 'Edit permissions'];
 
@@ -201,6 +189,7 @@
     const selectedTab = ref<number>(1);
 
     const scroll = () => {
+        if (!messageBoxLocal.value) return;
         messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
     };
 
@@ -215,28 +204,27 @@
 
     const selectedEditFile = ref<any>(null);
 
-    const setCurrentRightClickedItem = (item) => {
-      currentRightClickedItem.value = {
-        type: RIGHT_CLICK_TYPE.MESSAGE,
-        data: item
-      }
-    }
+    const setCurrentRightClickedItem = item => {
+        currentRightClickedItem.value = {
+            type: RIGHT_CLICK_TYPE.MESSAGE,
+            data: item,
+        };
+    };
 
     const editFileSharePermission = file => {
         selectedEditFile.value = file;
         showShareDialog.value = true;
     };
 
-
-    const retry = (file) =>{
+    const retry = file => {
         file.cancelToken.cancel('Operation canceled by the user.');
-        retrySendFile(file)
-    }
+        retrySendFile(file);
+    };
 
     const cancelUpload = image => {
         image.cancelToken.cancel('Operation canceled by the user.');
         imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id);
-        window.URL.revokeObjectURL(image.data);      
+        window.URL.revokeObjectURL(image.data);
     };
 
     const getPercent = image => {
@@ -288,17 +276,22 @@
         }, 100);
     });
 
+    watch(
+        () => props.chat.messages,
+        () => {
+            nextTick(() => {
+                const myName = window.location.host.split('.')[0];
+                const lastItem = props.chat.messages[props.chat.messages.length - 1].from;
 
-    watch(props.chat.messages,() => {
-     nextTick(() => {
-       const myName = window.location.host.split('.')[0];
-       const lastItem = props.chat.messages[props.chat.messages.length-1].from
-
-       if(myName !== lastItem) return;
-       messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
-
-     })
-    })
+                if (
+                    myName !== lastItem &&
+                    !(messageBoxLocal.value.offsetHeight <= messageBoxLocal?.value?.scrollTop - 500)
+                )
+                    return;
+                messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
+            });
+        }
+    );
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';
@@ -326,7 +319,6 @@
         event.clipboardData.setData('text/plain', data);
         event.preventDefault();
     };
-
 
     const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
 </script>
@@ -358,6 +350,7 @@
     .spinnerAnimation {
         animation: rotator 1.4s linear infinite;
     }
+
     @keyframes rotator {
         0% {
             transform: rotate(0deg);
@@ -366,12 +359,14 @@
             transform: rotate(270deg);
         }
     }
+
     .path {
         stroke-dasharray: 187;
         stroke-dashoffset: 0;
         transform-origin: center;
         animation: dash 1.4s ease-in-out infinite, colors 5.6s ease-in-out infinite;
     }
+
     @keyframes colors {
         0% {
             stroke: white;
@@ -389,6 +384,7 @@
             stroke: white;
         }
     }
+
     @keyframes dash {
         0% {
             stroke-dashoffset: 187;

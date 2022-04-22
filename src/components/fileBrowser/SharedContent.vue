@@ -17,29 +17,13 @@
                                 <tr>
                                     <th
                                         scope="col"
-                                        class="
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         Name
                                     </th>
                                     <th
                                         scope="col"
-                                        class="
-                                            px-6
-                                            py-3
-                                            text-left text-xs
-                                            font-medium
-                                            text-gray-500
-                                            uppercase
-                                            tracking-wider
-                                        "
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     >
                                         Size
                                     </th>
@@ -80,7 +64,7 @@
                                                     {{ item.name }}
                                                 </span>
                                                 <span class="text-xs opacity-50 cursor-pointer hover:underline">
-                                                    From: {{ item.owner.id }}
+                                                    From: {{ item?.owner?.id }}
                                                 </span>
                                             </div>
                                         </div>
@@ -91,13 +75,9 @@
                                         </div>
                                     </td>
                                 </tr>
-                                <tr
-                                    v-if="
-                                        sharedContent?.length === 0
-                                    "
-                                >
-                                  <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
-                                  <td class="px-6 py-4 whitespace-nowrap"></td>
+                                <tr v-if="sharedContent?.length === 0">
+                                    <td class="px-6 py-4 whitespace-nowrap">Nothing has been shared with you yet!</td>
+                                    <td class="px-6 py-4 whitespace-nowrap"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -106,30 +86,11 @@
                         <ul
                             role="list"
                             v-else
-                            class="
-                                grid grid-cols-2
-                                gap-x-2 gap-y-4
-                                sm:grid-cols-4 sm:gap-x-4
-                                lg:grid-cols-6
-                                xl:grid-cols-8
-                                2xl:grid-cols-10
-                                xl:gap-x-6
-                                mt-4
-                            "
+                            class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
                         >
                             <p
-                                class="
-                                    px-6
-                                    py-4
-                                    whitespace-nowrap
-                                    col-span-12
-                                    text-base
-                                    font-medium
-                                    text-center text-gray-800
-                                "
-                                v-if="
-                                    sharedContent?.length === 0
-                                "
+                                class="px-6 py-4 whitespace-nowrap col-span-12 text-base font-medium text-center text-gray-800"
+                                v-if="sharedContent?.length === 0"
                             >
                                 Nothing has been shared with you yet!
                             </p>
@@ -142,25 +103,7 @@
                                 class="relative"
                             >
                                 <div
-                                    class="
-                                        group
-                                        w-full
-                                        aspect-w-12 aspect-h-4
-                                        bg-white
-                                        border-2
-                                        rounded-md
-                                        hover:bg-gray-200
-                                        transition
-                                        duration:200
-                                        focus-within:ring-2
-                                        focus-within:ring-offset-2
-                                        focus-within:ring-offset-gray-100
-                                        focus-within:ring-indigo-500
-                                        overflow-hidden
-                                        flex
-                                        justify-start
-                                        items-center
-                                    "
+                                    class="group w-full aspect-w-12 aspect-h-4 bg-white border-2 rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
                                     @click="goTo(item)"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
@@ -174,15 +117,7 @@
                                             "
                                         ></i>
                                         <p
-                                            class="
-                                                block
-                                                ml-4
-                                                text-sm
-                                                font-medium
-                                                text-gray-900
-                                                truncate
-                                                pointer-events-none
-                                            "
+                                            class="block ml-4 text-sm font-medium text-gray-900 truncate pointer-events-none"
                                         >
                                             {{ item.name }}
                                         </p>
@@ -203,77 +138,59 @@
 </template>
 
 <script setup lang="ts">
-import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-import { calcExternalResourceLink } from '@/services/urlService';
-import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
-import {
-    FileType,
-    formatBytes,
-    getExtension,
-    getFileType,
-    getIcon,
-    getIconColor,
-    getFileSize,
-    getIconColorDirty,
-    getIconDirty,
-    getSharedContent,
-    getSharedFolderContent,
-    goIntoSharedFolder,
-    parseJwt,
-    PathInfoModel,
-    selectedPaths,
-    sharedContent,
-    goTo,
-    sharedBreadcrumbs,
-    clickBreadcrumb,
-    sharedFolderIsloading,
-    fileBrowserTypeView,
-    View,
-    allSharedContent,
-    loadSharedItems,
-    sharedWithMeCurrentFolder,
-    chatsWithFiles,
-    goToChatFiles,
-    chatFilesReceived,
-    goToFilesInChat,
-    isQuantumChatFiles,
-    chatFiles,
-} from '@/store/fileBrowserStore';
-import { SharedFileInterface } from '@/types';
-import { cloneVNode, defineComponent } from '@vue/runtime-core';
-import { onBeforeMount, watch, computed } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import Spinner from '@/components/Spinner.vue';
-import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
+    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
+    import {
+        formatBytes,
+        getExtension,
+        getFileType,
+        getIconColorDirty,
+        getIconDirty,
+        PathInfoModel,
+        selectedPaths,
+        sharedContent,
+        goTo,
+        sharedBreadcrumbs,
+        sharedFolderIsloading,
+        fileBrowserTypeView,
+        isQuantumChatFiles,
+    } from '@/store/fileBrowserStore';
+    import { onBeforeMount, watch, computed } from 'vue';
+    import { useRoute, useRouter } from 'vue-router';
+    import Spinner from '@/components/Spinner.vue';
+    import { useSocketActions } from '@/store/socketStore';
+    import { useAuthState } from '@/store/authStore';
 
-onBeforeMount(async () => {
-    sharedBreadcrumbs.value = [];
-});
+    onBeforeMount(async () => {
+        sharedBreadcrumbs.value = [];
+        const { initializeSocket } = useSocketActions();
+        const { user } = useAuthState();
+        initializeSocket(user.id.toString());
+    });
 
-watch(sharedFolderIsloading, () => {});
+    watch(sharedFolderIsloading, () => {});
 
-const router = useRouter();
-const route = useRoute();
+    const router = useRouter();
+    const route = useRoute();
 
-const currentFolderName = computed(() => {
-    //@TODO add current folder
+    const currentFolderName = computed(() => {
+        //@TODO add current folder
 
-    return '';
-});
+        return '';
+    });
 
-const truncate = name => {
-    return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
-};
+    const truncate = name => {
+        return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
+    };
 
-//const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
+    //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
 
-const epochToDate = epoch => {
-    let d = new Date(epoch).toLocaleDateString();
+    const epochToDate = epoch => {
+        let d = new Date(epoch).toLocaleDateString();
 
-    return d === '1/20/1980' ? 'Never' : d;
-};
+        return d === '1/20/1980' ? 'Never' : d;
+    };
 
-const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
+    const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
 </script>
 
 <style scoped></style>

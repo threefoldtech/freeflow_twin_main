@@ -42,12 +42,12 @@
     import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
     import Toggle from '@/components/Toggle.vue';
     import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-    import { sendMessageObject, usechatsActions, usechatsState } from '@/store/chatStore';
+    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SystemMessageTypes, MessageTypes } from '@/types';
 
     const { sendMessage } = usechatsActions();
-    const { chats } = usechatsState();
+    const { chats } = useChatsState();
     import { createNotification } from '@/store/notificiationStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
     import { isObject } from 'lodash';
@@ -86,6 +86,7 @@
 
     const renderPermissionsData = async () => {
         currentShare.value = await getShareByPath(props.selectedFile.path);
+        if (!currentShare.value) return;
         currentShare.value.permissions = currentShare.value?.permissions?.map(item => {
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.chatId;
@@ -126,8 +127,13 @@
     });
 
     const remove = async (data: any) => {
-        removeFilePermissions(data.chatId, props.selectedFile.path, props.selectedFile.location);
-        renderPermissionsData();
+        const chat = chats.value.find(c => c.chatId === data.chatId);
+        if (!chat) return;
+        const contact = chat.contacts.find(con => con.id === chat.chatId);
+        if ('location' in contact) {
+            await removeFilePermissions(data.chatId, props.selectedFile.path, contact.location);
+            await renderPermissionsData();
+        }
     };
 </script>
 

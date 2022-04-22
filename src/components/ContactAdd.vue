@@ -25,22 +25,7 @@
             ></UserTable>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
-                    class="
-                        flex
-                        justify-between
-                        w-full
-                        mt-4
-                        ml-0
-                        py-2
-                        text-sm
-                        font-medium
-                        text-left text-gray-500
-                        bg-gray-50
-                        rounded-lg
-                        hover:bg-gray-100
-                        focus:outline-none
-                        focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75
-                    "
+                    class="flex justify-between w-full mt-4 ml-0 py-2 text-sm font-medium text-left text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
                 >
                     <span class="ml-6">Advanced</span>
 
@@ -56,16 +41,7 @@
                                 <input
                                     id="manualContactAddUsername"
                                     v-model="manualContactAddUsername"
-                                    class="
-                                        shadow-sm
-                                        focus:ring-primary focus:border-primary
-                                        block
-                                        w-full
-                                        sm:text-sm
-                                        border-gray-300
-                                        rounded-md
-                                        mt-1
-                                    "
+                                    class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1"
                                     name="manualContactAddUsername"
                                     placeholder="Username"
                                     type="text"
@@ -77,7 +53,7 @@
                                 >
                                     <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <span class="text-red-600" v-if="error != ''"> {{ usernameAddError }} </span>
+                                <span class="text-red-600" v-if="usernameAddError != ''"> {{ usernameAddError }} </span>
                             </div>
                             <label class="block text-sm font-medium text-gray-700" for="manualContactAddLocation"
                                 >Location</label
@@ -86,16 +62,7 @@
                                 <input
                                     id="manualContactAddLocation"
                                     v-model="manualContactAddLocation"
-                                    class="
-                                        shadow-sm
-                                        focus:ring-primary focus:border-primary
-                                        block
-                                        w-full
-                                        sm:text-sm
-                                        border-gray-300
-                                        rounded-md
-                                        mt-1
-                                    "
+                                    class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1"
                                     name="manualContactAddLocation"
                                     placeholder="Location"
                                     type="text"
@@ -111,22 +78,7 @@
                         </div>
                         <div class="w-full flex justify-end">
                             <button
-                                class="
-                                    w-auto
-                                    px-3
-                                    py-2
-                                    mt-2
-                                    border
-                                    cursor-pointer
-                                    border-transparent
-                                    text-sm
-                                    leading-4
-                                    font-medium
-                                    rounded-md
-                                    text-white
-                                    bg-primary
-                                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500
-                                "
+                                class="w-auto px-3 py-2 mt-2 border cursor-pointer border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-500"
                                 value=""
                                 @click="contactAdd"
                             >
@@ -138,25 +90,20 @@
             </Disclosure>
         </div>
         <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent="groupAdd">
-            <div class="flex place-items-center mx-1">
+            <div class="flex place-items-center mx-1 mb-4">
                 <div class="w-full">
+                    <br />
+                    <span v-if="groupnameAddError !== ''" class="text-red-600">
+                        {{ groupnameAddError }}
+                    </span>
                     <div>
-                        <label for="groupname" class="block text-sm font-medium text-gray-700 mt-2">Group name</label>
+                        <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
                         <div class="relative">
                             <input
                                 id="groupname"
                                 v-model="groupnameAdd"
                                 v-focus
-                                class="
-                                    shadow-sm
-                                    focus:ring-primary focus:border-primary
-                                    block
-                                    w-full
-                                    sm:text-sm
-                                    border-gray-300
-                                    rounded-md
-                                    mt-1
-                                "
+                                class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1"
                                 name="groupname"
                                 placeholder="Group name"
                                 type="text"
@@ -170,10 +117,6 @@
                             </div>
                         </div>
                     </div>
-                    <br />
-                    <span v-if="groupnameAddError != ''" class="text-red-600">
-                        {{ groupnameAddError }}
-                    </span>
                 </div>
             </div>
             <div>
@@ -194,18 +137,7 @@
                     Cancel
                 </button>
                 <button
-                    class="
-                        py-2
-                        px-4
-                        ml-2
-                        text-white
-                        rounded-md
-                        justify-self-end
-                        bg-primary
-                        hover:bg-accent-700
-                        transition
-                        duration-300
-                    "
+                    class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary hover:bg-accent-700 transition duration-300"
                 >
                     Add Group
                 </button>
@@ -215,15 +147,13 @@
 </template>
 
 <script lang="ts" setup>
-    import { selectedId, usechatsActions, usechatsState } from '@/store/chatStore';
-    import { defineComponent, ref, computed, nextTick, watch } from 'vue';
+    import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
+    import { ref } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
     import { useAuthState, myYggdrasilAddress } from '../store/authStore';
-    import { Chat, Contact, Message } from '../types/index';
+    import { Contact } from '../types/index';
     import axios from 'axios';
     import config from '@/config';
-    import { uuidv4 } from '@/common';
-    import AvatarImg from '@/components/AvatarImg.vue';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
@@ -232,7 +162,6 @@
     const emit = defineEmits(['closeDialog']);
     const { contacts } = useContactsState();
     //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
-    const addGroup = ref(false);
     const userAddLocation = ref('');
     const usernameAddError = ref('');
     const groupnameAdd = ref('');
@@ -255,9 +184,8 @@
             id: contact?.id ? contact.id : manualContactAddUsername.value,
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
+        const { chats } = useChatsState();
         try {
-            const { chats } = usechatsState();
-
             if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
                 usernameAddError.value = 'Already added this user';
                 return;
@@ -279,17 +207,17 @@
         }
     };
 
-    const handleClicked = item => {
+    const handleClicked = (item: { location: string }) => {
         userAddLocation.value = item.location;
     };
 
     const activeItem = ref('user');
 
-    const isActive = menuItem => {
+    const isActive = (menuItem: string) => {
         return activeItem.value === menuItem;
     };
 
-    const setActive = menuItem => {
+    const setActive = (menuItem: string) => {
         activeItem.value = menuItem;
         groupnameAddError.value = '';
         usernameAddError.value = '';
@@ -298,9 +226,14 @@
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
         const { user } = useAuthState();
-        const { chats } = usechatsState();
+        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';
+            return;
+        }
+        if (format.test(groupnameAdd.value)) {
+            groupnameAddError.value = 'No special characters allowed in group names.';
             return;
         }
         if (groupnameAdd.value.length > 20) {

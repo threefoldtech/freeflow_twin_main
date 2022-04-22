@@ -12,10 +12,8 @@ import {
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
-import { calcExternalResourceLink } from '@/services/urlService';
-import { destroyNotification } from '@/store/notificiationStore';
 
-const endpoint = `${config.baseUrl}api/posts`;
+const endpoint = `${config.baseUrl}api/v1/posts`;
 const { user } = useAuthState();
 
 interface socialMeta {
@@ -37,7 +35,7 @@ export interface socialPostModel extends socialMeta {
 
 type createPostModel = Omit<socialPostModel, 'images', 'owner', 'likes', 'replies'>;
 
-export const createSocialPost = async (text?: string, files?: File[] = []) => {
+export const createSocialPost = async (text?: string, files: File[] = []) => {
     const formData = new FormData();
 
     files?.forEach((file, key) => {
@@ -65,7 +63,7 @@ export const createSocialPost = async (text?: string, files?: File[] = []) => {
 export const sortPosts = posts => {
     if (!posts) {
         allSocialPosts.value.sort(function (a, b) {
-            return new Date(b.post.createdOn) - new Date(a.post.createdOn);
+            return new Date(b.post.createdOn).getTime() - new Date(a.post.createdOn).getTime();
         });
         return;
     }
@@ -97,11 +95,11 @@ export const likeComment = async (
     location: string,
     commentId: string,
     isReplyToComment: boolean,
-    replyTo: boolean
+    replyTo: string
 ) => {
     const myAddress = await myYggdrasilAddress();
     return (
-        await axios.put<any>(`${endpoint}/comments/like`, {
+        await axios.put(`${endpoint}/comments/like`, {
             liker_id: user.id,
             postId,
             owner: location,
@@ -125,10 +123,11 @@ export const getSinglePost = async (postId: string, location: string) => {
     return response;
 };
 
-export const setSomeoneIsTyping = async (postId, location) => {
+export const setSomeoneIsTyping = async (postId, location, userId: string) => {
     await axios.put(`${endpoint}/typing`, {
         postId: postId,
         location: location,
+        userId,
     });
 };
 
@@ -163,10 +162,11 @@ export const commentOnPost = async (
     return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
 };
 
-export const updateSomeoneIsTyping = (chatId: string) => {
+export const updateSomeoneIsTyping = (postId: string, userId: string) => {
+    if (user.id.toString() === userId) return;
     const id = uuidv4();
     allSocialPosts.value = allSocialPosts.value.map((item, idx) => {
-        if (item.post.id === chatId) {
+        if (item.post.id === postId) {
             return {
                 ...item,
                 isTyping: [allSocialPosts.value[idx].isTyping, id].flat(Infinity),
@@ -176,15 +176,15 @@ export const updateSomeoneIsTyping = (chatId: string) => {
             ...item,
         };
     });
-    setTimeout(() => destroySomeoneIsTyping(chatId, id), 5000);
+    setTimeout(() => destroySomeoneIsTyping(postId, id), 5000);
 };
 
 export const destroySomeoneIsTyping = (chatId, queueId) => {
     allSocialPosts.value = allSocialPosts?.value?.map((item, idx) => {
         if (item.post.id === chatId) {
             const filteredArray = item?.isTyping
-                .filter(item => item !== queueId)
-                .filter(function (x) {
+                ?.filter(item => item !== queueId)
+                ?.filter(function (x) {
                     return x !== undefined;
                 });
             return {
@@ -220,4 +220,9 @@ export const createMessage = async (chatId, post: SOCIAL_POST): Promise<Message<
 export const sendMessageSharePost = async (chatId: string, post: SOCIAL_POST) => {
     const newMessage: Message<MESSAGE_POST_SHARE_BODY> = await createMessage(chatId, post);
     sendMessageObject(chatId, newMessage);
+};
+
+export const deletePost = async (item: SOCIAL_POST) => {
+    const post = item.post.id;
+    return await axios.delete(`${endpoint}/${post}`);
 };
