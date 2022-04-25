@@ -173,7 +173,6 @@
 
 <script setup lang="ts">
     import { defineComponent, watch } from 'vue';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
         currentDirectoryContent,
