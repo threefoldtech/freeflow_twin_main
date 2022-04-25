@@ -24,8 +24,11 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Device (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
+*Please don't submit bugs about any other browser than Google Chrome, we currently don't support these.*
+*Please don't submit bugs about mobile experience, currently our focus is on desktop experience.*
+ 
+- Operating system:
+ - Browser: Google Chrome
 
 **Additional context**
 Add any other context about the problem here.
