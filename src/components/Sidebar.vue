@@ -115,7 +115,7 @@
     const router = useRouter();
 
     const currentRoute = computed(() => router.currentRoute.value);
-    const emit = defineEmits(['clicked'])
+    const emit = defineEmits(['clicked']);
 
     const changePage = (name: string) => {
         emit('clicked');

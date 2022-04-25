@@ -10,7 +10,7 @@
             @keydown.esc="$emit('update-model-value', false)"
         >
             <div
-                class="form-container z-50 bg-white p-4 w-full h-screen sm:h-auto sm:w-10/12 xl:w-3/5 2xl:w-2/5 max-w-full sm:rounded overflow-auto"
+                class="form-container z-50 bg-white p-4 h-screen sm:h-auto w-11/12 md:max-w-2xl md:w-3/4 sm:rounded overflow-auto"
                 @click.stop
             >
                 <div class="flex justify-between">
