@@ -55,7 +55,7 @@ const initializeSocket = (username: string) => {
 
         addMessage(message.to === user.id ? message.from : message.to, message);
     });
-    state.socket.on('connectionRequest', (newContactRequest: Chat) => {
+    state.socket.on('connection_request', (newContactRequest: Chat) => {
         const { addChat } = usechatsActions();
         addChat(newContactRequest);
     });
@@ -75,7 +75,7 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('post_deleted', (postId: string) => {
         allSocialPosts.value = allSocialPosts.value.filter(p => p.post.id !== postId);
-    })
+    });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
