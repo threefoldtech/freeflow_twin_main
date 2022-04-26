@@ -248,7 +248,7 @@
                 </button>
             </div>
         </Dialog>
-        <!--<Dialog
+        <Dialog
             v-model="showDeleteDialog"
             class="max-w-10"
             :noActions="true"
@@ -278,8 +278,8 @@
                     Delete
                 </button>
             </div>
-        </Dialog>-->
-        <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
+        </Dialog>
+        <!--<Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
             <template #title> {{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }} </template>
             <template #content>
                 <div v-if="chat?.isGroup">
@@ -307,7 +307,7 @@
                     Cancel
                 </button>
             </template>
-        </Alert>
+        </Alert>-->
         
         <Dialog v-model="showError" class="max-w-10" :noActions="true" @update-model-value="showError = false">
             <template v-slot:title class="center">
@@ -485,10 +485,12 @@
         if (chat.value.isGroup) {
             const { updateContactsInGroup } = usechatsActions();
             await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP);
+            showDeleteDialog.value = false;
         } else {
             await sendRemoveChat(chat.value.chatId);
             localStorage.setItem('lastOpenedChat', '');
             router.push({ name: 'whisper' });
+            showDeleteDialog.value = false;
         }
     };
 
