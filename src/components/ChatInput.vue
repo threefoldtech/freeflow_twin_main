@@ -416,4 +416,5 @@
     const collapsed = ref(true);
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>
