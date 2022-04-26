@@ -49,7 +49,7 @@ const addContact = (username: DtId, location, dontCheck = false) => {
     };
     const chatname: String = username;
     axios
-        .post(`${config.baseUrl}api/v1/contacts`, {
+        .post(`${config.baseUrl}api/v2/contacts`, {
             id: username,
             location,
             message: addMessage,

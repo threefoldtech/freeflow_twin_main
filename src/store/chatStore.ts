@@ -74,7 +74,7 @@ const retrieveChats = async () => {
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
-    await axios.get(`${config.baseUrl}api/v1/chats`, { params: params }).then(response => {
+    await axios.get(`${config.baseUrl}api/v2/chats`, { params: params }).then(response => {
         const incomingchats = response.data;
 
         // debugger
