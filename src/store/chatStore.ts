@@ -549,7 +549,7 @@ const readMessage = (chatId: string, messageId: string) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = async (groupId: string, contact: Contact, type: SystemMessageTypes) => {
+const updateContactsInGroup = async (groupId: string, contact: Contact, type: SystemMessageTypes, nextAdmin?: string) => {
     const { user } = useAuthState();
     const chat = getChat(groupId);
     const admin = chat.contacts.find(c => c.id === chat.adminId);
@@ -569,6 +569,7 @@ const updateContactsInGroup = async (groupId: string, contact: Contact, type: Sy
             message: msg,
             adminLocation,
             contact,
+            nextAdmin: nextAdmin
         },
         timeStamp: new Date(),
         type: MessageTypes.SYSTEM,

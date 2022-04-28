@@ -259,9 +259,23 @@
                 <h1 class='text-center'>{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
             </template>
             <div v-if='chat?.isGroup'>
-                Do you really want to leave the group
-                <b>{{ chat?.name }}</b
-                >?
+                <p class='mb-5'>Please select the next admin before leaving the group <b>{{ chat?.name }}</b></p>
+                <div
+                    v-for='(contact, i) in chat?.contacts.filter(c => c.id !== user.id)'
+                    :key='i'
+                    @click='setNextAdmin'
+                    class='grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer'
+                    :class='contact.id === nextAdmin ?  "bg-gray-300" : "bg-gray-100"'
+                >
+                    <div class='col-span-2 place-items-center grid rounded-full flex-shrink-0'>
+                        <AvatarImg :id='contact.id' small />
+                    </div>
+                    <p
+                        class='col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold'
+                    >
+                        {{ contact.id }}
+                    </p>
+                </div>
             </div>
             <div v-else>
                 Do you really want to delete
@@ -416,6 +430,9 @@
         }, {});
     });
 
+    const nextAdmin = ref('');
+    const setNextAdmin = (e) => nextAdmin.value = e.target.innerText;
+
     const loadedOnce = ref(false);
     const chat = computed(() => {
         const currentChat = chats.value.find(c => c.chatId == selectedId.value);
@@ -484,7 +501,8 @@
     const doLeaveChat = async () => {
         if (chat.value.isGroup) {
             const { updateContactsInGroup } = usechatsActions();
-            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP);
+            if (!nextAdmin.value) return;
+            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
             return;
         }
         await doDeleteChat();
