@@ -1,10 +1,10 @@
 <template>
     <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif" />
-    <div v-if="action" class="flex justify-between m-2 p-4 bg-white rounded-xl">
+    <div v-if="action?.type === MessageAction.REPLY" class="flex justify-between m-2 p-4 bg-white rounded-xl">
         <div class="flex flex-row">
             <div class="text-accent-300 mr-4 self-center">
                 <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
-                <i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>
+                <!--<i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>-->
             </div>
             <div class="max-w-[750px] break-all">
                 <b>{{ action.message.from }}</b>
@@ -178,6 +178,11 @@
     watch(action, () => {
         if (action.value && message.value) {
             message.value.focus();
+            console.log(action.value.type);
+        }
+        if(action?.value?.type === MessageAction.EDIT) {
+            console.log(action);
+            messageInput.value = action.value.message.body;
         }
         draftMessage(selectedId, createMessage());
     });
