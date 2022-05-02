@@ -2,7 +2,7 @@ import { Chat, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
-import { useAuthState } from '@/store/authStore';
+import { myLocation, useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
@@ -75,12 +75,15 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('post_deleted', (postId: string) => {
         allSocialPosts.value = allSocialPosts.value.filter(p => p.post.id !== postId);
-    })
+    });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
     state.socket.on('shares_updated', () => {
         getSharedContent();
+    });
+    state.socket.on('yggdrasil', (location: string) => {
+        myLocation.value = location;
     });
 };
 

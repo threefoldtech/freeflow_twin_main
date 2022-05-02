@@ -9,7 +9,7 @@ import {
     MESSAGE_TYPE,
     SOCIAL_POST,
 } from '@/store/socialStore';
-import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+import { myLocation, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
 
@@ -80,10 +80,9 @@ export const getAllPosts = async () => {
 };
 
 export const likePost = async (postId: string, location: string, commentId: string) => {
-    const myAddress = await myYggdrasilAddress();
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {
-            liker_location: myAddress,
+            liker_location: myLocation.value,
             liker_id: user.id,
             owner: location,
         })
@@ -97,7 +96,6 @@ export const likeComment = async (
     isReplyToComment: boolean,
     replyTo: string
 ) => {
-    const myAddress = await myYggdrasilAddress();
     return (
         await axios.put(`${endpoint}/comments/like`, {
             liker_id: user.id,
@@ -137,13 +135,12 @@ export const commentOnPost = async (
     isReplyToComment: boolean,
     comment_id?: string
 ) => {
-    const myAddress = await myYggdrasilAddress();
     const data: COMMENT_MODEL = {
         id: uuidv4(),
         body: message,
         owner: {
             id: String(user.id),
-            location: myAddress,
+            location: myLocation.value,
         },
         post: {
             id: item.post.id,

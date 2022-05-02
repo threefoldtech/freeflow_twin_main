@@ -27,10 +27,10 @@
             </div>
         </app-layout>
         <div
-            v-if="isDev && location"
+            v-if="isDev && myLocation"
             class="fixed text-white bg-black -right-px -bottom-0.5 border border-white px-2 text-xs"
         >
-            {{ location }}
+            {{ myLocation }}
         </div>
     </div>
 </template>
@@ -38,21 +38,26 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { myYggdrasilAddress } from '@/store/authStore';
-    import { ref, computed } from 'vue';
+    import { myLocation, useAuthState } from '@/store/authStore';
+    import { computed, onBeforeMount } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    import { useSocketActions } from './store/socketStore';
 
     console.log('Version: ' + version);
 
     document.querySelector('body').classList.add('overflow-y-hidden');
 
     const isDev = import.meta.env.DEV;
-    const location = ref();
-    myYggdrasilAddress().then(v => (location.value = v));
 
     const route = useRoute();
     const path = computed(() => route.path);
+
+    const { user } = useAuthState();
+    onBeforeMount(() => {
+        const { initializeSocket } = useSocketActions();
+        initializeSocket(String(user.id));
+    });
 </script>
 
 <style>

@@ -345,14 +345,13 @@
 </template>
 
 <script lang="ts" setup>
-    import { DotsVerticalIcon, HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
+    import { HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
     import { HeartIcon, ChatAltIcon, ShareIcon, TrashIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { useAuthState, myYggdrasilAddress } from '@/store/authStore';
+    import { useAuthState, myLocation } from '@/store/authStore';
     import { ref, computed, onBeforeMount, watch } from 'vue';
     import moment from 'moment';
-    import { Popover, PopoverButton, PopoverPanel, TransitionRoot } from '@headlessui/vue';
-    import { ChevronDownIcon } from '@heroicons/vue/solid';
+    import { TransitionRoot } from '@headlessui/vue';
     import { showComingSoonToUhuru } from '@/services/dashboardService';
     import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue';
     import MarkdownIt from 'markdown-it';
@@ -370,7 +369,6 @@
     const showComments = ref<boolean>(false);
     const showAllImages = ref<boolean>(false);
     const amount_likes = ref<number>(props.item.likes.length);
-    const myLocation = ref<string | null>(null);
     const showImagePreview = ref<boolean>(false);
     const imagePreviewSrc = ref<string | null>(null);
     const showShareDialog = ref<boolean>(false);
@@ -440,7 +438,6 @@
     const localLike = ref(false);
 
     onBeforeMount(async () => {
-        myLocation.value = await myYggdrasilAddress();
         const { user } = useAuthState();
         if (props.item.likes.some(item => item.id === user.id)) {
             localLike.value = true;

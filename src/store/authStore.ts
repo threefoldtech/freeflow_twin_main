@@ -1,4 +1,5 @@
 import { reactive } from '@vue/reactivity';
+import { ref } from 'vue';
 import axios from 'axios';
 import { User } from '../types';
 
@@ -21,6 +22,7 @@ const authState = reactive<AuthState>({
 // @TODO get name from backend not URL
 export const loginName = window.location.host.split('.')[0];
 
+export const myLocation = ref<string>('');
 export const myYggdrasilAddress = async () => {
     const res = await axios.get(`${window.location.origin}/api/v2/locations/yggdrasil`);
     return res.data;
