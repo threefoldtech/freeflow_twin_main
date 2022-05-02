@@ -2,7 +2,7 @@ import { Chat, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
-import { myLocation, useAuthState } from '@/store/authStore';
+import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
@@ -83,6 +83,7 @@ const initializeSocket = (username: string) => {
         getSharedContent();
     });
     state.socket.on('yggdrasil', (location: string) => {
+        const { myLocation } = useAuthState();
         myLocation.value = location;
     });
 };

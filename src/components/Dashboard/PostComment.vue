@@ -13,10 +13,7 @@
             <div class="block">
                 <div class="bg-gray-100 w-auto rounded-xl px-2 pb-2">
                     <div class="font-medium">
-                        <a
-                            class="hover:underline text-sm"
-                            href="#"
-                        >
+                        <a class="hover:underline text-sm" href="#">
                             <small>{{ comment.owner.id }}</small>
                         </a>
                     </div>
@@ -103,7 +100,7 @@
     import { ThumbUpIcon } from '@heroicons/vue/solid';
     import { COMMENT_MODEL, MESSAGE_TYPE } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import { TransitionRoot } from '@headlessui/vue';
     import { likeComment } from '@/services/socialService';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -114,14 +111,9 @@
     const props = defineProps<{ comment: COMMENT_MODEL }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
-    const myLocation = ref<string>('');
-    const { user } = useAuthState();
+    const { user, myLocation } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
-
-    onBeforeMount(async () => {
-        myLocation.value = await myYggdrasilAddress();
-    });
 
     //only shows user panel if mouse stays focussed for a moment
     const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);

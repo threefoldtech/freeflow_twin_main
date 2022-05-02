@@ -9,12 +9,12 @@ import {
     MESSAGE_TYPE,
     SOCIAL_POST,
 } from '@/store/socialStore';
-import { myLocation, useAuthState } from '@/store/authStore';
+import { useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
 
 const endpoint = `${config.baseUrl}api/v1/posts`;
-const { user } = useAuthState();
+const { user, myLocation } = useAuthState();
 
 interface socialMeta {
     createdOn: Date;

@@ -150,7 +150,7 @@
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState, myLocation } from '../store/authStore';
+    import { useAuthState } from '../store/authStore';
     import { Contact } from '../types/index';
     import axios from 'axios';
     import config from '@/config';
@@ -178,6 +178,8 @@
         { name: 'user', text: 'Add a user' },
         { name: 'group', text: 'Create a group' },
     ]);
+
+    const { user, myLocation } = useAuthState();
 
     const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
@@ -225,7 +227,6 @@
 
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
-        const { user } = useAuthState();
         const format = /[`!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
 
         if (groupnameAdd.value == '') {
@@ -257,7 +258,6 @@
 
     // @todo: config
     axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
-        const { user } = useAuthState();
         const posContacts = <Contact[]>r.data;
         const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
         possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));

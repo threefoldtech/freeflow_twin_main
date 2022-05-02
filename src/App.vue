@@ -38,7 +38,7 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { myLocation, useAuthState } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import { computed, onBeforeMount } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
@@ -53,7 +53,7 @@
     const route = useRoute();
     const path = computed(() => route.path);
 
-    const { user } = useAuthState();
+    const { user, myLocation } = useAuthState();
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(String(user.id));

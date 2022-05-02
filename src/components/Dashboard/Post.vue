@@ -348,7 +348,7 @@
     import { HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
     import { HeartIcon, ChatAltIcon, ShareIcon, TrashIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { useAuthState, myLocation } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import { ref, computed, onBeforeMount, watch } from 'vue';
     import moment from 'moment';
     import { TransitionRoot } from '@headlessui/vue';
@@ -376,7 +376,7 @@
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
     const postingCommentInProgress = ref<boolean>(false);
-    const { user } = useAuthState();
+    const { user, myLocation } = useAuthState();
     const emit = defineEmits(['refreshPost']);
 
     //only shows user panel if mouse stays focussed for a moment
