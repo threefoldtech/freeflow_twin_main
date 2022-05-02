@@ -297,7 +297,7 @@
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
+    import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
     import ChatList from '@/components/ChatList.vue';
@@ -312,7 +312,7 @@
     import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
     import MessageBox from '@/components/MessageBox.vue';
     import Button from '@/components/Button.vue';
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+    import { isBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon } from '@heroicons/vue/outline';
@@ -338,6 +338,7 @@
     const showDeleteDialog = ref(false);
     const showRemoveUserDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
+    const { sendRemoveChat, sendBlockChat, sendRemoveBlockedChat } = useSocketActions();
 
     watch(
         () => route.params.id,
@@ -469,7 +470,7 @@
         router.push({ name: 'whisper' });
     };
 
-    const unBlockChat = async () => await deleteBlockedEntry(chat.value.chatId);
+    const unBlockChat = async () => sendRemoveBlockedChat(chat.value.chatId);
 
     const reads = computed(() => {
         const preReads = {};

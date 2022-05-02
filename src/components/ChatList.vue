@@ -190,7 +190,7 @@
         openDeleteDialogFromOtherFile,
         conversationComponentRerender,
     } from '@/store/contextmenuStore';
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+    import { isBlocked } from '@/store/blockStore';
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
@@ -227,7 +227,8 @@
                             conversationComponentRerender.value = conversationComponentRerender.value++;
                         }
                         if (isBlocked(chatId)) {
-                            await deleteBlockedEntry(chatId);
+                            const { sendRemoveBlockedChat } = useSocketActions();
+                            sendRemoveBlockedChat(chatId);
                             break;
                         }
                         openBlockDialogFromOtherFile.value = true;

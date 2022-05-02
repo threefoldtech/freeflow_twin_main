@@ -3,7 +3,7 @@ import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useAuthState } from '@/store/authStore';
-import { addUserToBlockList } from '@/store/blockStore';
+import { addUserToBlockList, blocklist } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
@@ -86,6 +86,9 @@ const initializeSocket = (username: string) => {
         const { myLocation } = useAuthState();
         myLocation.value = location;
     });
+    state.socket.on('blocked_contacts', (contacts: { id: string }[]) => {
+        blocklist.value = contacts;
+    });
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
@@ -104,6 +107,11 @@ export const sendBlockChat = async (id: Id) => {
     state.socket.emit('block_chat', id);
 };
 
+const sendRemoveBlockedChat = async (id: Id) => {
+    state.socket.emit('remove_blocked_chat', id);
+    blocklist.value = blocklist.value.filter(x => x !== id);
+};
+
 const sendSocketUserStatus = async (status: string) => {
     const data = {
         status,
@@ -116,6 +124,9 @@ export const useSocketActions = () => {
         initializeSocket,
         sendSocketMessage,
         sendSocketUserStatus,
+        sendRemoveBlockedChat,
+        sendRemoveChat,
+        sendBlockChat,
         notify,
     };
 };
