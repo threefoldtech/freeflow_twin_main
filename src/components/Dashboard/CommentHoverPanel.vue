@@ -72,7 +72,7 @@
     import { useContactsActions, useContactsState } from '@/store/contactStore';
     import { usechatsActions } from '@/store/chatStore';
     import { computed, nextTick, onBeforeMount, ref } from 'vue';
-    import { myYggdrasilAddress } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import { SOCIAL_POST } from '@/store/socialStore';
     import { fetchStatus } from '@/store/statusStore';
 
@@ -84,13 +84,12 @@
         comment: SOCIAL_POST;
         avatar: string;
     }>();
-    const location = ref<string>();
     const friendsSince = ref<string>();
     const online = ref<boolean>();
     const router = useRouter();
+    const { myLocation } = useAuthState();
 
     onBeforeMount(async () => {
-        location.value = await myYggdrasilAddress();
         const userId = props.comment.owner.id;
         const { isOnline } = await fetchStatus(userId);
         online.value = isOnline;
@@ -107,13 +106,13 @@
     });
 
     const isPersonFriend = computed(() => {
-        if (location.value === props.comment.owner.location) return null;
+        if (myLocation.value === props.comment.owner.location) return null;
         return contacts.some(item => item.id === props.comment.owner.id);
     });
 
     const goToChat = async e => {
         e.preventDefault();
-        if (location.value === props.comment.owner.location) return;
+        if (myLocation.value === props.comment.owner.location) return;
         if (!contacts.some(item => item.id === props.comment.owner.id)) {
             await retrieveChats();
             addContact(props.comment.owner.id, props.comment.owner.location);
