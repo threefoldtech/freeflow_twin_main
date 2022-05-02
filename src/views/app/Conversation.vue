@@ -308,7 +308,7 @@
                 </button>
             </template>
         </Alert>-->
-        
+
         <Dialog v-model="showError" class="max-w-10" :noActions="true" @update-model-value="showError = false">
             <template v-slot:title class="center">
                 <h1 class="text-center">Failed to send file</h1>
