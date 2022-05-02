@@ -110,6 +110,11 @@
     }
 }
 
+unicode-emoji-picker {
+    font-size: 20px;
+  }
+
+
 /* custom scrollbar */
 ::-webkit-scrollbar {
     width: 16px;
