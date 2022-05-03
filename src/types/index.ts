@@ -102,6 +102,7 @@ export enum FileTypes {
 export interface GroupManagementBody extends SystemBody {
     adminLocation: string;
     contact: Contact;
+    nextAdmin?: string;
 }
 export interface JoinedVideoRoomBody extends SystemBody {
     id: string;
