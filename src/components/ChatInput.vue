@@ -1,13 +1,13 @@
 <template>
     <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif" />
     <div v-if="action?.type === MessageAction.REPLY" class="flex justify-between m-2 p-4 bg-white rounded-xl">
-        <div class="flex">
+        <div class="flex flex-row">
             <div class="text-accent-300 mr-4 self-center">
-                <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
+                <i class="fa fa-reply fa-2x"></i>
             </div>
-            <div class="max-w-[700px] self-start truncate break-all">
+            <div class="max-w-[750px] break-all">
                 <b>{{ action.message.from }}</b>
-                <p class="max-h-16">{{ getActionMessage }}</p>
+                <p class="text-ellipsis max-h-9">{{ getActionMessage }}</p>
             </div>
         </div>
         <button @click="clearAction">
