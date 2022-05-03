@@ -259,7 +259,9 @@
                 <h1 class='text-center'>{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
             </template>
             <div v-if='chat?.isGroup'>
-                <p class='mb-5'>Please select the next admin before leaving the group <b>{{ chat?.name }}</b></p>
+                <p v-if='chat?.contacts.length > 1'
+                   class='mb-5'>
+                    Please select the next admin before leaving the group <b>{{ chat?.name }}</b></p>
                 <div
                     v-for='(contact, i) in chat?.contacts.filter(c => c.id !== user.id)'
                     :key='i'
@@ -499,7 +501,7 @@
     const deleteChat = () => (showDeleteDialog.value = true);
 
     const doLeaveChat = async () => {
-        if (chat.value.isGroup) {
+        if (chat.value.isGroup && chat.value.contacts.length > 1) {
             const { updateContactsInGroup } = usechatsActions();
             if (!nextAdmin.value) return;
             await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
