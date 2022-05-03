@@ -74,7 +74,7 @@ export const sortPosts = posts => {
 
 export const getAllPosts = async () => {
     isLoadingSocialPosts.value = true;
-    const posts = (await axios.get<any>(`${endpoint}/true`)).data;
+    const posts = (await axios.get<any>(`${endpoint}/${user.id}`)).data;
     isLoadingSocialPosts.value = false;
     allSocialPosts.value = sortPosts(posts);
 };
