@@ -226,7 +226,7 @@
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
         const { user } = useAuthState();
-        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+        const format = /[`!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
 
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';

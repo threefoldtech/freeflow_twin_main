@@ -81,7 +81,7 @@
                 @click="$emit('app-leave')"
             >
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete chat' }}</p>
+                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete user' }}</p>
             </div>
 
             <div
