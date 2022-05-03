@@ -193,7 +193,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
 
 const acceptChat = (id: string) => {
     axios
-        .post(`${config.baseUrl}api/v1/chats?id=${id}`)
+        .post(`${config.baseUrl}api/v2/chats?id=${id}`)
         .then(() => {
             const index = state.chatRequests.findIndex(c => c.chatId == id);
             state.chatRequests[index].acceptedChat = true;
