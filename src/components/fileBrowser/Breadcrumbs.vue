@@ -1,7 +1,7 @@
 <template>
     <div class="flex flex-row items-center mb-4">
-        <div class="ml-2 cursor-pointer" @click="goToHome">
-            <i class="fas fa-home text-primary"></i>
+        <div class="mx-2 cursor-pointer" @click="goToHome">
+            <HomeIcon class="h-5 w-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
         </div>
         <!--<div
         class='rounded-full w-6 h-6 flex justify-center items-center'
@@ -14,40 +14,40 @@
       <i class='fas fa-arrow-up text-white'></i>
     </div>-->
 
-            <div class="flex-1 mr-4">
-            <div v-if="!sharedDir && !isQuantumChatFiles && !savedAttachments">
+        <div class="flex-1 mr-4">
+            <div class="flex items-center" v-if="!sharedDir && !isQuantumChatFiles && !savedAttachments">
                 <template v-for="(item, i) in parts">
                     <span v-if="i !== 0 && item">
-                        <i class="fas fa-chevron-right"></i>
+                        <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
                     <span
-                        v-if="item || i === 0"
+                        v-if="item && i !== 0"
                         :title="item"
-                        class="cursor-pointer text-md p-2 rounded-md"
+                        class="cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-700 p-2 rounded-md"
                         @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
                         @dragenter="event => onDragEnter(event, i)"
                         @dragleave="event => onDragLeave(event, i)"
                         @dragover="event => event.preventDefault()"
                         @drop="event => onDrop(event, i)"
                     >
-                        {{ i === 0 ? 'Home' : truncate(item) }}
+                        {{ truncate(item) }}
                     </span>
                 </template>
             </div>
 
             <!-- SHARED BREADCRUMBS -->
-            <div v-if="sharedDir && !isQuantumChatFiles">
-                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
+            <div class="flex items-center" v-if="sharedDir && !isQuantumChatFiles">
+                <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
 
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
                     <span v-if="i !== 0 && breadcrumb">
-                        <i class="fas fa-chevron-right"></i>
+                        <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
                     <span
                         v-if="breadcrumb || idx === 0"
                         :key="idx"
                         :title="breadcrumb.name"
-                        class="cursor-pointer text-md p-2 rounded-md"
+                        class="cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-700 p-2 rounded-md"
                         @click="clickBreadcrumb(breadcrumb, sharedBreadcrumbs, idx)"
                     >
                         {{ idx === 0 ? 'Shared with me' : truncate(breadcrumb.name) }}
@@ -55,62 +55,62 @@
                 </template>
             </div>
             <!-- CHAT FILES BREADCRUMBS -->
-            <div v-if='isQuantumChatFiles'>
-                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
-                <i class="fas fa-chevron-right"></i>
-                <template v-for="(breadcrumb, idx) in chatFilesBreadcrumbs" :key='idx'>
+            <div class="flex items-center" v-if="isQuantumChatFiles">
+                <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
+                <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                <template v-for="(breadcrumb, idx) in chatFilesBreadcrumbs" :key="idx">
                     <span v-if="idx !== 0 && breadcrumb">
-                        <i class="fas fa-chevron-right"></i>
+                        <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
-                    <span class='mx-2 cursor-pointer' @click='router.push({path: breadcrumb.path})'>
-                        {{breadcrumb.name}}
+                    <span class="mx-2 cursor-pointer" @click="router.push({ path: breadcrumb.path })">
+                        {{ breadcrumb.name }}
                     </span>
                 </template>
             </div>
-              <!-- SAVED ATTACHMENTS -->
-              <div v-if='!isQuantumChatFiles && savedAttachments'>
-                <span class='mx-2 cursor-pointer' @click="router.push({path: '/quantum'})">Home</span>
-                <i class="fas fa-chevron-right"></i>
-                <template v-for="(breadcrumb, idx) in savedAttachmentsBreadcrumbs" :key='idx'>
+            <!-- SAVED ATTACHMENTS -->
+            <div class="flex items-center" v-if="!isQuantumChatFiles && savedAttachments">
+                <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
+                <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+                <template v-for="(breadcrumb, idx) in savedAttachmentsBreadcrumbs" :key="idx">
                     <span v-if="idx !== 0 && breadcrumb">
-                        <i class="fas fa-chevron-right"></i>
+                        <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
-                  <span class='mx-2 cursor-pointer' @click='router.push({path: breadcrumb.path})'>
-                        {{breadcrumb.name}}
+                    <span
+                        class="mx-2 text-sm font-medium text-gray-500 hover:text-gray-700 cursor-pointer"
+                        @click="router.push({ path: breadcrumb.path })"
+                    >
+                        {{ breadcrumb.name }}
                     </span>
                 </template>
-              </div>
+            </div>
         </div>
     </div>
 </template>
 
-
-<script lang="ts" setup >
+<script lang="ts" setup>
     import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-
+    import { ChevronRightIcon, HomeIcon } from '@heroicons/vue/solid';
     import {
-      clickBreadcrumb,
-      currentDirectory,
-      goToAPreviousDirectory,
-      goToHome,
-      isDraggingFiles,
-      moveFiles,
-      selectedPaths,
-      sharedBreadcrumbs,
-      sharedDir,
-      chatFilesBreadcrumbs,
-      savedAttachments,
-      isQuantumChatFiles,
-      savedAttachmentsBreadcrumbs
+        clickBreadcrumb,
+        currentDirectory,
+        goToAPreviousDirectory,
+        goToHome,
+        isDraggingFiles,
+        moveFiles,
+        selectedPaths,
+        sharedBreadcrumbs,
+        sharedDir,
+        chatFilesBreadcrumbs,
+        savedAttachments,
+        isQuantumChatFiles,
+        savedAttachmentsBreadcrumbs,
     } from '@/store/fileBrowserStore';
-    import {useRouter} from 'vue-router';
+    import { useRouter } from 'vue-router';
     import { createNotification } from '@/store/notificiationStore';
 
-
-    const router = useRouter()
+    const router = useRouter();
 
     const parts = computed(() => currentDirectory.value.split('/'));
-
 
     const onDragEnter = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;

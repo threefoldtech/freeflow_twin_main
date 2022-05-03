@@ -189,6 +189,7 @@
                                 <div class="h-full flex items-center justify-center"><i class="fa fa-times"></i></div>
                             </button>
                         </div>
+
                         <div class="max-w-full w-full bg-white border flex flex-col flex-grow">
                             <div class="bg-white pb-4 w-full mb-4 p-6 flex min-h-64 justify-start relative">
                                 <XIcon
@@ -211,7 +212,9 @@
                                     </p>
                                 </div>
                             </div>
+
                             <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
+
                             <group-management
                                 :chat="chat"
                                 @app-call="popupMeeting"
@@ -276,6 +279,12 @@
                 </button>
             </div>
         </Dialog>
+        <Dialog v-model="showError" class="max-w-10" :noActions="true" @update-model-value="showError = false">
+            <template v-slot:title class="center">
+                <h1 class="text-center">Failed to send file</h1>
+            </template>
+            <div>The file was to big, the maximum supported size is 20MB.</div>
+        </Dialog>
     </div>
 </template>
 
@@ -283,11 +292,11 @@
     import { useScrollActions, useScrollState } from '@/store/scrollStore';
     import AppLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
-    import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed, onBeforeMount, onUpdated } from 'vue';
+    import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
     import { useContactsState } from '@/store/contactStore';
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
-    import { useChatsState, usechatsActions, isLoading } from '@/store/chatStore';
+    import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
@@ -309,9 +318,9 @@
     import { XIcon } from '@heroicons/vue/outline';
     import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
     import {
+        conversationComponentRerender,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
-        conversationComponentRerender,
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
 
@@ -339,7 +348,7 @@
 
     onBeforeMount(async () => {
         await retrieveChats();
-    })
+    });
 
     const truncate = (value, limit = 20) => {
         if (value.length > limit) {
@@ -347,6 +356,18 @@
         }
         return value;
     };
+
+    const doSendFiles = async (files: []) => {
+        for (const f of files) {
+            const success = await sendFile(chat.value.chatId, f);
+            if (!success) {
+                showError.value = true;
+                return;
+            }
+        }
+    };
+
+    const showError = ref(false);
 
     const getMessagesSortedByUser = computed(() => {
         let chatBlockIndex = 0;
@@ -381,10 +402,7 @@
         if (!chat.value) return;
         if (chat.value.isGroup) {
             let message = `${chat.value.contacts.length} members`;
-            const onlineMembers = chat.value.contacts.map(c => ({
-                ...c,
-                isOnline: statusList[<string>c.id]?.isOnline ?? false,
-            })).length;
+            const onlineMembers = chat.value.contacts.filter(c => statusList[<string>c.id]?.isOnline).length;
 
             if (onlineMembers > 0) {
                 message += `, ${onlineMembers} online`;
@@ -432,10 +450,15 @@
 
     const deleteChat = () => (showDeleteDialog.value = true);
 
-    const doDeleteChat = () => {
-        sendRemoveChat(chat.value.chatId);
-        localStorage.setItem('lastOpenedChat', '');
-        router.push({ name: 'whisper' });
+    const doDeleteChat = async () => {
+        if (chat.value.isGroup) {
+            const { updateContactsInGroup } = usechatsActions();
+            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP);
+        } else {
+            await sendRemoveChat(chat.value.chatId);
+            localStorage.setItem('lastOpenedChat', '');
+            router.push({ name: 'whisper' });
+        }
     };
 
     const blockChat = () => (showDialog.value = true);

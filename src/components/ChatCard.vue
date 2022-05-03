@@ -1,40 +1,29 @@
 <template>
-    <div
+    <li
+        class="py-4 px-2 flex cursor-pointer"
         :class="{
-            'bg-gray-50 border border-gray-200': !router.currentRoute?.value.path.includes(chat.chatId),
-            'bg-gray-200 border border-gray-50': router.currentRoute?.value.path.includes(chat.chatId),
+            'hover:bg-gray-100': !router.currentRoute?.value.path.includes(chat.chatId),
+            'bg-gray-200 hover:bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
             'opacity-50': blocked,
         }"
-        class="chatcard relative text-sm flex flex-row focus:outline-none focus:ring-4 ring-accent-500 ring-offset-2 hover:bg-gray-200 transition duration-100"
-        tabindex="0"
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"
     >
-        <div class="place-items-center relative">
-            <AvatarImg
-                :id="chat.chatId"
-                :showOnlineStatus="!chat.isGroup"
-                :unreadMessagesAmount="unreadMessagesAmount"
-            />
-        </div>
-        <div v-if="!collapsed" class="px-2 ml-2 content">
+        <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" :unreadMessagesAmount="unreadMessagesAmount" />
+        <div v-if="!collapsed" class="ml-3 w-full">
             <p class="flex items-center">
-                <span class="font-bold break-normal overflow-ellipsis overflow-hidden name">
+                <span class="text-sm text-gray-900 font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
                 </span>
-                <span v-if="chat.isGroup" class="ml-2 text-xs"> (group)</span>
+                <span v-if="chat.isGroup" class="ml-2 text-sm"> (group)</span>
                 <span v-if="blocked" class="ml-2 text-red-500"> BLOCKED</span>
-                <span v-if="lastMessage" class="text-gray-400 ml-auto text-xs">
+                <span v-if="lastMessage" class="text-gray-400 ml-auto self-end text-sm">
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <div class="flex overflow-hidden">
-                <div class="flex-0 col-end-13 col-span-2 text-gray-400 overflow-ellipsis overflow-hidden text-xs">
-                    {{ lastMessageBody }}
-                </div>
-            </div>
+            <p class="text-sm text-gray-500 max-h-6 max-w-xs truncate">{{ lastMessageBody }}</p>
         </div>
-    </div>
+    </li>
 </template>
 
 <script lang="ts" setup>

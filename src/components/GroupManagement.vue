@@ -1,5 +1,5 @@
 <template>
-    <div v-if="chat.isGroup" class="bg-whitew-full relative rounded-lg mb-4 md:grid grid-cols-1">
+    <div v-if="chat.isGroup" class="bg-white w-full relative rounded-lg md:grid grid-cols-1">
         <div class="flex justify-between items-center mb-6 mt-4 mx-4">
             <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
             <UserAddIcon
@@ -8,28 +8,30 @@
                 @click="openAddUserToGroup = true"
             />
         </div>
-        <div v-for="(contact, idx) in chat.contacts" :key="contact.id + chat.contacts.length" class="w-full">
-            <div class="chatcard relative grid grid-cols-12 py-3">
-                <div class="md:col-span-2 col-span-2 place-items-center grid relative">
+        <ul role="list" class="divide-y divide-gray-200 w-full border-t">
+            <li
+                v-for="(contact, idx) in chat.contacts"
+                :key="contact.id + chat.contacts.length"
+                class="py-3 px-4 sm:px-6 grid grid-cols-2 items-center"
+            >
+                <div class="flex items-center justify-self-start overflow-hidden overflow-ellipsis">
                     <AvatarImg :id="contact.id" small />
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
+                    </div>
                 </div>
-                <div class="md:col-span-8 col-span-8 pl-2 pt-1">
-                    <p class="flex place-content-between">
-                        <span class="font-bold overflow-hidden overflow-ellipsis">
-                            {{ contact.id }}
-                        </span>
-                    </p>
-                </div>
-                <div class="btns col-span-2 pt-1">
-                    <button v-if="isAdmin && chat.adminId !== contact.id" @click="removeFromGroup(contact)">
-                        <i class="fas fa-times text-red-500"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
+                <button
+                    v-if="isAdmin && chat.adminId !== contact.id"
+                    @click="removeFromGroup(contact)"
+                    class="inline-flex items-center border border-red-500 px-3 py-2 shadow-sm text-sm font-medium cursor-pointer rounded-md w-min justify-self-end"
+                >
+                    <TrashIcon class="h-4 w-4 text-red-500" />
+                </button>
+            </li>
+        </ul>
+        <div id="spacer" class="bg-gray-100 h-2 w-full mt-2"></div>
     </div>
-    <div v-if="sidebarFileList?.length !== 0" class="p-2">
+    <div v-if="sidebarFileList?.length !== 0" class="px-2">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Files</h3>
         <ul class="space-y-2 max-h-64 overflow-y-auto">
             <li
@@ -45,7 +47,7 @@
             </li>
         </ul>
     </div>
-    <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full mt-6"></div>
+    <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full"></div>
     <div class="bg-white p-2 w-full h-full flex flex-col justify-start">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
         <div class="flex items-center flex-col w-full">
@@ -179,7 +181,7 @@
     </Dialog>
 </template>
 <script setup lang="ts">
-    import { computed, ref, onMounted } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
@@ -187,10 +189,11 @@
     import { isBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
+    import { TrashIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import { Chat, MessageTypes } from '@/types';
+    import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
 
     interface IProps {
         chat: Chat;
@@ -246,14 +249,14 @@
     };
     const doRemoveFromGroup = () => {
         const { updateContactsInGroup } = usechatsActions();
-        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, true);
+        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
         toBeRemovedUser.value = null;
     };
     const addToGroup = contact => {
         const { updateContactsInGroup } = usechatsActions();
         //@ts-ignore
-        updateContactsInGroup(props.chat.chatId, contact, false);
+        updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
     const filteredContacts = computed(() => {
         return contacts.filter(

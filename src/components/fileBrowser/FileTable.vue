@@ -40,7 +40,6 @@
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
-                <ViewSelect />
                 <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                     <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
@@ -54,7 +53,7 @@
                         <table
                             v-if="fileBrowserTypeView === 'LIST' && !savedAttachmentsIsLoading"
                             :key="currentDirectory"
-                            class="min-w-full divide-y divide-gray-200 shadow"
+                            class="min-w-full divide-y divide-gray-300 shadow border border-gray-300 sm:rounded-lg"
                             @dragenter="onDragEnterParent"
                             @dragleave="onDragLeaveParent"
                         >
@@ -302,7 +301,6 @@
 
 <script lang="ts" setup>
     import { computed, onBeforeMount, ref } from 'vue';
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         currentDirectory,
         currentDirectoryContent,

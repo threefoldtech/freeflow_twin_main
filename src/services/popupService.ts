@@ -1,4 +1,4 @@
-export const popupCenter = (url: string, title: string, w: number, h: number, blank:boolean =false) => {
+export const popupCenter = (url: string, title: string, w: number, h: number, blank: boolean = false) => {
     const dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
     const dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
     const width = window.innerWidth

@@ -1,7 +1,7 @@
 <template>
     <div
         @click="createPostModalStatus = true"
-        class="z-50 bg-white relative"
+        class="z-40 bg-white relative"
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
@@ -46,11 +46,20 @@
                     <FileDropArea @send-file="selectFiles">
                         <div class="p-4 flex items-start h-48">
                             <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
-                            <textarea
-                                class="resize-none ml-4 text-base text-gray-800 p-2 outline-none block w-full border-none h-full focus:outline-none"
-                                placeholder="Write something about you"
-                                v-model="new_post_text"
-                            />
+                            <div class="flex flex-col w-full h-full py-2 px-4">
+                                <textarea
+                                    class="resize-none ml-4 text-base text-gray-800 outline-none block w-full border-none h-full focus:outline-none"
+                                    placeholder="Write something about you"
+                                    v-model="new_post_text"
+                                    maxlength="2000"
+                                />
+                                <p
+                                    :class="new_post_text.length >= 2000 ? ['text-red-600'] : ''"
+                                    class="text-sm text-gray-500 self-end"
+                                >
+                                    {{ new_post_text.length }}/2000
+                                </p>
+                            </div>
                         </div>
                         <div class="flex flex-col" v-if="errorFileSize">
                             <small class="px-4 text-gray-500">File size limit is 20MB per image</small>
@@ -68,7 +77,7 @@
                             type="file"
                             multiple="multiple"
                             ref="create_post_file_upload"
-                            accept="image/png, image/gif, image/jpeg"
+                            accept="image/png, image/jpeg"
                             class="hidden border-none outline-none ring-0"
                         />
                         <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
@@ -118,17 +127,17 @@
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
     >
-        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-40 bg-black opacity-10"></div>
+        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-30 bg-black opacity-10"></div>
     </TransitionRoot>
 </template>
 
 <script setup lang="ts">
-    import { PhotographIcon, XIcon, PencilAltIcon, FilmIcon, DotsVerticalIcon } from '@heroicons/vue/solid';
+    import { XIcon, PencilAltIcon } from '@heroicons/vue/solid';
     import { CameraIcon, HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { computed, ref } from 'vue';
-    import { showComingSoonToUhuru, createPostModalStatus } from '@/services/dashboardService';
+    import { createPostModalStatus } from '@/services/dashboardService';
     import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
     import ImageGrid from '@/components/Dashboard/ImageGrid.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
@@ -192,7 +201,8 @@
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
         errorFileSize.value = false;
-        if (new_post_text.value.trim() === '') return
+        if (new_post_text.value.trim() === ''
+            && new_post_images.value.length === 0) return;
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);

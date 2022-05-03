@@ -16,6 +16,7 @@ import { AppType } from '@/types/apps';
 import { usechatsActions, useChatsState } from './chatStore';
 
 declare const Buffer;
+
 export enum FileType {
     Unknown,
     Word,
@@ -138,8 +139,8 @@ export const createDirectory = async (name: string, path = currentDirectory.valu
 };
 
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {
-    await Promise.all(
-        files.map(async f => {
+    Promise.all(
+        files.map(async (f): Promise<void> => {
             const result = await Api.uploadFile(path, f);
             if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
                 throw new Error('Could not create new folder');
@@ -158,7 +159,7 @@ export const goToShared = async () => {
     searchResults.value = [];
     searchDirValue.value = '';
 
-    await router.push({ name: 'sharedWithMe', });
+    await router.push({ name: 'sharedWithMe' });
     await getSharedContent();
 };
 
@@ -291,9 +292,7 @@ export const downloadFileForPreview = async (path: string) => {
 };
 
 export const goToFolderInCurrentDirectory = (item: PathInfoModel, attachment: boolean = false) => {
-    let currentPath = currentDirectory.value;
-    if (!currentPath || currentPath[currentPath.length - 1] !== rootDirectory) currentPath += '/';
-    currentPath += item.name;
+    const currentPath = item.path;
     if (savedAttachments.value) {
         router.push({
             name: 'savedAttachments',
@@ -385,7 +384,15 @@ export const searchDir = async () => {
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {
-    if (!name) return;
+    const characterLimit = 50;
+    if (!name || name.length === 0 || name.length > characterLimit) {
+        createNotification(
+            'Failed to rename file',
+            `Filename cannot be empty or longer than ${characterLimit} characters`,
+            Status.Error
+        );
+        return;
+    }
     const oldPath = item.path;
     let newPath = pathJoin([currentDirectory.value, name]);
     if (item.extension) newPath = pathJoin([currentDirectory.value, `${name}.${item.extension}`]);
@@ -462,7 +469,7 @@ export const deselectAll = () => {
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
     if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
-        router.push({
+        await router.push({
             name: 'savedAttachmentsFromChat',
             params: {
                 chatId: item.name,
@@ -772,15 +779,18 @@ const resetSharedFolder = () => {
 //This timer is used for if a folder has been trying to load for too long.
 //If it takes too long => redirect to sharedwithme page
 let timer;
+
 function startTimer(milliseconds) {
     timer = setTimeout(function () {
         router.push({ name: 'sharedWithMe' });
         showSharedFolderErrorModal.value = true;
     }, milliseconds);
 }
+
 export function stopTimer() {
     clearTimeout(timer);
 }
+
 //Error dialog
 export const showSharedFolderErrorModal = ref(false);
 

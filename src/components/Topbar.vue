@@ -7,12 +7,12 @@
                     @click='backOrMenu'
                     :class="{ 'md:hidden': !(route.meta && route.meta.back) }"
                 >
-                    <i class='fas fa-bars'></i>
-<!--                    <i :class="`fas ${route.meta && route.meta.back ? 'fa-chevron-left' : 'fa-bars'}`"></i>-->
+                    <!--                    <i class='fas fa-bars'></i>-->
+                    <i :class="`fas ${route.name === 'single' ? 'fa-chevron-left' : 'fa-bars'}`"></i>
                 </button>
             </div>
 
-            <div class="h-8 flex items-center col-span-3 md:col-span-1 md:hidden">
+            <div class='h-8 flex items-center col-span-3 md:col-span-1 md:hidden'>
                 <slot>
                     <!--                    <img src="/digitaltwin.svg" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />-->
                     <svg
@@ -67,11 +67,11 @@
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
     import { showUserConfigDialog } from '@/services/dialogService';
+    import { useLocalStorage } from '@vueuse/core';
 
     const emit = defineEmits(['addUser', 'clicked']);
 
     const { user } = useAuthState();
-    const showEdit = ref(false);
     const showEditPic = ref(false);
     const fileinput = ref();
     const file = ref();
@@ -79,13 +79,15 @@
     const isEditingStatus = ref(false);
     const router = useRouter();
     const route = useRoute();
+    const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');
+
     const backOrMenu = () => {
-        // if (route.meta && route.meta.back) {
-        //     router.push({ name: <any>route.meta.back });
-        //     return;
-        // }
+        if (route?.name === 'single') {
+            lastOpenedChatId.value = '';
+            router.push({ name: 'whisper' });
+            return;
+        }
         emit('clicked');
-        // showUserConfigDialog.value = true;
     };
 
     const selectFile = () => {

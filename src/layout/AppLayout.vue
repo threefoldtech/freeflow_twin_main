@@ -2,26 +2,28 @@
     <suspense>
         <UserConfigDialog></UserConfigDialog>
     </suspense>
-    <div class='bg-gray-100 h-full relative text-sm'>
+    <div class="bg-gray-100 h-full relative text-sm">
         <NotificationSection />
-        <div class='pl-0 relative h-full w-full maingrid md:bigmaingrid'>
-            <div class='top h-20 md:hidden'>
-                <Topbar @clicked='showNav = !showNav'>
+        <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
+            <div class="top h-20 md:hidden">
+                <Topbar @clicked="showNav = !showNav">
                     <template v-slot:default>
-                        <slot name='top'></slot>
+                        <slot name="top"></slot>
                     </template>
                     <template v-slot:actions>
-                        <slot name='actions'></slot>
+                        <slot name="actions"></slot>
                     </template>
                 </Topbar>
             </div>
-            <slot name='side'>
-                <Sidebar class='bg-accent-800 md:block'
-                         :class='[showNav ? "" : "hidden", smallScreen ? "top" : "side"]'></Sidebar>
+            <slot name="side">
+                <Sidebar @clicked='showNav = false'
+                    class="bg-accent-800 md:block"
+                    :class="[showNav ? '' : 'hidden', smallScreen ? 'top' : 'side']"
+                ></Sidebar>
             </slot>
-            <div class='content w-full h-full overflow-y-auto relative flex flex-col'>
-                <div class='relative w-full h-full overflow-y-auto'>
-                    <div class='absolute w-full h-full'>
+            <div class="content w-full h-full overflow-y-auto relative flex flex-col">
+                <div class="relative w-full h-full overflow-y-auto">
+                    <div class="absolute w-full h-full">
                         <ImagePreview />
                         <slot></slot>
                     </div>
@@ -31,7 +33,7 @@
     </div>
 </template>
 
-<script setup lang='ts'>
+<script setup lang="ts">
     import { ref, watch } from 'vue';
     import Sidebar from '@/components/Sidebar.vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
@@ -64,7 +66,6 @@
 
         audio.play();
     });
-
 </script>
 
 <style scoped>

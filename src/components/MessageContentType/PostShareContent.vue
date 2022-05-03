@@ -80,7 +80,7 @@
             });
     });
 
-    const refreshPost = post => {
+    const refreshPost = (post: SOCIAL_POST) => {
         postData.value = post;
     };
 
