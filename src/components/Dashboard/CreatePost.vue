@@ -61,10 +61,8 @@
                                 </p>
                             </div>
                         </div>
-                        <div class='flex flex-col' v-if='errorFileSize'>
-                            <small class='px-4 text-gray-500'>File size limit is 20MB per image</small>
-                            <small class='px-4 text-gray-500'>Only png/jpeg files allowed</small>
-                            <small class='px-4 text-gray-500'>A post can only have a maximum of 10 images</small>
+                        <div class='flex flex-col' v-if='error'>
+                            <small class='px-4 text-gray-500'>{{ errorMessage }}</small>
                         </div>
                         <div class='p-4'>
                             <ImageGrid
@@ -149,7 +147,8 @@
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
-    const errorFileSize = ref<boolean>(false);
+    const error = ref<boolean>(false);
+    const errorMessage = ref('');
     const isPublishingNewPost = ref<boolean>(false);
 
     const isAllowedToPost = computed(() => {
@@ -163,7 +162,8 @@
 
     const checkFileSize = (image: File) => {
         if (image.size / 1024 / 1024 >= 20) {
-            errorFileSize.value = true;
+            error.value = true;
+            errorMessage.value = 'File size limit is 20MB per image';
         }
     };
 
@@ -174,39 +174,43 @@
 
     const isExtensionSupported = (image: File) => {
         const options = Object.values(SUPPORTED_EXTENSIONS);
-        options.includes(image.type) ? '' : (errorFileSize.value = true);
+        if (!options.includes(image.type)) {
+            error.value = true;
+            errorMessage.value = 'Only png/jpeg files allowed';
+        }
     };
 
     const handleFileInput = e => {
-        errorFileSize.value = false;
+        error.value = false;
 
         for (const file of e.target.files) {
             checkFileSize(file);
             isExtensionSupported(file);
             if (new_post_images.value.length > 10) {
-                errorFileSize.value = true;
+                error.value = true;
+                errorMessage.value = 'A post can only have a maximum of 10 images';
                 break;
             }
             new_post_images.value.push(file);
         }
-        errorFileSize.value ? (new_post_images.value = []) : '';
+        error.value ? (new_post_images.value = []) : '';
     };
 
     const selectFiles = (files: File[]) => {
         createPostModalStatus.value = true;
-        errorFileSize.value = false;
+        error.value = false;
         new_post_images.value = [];
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
             new_post_images.value.push(file);
         }
-        errorFileSize.value ? (new_post_images.value = []) : '';
+        error.value ? (new_post_images.value = []) : '';
     };
 
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
-        errorFileSize.value = false;
+        error.value = false;
         if (new_post_text.value.trim() === ''
             && new_post_images.value.length === 0) return;
         if (new_post_images.value.length > 10) return;
