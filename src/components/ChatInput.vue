@@ -1,17 +1,15 @@
 <template>
     <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif" />
     <div v-if="action?.type === MessageAction.REPLY" class="flex justify-between m-2 p-4 bg-white rounded-xl">
-        <div class="flex flex-row">
+        <div class="flex">
             <div class="text-accent-300 mr-4 self-center">
                 <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
-                <!--<i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>-->
             </div>
-            <div class="max-w-[750px] break-all">
+            <div class="max-w-[700px] self-start truncate break-all">
                 <b>{{ action.message.from }}</b>
-                <p>{{ getActionMessage }}</p>
+                <p class="max-h-16">{{ getActionMessage }}</p>
             </div>
         </div>
-
         <button @click="clearAction">
             <i class="fas fa-times"></i>
         </button>
@@ -72,13 +70,14 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form class="w-full" @submit.prevent="chatsend">
+            <form class="w-full" @submit.prevent="chatsend" @keydown.enter.prevent="chatsend">
                 <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
-                    <input
+                    <textarea
                         v-model="messageInput"
-                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
+                        class="block w-full pl-1 min-h-[24px] max-h-[150px] h-9 resize-none overflow-y-auto whitespace-pre-wrap border-0 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
                         autofocus
-                        type="text"
+                        maxlength="2000"
+                        @input="resizeTextarea()"
                         ref="message"
                         placeholder="Write a message ..."
                     />
@@ -144,6 +143,12 @@
 
     const { addScrollEvent } = useScrollActions();
 
+    const resizeTextarea = () => {
+        let area = message.value;
+        area.style.height = '36px';
+        area.style.height = area.scrollHeight + 'px';
+    };
+
     if (props.chat.draft) {
         if (props.chat.draft?.action === 'EDIT') {
             messageState.actions[<string>props.chat.draft.id];
@@ -178,11 +183,16 @@
     watch(action, () => {
         if (action.value && message.value) {
             message.value.focus();
-            console.log(action.value.type);
         }
-        if(action?.value?.type === MessageAction.EDIT) {
-            console.log(action);
-            messageInput.value = action.value.message.body;
+        if (action?.value?.type === MessageAction.EDIT) {
+            if (action.value.message.type === MessageTypes.QUOTE) {
+                messageInput.value = action.value.message.body.message;
+            } else {
+                messageInput.value = action.value.message.body;
+            }
+            nextTick(() => {
+                resizeTextarea();
+            })
         }
         draftMessage(selectedId, createMessage());
     });
@@ -275,6 +285,7 @@
 
     const clearMessage = () => {
         message.value.value = '';
+        resizeTextarea();
     };
 
     const chatsend = async () => {
@@ -421,5 +432,4 @@
     const collapsed = ref(true);
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
