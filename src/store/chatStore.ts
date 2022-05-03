@@ -569,7 +569,7 @@ const updateContactsInGroup = async (groupId: string, contact: Contact, type: Sy
             message: msg,
             adminLocation,
             contact,
-            nextAdmin: nextAdmin
+            nextAdmin
         },
         timeStamp: new Date(),
         type: MessageTypes.SYSTEM,
