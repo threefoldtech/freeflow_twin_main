@@ -61,33 +61,40 @@
                 <i v-if="collapsed" class="fas fa-chevron-down"></i>
                 <i v-else class="fas fa-chevron-up"></i>
             </button>
-            <div class="bg-accent-100 inline-flex text-sm rounded flex-row h-8 pl-3 self-center mr-2" v-if="attachment">
-                <div class="self-center">
-                    <i class="fas fa-file"></i>
+            <div class="flex flex-col w-full">
+                <div
+                    class="bg-accent-100 inline-flex text-sm rounded flex-row h-8 pl-3 mt-1 mr-2 w-min"
+                    v-if="attachment"
+                >
+                    <div class="self-center">
+                        <i class="fas fa-file"></i>
+                    </div>
+                    <span class="ml-2 mr-1 leading-relaxed truncate max-w- self-center">
+                        {{ attachment.name }}
+                    </span>
+                    <button class="hover:text-icon p-2 mx-0 self-center" @click.stop="removeFile">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <span class="ml-2 mr-1 leading-relaxed truncate max-w- self-center hidden md:inline-block">
-                    {{ attachment.name }}
-                </span>
-                <button class="hover:text-icon p-2 mx-0 self-center" @click.stop="removeFile">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form class="w-full" @submit.prevent="chatsend">
-                <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
-                    <input
-                        v-model="messageInput"
-                        class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
-                        autofocus
-                        type="text"
-                        ref="message"
-                        placeholder="Write a message ..."
-                    />
-                </div>
-            </form>
+                <div class='flex'>
+                    <form class="w-full flex-grow" @submit.prevent="chatsend">
+                        <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
+                            <input
+                                v-model="messageInput"
+                                class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
+                                autofocus
+                                type="text"
+                                ref="message"
+                                placeholder="Write a message ..."
+                            />
+                        </div>
+                    </form>
 
-            <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatsend">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+                    <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatsend">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     <div
