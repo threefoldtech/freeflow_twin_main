@@ -1,137 +1,139 @@
 <template>
     <div
-        @click="createPostModalStatus = true"
-        class="z-40 bg-white relative"
+        @click='createPostModalStatus = true'
+        class='z-40 bg-white relative'
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
-            <TabList class="flex items-stretch h-12 rounded-t-lg relative">
-                <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
+            <TabList class='flex items-stretch h-12 rounded-t-lg relative'>
+                <Tab v-slot='{ selected }' v-for='tab in navigation' :key='tab.name' as='template'>
                     <div
-                        class="px-8 font-medium flex flex-row items-center cursor-pointer"
+                        class='px-8 font-medium flex flex-row items-center cursor-pointer'
                         :class="{ 'bg-white': selected, 'bg-gray-200': !selected }"
                     >
-                        <component :is="tab.component" class="w-4 h-4 text-gray-400 mr-4" />
+                        <component :is='tab.component' class='w-4 h-4 text-gray-400 mr-4' />
                         <p>{{ tab.name }}</p>
                     </div>
                 </Tab>
-                <div class="h-full bg-gray-200 flex-grow self-stretch flex items-center justify-end pr-4">
+                <div class='h-full bg-gray-200 flex-grow self-stretch flex items-center justify-end pr-4'>
                     <XIcon
                         @click.stop
-                        v-if="createPostModalStatus"
-                        @click="createPostModalStatus = false"
-                        class="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition duration-100"
+                        v-if='createPostModalStatus'
+                        @click='createPostModalStatus = false'
+                        class='w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800 transition duration-100'
                     />
                 </div>
             </TabList>
             <TabPanels>
-                <TabPanel @wheel.prevent @touchmove.prevent @scroll.prevent class="relative">
+                <TabPanel @wheel.prevent @touchmove.prevent @scroll.prevent class='relative'>
                     <TransitionRoot
-                        :show="isPublishingNewPost"
-                        enter="transition-opacity duration-75"
-                        enter-from="opacity-0"
-                        enter-to="opacity-100"
-                        leave="transition-opacity duration-150"
-                        leave-from="opacity-100"
-                        leave-to="opacity-0"
+                        :show='isPublishingNewPost'
+                        enter='transition-opacity duration-75'
+                        enter-from='opacity-0'
+                        enter-to='opacity-100'
+                        leave='transition-opacity duration-150'
+                        leave-from='opacity-100'
+                        leave-to='opacity-0'
                     >
-                        <div class="absolute h-full w-full flex items-center justify-center z-50">
+                        <div class='absolute h-full w-full flex items-center justify-center z-50'>
                             <Spinner />
-                            <p class="ml-4 font-semibold text-accent-800">Creating post</p>
+                            <p class='ml-4 font-semibold text-accent-800'>Creating post</p>
                         </div>
                         <div
-                            class="absolute h-full w-full flex items-center justify-center z-40 bg-white bg-opacity-50"
+                            class='absolute h-full w-full flex items-center justify-center z-40 bg-white bg-opacity-50'
                         ></div>
                     </TransitionRoot>
-                    <FileDropArea @send-file="selectFiles">
-                        <div class="p-4 flex items-start h-48">
-                            <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
-                            <div class="flex flex-col w-full h-full py-2 px-4">
+                    <FileDropArea @send-file='selectFiles'>
+                        <div class='p-4 flex items-start h-48'>
+                            <AvatarImg :id='user.id' class='w-12 h-12'></AvatarImg>
+                            <div class='flex flex-col w-full h-full py-2 px-4'>
                                 <textarea
-                                    class="resize-none ml-4 text-base text-gray-800 outline-none block w-full border-none h-full focus:outline-none"
-                                    placeholder="Write something about you"
-                                    v-model="new_post_text"
-                                    maxlength="2000"
+                                    class='resize-none ml-4 text-base text-gray-800 outline-none block w-full border-none h-full focus:outline-none'
+                                    placeholder='Write something about you'
+                                    v-model='new_post_text'
+                                    maxlength='2000'
                                 />
                                 <p
                                     :class="new_post_text.length >= 2000 ? ['text-red-600'] : ''"
-                                    class="text-sm text-gray-500 self-end"
+                                    class='text-sm text-gray-500 self-end'
                                 >
                                     {{ new_post_text.length }}/2000
                                 </p>
                             </div>
                         </div>
-                        <div class="flex flex-col" v-if="errorFileSize">
-                            <small class="px-4 text-gray-500">File size limit is 20MB per image</small>
-                            <small class="px-4 text-gray-500">Only png/jpeg files allowed</small>
+                        <div class='flex flex-col' v-if='errorFileSize'>
+                            <small class='px-4 text-gray-500'>File size limit is 20MB per image</small>
+                            <small class='px-4 text-gray-500'>Only png/jpeg files allowed</small>
+                            <small class='px-4 text-gray-500'>A post can only have a maximum of 10 images</small>
                         </div>
-                        <div class="p-4">
+                        <div class='p-4'>
                             <ImageGrid
-                                v-if="new_post_images.length >= 1 && createPostModalStatus"
-                                :images="new_post_images"
-                                @resetImage="new_post_images = []"
+                                v-if='new_post_images.length >= 1 && createPostModalStatus'
+                                :images='new_post_images'
+                                @resetImage='new_post_images = []'
                             />
                         </div>
                         <input
-                            @change="handleFileInput"
-                            type="file"
-                            multiple="multiple"
-                            ref="create_post_file_upload"
-                            accept="image/png, image/jpeg"
-                            class="hidden border-none outline-none ring-0"
+                            @change='handleFileInput'
+                            type='file'
+                            multiple='multiple'
+                            ref='create_post_file_upload'
+                            accept='image/png, image/jpeg'
+                            class='hidden border-none outline-none ring-0'
                         />
-                        <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
+                        <div :class="{ 'border-b-lg': createPostModalStatus }" class='border-t-2 p-4 block'>
                             <div
-                                @click="$refs.create_post_file_upload.click()"
-                                class="bg-gray-300 px-4 py-2 rounded-full flex items-center w-28 cursor-pointer hover:bg-gray-200"
+                                @click='$refs.create_post_file_upload.click()'
+                                class='bg-gray-300 px-4 py-2 rounded-full flex items-center w-28 cursor-pointer hover:bg-gray-200'
                             >
-                                <CameraIcon class="text-gray-600 w-6 h-6" /><span class="ml-2 font-medium text-gray-600"
-                                    >Media</span
+                                <CameraIcon class='text-gray-600 w-6 h-6' />
+                                <span class='ml-2 font-medium text-gray-600'
+                                >Media</span
                                 >
                             </div>
                         </div>
                     </FileDropArea>
                     <div
                         @click.stop
-                        v-if="createPostModalStatus"
-                        class="bg-gray-200 px-4 h-14 flex items-center justify-center border-t-2 rounded-b-lg absolute -bottom-14 w-full"
+                        v-if='createPostModalStatus'
+                        class='bg-gray-200 px-4 h-14 flex items-center justify-center border-t-2 rounded-b-lg absolute -bottom-14 w-full'
                     >
                         <button
-                            class="w-full py-2 bg-primary text-white font-semibold rounded hover:bg-accent-800 duration-100"
+                            class='w-full py-2 bg-primary text-white font-semibold rounded hover:bg-accent-800 duration-100'
                             :class="{ 'opacity-50': !isAllowedToPost }"
-                            @click="handleCreatePost"
+                            @click='handleCreatePost'
                         >
                             Publish
                         </button>
                     </div>
                 </TabPanel>
                 <TabPanel>
-                    <div class="p-4 flex items-center justify-center h-32">
-                        <p class="font-medium">Coming soon</p>
+                    <div class='p-4 flex items-center justify-center h-32'>
+                        <p class='font-medium'>Coming soon</p>
                     </div>
                 </TabPanel>
                 <TabPanel>
-                    <div class="p-4 flex items-center justify-center h-32">
-                        <p class="font-medium">Coming soon</p>
+                    <div class='p-4 flex items-center justify-center h-32'>
+                        <p class='font-medium'>Coming soon</p>
                     </div>
                 </TabPanel>
             </TabPanels>
         </TabGroup>
     </div>
     <TransitionRoot
-        :show="createPostModalStatus"
-        enter="transition-opacity duration-75"
-        enterFrom="opacity-0"
-        enterTo="opacity-100"
-        leave="transition-opacity duration-150"
-        leaveFrom="opacity-100"
-        leaveTo="opacity-0"
+        :show='createPostModalStatus'
+        enter='transition-opacity duration-75'
+        enterFrom='opacity-0'
+        enterTo='opacity-100'
+        leave='transition-opacity duration-150'
+        leaveFrom='opacity-100'
+        leaveTo='opacity-0'
     >
-        <div @click="createPostModalStatus = false" class="w-full h-full inset-0 fixed z-30 bg-black opacity-10"></div>
+        <div @click='createPostModalStatus = false' class='w-full h-full inset-0 fixed z-30 bg-black opacity-10'></div>
     </TransitionRoot>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
     import { XIcon, PencilAltIcon } from '@heroicons/vue/solid';
     import { CameraIcon, HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -152,9 +154,9 @@
 
     const isAllowedToPost = computed(() => {
         return new_post_images.value.length >= 1 ||
-            new_post_text.value !== '' ||
-            !isPublishingNewPost ||
-            !isPublishingNewPost.value
+        new_post_text.value !== '' ||
+        !isPublishingNewPost ||
+        !isPublishingNewPost.value
             ? true
             : false;
     });
@@ -177,10 +179,14 @@
 
     const handleFileInput = e => {
         errorFileSize.value = false;
-        new_post_images.value = [];
+
         for (const file of e.target.files) {
             checkFileSize(file);
             isExtensionSupported(file);
+            if (new_post_images.value.length > 10) {
+                errorFileSize.value = true;
+                break;
+            }
             new_post_images.value.push(file);
         }
         errorFileSize.value ? (new_post_images.value = []) : '';
@@ -203,6 +209,7 @@
         errorFileSize.value = false;
         if (new_post_text.value.trim() === ''
             && new_post_images.value.length === 0) return;
+        if (new_post_images.value.length > 10) return;
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);
