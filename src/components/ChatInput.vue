@@ -1,20 +1,21 @@
 <template>
     <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif" />
-    <div v-if="action?.type === MessageAction.REPLY" class="flex justify-between m-2 p-4 bg-white rounded-xl">
+    <div v-if="action" class="flex justify-between mt-2 p-4 bg-white border-b border-t">
         <div class="flex flex-row">
             <div class="text-accent-300 mr-4 self-center">
-                <i class="fa fa-reply fa-2x"></i>
+                <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
+                <i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>
             </div>
-            <div class="max-w-[750px] break-all">
-                <b>{{ action.message.from }}</b>
-                <p class="text-ellipsis max-h-9">{{ getActionMessage }}</p>
+            <div class="w-full break-all overflow-y-auto">
+                <b v-if="action?.type === MessageAction.REPLY">{{ action.message.from }}</b>
+                <p class="text-ellipsis max-h-12 overflow-y-auto mr-2">{{ getActionMessage }}</p>
             </div>
         </div>
         <button @click="clearAction">
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <div class="md:p-2 md:m-2 md:rounded-3xl bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
+    <div class="md:p-2 bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
         <div class="md:col-span-4 flex flex-nowrap md:bg-transparent bg-gray-200" :class="{ hidden: !collapsed }">
             <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1 pt-0.5" @click="toggleGif">
                 <h2>GIF</h2>
@@ -181,6 +182,7 @@ const selectedId = String(props.chat.chatId);
     });
 
     const clearAction = () => {
+        messageInput.value = "";
         clearMessageAction(selectedId);
     };
 
@@ -194,11 +196,11 @@ const selectedId = String(props.chat.chatId);
             } else {
                 messageInput.value = action.value.message.body;
             }
-            nextTick(() => {
-                resizeTextarea();
-            })
         }
         draftMessage(selectedId, createMessage());
+        nextTick(() => {
+            resizeTextarea();
+        })
     });
 
     watch(messageInput, () => {
@@ -293,7 +295,7 @@ const selectedId = String(props.chat.chatId);
     };
 
     const chatsend = async () => {
-        messageInput.value = '';
+        messageInput.value = "";
         const { sendMessageObject } = usechatsActions();
 
         if (action.value) {
@@ -424,14 +426,14 @@ const getActionMessage = computed(() => {
     if(!message) return 'Message not found'
     switch (action.value.message.type) {
         case MessageTypes.QUOTE:
-            return (action.value.message.body as QuoteBodyType).message;
+            return (message.body as QuoteBodyType).message;
         case MessageTypes.STRING:
             return message.body;
         case MessageTypes.FILE:
-            if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
-            return action.value.message.type;
+            if (message.body.type === FileTypes.RECORDING) return 'Voice message';
+            return message.type;
         default:
-            return action.value.message.type;
+            return message.type;
     }
 });
 
