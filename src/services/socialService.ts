@@ -36,6 +36,7 @@ export interface socialPostModel extends socialMeta {
 type createPostModel = Omit<socialPostModel, 'images', 'owner', 'likes', 'replies'>;
 
 export const createSocialPost = async (text?: string, files: File[] = []) => {
+    if (files?.length > 10) return;
     const formData = new FormData();
 
     files?.forEach((file, key) => {
@@ -62,12 +63,12 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
 
 export const sortPosts = posts => {
     if (!posts) {
-        allSocialPosts.value.sort(function (a, b) {
+        allSocialPosts.value.sort(function(a, b) {
             return new Date(b.post.createdOn).getTime() - new Date(a.post.createdOn).getTime();
         });
         return;
     }
-    return posts.sort(function (a, b) {
+    return posts.sort(function(a, b) {
         return new Date(b.post.createdOn) - new Date(a.post.createdOn);
     });
 };
@@ -95,7 +96,7 @@ export const likeComment = async (
     location: string,
     commentId: string,
     isReplyToComment: boolean,
-    replyTo: string
+    replyTo: string,
 ) => {
     const myAddress = await myYggdrasilAddress();
     return (
@@ -135,7 +136,7 @@ export const commentOnPost = async (
     message: string,
     item: SOCIAL_POST,
     isReplyToComment: boolean,
-    comment_id?: string
+    comment_id?: string,
 ) => {
     const myAddress = await myYggdrasilAddress();
     const data: COMMENT_MODEL = {
@@ -184,7 +185,7 @@ export const destroySomeoneIsTyping = (chatId, queueId) => {
         if (item.post.id === chatId) {
             const filteredArray = item?.isTyping
                 ?.filter(item => item !== queueId)
-                ?.filter(function (x) {
+                ?.filter(function(x) {
                     return x !== undefined;
                 });
             return {
