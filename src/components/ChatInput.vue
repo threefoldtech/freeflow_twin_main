@@ -171,8 +171,7 @@ if (props.chat.draft) {
     if(!props.chat.draft.action){
          messageInput.value = String(props.chat.draft.body);
     }
-}
-const selectedId = String(props.chat.chatId);
+    const selectedId = String(props.chat.chatId);
 
     const action = computed(() => {
         if (!selectedId) {
@@ -420,6 +419,7 @@ const selectedId = String(props.chat.chatId);
             message.value.focus();
         }
     };
+
 
 const getActionMessage = computed(() => {
     const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
