@@ -76,7 +76,7 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class='flex'>
+                <div class="flex">
                     <form class="w-full flex-grow" @submit.prevent="chatsend">
                         <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                             <input
@@ -151,22 +151,20 @@
 
     const { addScrollEvent } = useScrollActions();
 
-
-
-if (props.chat.draft) {
-   if(props.chat.draft?.action === "EDIT"){
-       messageInput.value = String(props.chat.draft.body.body)
-       editMessage(props.chat.draft.to, props.chat.draft.body)
-   }
-   if(props.chat.draft?.action === "REPLY"){
-       messageInput.value = String(props.chat.draft.body.message)
-       replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage)
-   }
-    if(!props.chat.draft.action){
-         messageInput.value = String(props.chat.draft.body);
+    if (props.chat.draft) {
+        if (props.chat.draft?.action === 'EDIT') {
+            messageInput.value = String(props.chat.draft.body.body);
+            editMessage(props.chat.draft.to, props.chat.draft.body);
+        }
+        if (props.chat.draft?.action === 'REPLY') {
+            messageInput.value = String(props.chat.draft.body.message);
+            replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
+        }
+        if (!props.chat.draft.action) {
+            messageInput.value = String(props.chat.draft.body);
+        }
     }
-}
-const selectedId = String(props.chat.chatId);
+    const selectedId = String(props.chat.chatId);
 
     const action = computed(() => {
         if (!selectedId) {
@@ -403,24 +401,23 @@ const selectedId = String(props.chat.chatId);
         }
     };
 
-const getActionMessage = computed(() => {
-    const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
-    if(!message) return 'Message not found'
-    switch (action.value.message.type) {
-        case MessageTypes.QUOTE:
-            return (action.value.message.body as QuoteBodyType).message;
-        case MessageTypes.STRING:
-            return message.body;
-        case MessageTypes.FILE:
-            if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
-            return action.value.message.type;
-        default:
-            return action.value.message.type;
-    }
-});
+    const getActionMessage = computed(() => {
+        const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
+        if (!message) return 'Message not found';
+        switch (action.value.message.type) {
+            case MessageTypes.QUOTE:
+                return (action.value.message.body as QuoteBodyType).message;
+            case MessageTypes.STRING:
+                return message.body;
+            case MessageTypes.FILE:
+                if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
+                return action.value.message.type;
+            default:
+                return action.value.message.type;
+        }
+    });
 
     const collapsed = ref(true);
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

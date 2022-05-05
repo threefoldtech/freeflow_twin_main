@@ -13,10 +13,7 @@
             <div class="block">
                 <div class="bg-gray-100 w-auto rounded-xl px-2 pb-2">
                     <div class="font-medium">
-                        <a
-                            class="hover:underline text-sm"
-                            href="#"
-                        >
+                        <a class="hover:underline text-sm" href="#">
                             <small>{{ comment.owner.id }}</small>
                         </a>
                     </div>

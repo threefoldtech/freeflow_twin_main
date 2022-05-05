@@ -75,7 +75,7 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('post_deleted', (postId: string) => {
         allSocialPosts.value = allSocialPosts.value.filter(p => p.post.id !== postId);
-    })
+    });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
