@@ -227,8 +227,8 @@
                             conversationComponentRerender.value = conversationComponentRerender.value++;
                         }
                         if (isBlocked(chatId)) {
-                            const { sendRemoveBlockedChat } = useSocketActions();
-                            sendRemoveBlockedChat(chatId);
+                            const { sendUnBlockedChat } = useSocketActions();
+                            sendUnBlockedChat(chatId);
                             break;
                         }
                         openBlockDialogFromOtherFile.value = true;

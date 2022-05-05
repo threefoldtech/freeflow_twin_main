@@ -383,7 +383,7 @@
     const showDeleteDialog = ref(false);
     const showRemoveUserDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
-    const { sendRemoveChat, sendBlockChat, sendRemoveBlockedChat } = useSocketActions();
+    const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
 
     watch(
         () => route.params.id,
@@ -535,7 +535,7 @@
         router.push({ name: 'whisper' });
     };
 
-    const unBlockChat = async () => sendRemoveBlockedChat(chat.value.chatId);
+    const unBlockChat = async () => sendUnBlockedChat(chat.value.chatId);
 
     const reads = computed(() => {
         const preReads = {};

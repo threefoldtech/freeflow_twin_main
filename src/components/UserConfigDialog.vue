@@ -243,8 +243,8 @@
     };
 
     const unblockUser = async (user: string) => {
-        const { sendRemoveBlockedChat } = useSocketActions();
-        sendRemoveBlockedChat(user);
+        const { sendUnBlockedChat } = useSocketActions();
+        sendUnBlockedChat(user);
         showUserConfigDialog.value = false;
     };
 

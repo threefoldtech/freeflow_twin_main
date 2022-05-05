@@ -116,8 +116,8 @@
     };
 
     const unblockUser = async user => {
-        const { sendRemoveBlockedChat } = useSocketActions();
-        sendRemoveBlockedChat(user);
+        const { sendUnBlockedChat } = useSocketActions();
+        sendUnBlockedChat(user);
         showUserConfigDialog.value = false;
     };
 
