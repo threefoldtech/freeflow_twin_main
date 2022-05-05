@@ -56,7 +56,8 @@
     </div>
 </template>
 
-<script setup lang='ts'>
+
+<script setup lang="ts">
     import { defineComponent, onBeforeMount, ref } from 'vue';
     import { useAuthState } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
