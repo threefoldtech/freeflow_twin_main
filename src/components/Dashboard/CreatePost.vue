@@ -198,9 +198,14 @@
         createPostModalStatus.value = true;
         error.value = false;
         new_post_images.value = [];
+        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
+            if (format.test(file.name)) {
+                error.value = true;
+                errorMessage.value = 'No special characters allowed';
+            }
             new_post_images.value.push(file);
         }
         error.value ? (new_post_images.value = []) : '';
