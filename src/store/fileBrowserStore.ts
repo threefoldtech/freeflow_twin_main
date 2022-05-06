@@ -139,12 +139,16 @@ export const createDirectory = async (name: string, path = currentDirectory.valu
 };
 
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {
+    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
     Promise.all(
         files.map(async (f): Promise<void> => {
             const result = await Api.uploadFile(path, f);
             if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
                 throw new Error('Could not create new folder');
-
+            if (format.test(f.name)) {
+                createErrorNotification('Failed to upload file', 'No special characters allowed');
+                return;
+            }
             currentDirectoryContent.value.push(createModel(result.data));
             await updateContent();
         })

@@ -91,6 +91,7 @@
     import { createDirectory, uploadFiles, sharedDir, savedAttachments } from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
+    import { createErrorNotification } from '@/store/notificiationStore';
 
     const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);
@@ -151,6 +152,11 @@
     };
 
     const handleFileSelectChange = () => {
+        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+        if (format.test(newFileInput.value)) {
+            createErrorNotification('Failed to upload file', 'No special characters allowed');
+            return;
+        }
         newFileInputArray.value = Array.from(newFileInput.value?.files);
         newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
     };
