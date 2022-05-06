@@ -52,8 +52,8 @@
             <h1>Add files</h1>
         </template>
         <div class="flex flex-col">
-            <p v-for="(error, idx) in fileUploadErrors" :key="idx" class="text-sm font-medium text-red-500">
-                {{ error }}
+            <p class="text-sm font-medium text-red-500">
+                {{ fileUploadErrors }}
             </p>
             <span>Files*</span>
             <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">
@@ -100,7 +100,7 @@
     const newFileInputArray = ref<File[]>([]);
     const createFolderErrors = ref<string[]>([]);
     const manualContactAdd = ref<string>('');
-    const fileUploadErrors = ref<string[]>([]);
+    const fileUploadErrors = ref<string>('');
     const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
 
     watch(manualContactAdd, () => {
@@ -117,14 +117,13 @@
     });
 
     const updateCreateFileDialog = (val: boolean) => {
-        fileUploadErrors.value = [];
         if (!val) {
             showCreateFileDialog.value = false;
             return;
         }
 
         if (!selectedFiles.value?.length) {
-            fileUploadErrors.value.push('Please upload atleast one file.');
+            fileUploadErrors.value = 'Please upload atleast one file.';
             return;
         }
         uploadFiles(selectedFiles.value);
@@ -133,6 +132,13 @@
     };
 
     const handleDragAndDrop = (files: File[]) => {
+        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+        for (let file of files) {
+            if (format.test(file.name)) {
+                fileUploadErrors.value = 'No special characters allowed';
+                return;
+            }
+        }
         selectedFiles.value.push(...files);
     };
 
