@@ -111,65 +111,63 @@
     ></div>
 </template>
 <script lang="ts" setup>
-        import { computed, nextTick, ref, watch } from 'vue';
-        import {
-            clearMessageAction,
-            draftMessage,
-            editMessage,
-            MessageAction,
-            messageState,
-            replyMessage,
-            usechatsActions,
-        } from '@/store/chatStore';
-        import GifSelector from '@/components/GifSelector.vue';
-        import { useAuthState } from '@/store/authStore';
-        import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
-        import { uuidv4 } from '@/common';
-        import { useScrollActions } from '@/store/scrollStore';
-        import { EmojiPickerElement } from 'unicode-emoji-picker';
+    import { computed, nextTick, ref, watch } from 'vue';
+    import {
+        clearMessageAction,
+        draftMessage,
+        editMessage,
+        MessageAction,
+        messageState,
+        replyMessage,
+        usechatsActions,
+    } from '@/store/chatStore';
+    import GifSelector from '@/components/GifSelector.vue';
+    import { useAuthState } from '@/store/authStore';
+    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
+    import { uuidv4 } from '@/common';
+    import { useScrollActions } from '@/store/scrollStore';
+    import { EmojiPickerElement } from 'unicode-emoji-picker';
 
-        const emit = defineEmits(['messageSend', 'failed']);
+    const emit = defineEmits(['messageSend', 'failed']);
 
-        interface IProps {
-            chat: Chat;
-        }
+    interface IProps {
+        chat: Chat;
+    }
 
-        const props = defineProps<IProps>();
+    const props = defineProps<IProps>();
 
-        // Not actually a vue component but CustomElement ShadowRoot. I know vue doesnt really like it and gives a warning.
-        new EmojiPickerElement();
+    // Not actually a vue component but CustomElement ShadowRoot. I know vue doesnt really like it and gives a warning.
+    new EmojiPickerElement();
 
-        const { sendMessage, sendFile } = usechatsActions();
+    const { sendMessage, sendFile } = usechatsActions();
 
-        const message = ref(null);
-        const messageInput = ref('');
-        const fileinput = ref();
-        const attachment = ref();
+    const message = ref(null);
+    const messageInput = ref('');
+    const fileinput = ref();
+    const attachment = ref();
 
-        const stopRecording = ref(null);
-        const showEmoji = ref(false);
+    const stopRecording = ref(null);
+    const showEmoji = ref(false);
 
-        const { addScrollEvent } = useScrollActions();
+    const { addScrollEvent } = useScrollActions();
 
-        const resizeTextarea = () => {
-            let area = message.value;
-            area.style.height = '36px';
-            area.style.height = area.scrollHeight + 'px';
-        };
-
-
+    const resizeTextarea = () => {
+        let area = message.value;
+        area.style.height = '36px';
+        area.style.height = area.scrollHeight + 'px';
+    };
 
     if (props.chat.draft) {
-       if(props.chat.draft?.action === "EDIT"){
-           messageInput.value = String(props.chat.draft.body.body)
-           editMessage(props.chat.draft.to, props.chat.draft.body)
-       }
-       if(props.chat.draft?.action === "REPLY"){
-           messageInput.value = String(props.chat.draft.body.message)
-           replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage)
-       }
-        if(!props.chat.draft.action){
-             messageInput.value = String(props.chat.draft.body);
+        if (props.chat.draft?.action === 'EDIT') {
+            messageInput.value = String(props.chat.draft.body.body);
+            editMessage(props.chat.draft.to, props.chat.draft.body);
+        }
+        if (props.chat.draft?.action === 'REPLY') {
+            messageInput.value = String(props.chat.draft.body.message);
+            replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
+        }
+        if (!props.chat.draft.action) {
+            messageInput.value = String(props.chat.draft.body);
         }
         const selectedId = String(props.chat.chatId);
 
@@ -181,7 +179,7 @@
         });
 
         const clearAction = () => {
-            messageInput.value = "";
+            messageInput.value = '';
             clearMessageAction(selectedId);
         };
 
@@ -199,7 +197,7 @@
             draftMessage(selectedId, createMessage());
             nextTick(() => {
                 resizeTextarea();
-            })
+            });
         });
 
         watch(messageInput, () => {
@@ -294,7 +292,7 @@
         };
 
         const chatsend = async () => {
-            messageInput.value = "";
+            messageInput.value = '';
             const { sendMessageObject } = usechatsActions();
 
             if (action.value) {
@@ -420,24 +418,24 @@
             }
         };
 
-
-    const getActionMessage = computed(() => {
-        const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
-        if(!message) return 'Message not found'
-        switch (action.value.message.type) {
-            case MessageTypes.QUOTE:
-                return (message.body as QuoteBodyType).message;
-            case MessageTypes.STRING:
-                return message.body;
-            case MessageTypes.FILE:
-                if (message.body.type === FileTypes.RECORDING) return 'Voice message';
-                return message.type;
-            default:
-                return message.type;
-        }
-    });
+        const getActionMessage = computed(() => {
+            const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
+            if (!message) return 'Message not found';
+            switch (action.value.message.type) {
+                case MessageTypes.QUOTE:
+                    return (message.body as QuoteBodyType).message;
+                case MessageTypes.STRING:
+                    return message.body;
+                case MessageTypes.FILE:
+                    if (message.body.type === FileTypes.RECORDING) return 'Voice message';
+                    return message.type;
+                default:
+                    return message.type;
+            }
+        });
 
         const collapsed = ref(true);
+    }
 </script>
 
 <style scoped></style>
