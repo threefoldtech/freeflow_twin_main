@@ -92,6 +92,7 @@
     import Button from '@/components/Button.vue';
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
     import { createErrorNotification } from '@/store/notificiationStore';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);
@@ -102,11 +103,10 @@
     const createFolderErrors = ref<string[]>([]);
     const manualContactAdd = ref<string>('');
     const fileUploadErrors = ref<string>('');
-    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
 
     watch(manualContactAdd, () => {
         createFolderErrors.value = [];
-        if (format.test(manualContactAdd.value))
+        if (hasSpecialCharacters(manualContactAdd.value))
             createFolderErrors.value.push('No special characters allowed in folder names.');
 
         if (manualContactAdd.value.includes('/')) {
@@ -133,9 +133,8 @@
     };
 
     const handleDragAndDrop = (files: File[]) => {
-        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
         for (let file of files) {
-            if (format.test(file.name)) {
+            if (hasSpecialCharacters(file.name)) {
                 fileUploadErrors.value = 'No special characters allowed';
                 return;
             }
@@ -152,8 +151,7 @@
     };
 
     const handleFileSelectChange = () => {
-        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
-        if (format.test(newFileInput.value)) {
+        if (hasSpecialCharacters(newFileInput.value)) {
             createErrorNotification('Failed to upload file', 'No special characters allowed');
             return;
         }
@@ -179,13 +177,13 @@
             return;
         }
 
-        if (format.test(manualContactAdd.value))
+        if (hasSpecialCharacters(manualContactAdd.value))
             createFolderErrors.value.push('No special characters allowed in folder names.');
         if (manualContactAdd.value.length >= 50) {
             createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
         }
 
-        if (format.test(manualContactAdd.value) || manualContactAdd.value.length >= 50) return;
+        if (hasSpecialCharacters(manualContactAdd.value) || manualContactAdd.value.length >= 50) return;
 
         createDirectory(newFolderInput.value.value);
         showCreateFolderDialog.value = false;

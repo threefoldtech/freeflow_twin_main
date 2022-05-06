@@ -142,6 +142,7 @@
     import { createSocialPost, getAllPosts } from '@/services/socialService';
     import { TransitionRoot } from '@headlessui/vue';
     import Spinner from '@/components/Spinner.vue';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
@@ -198,11 +199,10 @@
         createPostModalStatus.value = true;
         error.value = false;
         new_post_images.value = [];
-        const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
-            if (format.test(file.name)) {
+            if (hasSpecialCharacters(file.name)) {
                 error.value = true;
                 errorMessage.value = 'No special characters allowed';
             }

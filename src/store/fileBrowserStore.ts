@@ -1,7 +1,7 @@
 import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { getShareWithId } from '@/services/fileBrowserService';
+import { getShareWithId, hasSpecialCharacters } from '@/services/fileBrowserService';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
@@ -139,13 +139,12 @@ export const createDirectory = async (name: string, path = currentDirectory.valu
 };
 
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {
-    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
     Promise.all(
         files.map(async (f): Promise<void> => {
             const result = await Api.uploadFile(path, f);
             if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
                 throw new Error('Could not create new folder');
-            if (format.test(f.name)) {
+            if (hasSpecialCharacters(f.name)) {
                 createErrorNotification('Failed to upload file', 'No special characters allowed');
                 return;
             }
@@ -397,8 +396,7 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
         );
         return;
     }
-    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
-    if (format.test(name)) {
+    if (hasSpecialCharacters(name)) {
         createNotification('Failed to rename file', 'No special characters allowed', Status.Error);
         return;
     }
