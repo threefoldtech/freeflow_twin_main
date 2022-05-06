@@ -255,13 +255,6 @@
         usersInGroup.value = [];
         emit('closeDialog');
     };
-
-    // @todo: config
-    // axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
-    //     const posContacts = <Contact[]>r.data;
-    //     const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
-    //     possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
-    // });
 </script>
 
 <style scoped></style>

@@ -9,6 +9,7 @@ import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
 import { loadAllUsers } from '@/store/userStore';
+import config from '@/config';
 
 const state = reactive<State>({
     socket: '',
@@ -90,9 +91,8 @@ const initializeSocket = (username: string) => {
     state.socket.on('blocked_contacts', (contacts: { id: string }[]) => {
         blocklist.value = contacts;
     });
-    state.socket.on('users_loaded', async (users: Promise<Contact[]>) => {
-        console.log('loaded users ', users);
-        loadAllUsers(await users);
+    state.socket.on('users_loaded', async (users: Contact[]) => {
+        loadAllUsers(users);
     })
 };
 
