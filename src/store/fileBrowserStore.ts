@@ -7,7 +7,7 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
+import { Chat, ContactInterface, DtId, MessageTypes, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -391,6 +391,11 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
             `Filename cannot be empty or longer than ${characterLimit} characters`,
             Status.Error
         );
+        return;
+    }
+    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+    if (format.test(name)) {
+        createNotification('Failed to rename file', 'No special characters allowed', Status.Error);
         return;
     }
     const oldPath = item.path;
