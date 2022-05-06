@@ -94,10 +94,9 @@
                         :class="{ flex: !showSideBar, hidden: showSideBar }"
                         class="relative h-full xl:flex flex-col flex-1"
                     >
-                        <FileDropArea
-                            class="h-full flex flex-col"
-                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"
-                        >
+                        <FileDropArea class="h-full flex flex-col" @send-file="files => doSendFiles(files)">
+                            <!--                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"-->
+                            <!--                        >-->
                             <div
                                 class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden md:flex"
                             >
@@ -328,7 +327,7 @@
             <template v-slot:title class="center">
                 <h1 class="text-center">Failed to send file</h1>
             </template>
-            <div>The file was to big, the maximum supported size is 20MB.</div>
+            <div>{{ errorMessage }}</div>
         </Dialog>
     </div>
 </template>
@@ -368,6 +367,7 @@
         openDeleteDialogFromOtherFile,
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);
@@ -403,17 +403,23 @@
         return value;
     };
 
-    const doSendFiles = async (files: []) => {
+    const showError = ref(false);
+    const errorMessage = ref('');
+    const doSendFiles = async (files: File[]) => {
         for (const f of files) {
+            if (hasSpecialCharacters(f.name)) {
+                showError.value = true;
+                errorMessage.value = 'File name cannot have special characters.';
+                return;
+            }
             const success = await sendFile(chat.value.chatId, f);
             if (!success) {
                 showError.value = true;
+                errorMessage.value = 'The file was to big, the maximum supported size is 20MB.';
                 return;
             }
         }
     };
-
-    const showError = ref(false);
 
     const getMessagesSortedByUser = computed(() => {
         let chatBlockIndex = 0;
