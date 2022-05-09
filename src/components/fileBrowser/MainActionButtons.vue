@@ -151,12 +151,14 @@
     };
 
     const handleFileSelectChange = () => {
-        if (hasSpecialCharacters(newFileInput.value)) {
-            createErrorNotification('Failed to upload file', 'No special characters allowed');
-            return;
-        }
         newFileInputArray.value = Array.from(newFileInput.value?.files);
-        newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+        newFileInputArray.value.forEach(file => {
+            if (hasSpecialCharacters(file.name)) {
+                createErrorNotification('Failed to upload file', 'No special characters allowed');
+                return;
+            }
+            selectedFiles.value.push(file);
+        });
     };
 
     watch(showCreateFolderDialog, () => {
