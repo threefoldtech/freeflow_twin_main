@@ -7,7 +7,7 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
+import { Chat, ContactInterface, DtId, MessageTypes, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -141,6 +141,7 @@ export const createDirectory = async (name: string, path = currentDirectory.valu
 export const uploadFiles = async (files: File[], path = currentDirectory.value) => {
     Promise.all(
         files.map(async (f): Promise<void> => {
+            // const id = await uploadTempFile(f);
             const result = await Api.uploadFile(path, f);
             if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
                 throw new Error('Could not create new folder');
@@ -253,14 +254,16 @@ export const getchatsWithFiles = (received: boolean) => {
     return chats.value.filter(chat => chatFilesReceived(chat, received).length > 0);
 };
 
-export const uploadFile = async (file: File, path = currentDirectory.value) => {
-    const result = await Api.uploadFile(path, file);
-    if ((result.status !== 200 && result.status !== 201) || !result.data)
-        throw new Error('Could not create new folder');
-
-    currentDirectoryContent.value.push(createModel(result.data));
-    await updateContent();
-};
+// --> not used anywhere
+//
+// export const uploadFile = async (file: File, path = currentDirectory.value) => {
+//     const result = await Api.uploadFile(path, file);
+//     if ((result.status !== 200 && result.status !== 201) || !result.data)
+//         throw new Error('Could not create new folder');
+//
+//     currentDirectoryContent.value.push(createModel(result.data));
+//     await updateContent();
+// };
 
 export const deleteFiles = async (list: PathInfoModel[]) => {
     await Promise.all(

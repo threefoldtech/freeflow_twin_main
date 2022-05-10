@@ -29,33 +29,32 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, onMounted, ref } from 'vue';
-    import { useRoute } from 'vue-router';
-    import {
-        fetchShareDetails,
-        fetchFileAccessDetails,
-        getExtension,
-        FileType,
-        getFileType,
-        accessDenied,
-    } from '@/store/fileBrowserStore';
-    import { get } from 'scriptjs';
-    import { useAuthState } from '@/store/authStore';
-    import { startFetchStatusLoop, showUserOfflineMessage } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '@/services/urlService';
-    import { EditPathInfo, getFileInfo } from '@/services/fileBrowserService';
-    import Spinner from '@/components/Spinner.vue';
-    import { isUndefined } from 'lodash';
+import {computed, onMounted, ref} from 'vue';
+import {useRoute} from 'vue-router';
+import {
+  accessDenied,
+  fetchFileAccessDetails,
+  fetchShareDetails,
+  FileType,
+  getExtension,
+  getFileType,
+} from '@/store/fileBrowserStore';
+import {get} from 'scriptjs';
+import {showUserOfflineMessage, startFetchStatusLoop} from '@/store/statusStore';
+import {calcExternalResourceLink} from '@/services/urlService';
+import {EditPathInfo, getFileInfo} from '@/services/fileBrowserService';
+import Spinner from '@/components/Spinner.vue';
+import {isUndefined} from 'lodash';
 
-    const route = useRoute();
-    const fileType = ref<FileType>();
-    const readUrl = ref<string>();
-    const isLoading = ref<boolean>(true);
+const route = useRoute();
+const fileType = ref<FileType>();
+const readUrl = ref<string>();
+const isLoading = ref<boolean>(true);
 
-    const isSupportedInDocumentServer = computed(() => {
-        return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
-            x => x === fileType.value
-        );
+const isSupportedInDocumentServer = computed(() => {
+  return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
+      x => x === fileType.value
+  );
     });
 
     const generateUrl = (
