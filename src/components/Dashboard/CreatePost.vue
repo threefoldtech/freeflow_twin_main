@@ -142,6 +142,7 @@
     import { createSocialPost, getAllPosts } from '@/services/socialService';
     import { TransitionRoot } from '@headlessui/vue';
     import Spinner from '@/components/Spinner.vue';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
@@ -184,6 +185,7 @@
         for (const file of e.target.files) {
             checkFileSize(file);
             isExtensionSupported(file);
+            checkOnSpecialCharacters(file.name);
             if (new_post_images.value.length > 10) {
                 error.value = true;
                 errorMessage.value = 'A post can only have a maximum of 10 images';
@@ -194,6 +196,13 @@
         error.value ? (new_post_images.value = []) : '';
     };
 
+    const checkOnSpecialCharacters = (name: string) => {
+        if (hasSpecialCharacters(name)) {
+            error.value = true;
+            errorMessage.value = 'No special characters allowed';
+        }
+    };
+
     const selectFiles = (files: File[]) => {
         createPostModalStatus.value = true;
         error.value = false;
@@ -201,6 +210,7 @@
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
+            checkOnSpecialCharacters(file.name);
             new_post_images.value.push(file);
         }
         error.value ? (new_post_images.value = []) : '';
