@@ -5,7 +5,7 @@
             'md:w-16': collapsed,
             'md:w-[400px]': !collapsed,
         }"
-        class="bg-white w-full flex flex-col overflow-hidden"
+        class="bg-white w-full flex flex-col overflow-hidden border-r"
     >
         <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
             <div

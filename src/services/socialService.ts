@@ -36,6 +36,7 @@ export interface socialPostModel extends socialMeta {
 type createPostModel = Omit<socialPostModel, 'images', 'owner', 'likes', 'replies'>;
 
 export const createSocialPost = async (text?: string, files: File[] = []) => {
+    if (files?.length > 10) return;
     const formData = new FormData();
 
     files?.forEach((file, key) => {

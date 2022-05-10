@@ -1,6 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
-import { createNotification, createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
+import {
+    createErrorNotification,
+    createNotification,
+    createPercentProgressNotification,
+    fail,
+    success,
+} from '@/store/notificiationStore';
 import { ProgressNotification, Status } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
@@ -21,6 +27,7 @@ export interface PathInfo {
     lastModified: Date;
     lastAccessed: Date;
 }
+
 export interface ShareInfo {
     [id: string]: {
         path: string;
@@ -245,4 +252,9 @@ export const downloadAttachment = async (message: any) => {
         createNotification('Something went wrong during the download', `from ${message.from}`, Status.Error);
         return;
     }
+};
+
+export const hasSpecialCharacters = (name: string) => {
+    const format = /[`!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+    return format.test(name);
 };

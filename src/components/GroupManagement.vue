@@ -85,7 +85,7 @@
             </div>
 
             <div
-                v-if='isAdmin'
+                v-if="isAdmin"
                 class="delete bg-red-100 flex items-center rounded w-full m-2 cursor-pointer"
                 @click="$emit('app-delete')"
             >

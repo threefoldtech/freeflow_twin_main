@@ -159,6 +159,7 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
     import { allUsers, loadAllUsers } from '@/store/userStore';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
     const { contacts } = useContactsState();
@@ -227,13 +228,13 @@
 
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
-        const format = /[`!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+        const { user } = useAuthState();
 
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';
             return;
         }
-        if (format.test(groupnameAdd.value)) {
+        if (hasSpecialCharacters(groupnameAdd.value)) {
             groupnameAddError.value = 'No special characters allowed in group names.';
             return;
         }

@@ -1,22 +1,21 @@
 <template>
     <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif" />
-    <div v-if="action" class="flex justify-between m-2 p-4 bg-white rounded-xl">
+    <div v-if="action" class="flex justify-between mt-2 p-4 bg-white border-b border-t">
         <div class="flex flex-row">
             <div class="text-accent-300 mr-4 self-center">
                 <i class="fa fa-reply fa-2x" v-if="action?.type === MessageAction.REPLY"></i>
                 <i class="fa fa-pen fa-2x" v-else-if="action?.type === MessageAction.EDIT"></i>
             </div>
-            <div class="max-w-[750px] break-all">
-                <b>{{ action.message.from }}</b>
-                <p>{{ getActionMessage }}</p>
+            <div class="w-full break-all overflow-y-auto">
+                <b v-if="action?.type === MessageAction.REPLY">{{ action.message.from }}</b>
+                <p class="text-ellipsis max-h-12 overflow-y-auto mr-2">{{ getActionMessage }}</p>
             </div>
         </div>
-
         <button @click="clearAction">
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <div class="md:p-2 md:m-2 md:rounded-3xl bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
+    <div class="md:p-2 bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
         <div class="md:col-span-4 flex flex-nowrap md:bg-transparent bg-gray-200" :class="{ hidden: !collapsed }">
             <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1 pt-0.5" @click="toggleGif">
                 <h2>GIF</h2>
@@ -76,14 +75,15 @@
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class='flex'>
-                    <form class="w-full flex-grow" @submit.prevent="chatsend">
+                <div class="flex">
+                    <form class="w-full" @submit.prevent="chatsend" @keydown.enter.prevent="chatsend">
                         <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
-                            <input
+                            <textarea
                                 v-model="messageInput"
-                                class="block w-full pl-1 border-0 border-b-2 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
+                                class="block w-full pl-1 min-h-[24px] max-h-[150px] h-9 resize-none overflow-y-auto whitespace-pre-wrap border-0 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
                                 autofocus
-                                type="text"
+                                maxlength="2000"
+                                @input="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
                             />
@@ -151,22 +151,26 @@
 
     const { addScrollEvent } = useScrollActions();
 
+    const resizeTextarea = () => {
+        let area = message.value;
+        area.style.height = '36px';
+        area.style.height = area.scrollHeight + 'px';
+    };
 
-
-if (props.chat.draft) {
-   if(props.chat.draft?.action === "EDIT"){
-       messageInput.value = String(props.chat.draft.body.body)
-       editMessage(props.chat.draft.to, props.chat.draft.body)
-   }
-   if(props.chat.draft?.action === "REPLY"){
-       messageInput.value = String(props.chat.draft.body.message)
-       replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage)
-   }
-    if(!props.chat.draft.action){
-         messageInput.value = String(props.chat.draft.body);
+    if (props.chat.draft) {
+        if (props.chat.draft?.action === 'EDIT') {
+            messageInput.value = String(props.chat.draft.body.body);
+            editMessage(props.chat.draft.to, props.chat.draft.body);
+        }
+        if (props.chat.draft?.action === 'REPLY') {
+            messageInput.value = String(props.chat.draft.body.message);
+            replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
+        }
+        if (!props.chat.draft.action) {
+            messageInput.value = String(props.chat.draft.body);
+        }
     }
-}
-const selectedId = String(props.chat.chatId);
+    const selectedId = String(props.chat.chatId);
 
     const action = computed(() => {
         if (!selectedId) {
@@ -176,6 +180,7 @@ const selectedId = String(props.chat.chatId);
     });
 
     const clearAction = () => {
+        messageInput.value = '';
         clearMessageAction(selectedId);
     };
 
@@ -183,7 +188,17 @@ const selectedId = String(props.chat.chatId);
         if (action.value && message.value) {
             message.value.focus();
         }
+        if (action?.value?.type === MessageAction.EDIT) {
+            if (action.value.message.type === MessageTypes.QUOTE) {
+                messageInput.value = action.value.message.body.message;
+            } else {
+                messageInput.value = action.value.message.body;
+            }
+        }
         draftMessage(selectedId, createMessage());
+        nextTick(() => {
+            resizeTextarea();
+        });
     });
 
     watch(messageInput, () => {
@@ -274,6 +289,7 @@ const selectedId = String(props.chat.chatId);
 
     const clearMessage = () => {
         message.value.value = '';
+        resizeTextarea();
     };
 
     const chatsend = async () => {
@@ -403,24 +419,23 @@ const selectedId = String(props.chat.chatId);
         }
     };
 
-const getActionMessage = computed(() => {
-    const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
-    if(!message) return 'Message not found'
-    switch (action.value.message.type) {
-        case MessageTypes.QUOTE:
-            return (action.value.message.body as QuoteBodyType).message;
-        case MessageTypes.STRING:
-            return message.body;
-        case MessageTypes.FILE:
-            if (action.value.message.body.type === FileTypes.RECORDING) return 'Voice message';
-            return action.value.message.type;
-        default:
-            return action.value.message.type;
-    }
-});
+    const getActionMessage = computed(() => {
+        const message = props.chat?.messages.find(m => m.id === action.value?.message.id);
+        if (!message) return 'Message not found';
+        switch (action.value.message.type) {
+            case MessageTypes.QUOTE:
+                return (message.body as QuoteBodyType).message;
+            case MessageTypes.STRING:
+                return message.body;
+            case MessageTypes.FILE:
+                if (message.body.type === FileTypes.RECORDING) return 'Voice message';
+                return message.type;
+            default:
+                return message.type;
+        }
+    });
 
     const collapsed = ref(true);
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
