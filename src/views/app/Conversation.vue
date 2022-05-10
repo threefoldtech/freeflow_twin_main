@@ -250,7 +250,7 @@
                     Cancel
                 </button>
             </template>
-        </Dialog>
+        </Alert>
         <Dialog
             v-model="showLeaveDialog"
             class="max-w-10"
