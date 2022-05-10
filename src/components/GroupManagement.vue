@@ -203,6 +203,7 @@
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
     import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
+    import Alert from '@/components/Alert.vue';
 
     interface IProps {
         chat: Chat;

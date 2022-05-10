@@ -1,6 +1,6 @@
 <template>
     <suspense>
-        <UserConfigDialog></UserConfigDialog>
+        <UserConfig></UserConfig>
     </suspense>
     <div class="bg-gray-100 h-full relative text-sm">
         <NotificationSection />
@@ -37,7 +37,7 @@
 <script setup lang="ts">
     import { ref, watch } from 'vue';
     import Sidebar from '@/components/Sidebar.vue';
-    import UserConfigDialog from '@/components/UserConfigDialog.vue';
+    import UserConfig from '@/components/UserConfig.vue';
     import Topbar from '@/components/Topbar.vue';
     import { useSocketState } from '../store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
