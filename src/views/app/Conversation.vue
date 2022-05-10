@@ -229,16 +229,14 @@
             </template>
         </appLayout>
         <Alert v-if="showDialog" :showAlert="showDialog" @close="showDialog = false">
-            <template #title>
-                Blocking
-            </template>
+            <template #title> Blocking </template>
             <template #content>
                 Do you really want to block
                 <b> {{ chat.name }} </b>?
             </template>
             <template #actions>
-                <button 
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm" 
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
                     @click="doBlockChat"
                 >
                     Block
@@ -299,22 +297,16 @@
             </div>
         </Dialog>
 
-        <Alert
-            v-if="showDeleteDialog"
-            :showAlert="showDeleteDialog"
-            @close="showDeleteDialog = false"
-        >
-            <template #title>
-                Deleting group
-            </template>
+        <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
+            <template #title> Deleting group </template>
             <template #content>
                 Do you really want to delete this group
                 <b>{{ chat?.name }}</b
                 >?
             </template>
             <template #actions>
-                <button 
-                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"  
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
                     @click="doDeleteChat"
                 >
                     Delete
