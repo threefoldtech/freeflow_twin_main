@@ -283,11 +283,9 @@
                 const myName = window.location.host.split('.')[0];
                 const lastItem = props.chat.messages[props.chat.messages.length - 1].from;
 
-                if (
-                    myName !== lastItem &&
-                    !(messageBoxLocal.value.offsetHeight <= messageBoxLocal?.value?.scrollTop - 500)
-                )
-                    return;
+                const scrollBottom = messageBoxLocal.value.scrollTop + messageBoxLocal.value.clientHeight;
+                if (myName !== lastItem && messageBoxLocal?.value?.scrollHeight - scrollBottom > 500) return;
+
                 messageBoxLocal?.value?.scrollTo(0, messageBoxLocal.value.scrollHeight);
             });
         }

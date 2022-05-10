@@ -72,7 +72,7 @@
                             <button
                                 class="flex"
                                 @click="
-                                    deleteChat();
+                                    leaveChat();
                                     showMenu = false;
                                 "
                             >
@@ -94,10 +94,9 @@
                         :class="{ flex: !showSideBar, hidden: showSideBar }"
                         class="relative h-full xl:flex flex-col flex-1"
                     >
-                        <FileDropArea
-                            class="h-full flex flex-col"
-                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"
-                        >
+                        <FileDropArea class="h-full flex flex-col" @send-file="files => doSendFiles(files)">
+                            <!--                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"-->
+                            <!--                        >-->
                             <div
                                 class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden md:flex"
                             >
@@ -220,6 +219,7 @@
                                 @app-call="popupMeeting"
                                 @app-block="blockChat"
                                 @app-unblock="unBlockChat"
+                                @app-leave="leaveChat"
                                 @app-delete="deleteChat"
                             >
                             </group-management>
@@ -249,23 +249,66 @@
             </div>
         </Dialog>
         <Dialog
+            v-model="showLeaveDialog"
+            class="max-w-10"
+            :noActions="true"
+            @update-model-value="showLeaveDialog = false"
+        >
+            <template v-slot:title class="center">
+                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
+            </template>
+            <div v-if="chat?.isGroup">
+                <p v-if="chat?.contacts.length > 1" class="mb-5">
+                    Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
+                </p>
+                <div
+                    v-for="(contact, i) in chat?.contacts.filter(c => c.id !== user.id)"
+                    :key="i"
+                    @click="setNextAdmin"
+                    class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
+                    :class="contact.id === nextAdmin ? 'bg-gray-300' : 'bg-gray-100'"
+                >
+                    <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
+                        <AvatarImg :id="contact.id" small />
+                    </div>
+                    <p
+                        class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"
+                    >
+                        {{ contact.id }}
+                    </p>
+                </div>
+            </div>
+            <div v-else>
+                Do you really want to delete
+                <b> {{ chat?.name }} </b>
+                from your connections?
+            </div>
+            <div class="flex justify-end mt-2">
+                <button
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    @click="showLeaveDialog = false"
+                >
+                    Cancel
+                </button>
+                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred" @click="doLeaveChat">
+                    {{ chat?.isGroup ? 'Leave' : 'Delete' }}
+                </button>
+            </div>
+        </Dialog>
+
+        <Dialog
             v-model="showDeleteDialog"
             class="max-w-10"
             :noActions="true"
             @update-model-value="showDeleteDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
+                <h1 class="text-center">Deleting group</h1>
             </template>
-            <div v-if="chat?.isGroup">
-                Do you really want to leave the group
+            <div>
+                Do you really want to delete this group
                 <b>{{ chat?.name }}</b
                 >?
-            </div>
-            <div v-else>
-                Do you really want to delete
-                <b> {{ chat?.name }} </b>
-                from your connections?
             </div>
             <div class="flex justify-end mt-2">
                 <button
@@ -279,11 +322,12 @@
                 </button>
             </div>
         </Dialog>
+
         <Dialog v-model="showError" class="max-w-10" :noActions="true" @update-model-value="showError = false">
             <template v-slot:title class="center">
                 <h1 class="text-center">Failed to send file</h1>
             </template>
-            <div>The file was to big, the maximum supported size is 20MB.</div>
+            <div>{{ errorMessage }}</div>
         </Dialog>
     </div>
 </template>
@@ -323,6 +367,7 @@
         openDeleteDialogFromOtherFile,
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);
@@ -335,6 +380,7 @@
     const showMenu = ref(false);
     const router = useRouter();
     const showDialog = ref(false);
+    const showLeaveDialog = ref(false);
     const showDeleteDialog = ref(false);
     const showRemoveUserDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
@@ -357,17 +403,23 @@
         return value;
     };
 
-    const doSendFiles = async (files: []) => {
+    const showError = ref(false);
+    const errorMessage = ref('');
+    const doSendFiles = async (files: File[]) => {
         for (const f of files) {
+            if (hasSpecialCharacters(f.name)) {
+                showError.value = true;
+                errorMessage.value = 'File name cannot have special characters.';
+                return;
+            }
             const success = await sendFile(chat.value.chatId, f);
             if (!success) {
                 showError.value = true;
+                errorMessage.value = 'The file was to big, the maximum supported size is 20MB.';
                 return;
             }
         }
     };
-
-    const showError = ref(false);
 
     const getMessagesSortedByUser = computed(() => {
         let chatBlockIndex = 0;
@@ -386,6 +438,9 @@
             return acc;
         }, {});
     });
+
+    const nextAdmin = ref('');
+    const setNextAdmin = e => (nextAdmin.value = e.target.innerText);
 
     const loadedOnce = ref(false);
     const chat = computed(() => {
@@ -448,16 +503,33 @@
         popupCenter(`https://kutana.uhuru.me/?roomName=${id}&username=${user.id}`, 'video room', 800, 550, true);
     };
 
+    const leaveChat = () => (showLeaveDialog.value = true);
+
     const deleteChat = () => (showDeleteDialog.value = true);
 
-    const doDeleteChat = async () => {
-        if (chat.value.isGroup) {
+    const doLeaveChat = async () => {
+        if (chat.value.isGroup && chat.value.contacts.length > 1) {
             const { updateContactsInGroup } = usechatsActions();
-            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP);
-        } else {
+            if (!nextAdmin.value) return;
+            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
+            return;
+        }
+        await doDeleteChat();
+    };
+
+    const doDeleteChat = async () => {
+        if (!chat.value.isGroup) {
             await sendRemoveChat(chat.value.chatId);
-            localStorage.setItem('lastOpenedChat', '');
-            router.push({ name: 'whisper' });
+            return;
+        }
+        let contacts = chat.value.contacts.filter(c => c.id.toString() !== user.id.toString());
+        //admin gets removed as last from the group
+        contacts.push({ id: user.id, location: user.location });
+        for (const contact of contacts) {
+            if ('location' in contact) {
+                const { updateContactsInGroup } = usechatsActions();
+                await updateContactsInGroup(chat.value.chatId, contact, SystemMessageTypes.REMOVE_USER);
+            }
         }
     };
 
@@ -492,7 +564,7 @@
     onMounted(() => {
         nextTick(() => scrollToBottom(true));
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
-        if (openDeleteDialogFromOtherFile.value) showDeleteDialog.value = true;
+        if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
     });
@@ -500,7 +572,7 @@
     onUpdated(() => {
         //For when component is already mounted
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
-        if (openDeleteDialogFromOtherFile.value) showDeleteDialog.value = true;
+        if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
     });

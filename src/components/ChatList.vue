@@ -5,7 +5,7 @@
             'md:w-16': collapsed,
             'md:w-[400px]': !collapsed,
         }"
-        class="bg-white w-full flex flex-col overflow-hidden"
+        class="bg-white w-full flex flex-col overflow-hidden border-r"
     >
         <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
             <div
@@ -127,7 +127,7 @@
                                     rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE;
                                 }
                             "
-                            >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete chat' }}
+                            >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete user' }}
                         </v-contextmenu-item>
                     </v-contextmenu>
                     <ul role="list" class="divide-y divide-gray-200 border-t border-gray-200 w-full">

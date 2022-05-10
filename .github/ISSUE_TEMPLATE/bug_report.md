@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: acceptance testing, type_bug
 assignees: ken-de-moor
-
 ---
 
 **Describe the bug**
@@ -24,11 +23,11 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Device (please complete the following information):**
-*Please don't submit bugs about any other browser than Google Chrome, we currently don't support these.*
-*Please don't submit bugs about mobile experience, currently our focus is on desktop experience.*
- 
-- Operating system:
- - Browser: Google Chrome
+_Please don't submit bugs about any other browser than Google Chrome, we currently don't support these._
+_Please don't submit bugs about mobile experience, currently our focus is on desktop experience._
+
+-   Operating system:
+-   Browser: Google Chrome
 
 **Additional context**
 Add any other context about the problem here.

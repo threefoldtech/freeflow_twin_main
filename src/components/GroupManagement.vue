@@ -78,10 +78,19 @@
 
             <div
                 class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
+                @click="$emit('app-leave')"
+            >
+                <i class="fas fa-trash m-3"></i>
+                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete user' }}</p>
+            </div>
+
+            <div
+                v-if="isAdmin"
+                class="delete bg-red-100 flex items-center rounded w-full m-2 cursor-pointer"
                 @click="$emit('app-delete')"
             >
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete chat' }}</p>
+                <p class="m-3 text-xs">Delete group</p>
             </div>
         </div>
         <div class="flex-grow-0 w-full h-full"></div>
@@ -210,7 +219,7 @@
         return files;
     });
 
-    defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock']);
+    defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock', 'app-leave']);
 
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);

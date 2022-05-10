@@ -36,6 +36,7 @@ export interface socialPostModel extends socialMeta {
 type createPostModel = Omit<socialPostModel, 'images', 'owner', 'likes', 'replies'>;
 
 export const createSocialPost = async (text?: string, files: File[] = []) => {
+    if (files?.length > 10) return;
     const formData = new FormData();
 
     files?.forEach((file, key) => {
@@ -74,7 +75,7 @@ export const sortPosts = posts => {
 
 export const getAllPosts = async () => {
     isLoadingSocialPosts.value = true;
-    const posts = (await axios.get<any>(`${endpoint}/true`)).data;
+    const posts = (await axios.get<any>(`${endpoint}/${user.id}`)).data;
     isLoadingSocialPosts.value = false;
     allSocialPosts.value = sortPosts(posts);
 };
