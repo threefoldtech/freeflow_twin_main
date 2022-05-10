@@ -14,6 +14,7 @@ import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
 import { usechatsActions, useChatsState } from './chatStore';
+import { isArray } from 'lodash';
 
 declare const Buffer;
 
