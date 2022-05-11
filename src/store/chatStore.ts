@@ -23,6 +23,7 @@ import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
+import { UPLOADED_FILE_ACTION } from 'types/file-actions.type';
 
 const messageLimit = 50;
 const state = reactive<ChatState>({
@@ -382,6 +383,7 @@ export const imageUpload = ref([]);
 export const imageUploadQueue = ref([]);
 
 const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRecording = false) => {
+    const { sendHandleUploadedFile } = useSocketActions();
     if (selectedFile.size > 20000000) return false;
     let formData = new FormData();
     if (!isBlob) {
@@ -417,7 +419,7 @@ const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRec
             selectedFile: selectedFile,
         });
 
-        await axios.post(`${config.baseUrl}api/v1/files/${chatId}/${uuid}`, formData, {
+        const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -431,6 +433,8 @@ const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRec
                 });
             },
         });
+        if (!data.id) return false;
+        sendHandleUploadedFile({ fileId: String(data.id), action: UPLOADED_FILE_ACTION.ADD_TO_CHAT });
         return true;
     } catch (e) {
         catchErrorsSendFile(e, uuid);

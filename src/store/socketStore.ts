@@ -9,6 +9,7 @@ import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
 import { StatusUpdate } from 'types/status.type';
+import { UPLOADED_FILE_ACTION } from 'types/file-actions.type';
 import { statusList } from './statusStore';
 
 const state = reactive<State>({
@@ -55,7 +56,7 @@ const initializeSocket = (username: string) => {
         }
         const { addMessage } = usechatsActions();
 
-        addMessage(message.to === user.id ? message.from : message.to, message);
+        addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
     });
     state.socket.on('connection_request', (newContactRequest: Chat) => {
         const { addChat } = usechatsActions();
@@ -112,11 +113,20 @@ const sendSocketUserStatus = async (status: string) => {
     state.socket.emit('status_update', data);
 };
 
+const sendHandleUploadedFile = async ({ fileId, action }: { fileId: string; action: UPLOADED_FILE_ACTION }) => {
+    const data = {
+        fileId,
+        action,
+    };
+    state.socket.emit('handle_uploaded_file', data);
+};
+
 export const useSocketActions = () => {
     return {
         initializeSocket,
         sendSocketMessage,
         sendSocketUserStatus,
+        sendHandleUploadedFile,
         notify,
     };
 };
