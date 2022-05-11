@@ -6,7 +6,7 @@
         @keydown.esc="$emit('close')"
         @click="$emit('close')"
     >
-        <div class="bg-white w-11/12 sm:w-9/12 lg:w-2/4 2xl:w-2/5 p-4 rounded-lg relative" @click.stop>
+        <div class="bg-white w-11/12 md:max-w-2xl md:w-3/4 p-4 rounded-lg relative" @click.stop>
             <XIcon class="w-5 h-5 text-gray-500 absolute right-4 top-4 cursor-pointer" @click="$emit('close')" />
             <h1 class="font-medium">Share post</h1>
             <div class="p-4 rounded bg-gray-100 my-4" :class="{ 'min-h-[200px]': item?.images?.length !== 0 }">
