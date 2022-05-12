@@ -23,7 +23,7 @@ import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
-import { UPLOADED_FILE_ACTION } from 'types/file-actions.type';
+import { FileAction } from 'types/file-actions.type';
 
 const messageLimit = 50;
 const state = reactive<ChatState>({
@@ -434,7 +434,11 @@ const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRec
             },
         });
         if (!data.id) return false;
-        sendHandleUploadedFile({ fileId: String(data.id), action: UPLOADED_FILE_ACTION.ADD_TO_CHAT });
+        sendHandleUploadedFile({
+            fileId: String(data.id),
+            payload: { chatId, messageId: uuid, type: formData.get('type').toString() },
+            action: FileAction.ADD_TO_CHAT,
+        });
         return true;
     } catch (e) {
         catchErrorsSendFile(e, uuid);

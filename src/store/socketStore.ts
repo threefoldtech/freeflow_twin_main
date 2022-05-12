@@ -9,7 +9,7 @@ import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
 import { StatusUpdate } from 'types/status.type';
-import { UPLOADED_FILE_ACTION } from 'types/file-actions.type';
+import { FileAction } from 'types/file-actions.type';
 import { statusList } from './statusStore';
 
 const state = reactive<State>({
@@ -113,9 +113,18 @@ const sendSocketUserStatus = async (status: string) => {
     state.socket.emit('status_update', data);
 };
 
-const sendHandleUploadedFile = async ({ fileId, action }: { fileId: string; action: UPLOADED_FILE_ACTION }) => {
+const sendHandleUploadedFile = async ({
+    fileId,
+    action,
+    payload,
+}: {
+    fileId: string;
+    payload: unknown;
+    action: FileAction;
+}) => {
     const data = {
         fileId,
+        payload,
         action,
     };
     state.socket.emit('handle_uploaded_file', data);
