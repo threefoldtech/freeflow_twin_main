@@ -365,6 +365,7 @@
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
+    import Alert from '@/components/Alert.vue';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);
