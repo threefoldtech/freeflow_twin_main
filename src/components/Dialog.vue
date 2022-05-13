@@ -6,12 +6,12 @@
             tabindex="-1"
             class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
             style="z-index: 60"
-            @click="$emit('update-model-value', false)"
+            @mousedown="$emit('update-model-value', false)"
             @keydown.esc="$emit('update-model-value', false)"
         >
             <div
                 class="form-container z-50 bg-white p-4 h-screen sm:h-auto w-11/12 md:max-w-2xl md:w-3/4 sm:rounded overflow-auto"
-                @click.stop
+                @mousedown.stop
             >
                 <div class="flex justify-between">
                     <slot name="title" />
