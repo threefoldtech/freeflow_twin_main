@@ -43,8 +43,41 @@
                 <unicode-emoji-picker v-pre></unicode-emoji-picker>
             </span>
 
-            <div v-if="!showTagPerson" class="absolute bottom-16 left-16">
-                <h4>Members</h4>
+            <div
+                v-if="showTagPerson"
+                class="absolute bottom-16 left-2 right-2 bg-white p-3 rounded-md shadow-md divide-y"
+            >
+                <h4 class="mb-1">Members</h4>
+                <ul>
+                    <li
+                        v-for="(contact, idx) in sortedContacts"
+                        :key="idx"
+                        :ref="
+                            el => {
+                                sortedContactRefs[idx] = el;
+                            }
+                        "
+                        :tabindex="activeTag"
+                        class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
+                        :class="{ 'bg-gray-100': activeTag === idx }"
+                        @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = sortedContacts.length - 1)"
+                        @keyup.arrow-down="activeTag < sortedContacts.length - 1 ? activeTag++ : (activeTag = 0)"
+                        @keyup.esc="
+                            () => {
+                                showTagPerson = false;
+                                message.focus();
+                            }
+                        "
+                    >
+                        <AvatarImg :id="String(contact.id)" small />
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ contact.id }}
+                                <span class="text-gray-400 font-normal text-xs ml-1">{{ contact.location }}</span>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
             </div>
 
             <button
@@ -131,6 +164,7 @@
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
+    import AvatarImg from '@/components/AvatarImg.vue';
 
     const emit = defineEmits(['messageSend', 'failed']);
 
@@ -153,9 +187,16 @@
     const stopRecording = ref(null);
     const showEmoji = ref(false);
 
-    const showTagPerson = ref(false);
-
     const { addScrollEvent } = useScrollActions();
+
+    const showTagPerson = ref(false);
+    const activeTag = ref(0);
+    const sortedContactRefs = ref([]);
+    const sortedContacts = computed(() => {
+        return props.chat.contacts.sort((a, b) => a.id.localeCompare(String(b.id)));
+    });
+
+    const handleKeyUp = () => {};
 
     const resizeTextarea = () => {
         let area = message.value;
@@ -210,7 +251,13 @@
     watch(messageInput, () => {
         showTagPerson.value = false;
         const messageInputs = messageInput.value.split(' ');
-        if (messageInputs[messageInputs.length - 1].includes('@')) showTagPerson.value = true;
+        if (messageInputs[messageInputs.length - 1].startsWith('@')) {
+            showTagPerson.value = true;
+            nextTick(() => {
+                console.log(sortedContactRefs.value);
+                sortedContactRefs.value[0].focus();
+            });
+        }
 
         draftMessage(selectedId, createMessage());
     });
