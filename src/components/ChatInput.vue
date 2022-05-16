@@ -57,17 +57,8 @@
                                 sortedContactRefs[idx] = el;
                             }
                         "
-                        :tabindex="activeTag"
                         class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
                         :class="{ 'bg-gray-100': activeTag === idx }"
-                        @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = sortedContacts.length - 1)"
-                        @keyup.arrow-down="activeTag < sortedContacts.length - 1 ? activeTag++ : (activeTag = 0)"
-                        @keyup.esc="
-                            () => {
-                                showTagPerson = false;
-                                message.focus();
-                            }
-                        "
                     >
                         <AvatarImg :id="String(contact.id)" small />
                         <div class="ml-3">
@@ -123,6 +114,16 @@
                                 @input="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
+                                @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = sortedContacts.length - 1)"
+                                @keyup.arrow-down="
+                                    activeTag < sortedContacts.length - 1 ? activeTag++ : (activeTag = 0)
+                                "
+                                @keyup.esc="
+                                    () => {
+                                        showTagPerson = false;
+                                        message.focus();
+                                    }
+                                "
                             />
                         </div>
                     </form>
@@ -193,10 +194,8 @@
     const activeTag = ref(0);
     const sortedContactRefs = ref([]);
     const sortedContacts = computed(() => {
-        return props.chat.contacts.sort((a, b) => a.id.localeCompare(String(b.id)));
+        return [...props.chat.contacts].sort((a, b) => a.id.localeCompare(String(b.id)));
     });
-
-    const handleKeyUp = () => {};
 
     const resizeTextarea = () => {
         let area = message.value;
