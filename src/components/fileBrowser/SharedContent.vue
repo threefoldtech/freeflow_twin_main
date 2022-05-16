@@ -6,7 +6,6 @@
         <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="align-middle inline-block min-w-full">
-                    <ViewSelect />
                     <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
                         <table
                             v-if="fileBrowserTypeView === 'LIST'"
@@ -138,7 +137,6 @@
 </template>
 
 <script setup lang="ts">
-    import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import {
         formatBytes,
         getExtension,

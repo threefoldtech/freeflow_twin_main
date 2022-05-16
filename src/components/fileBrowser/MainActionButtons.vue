@@ -52,8 +52,8 @@
             <h1>Add files</h1>
         </template>
         <div class="flex flex-col">
-            <p v-for="(error, idx) in fileUploadErrors" :key="idx" class="text-sm font-medium text-red-500">
-                {{ error }}
+            <p class="text-sm font-medium text-red-500">
+                {{ fileUploadErrors }}
             </p>
             <span>Files*</span>
             <button class="py-2 px-4 text-white rounded-md bg-primary max-w-max" @click="newFileInput.click()">
@@ -91,6 +91,8 @@
     import { createDirectory, uploadFiles, sharedDir, savedAttachments } from '@/store/fileBrowserStore';
     import Button from '@/components/Button.vue';
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
+    import { createErrorNotification } from '@/store/notificiationStore';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);
@@ -100,12 +102,11 @@
     const newFileInputArray = ref<File[]>([]);
     const createFolderErrors = ref<string[]>([]);
     const manualContactAdd = ref<string>('');
-    const fileUploadErrors = ref<string[]>([]);
-    const format = /[ `!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+    const fileUploadErrors = ref<string>('');
 
     watch(manualContactAdd, () => {
         createFolderErrors.value = [];
-        if (format.test(manualContactAdd.value))
+        if (hasSpecialCharacters(manualContactAdd.value))
             createFolderErrors.value.push('No special characters allowed in folder names.');
 
         if (manualContactAdd.value.includes('/')) {
@@ -117,14 +118,13 @@
     });
 
     const updateCreateFileDialog = (val: boolean) => {
-        fileUploadErrors.value = [];
         if (!val) {
             showCreateFileDialog.value = false;
             return;
         }
 
         if (!selectedFiles.value?.length) {
-            fileUploadErrors.value.push('Please upload atleast one file.');
+            fileUploadErrors.value = 'Please upload atleast one file.';
             return;
         }
         uploadFiles(selectedFiles.value);
@@ -133,6 +133,12 @@
     };
 
     const handleDragAndDrop = (files: File[]) => {
+        for (let file of files) {
+            if (hasSpecialCharacters(file.name)) {
+                fileUploadErrors.value = 'No special characters allowed';
+                return;
+            }
+        }
         selectedFiles.value.push(...files);
     };
 
@@ -146,7 +152,13 @@
 
     const handleFileSelectChange = () => {
         newFileInputArray.value = Array.from(newFileInput.value?.files);
-        newFileInputArray.value.forEach(file => selectedFiles.value.push(file));
+        newFileInputArray.value.forEach(file => {
+            if (hasSpecialCharacters(file.name)) {
+                createErrorNotification('Failed to upload file', 'No special characters allowed');
+                return;
+            }
+            selectedFiles.value.push(file);
+        });
     };
 
     watch(showCreateFolderDialog, () => {
@@ -167,13 +179,13 @@
             return;
         }
 
-        if (format.test(manualContactAdd.value))
+        if (hasSpecialCharacters(manualContactAdd.value))
             createFolderErrors.value.push('No special characters allowed in folder names.');
         if (manualContactAdd.value.length >= 50) {
             createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
         }
 
-        if (format.test(manualContactAdd.value) || manualContactAdd.value.length >= 50) return;
+        if (hasSpecialCharacters(manualContactAdd.value) || manualContactAdd.value.length >= 50) return;
 
         createDirectory(newFolderInput.value.value);
         showCreateFolderDialog.value = false;

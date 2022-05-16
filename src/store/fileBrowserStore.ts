@@ -1,13 +1,13 @@
 import { ref, watch } from 'vue';
 import fileDownload from 'js-file-download';
 import * as Api from '@/services/fileBrowserService';
-import { getShareWithId } from '@/services/fileBrowserService';
+import { getShareWithId, hasSpecialCharacters } from '@/services/fileBrowserService';
 import { setImageSrc } from '@/store/imageStore';
 import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
+import { Chat, ContactInterface, DtId, MessageTypes, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -144,7 +144,10 @@ export const uploadFiles = async (files: File[], path = currentDirectory.value) 
             const result = await Api.uploadFile(path, f);
             if (!result || (result.status !== 200 && result.status !== 201) || !result.data)
                 throw new Error('Could not create new folder');
-
+            if (hasSpecialCharacters(f.name)) {
+                createErrorNotification('Failed to upload file', 'No special characters allowed');
+                return;
+            }
             currentDirectoryContent.value.push(createModel(result.data));
             await updateContent();
         })
@@ -391,6 +394,10 @@ export const renameFile = async (item: PathInfoModel, name: string) => {
             `Filename cannot be empty or longer than ${characterLimit} characters`,
             Status.Error
         );
+        return;
+    }
+    if (hasSpecialCharacters(name)) {
+        createNotification('Failed to rename file', 'No special characters allowed', Status.Error);
         return;
     }
     const oldPath = item.path;

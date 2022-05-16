@@ -5,7 +5,7 @@
                 <div
                     class="rounded-full grid place-items-center"
                     style="position: relative"
-                    @click="changePage('chat')"
+                    @click="changePage('dashboard')"
                 >
                     <svg class="sm:w-10 w-8 mt-5" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
                         <defs>
@@ -61,7 +61,7 @@
                 class="w-20 h-20 mb-5 grid cursor-pointer content-end items-center justify-center justify-items-center"
                 @click="toggleShowUserConfigDialog"
             >
-                <AvatarImg :id="user.id" />
+                <AvatarImg :id="String(user.id)" />
                 <!--<h3 class="truncate w-full text-sm">{{ user.id }}</h3>-->
             </div>
         </div>
@@ -69,7 +69,6 @@
 </template>
 
 <script setup lang="ts">
-    import { computed } from 'vue';
     import { useRouter } from 'vue-router';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
@@ -114,8 +113,7 @@
     ];
     const router = useRouter();
 
-    const currentRoute = computed(() => router.currentRoute.value);
-    const emit = defineEmits(['clicked'])
+    const emit = defineEmits(['clicked']);
 
     const changePage = (name: string) => {
         emit('clicked');

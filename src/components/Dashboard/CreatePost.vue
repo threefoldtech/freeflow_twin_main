@@ -61,9 +61,8 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="flex flex-col" v-if="errorFileSize">
-                            <small class="px-4 text-gray-500">File size limit is 20MB per image</small>
-                            <small class="px-4 text-gray-500">Only png/jpeg files allowed</small>
+                        <div class="flex flex-col" v-if="error">
+                            <small class="px-4 text-gray-500">{{ errorMessage }}</small>
                         </div>
                         <div class="p-4">
                             <ImageGrid
@@ -85,9 +84,8 @@
                                 @click="$refs.create_post_file_upload.click()"
                                 class="bg-gray-300 px-4 py-2 rounded-full flex items-center w-28 cursor-pointer hover:bg-gray-200"
                             >
-                                <CameraIcon class="text-gray-600 w-6 h-6" /><span class="ml-2 font-medium text-gray-600"
-                                    >Media</span
-                                >
+                                <CameraIcon class="text-gray-600 w-6 h-6" />
+                                <span class="ml-2 font-medium text-gray-600">Media</span>
                             </div>
                         </div>
                     </FileDropArea>
@@ -144,10 +142,12 @@
     import { createSocialPost, getAllPosts } from '@/services/socialService';
     import { TransitionRoot } from '@headlessui/vue';
     import Spinner from '@/components/Spinner.vue';
+    import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const new_post_images = ref<File[]>([]);
     const new_post_text = ref<string>('');
-    const errorFileSize = ref<boolean>(false);
+    const error = ref<boolean>(false);
+    const errorMessage = ref('');
     const isPublishingNewPost = ref<boolean>(false);
 
     const isAllowedToPost = computed(() => {
@@ -161,7 +161,8 @@
 
     const checkFileSize = (image: File) => {
         if (image.size / 1024 / 1024 >= 20) {
-            errorFileSize.value = true;
+            error.value = true;
+            errorMessage.value = 'File size limit is 20MB per image';
         }
     };
 
@@ -172,36 +173,54 @@
 
     const isExtensionSupported = (image: File) => {
         const options = Object.values(SUPPORTED_EXTENSIONS);
-        options.includes(image.type) ? '' : (errorFileSize.value = true);
+        if (!options.includes(image.type)) {
+            error.value = true;
+            errorMessage.value = 'Only png/jpeg files allowed';
+        }
     };
 
     const handleFileInput = e => {
-        errorFileSize.value = false;
-        new_post_images.value = [];
+        error.value = false;
+
         for (const file of e.target.files) {
             checkFileSize(file);
             isExtensionSupported(file);
+            checkOnSpecialCharacters(file.name);
+            if (new_post_images.value.length > 10) {
+                error.value = true;
+                errorMessage.value = 'A post can only have a maximum of 10 images';
+                break;
+            }
             new_post_images.value.push(file);
         }
-        errorFileSize.value ? (new_post_images.value = []) : '';
+        error.value ? (new_post_images.value = []) : '';
+    };
+
+    const checkOnSpecialCharacters = (name: string) => {
+        if (hasSpecialCharacters(name)) {
+            error.value = true;
+            errorMessage.value = 'No special characters allowed';
+        }
     };
 
     const selectFiles = (files: File[]) => {
         createPostModalStatus.value = true;
-        errorFileSize.value = false;
+        error.value = false;
         new_post_images.value = [];
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
+            checkOnSpecialCharacters(file.name);
             new_post_images.value.push(file);
         }
-        errorFileSize.value ? (new_post_images.value = []) : '';
+        error.value ? (new_post_images.value = []) : '';
     };
 
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
-        errorFileSize.value = false;
-        if (new_post_text.value.trim() === '') return;
+        error.value = false;
+        if (new_post_text.value.trim() === '' && new_post_images.value.length === 0) return;
+        if (new_post_images.value.length > 10) return;
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, new_post_images.value);
