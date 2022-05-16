@@ -252,10 +252,7 @@
         const messageInputs = messageInput.value.split(' ');
         if (messageInputs[messageInputs.length - 1].startsWith('@')) {
             showTagPerson.value = true;
-            nextTick(() => {
-                console.log(sortedContactRefs.value);
-                sortedContactRefs.value[0].focus();
-            });
+            nextTick(() => sortedContactRefs.value[0].focus());
         }
 
         draftMessage(selectedId, createMessage());
