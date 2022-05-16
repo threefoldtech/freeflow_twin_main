@@ -43,6 +43,10 @@
                 <unicode-emoji-picker v-pre></unicode-emoji-picker>
             </span>
 
+            <div v-if="!showTagPerson" class="absolute bottom-16 left-16">
+                <h4>Members</h4>
+            </div>
+
             <button
                 class="hover:text-icon mx-2 my-0 p-0 self-center flex-1"
                 @click.stop="toggleEmoji"
@@ -149,6 +153,8 @@
     const stopRecording = ref(null);
     const showEmoji = ref(false);
 
+    const showTagPerson = ref(false);
+
     const { addScrollEvent } = useScrollActions();
 
     const resizeTextarea = () => {
@@ -202,6 +208,10 @@
     });
 
     watch(messageInput, () => {
+        showTagPerson.value = false;
+        const messageInputs = messageInput.value.split(' ');
+        if (messageInputs[messageInputs.length - 1].includes('@')) showTagPerson.value = true;
+
         draftMessage(selectedId, createMessage());
     });
 
