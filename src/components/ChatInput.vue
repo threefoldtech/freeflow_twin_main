@@ -185,6 +185,7 @@
 
     const showTagPerson = ref(false);
     const activeTag = ref(0);
+    const isTagging = ref(false);
     const contacts = ref([...props.chat.contacts].sort((a, b) => a.id.localeCompare(String(b.id))));
 
     const resizeTextarea = () => {
@@ -240,10 +241,11 @@
     watch(messageInput, () => {
         showTagPerson.value = false;
         const messageInputs = messageInput.value.split(' ');
-        const latestMessage = messageInputs[messageInputs.length - 1]
+        const latestMessage = messageInputs[messageInputs.length - 1];
         if (props.chat.isGroup && latestMessage.startsWith('@')) {
             showTagPerson.value = true;
-            const tag = latestMessage.substring(1).toLowerCase();
+            isTagging.value = true;
+            const tag = latestMessage.toLowerCase().substring(1); // remove '@'
             if (tag.length > 0) {
                 contacts.value = [...props.chat.contacts].filter(c => String(c.id).toLowerCase().includes(tag));
             }
@@ -340,6 +342,19 @@
     };
 
     const chatsend = async () => {
+        if (isTagging.value) {
+            const contact = contacts.value[activeTag.value].id;
+            const atIdx = messageInput.value.lastIndexOf('@');
+            if (atIdx > -1) {
+                messageInput.value = messageInput.value.substring(0, atIdx + 1);
+                messageInput.value += `${contact} `;
+                isTagging.value = false;
+                showTagPerson.value = false;
+                contacts.value = [...props.chat.contacts];
+            }
+            return;
+        }
+
         messageInput.value = '';
         const { sendMessageObject } = usechatsActions();
 
