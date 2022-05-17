@@ -154,14 +154,11 @@
     } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
     import { useAuthState } from '@/store/authStore';
-    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType, Contact } from '@/types';
+    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { marked } from 'marked';
-    import DOMPurify from 'dompurify';
-    import emoji from 'node-emoji';
 
     const emit = defineEmits(['messageSend', 'failed']);
 
@@ -371,9 +368,7 @@
         }
 
         if (message.value.value.trim() != '') {
-            const replacer = (match: string) => emoji.emojify(match);
-            message.value.value = message.value.value.replace(/(:.*:)/g, replacer);
-            sendMessage(selectedId, DOMPurify.sanitize(marked(message.value.value)));
+            sendMessage(selectedId, message.value.value);
             clearMessage();
         }
 
