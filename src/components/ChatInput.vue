@@ -159,6 +159,9 @@
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { marked } from 'marked';
+    import DOMPurify from 'dompurify';
+    import emoji from 'node-emoji';
 
     const emit = defineEmits(['messageSend', 'failed']);
 
@@ -368,7 +371,9 @@
         }
 
         if (message.value.value.trim() != '') {
-            sendMessage(selectedId, message.value.value);
+            const replacer = (match: string) => emoji.emojify(match);
+            message.value.value = message.value.value.replace(/(:.*:)/g, replacer);
+            sendMessage(selectedId, DOMPurify.sanitize(marked(message.value.value)));
             clearMessage();
         }
 
