@@ -50,13 +50,8 @@
                 <h4 class="mb-1">Members</h4>
                 <ul>
                     <li
-                        v-for="(contact, idx) in sortedContacts"
+                        v-for="(contact, idx) in contacts"
                         :key="idx"
-                        :ref="
-                            el => {
-                                sortedContactRefs[idx] = el;
-                            }
-                        "
                         class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
                         :class="{ 'bg-gray-100': activeTag === idx }"
                     >
@@ -114,10 +109,8 @@
                                 @input="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
-                                @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = sortedContacts.length - 1)"
-                                @keyup.arrow-down="
-                                    activeTag < sortedContacts.length - 1 ? activeTag++ : (activeTag = 0)
-                                "
+                                @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
+                                @keyup.arrow-down="activeTag < contacts.length - 1 ? activeTag++ : (activeTag = 0)"
                                 @keyup.esc="
                                     () => {
                                         showTagPerson = false;
@@ -161,7 +154,7 @@
     } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
     import { useAuthState } from '@/store/authStore';
-    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
+    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType, Contact } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
@@ -192,10 +185,7 @@
 
     const showTagPerson = ref(false);
     const activeTag = ref(0);
-    const sortedContactRefs = ref([]);
-    const sortedContacts = computed(() => {
-        return [...props.chat.contacts].sort((a, b) => a.id.localeCompare(String(b.id)));
-    });
+    const contacts = ref([...props.chat.contacts].sort((a, b) => a.id.localeCompare(String(b.id))));
 
     const resizeTextarea = () => {
         let area = message.value;
@@ -250,9 +240,13 @@
     watch(messageInput, () => {
         showTagPerson.value = false;
         const messageInputs = messageInput.value.split(' ');
-        if (messageInputs[messageInputs.length - 1].startsWith('@')) {
+        const latestMessage = messageInputs[messageInputs.length - 1]
+        if (props.chat.isGroup && latestMessage.startsWith('@')) {
             showTagPerson.value = true;
-            nextTick(() => sortedContactRefs.value[0].focus());
+            const tag = latestMessage.substring(1).toLowerCase();
+            if (tag.length > 0) {
+                contacts.value = [...props.chat.contacts].filter(c => String(c.id).toLowerCase().includes(tag));
+            }
         }
 
         draftMessage(selectedId, createMessage());
