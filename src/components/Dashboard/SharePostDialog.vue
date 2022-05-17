@@ -49,7 +49,7 @@
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full">
                                                     <img
-                                                        :src="getAvatar(parseContactLocation(chat.adminId))"
+                                                        :src="getAvatar(parseContactLocation(chat.chatId, chat.adminId))"
                                                         class="h-10 w-10 rounded-full"
                                                     />
                                                 </div>
@@ -140,9 +140,9 @@
         }, 2000);
     };
 
-    const parseContactLocation = (id: string) => {
-        const chat = chats.value.find(item => item.chatId === id);
-        return chat.contacts.find(contact => contact.id === id)['location'];
+    const parseContactLocation = (chatId: string, adminId: string) => {
+        const chat = chats.value.find(item => item.chatId === chatId);
+        return chat.contacts.find(contact => contact.id === adminId)['location'];
     };
 
     const isAlreadySharedWWithPerson = (id: string) => {
