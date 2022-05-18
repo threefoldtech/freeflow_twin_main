@@ -23,10 +23,6 @@ const authState = reactive<AuthState>({
 export const loginName = window.location.host.split('.')[0];
 
 const myLocation = ref<string>('');
-// export const myYggdrasilAddress = async () => {
-//     const res = await axios.get(`${window.location.origin}/api/v2/locations/yggdrasil`);
-//     return res.data;
-// };
 
 export const useAuthState = () => {
     return {

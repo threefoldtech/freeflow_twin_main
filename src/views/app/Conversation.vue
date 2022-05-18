@@ -356,7 +356,7 @@
     import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
     import MessageBox from '@/components/MessageBox.vue';
     import Button from '@/components/Button.vue';
-    import { isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon } from '@heroicons/vue/outline';
@@ -595,7 +595,7 @@
 
     const blocked = computed(() => {
         if (!chat.value || chat.value.isGroup) return false;
-        return isBlocked(<string>chat.value.chatId);
+        return userIsBlocked(<string>chat.value.chatId);
     });
 
     let activeItem = ref('edit');

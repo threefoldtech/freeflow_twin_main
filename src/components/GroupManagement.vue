@@ -195,7 +195,7 @@
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
-    import { isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
     import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { TrashIcon } from '@heroicons/vue/solid';
@@ -282,7 +282,7 @@
 
     const blocked = computed(() => {
         if (!props.chat || props.chat.isGroup) return false;
-        return isBlocked(props.chat.chatId.toString());
+        return userIsBlocked(props.chat.chatId.toString());
     });
 </script>
 

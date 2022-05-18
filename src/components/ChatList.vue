@@ -118,7 +118,7 @@
                                 }
                             "
                         >
-                            {{ isBlocked(currentRightClickedItem?.data?.chatId) ? 'Unblock' : 'Block' }} User
+                            {{ userIsBlocked(currentRightClickedItem?.data?.chatId) ? 'Unblock' : 'Block' }} User
                         </v-contextmenu-item>
                         <v-contextmenu-item
                             @click="
@@ -180,17 +180,17 @@
     import { SearchIcon, PlusIcon } from '@heroicons/vue/solid';
     import { ChatIcon } from '@heroicons/vue/outline';
     import {
-        triggerWatchOnRightClickItem,
-        RIGHT_CLICK_ACTIONS_CHAT_CARD,
-        rightClickItemAction,
+        conversationComponentRerender,
         currentRightClickedItem,
-        RIGHT_CLICK_TYPE,
-        setCurrentRightClickedItem,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
-        conversationComponentRerender,
+        RIGHT_CLICK_ACTIONS_CHAT_CARD,
+        RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        setCurrentRightClickedItem,
+        triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
-    import { isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
@@ -226,7 +226,7 @@
                         if (router.currentRoute.value.name === 'single') {
                             conversationComponentRerender.value = conversationComponentRerender.value++;
                         }
-                        if (isBlocked(chatId)) {
+                        if (userIsBlocked(chatId)) {
                             const { sendUnBlockedChat } = useSocketActions();
                             sendUnBlockedChat(chatId);
                             break;
