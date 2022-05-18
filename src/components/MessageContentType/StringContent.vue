@@ -17,9 +17,18 @@
     const props = defineProps<IProp>();
     let { body } = props.message;
     const replacer = (match: string) => emoji.emojify(match);
+    const words = body.split(' ');
 
     const computedMessage = computed(() => {
         body = body.replace(/(:.*:)/g, replacer);
+        words.map(word =>
+            word.startsWith('@')
+                ? (body = body.replace(
+                      word,
+                      `<span class="bg-blue-500 text-white px-2 py-1 text-sm rounded-sm cursor-pointer hover:bg-blue-400">${word}<span>`
+                  ))
+                : (body = body)
+        );
         return DOMPurify.sanitize(marked(body));
     });
 </script>
