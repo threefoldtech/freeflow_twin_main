@@ -154,7 +154,16 @@
     } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
     import { useAuthState } from '@/store/authStore';
-    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
+    import {
+        Chat,
+        FileTypes,
+        Message,
+        MessageBodyType,
+        MessageTypes,
+        QuoteBodyType,
+        Contact,
+        AnonymousContact,
+    } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
@@ -185,7 +194,15 @@
 
     const showTagPerson = ref(false);
     const activeTag = ref(0);
-    const contacts = ref([...props.chat.contacts].sort((a, b) => a.id.localeCompare(String(b.id))));
+    const contactsRef = ref([...props.chat.contacts]);
+    const contacts = computed<(Contact | AnonymousContact)[]>({
+        get() {
+            return contactsRef.value.sort((a, b) => a.id.localeCompare(String(b.id)));
+        },
+        set(newVal) {
+            contactsRef.value = newVal;
+        },
+    });
 
     const resizeTextarea = () => {
         let area = message.value;
