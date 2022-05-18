@@ -23,14 +23,14 @@
                 <div class="inline-flex items-center shadow-sm text-sm font-medium justify-self-end">
                     <button
                         v-if="isAdmin && chat.adminId !== contact.id"
-                        @click="removeFromGroup(contact)"
+                        @click="changeUserRole(contact)"
                         class="border border-blue-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
                     >
                         <ChevronDoubleUpIcon class="h-4 w-4 text-blue-500" />
                     </button>
                     <button
                         v-if="isAdmin && chat.adminId !== contact.id"
-                        @click="removeFromGroup(contact)"
+                        @click="changeUserRole(contact)"
                         class="border border-yellow-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
                     >
                         <ChevronDoubleDownIcon class="h-4 w-4 text-yellow-500" />
@@ -179,12 +179,12 @@
         :showAlert="showRemoveUserDialog"
         @close="
             showRemoveUserDialog = false;
-            toBeRemovedUser = null;
+            selectedUser = null;
         "
     >
-        <template #title> Remove user </template>
+        <template #title> Remove user</template>
         <template #content>
-            Do you really want to remove <b>{{ toBeRemovedUser.id }}</b> from the group?
+            Do you really want to remove <b>{{ selectedUser.id }}</b> from the group?
         </template>
         <template #actions>
             <button
@@ -197,7 +197,36 @@
                 class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
                 @click="
                     showRemoveUserDialog = false;
-                    toBeRemovedUser = null;
+                    selectedUser = null;
+                "
+            >
+                Cancel
+            </button>
+        </template>
+    </Alert>
+
+    <Alert
+        v-if="showChangeUserRoleDialog"
+        :showAlert="showChangeUserRoleDialog"
+        @close="
+            showChangeUserRoleDialog = false;
+            selectedUser = null;
+        "
+    >
+        <template #title v-if="selectedUser.roles.include(Roles.MODERATOR)"> Demote user</template>
+        <template #title v-else>Promote user</template>
+        <template #actions>
+            <button
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                @click="doChangeUserRole"
+            >
+                {{ selectedUser.roles.include(Roles.MODERATOR) ? 'Promote ' : 'Demote ' }}user
+            </button>
+            <button
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                @click="
+                    showChangeUserRoleDialog = false;
+                    selectedUser = null;
                 "
             >
                 Cancel
@@ -213,12 +242,13 @@
     import { useAuthState } from '../store/authStore';
     import { isBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
-    import { TrashIcon, ChevronDoubleUpIcon, ChevronDoubleDownIcon } from '@heroicons/vue/solid';
+    import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
+    import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
+    import { sendUserRoleChange } from '@/store/socketStore';
 
     interface IProps {
         chat: Chat;
@@ -249,7 +279,8 @@
     });
 
     const showRemoveUserDialog = ref(false);
-    const toBeRemovedUser = ref();
+    const showChangeUserRoleDialog = ref(false);
+    const selectedUser = ref<GroupContact>();
 
     const truncate = ({ body, extension }) => {
         return body.filename?.length < 30
@@ -268,15 +299,28 @@
         });
     });
 
+    const changeUserRole = (contact: GroupContact | Contact) => {
+        if ('roles' in contact) {
+            showChangeUserRoleDialog.value = true;
+            selectedUser.value = contact;
+        }
+    };
+
+    const doChangeUserRole = () => {
+        sendUserRoleChange(selectedUser.value);
+        showChangeUserRoleDialog.value = false;
+        selectedUser.value = null;
+    };
+
     const removeFromGroup = contact => {
         showRemoveUserDialog.value = true;
-        toBeRemovedUser.value = contact;
+        selectedUser.value = contact;
     };
     const doRemoveFromGroup = () => {
         const { updateContactsInGroup } = usechatsActions();
-        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, SystemMessageTypes.REMOVE_USER);
+        updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
-        toBeRemovedUser.value = null;
+        selectedUser.value = null;
     };
     const addToGroup = contact => {
         const { updateContactsInGroup } = usechatsActions();

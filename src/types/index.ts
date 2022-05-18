@@ -60,7 +60,7 @@ export interface Chat {
     read: {
         [key: string]: string;
     };
-    contacts: (AnonymousContact | Contact)[];
+    contacts: (GroupContact | Contact)[];
     acceptedChat: boolean;
     name: string;
     isGroup: boolean;
@@ -69,10 +69,6 @@ export interface Chat {
 }
 
 export interface PersonChat extends Chat {}
-
-export interface GroupChat extends Omit<Chat, 'contacts'> {
-    contacts: GroupContact[];
-}
 
 export interface Contact extends AnonymousContact {
     location: string;
@@ -89,6 +85,8 @@ export interface AnonymousContact {
 export interface DtId extends Id {}
 
 export interface Id extends String {}
+
+export interface GroupChat extends Chat {}
 
 export interface Workspace extends GroupChat {
     subGroups: GroupChat[];

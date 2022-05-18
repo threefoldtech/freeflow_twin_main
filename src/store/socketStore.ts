@@ -1,6 +1,6 @@
-import { Chat, Id, Message } from '@/types';
+import { Chat, GroupContact, Id, Message, Roles } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { toRefs, inject } from 'vue';
+import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
@@ -82,6 +82,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('shares_updated', () => {
         getSharedContent();
     });
+    state.socket.on('role_changed', ()=> {
+        console.log('changed role');
+    })
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
@@ -98,6 +101,13 @@ export const sendRemoveChat = async (id: Id) => {
 };
 export const sendBlockChat = async (id: Id) => {
     state.socket.emit('block_chat', id);
+};
+
+export const sendUserRoleChange = (contact: GroupContact) => {
+    if (contact.roles.includes(Roles.MODERATOR)) {
+        contact.roles.pop();
+    } else contact.roles.push(Roles.MODERATOR);
+    state.socket.emit('change_role', contact);
 };
 
 const sendSocketUserStatus = async (status: string) => {
