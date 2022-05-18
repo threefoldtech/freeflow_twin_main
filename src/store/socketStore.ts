@@ -8,6 +8,7 @@ import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
+import { statusList } from './statusStore';
 
 const state = reactive<State>({
     socket: '',
@@ -81,6 +82,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('shares_updated', () => {
         getSharedContent();
+    });
+    state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
+        if (statusList[id]) statusList[id].isOnline = isOnline;
     });
 };
 
