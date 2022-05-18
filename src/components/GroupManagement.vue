@@ -20,13 +20,29 @@
                         <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
                     </div>
                 </div>
-                <button
-                    v-if="isAdmin && chat.adminId !== contact.id"
-                    @click="removeFromGroup(contact)"
-                    class="inline-flex items-center border border-red-500 px-3 py-2 shadow-sm text-sm font-medium cursor-pointer rounded-md w-min justify-self-end"
-                >
-                    <TrashIcon class="h-4 w-4 text-red-500" />
-                </button>
+                <div class="inline-flex items-center shadow-sm text-sm font-medium justify-self-end">
+                    <button
+                        v-if="isAdmin && chat.adminId !== contact.id"
+                        @click="removeFromGroup(contact)"
+                        class="border border-blue-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
+                    >
+                        <ChevronDoubleUpIcon class="h-4 w-4 text-blue-500" />
+                    </button>
+                    <button
+                        v-if="isAdmin && chat.adminId !== contact.id"
+                        @click="removeFromGroup(contact)"
+                        class="border border-yellow-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
+                    >
+                        <ChevronDoubleDownIcon class="h-4 w-4 text-yellow-500" />
+                    </button>
+                    <button
+                        v-if="isAdmin && chat.adminId !== contact.id"
+                        @click="removeFromGroup(contact)"
+                        class="border border-red-500 px-3 py-2 mr-2 cursor-pointer rounded-md w-min"
+                    >
+                        <TrashIcon class="h-4 w-4 text-red-500" />
+                    </button>
+                </div>
             </li>
         </ul>
         <div id="spacer" class="bg-gray-100 h-2 w-full mt-2"></div>
@@ -197,7 +213,7 @@
     import { useAuthState } from '../store/authStore';
     import { isBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
-    import { TrashIcon } from '@heroicons/vue/solid';
+    import { TrashIcon, ChevronDoubleUpIcon, ChevronDoubleDownIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
