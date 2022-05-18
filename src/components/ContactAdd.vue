@@ -173,7 +173,7 @@
         { name: 'group', text: 'Create a group' },
     ]);
 
-    const { user, myLocation } = useAuthState();
+    const { user } = useAuthState();
 
     const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
@@ -232,12 +232,12 @@
             return;
         }
         if (groupnameAdd.value.length > 50) {
-            groupnameAddError.value = 'The name can\'t contain more than 50 characters';
+            groupnameAddError.value = "The name can't contain more than 50 characters";
             return;
         }
         usersInGroup.value.push({
             id: user.id,
-            location: myLocation.value,
+            location: user.location,
         });
 
         addGroupchat(groupnameAdd.value, usersInGroup.value);

@@ -78,7 +78,7 @@
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
-    const { getChat } = usechatsActions();
+    const { getChat, retrieveChats } = usechatsActions();
 
     const props = defineProps<{
         comment: SOCIAL_POST;
@@ -87,7 +87,7 @@
     const friendsSince = ref<string>();
     const online = ref<boolean>();
     const router = useRouter();
-    const { myLocation } = useAuthState();
+    const { user } = useAuthState();
 
     onBeforeMount(async () => {
         const userId = props.comment.owner.id;
@@ -106,13 +106,13 @@
     });
 
     const isPersonFriend = computed(() => {
-        if (myLocation.value === props.comment.owner.location) return null;
+        if (user.location === props.comment.owner.location) return null;
         return contacts.some(item => item.id === props.comment.owner.id);
     });
 
     const goToChat = async e => {
         e.preventDefault();
-        if (myLocation.value === props.comment.owner.location) return;
+        if (user.location === props.comment.owner.location) return;
         if (!contacts.some(item => item.id === props.comment.owner.id)) {
             await retrieveChats();
             addContact(props.comment.owner.id, props.comment.owner.location);

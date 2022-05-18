@@ -372,7 +372,7 @@
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
     const postingCommentInProgress = ref<boolean>(false);
-    const { user, myLocation } = useAuthState();
+    const { user } = useAuthState();
     const emit = defineEmits(['refreshPost']);
 
     //only shows user panel if mouse stays focussed for a moment
@@ -450,7 +450,7 @@
     });
 
     const myAvatar = computed(() => {
-        return calcExternalResourceLink(`http://[${myLocation.value}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${user.location}]/api/v1/user/avatar/default`);
     });
 
     const fetchPostImage = image => {

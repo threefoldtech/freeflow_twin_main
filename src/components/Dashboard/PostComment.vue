@@ -111,7 +111,7 @@
     const props = defineProps<{ comment: COMMENT_MODEL }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
-    const { user, myLocation } = useAuthState();
+    const { user } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
 
@@ -135,7 +135,7 @@
     });
 
     const myAvatar = computed(() => {
-        return calcExternalResourceLink(`http://[${myLocation.value}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${user.location}]/api/v1/user/avatar/default`);
     });
 
     const handleReplyForm = () => {

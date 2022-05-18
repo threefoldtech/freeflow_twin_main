@@ -2,7 +2,7 @@ import { Chat, Contact, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
-import { useAuthState } from '@/store/authStore';
+import { setLocation, useAuthState } from '@/store/authStore';
 import { addUserToBlockList, blocklist } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
@@ -85,15 +85,14 @@ const initializeSocket = (username: string) => {
         getSharedContent();
     });
     state.socket.on('yggdrasil', (location: string) => {
-        const { myLocation } = useAuthState();
-        myLocation.value = location;
+        setLocation(location);
     });
     state.socket.on('blocked_contacts', (contacts: { id: string }[]) => {
         blocklist.value = contacts;
     });
     state.socket.on('users_loaded', async (users: Contact[]) => {
         loadAllUsers(users);
-    })
+    });
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {

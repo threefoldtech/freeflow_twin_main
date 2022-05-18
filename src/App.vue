@@ -19,10 +19,10 @@
             </div>
         </app-layout>
         <div
-            v-if="isDev && myLocation"
+            v-if="isDev && user.location"
             class="fixed text-white bg-black -right-px -bottom-0.5 border border-white px-2 text-xs"
         >
-            {{ myLocation }}
+            {{ user.location }}
         </div>
     </div>
 </template>
@@ -45,7 +45,7 @@
     const route = useRoute();
     const path = computed(() => route.path);
 
-    const { user, myLocation } = useAuthState();
+    const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
     initializeSocket(String(user.id));
 </script>

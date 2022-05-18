@@ -14,7 +14,7 @@ import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
 
 const endpoint = `${config.baseUrl}api/v1/posts`;
-const { user, myLocation } = useAuthState();
+const { user } = useAuthState();
 
 interface socialMeta {
     createdOn: Date;
@@ -83,7 +83,7 @@ export const getAllPosts = async () => {
 export const likePost = async (postId: string, location: string, commentId: string) => {
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {
-            liker_location: myLocation.value,
+            liker_location: user.location,
             liker_id: user.id,
             owner: location,
         })
@@ -141,7 +141,7 @@ export const commentOnPost = async (
         body: message,
         owner: {
             id: String(user.id),
-            location: myLocation.value,
+            location: user.location,
         },
         post: {
             id: item.post.id,

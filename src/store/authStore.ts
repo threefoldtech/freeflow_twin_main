@@ -14,21 +14,22 @@ const authState = reactive<AuthState>({
         image: `${window.location.origin}/api/v1/user/avatar/default`,
         email: 'testemail',
         status: '',
-        // @TODO implement this
-        location: '@TODO implement this',
+        location: '',
     },
 });
 
 // @TODO get name from backend not URL
 export const loginName = window.location.host.split('.')[0];
 
-const myLocation = ref<string>('');
 
 export const useAuthState = () => {
     return {
         ...authState,
-        myLocation,
     };
+};
+
+export const setLocation = (loc: string) => {
+    authState.user.location = loc;
 };
 
 export const useAuthActions = () => {
