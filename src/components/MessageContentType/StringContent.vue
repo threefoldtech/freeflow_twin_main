@@ -25,7 +25,7 @@
             word.startsWith('@')
                 ? (body = body.replace(
                       word,
-                      `<span class="bg-blue-400 text-white px-2 py-1 text-sm rounded-sm cursor-pointer hover:bg-blue-500">${word}</span>`
+                      `<span class="bg-blue-400 text-white p-1 text-sm rounded-sm cursor-pointer hover:bg-blue-500">${word}</span>`
                   ))
                 : (body = body)
         );
