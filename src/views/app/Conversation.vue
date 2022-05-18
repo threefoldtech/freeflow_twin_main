@@ -228,26 +228,27 @@
                 </div>
             </template>
         </appLayout>
-        <Dialog v-model="showDialog" class="max-w-10" :noActions="true" @update-model-value="showDialog = false">
-            <template v-slot:title class="center">
-                <h1 class="text-center">Blocking</h1>
-            </template>
-            <div>
+        <Alert v-if="showDialog" :showAlert="showDialog" @close="showDialog = false">
+            <template #title> Blocking </template>
+            <template #content>
                 Do you really want to block
                 <b> {{ chat.name }} </b>?
-            </div>
-            <div class="flex justify-end mt-2">
+            </template>
+            <template #actions>
                 <button
-                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="doBlockChat"
+                >
+                    Block
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
                     @click="showDialog = false"
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred" @click="doBlockChat">
-                    Block
-                </button>
-            </div>
-        </Dialog>
+            </template>
+        </Alert>
         <Dialog
             v-model="showLeaveDialog"
             class="max-w-10"
@@ -266,7 +267,7 @@
                     :key="i"
                     @click="setNextAdmin"
                     class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
-                    :class="contact.id === nextAdmin ? 'bg-gray-300' : 'bg-gray-100'"
+                    :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
                 >
                     <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
                         <AvatarImg :id="contact.id" small />
@@ -296,32 +297,28 @@
             </div>
         </Dialog>
 
-        <Dialog
-            v-model="showDeleteDialog"
-            class="max-w-10"
-            :noActions="true"
-            @update-model-value="showDeleteDialog = false"
-        >
-            <template v-slot:title class="center">
-                <h1 class="text-center">Deleting group</h1>
-            </template>
-            <div>
+        <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
+            <template #title> Deleting group </template>
+            <template #content>
                 Do you really want to delete this group
                 <b>{{ chat?.name }}</b
                 >?
-            </div>
-            <div class="flex justify-end mt-2">
+            </template>
+            <template #actions>
                 <button
-                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="doDeleteChat"
+                >
+                    Delete
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
                     @click="showDeleteDialog = false"
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred" @click="doDeleteChat">
-                    Delete
-                </button>
-            </div>
-        </Dialog>
+            </template>
+        </Alert>
 
         <Dialog v-model="showError" class="max-w-10" :noActions="true" @update-model-value="showError = false">
             <template v-slot:title class="center">
@@ -368,6 +365,7 @@
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
+    import Alert from '@/components/Alert.vue';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);

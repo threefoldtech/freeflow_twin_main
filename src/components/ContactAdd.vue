@@ -231,8 +231,8 @@
             groupnameAddError.value = 'No special characters allowed in group names.';
             return;
         }
-        if (groupnameAdd.value.length > 20) {
-            groupnameAddError.value = "The name can't contain more than 20 characters";
+        if (groupnameAdd.value.length > 50) {
+            groupnameAddError.value = 'The name can\'t contain more than 50 characters';
             return;
         }
         usersInGroup.value.push({

@@ -158,24 +158,27 @@
             </div>
         </div>
     </div>
-    <Dialog
-        v-model="showRemoveUserDialog"
-        class="max-w-10"
-        :noActions="true"
-        @update-model-value="
+    <Alert
+        v-if="showRemoveUserDialog"
+        :showAlert="showRemoveUserDialog"
+        @close="
             showRemoveUserDialog = false;
             toBeRemovedUser = null;
         "
     >
-        <template v-slot:title class="center">
-            <h1 class="text-center">Remove User</h1>
-        </template>
-        <div>
+        <template #title> Remove user </template>
+        <template #content>
             Do you really want to remove <b>{{ toBeRemovedUser.id }}</b> from the group?
-        </div>
-        <div class="flex justify-end mt-2">
+        </template>
+        <template #actions>
             <button
-                class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                @click="doRemoveFromGroup"
+            >
+                Remove
+            </button>
+            <button
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
                 @click="
                     showRemoveUserDialog = false;
                     toBeRemovedUser = null;
@@ -183,11 +186,8 @@
             >
                 Cancel
             </button>
-            <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred" @click="doRemoveFromGroup">
-                Remove
-            </button>
-        </div>
-    </Dialog>
+        </template>
+    </Alert>
 </template>
 <script setup lang="ts">
     import { computed, onMounted, ref } from 'vue';
@@ -203,6 +203,7 @@
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
     import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
+    import Alert from '@/components/Alert.vue';
 
     interface IProps {
         chat: Chat;
