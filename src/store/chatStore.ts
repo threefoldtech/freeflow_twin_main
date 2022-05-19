@@ -436,7 +436,7 @@ const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRec
         if (!data.id) return false;
         sendHandleUploadedFile({
             fileId: String(data.id),
-            payload: { chatId, messageId: uuid, type: formData.get('type').toString() },
+            payload: { chatId, messageId: uuid, type: formData.get('type').toString(), filename: data.filename },
             action: FileAction.ADD_TO_CHAT,
         });
         return true;
