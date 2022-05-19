@@ -36,7 +36,7 @@
                         <ChevronDoubleDownIcon class="h-4 w-4 text-yellow-500" />
                     </button>
                     <button
-                        v-if="(isAdmin || isModerator) && user.id !== contact.id"
+                        v-if="(isAdmin || isModerator) && user.id !== contact.id && contact.id !== chat.adminId"
                         @click="removeFromGroup(contact)"
                         class="border border-red-500 px-3 py-2 mr-2 cursor-pointer rounded-md w-min"
                     >
@@ -248,7 +248,6 @@
     import moment from 'moment';
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
-    import { sendUserRoleChange } from '@/store/socketStore';
 
     interface IProps {
         chat: Chat;
@@ -307,7 +306,13 @@
     };
 
     const doChangeUserRole = () => {
-        sendUserRoleChange(selectedUser.value, props.chat.chatId);
+        const { updateContactsInGroup } = usechatsActions();
+
+        if (selectedUser.value.roles.includes(Roles.MODERATOR)) {
+            selectedUser.value.roles.pop();
+        } else selectedUser.value.roles.push(Roles.MODERATOR);
+
+        updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.CHANGE_USER_ROLE);
         showChangeUserRoleDialog.value = false;
         selectedUser.value = null;
     };

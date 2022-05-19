@@ -100,17 +100,6 @@ export const sendBlockChat = async (id: Id) => {
     state.socket.emit('block_chat', id);
 };
 
-export const sendUserRoleChange = (contact: GroupContact, chatId: string) => {
-    if (contact.roles.includes(Roles.MODERATOR)) {
-        contact.roles.pop();
-    } else contact.roles.push(Roles.MODERATOR);
-    const data = {
-        contact,
-        chatId,
-    };
-    state.socket.emit('change_role', data);
-};
-
 const sendSocketUserStatus = async (status: string) => {
     const data = {
         status,
