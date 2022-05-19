@@ -22,14 +22,14 @@
                 </div>
                 <div class="inline-flex items-center shadow-sm text-sm font-medium justify-self-end">
                     <button
-                        v-if="isAdmin && chat.adminId !== contact.id"
+                        v-if="isAdmin && chat.adminId !== contact.id && !contact.roles?.includes(Roles.MODERATOR)"
                         @click="changeUserRole(contact)"
                         class="border border-blue-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
                     >
                         <ChevronDoubleUpIcon class="h-4 w-4 text-blue-500" />
                     </button>
                     <button
-                        v-if="isAdmin && chat.adminId !== contact.id"
+                        v-if="isAdmin && chat.adminId !== contact.id && contact.roles?.includes(Roles.MODERATOR)"
                         @click="changeUserRole(contact)"
                         class="border border-yellow-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
                     >
@@ -213,14 +213,14 @@
             selectedUser = null;
         "
     >
-        <template #title v-if="selectedUser.roles.include(Roles.MODERATOR)"> Demote user</template>
+        <template #title v-if="selectedUser?.roles?.includes(Roles.MODERATOR)"> Demote user</template>
         <template #title v-else>Promote user</template>
         <template #actions>
             <button
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
                 @click="doChangeUserRole"
             >
-                {{ selectedUser.roles.include(Roles.MODERATOR) ? 'Promote ' : 'Demote ' }}user
+                {{ selectedUser?.roles?.includes(Roles.MODERATOR) ? 'Demote ' : 'Promote ' }}user
             </button>
             <button
                 class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
@@ -270,10 +270,10 @@
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);
 
-    const { contacts } = useContactsState();
+    const { contacts, groupContacts } = useContactsState();
 
     const filteredMembers = computed(() => {
-        return contacts
+        return groupContacts
             .filter(con => !props.chat.contacts.some(c => c.id === con.id))
             .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()));
     });
@@ -307,7 +307,7 @@
     };
 
     const doChangeUserRole = () => {
-        sendUserRoleChange(selectedUser.value);
+        sendUserRoleChange(selectedUser.value, props.chat.chatId);
         showChangeUserRoleDialog.value = false;
         selectedUser.value = null;
     };

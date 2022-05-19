@@ -82,9 +82,6 @@ const initializeSocket = (username: string) => {
     state.socket.on('shares_updated', () => {
         getSharedContent();
     });
-    state.socket.on('role_changed', ()=> {
-        console.log('changed role');
-    })
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
@@ -103,11 +100,15 @@ export const sendBlockChat = async (id: Id) => {
     state.socket.emit('block_chat', id);
 };
 
-export const sendUserRoleChange = (contact: GroupContact) => {
+export const sendUserRoleChange = (contact: GroupContact, chatId: string) => {
     if (contact.roles.includes(Roles.MODERATOR)) {
         contact.roles.pop();
     } else contact.roles.push(Roles.MODERATOR);
-    state.socket.emit('change_role', contact);
+    const data = {
+        contact,
+        chatId,
+    };
+    state.socket.emit('change_role', data);
 };
 
 const sendSocketUserStatus = async (status: string) => {

@@ -8,6 +8,7 @@ import {
     FileTypes,
     GetMessagesResponse,
     GroupChat,
+    GroupContact,
     GroupManagementBody,
     Message,
     MessageBodyType,
@@ -144,7 +145,7 @@ export const removeChat = (chatId: string) => {
     selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const addGroupchat = (name: string, contacts: Contact[]) => {
+const addGroupchat = (name: string, contacts: GroupContact[]) => {
     const { user } = useAuthState();
 
     const contactInGroup = contacts
