@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center mb-6 mt-4 mx-4">
             <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
             <UserAddIcon
-                v-if="isAdmin"
+                v-if="isAdmin || isModerator"
                 class="text-gray-600 w-5 h-5 cursor-pointer hover:text-gray-800 transition duration-75"
                 @click="openAddUserToGroup = true"
             />
@@ -36,7 +36,7 @@
                         <ChevronDoubleDownIcon class="h-4 w-4 text-yellow-500" />
                     </button>
                     <button
-                        v-if="isAdmin && chat.adminId !== contact.id"
+                        v-if="(isAdmin || isModerator) && user.id !== contact.id"
                         @click="removeFromGroup(contact)"
                         class="border border-red-500 px-3 py-2 mr-2 cursor-pointer rounded-md w-min"
                     >
@@ -334,10 +334,17 @@
         );
     });
 
+    const { user } = useAuthState();
+
     const isAdmin = computed(() => {
-        const { user } = useAuthState();
         //@ts-ignore
         return props.chat.adminId == user.id;
+    });
+
+    const isModerator = computed(() => {
+        const contact = props.chat.contacts.find(c => c.id === user.id);
+        if ('roles' in contact) return contact.roles.includes(Roles.MODERATOR);
+        return false;
     });
 
     const blocked = computed(() => {

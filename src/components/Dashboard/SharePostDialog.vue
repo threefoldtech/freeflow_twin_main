@@ -49,7 +49,9 @@
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full">
                                                     <img
-                                                        :src="getAvatar(parseContactLocation(chat.chatId, chat.adminId))"
+                                                        :src="
+                                                            getAvatar(parseContactLocation(chat.chatId, chat.adminId))
+                                                        "
                                                         class="h-10 w-10 rounded-full"
                                                     />
                                                 </div>
