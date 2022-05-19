@@ -267,7 +267,7 @@
                     :key="i"
                     @click="setNextAdmin"
                     class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
-                    :class="contact.id === nextAdmin ? 'bg-gray-300' : 'bg-gray-100'"
+                    :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
                 >
                     <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
                         <AvatarImg :id="contact.id" small />
@@ -365,6 +365,7 @@
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
+    import Alert from '@/components/Alert.vue';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);
