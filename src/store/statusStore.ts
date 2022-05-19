@@ -22,12 +22,10 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
             `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
-    let response;
     try {
-        response = await axios.get(location, { timeout: 5000 });
-        let status = response.data;
-        statusList[<string>digitalTwinId] = status;
-        return status;
+        const { data } = await axios.get(location, { timeout: 5000 });
+        statusList[<string>digitalTwinId] = data;
+        return data;
     } catch (error) {
         showUserOfflineMessage.value = true;
     }
