@@ -113,7 +113,7 @@
     </div>
     <!-- ADD USER TO GROUP MODAL -->
     <div
-        v-if="isAdmin && openAddUserToGroup"
+        v-if="(isAdmin || isModerator) && openAddUserToGroup"
         @click="openAddUserToGroup = false"
         class="w-full h-full inset-0 absolute bg-black bg-opacity-25 z-50 flex justify-center items-center"
     >
