@@ -85,8 +85,8 @@ const initializeSocket = (username: string) => {
     state.socket.on('shares_updated', () => {
         getSharedContent();
     });
-    state.socket.on('update_status', (status: StatusUpdate) => {
-        if (statusList[status.id]) statusList[status.id].isOnline = status.isOnline;
+    state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
+        if (statusList[id]) statusList[id].isOnline = isOnline;
     });
 };
 

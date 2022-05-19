@@ -51,16 +51,16 @@
         xsmall?: boolean;
     }
 
-    onBeforeMount(async () => {
-        const { user } = useAuthState();
-        await fetchStatus(user.id);
-    });
-
     const props = withDefaults(defineProps<IProps>(), {
         showOnlineStatus: true,
         large: false,
         small: false,
         xsmall: false,
+    });
+
+    onBeforeMount(async () => {
+        const { user } = useAuthState();
+        await fetchStatus(user.id);
     });
 
     const status = computed(() => {
