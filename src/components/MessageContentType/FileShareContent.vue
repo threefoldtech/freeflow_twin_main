@@ -24,17 +24,13 @@
     import {
         formatBytes,
         sharedDir,
-        goToShared,
         goTo,
         currentDirectory,
-        goIntoSharedFolder,
         sharedItem,
-        sharedFolderIsloading,
         selectedTab,
         selectedPaths,
     } from '@/store/fileBrowserStore';
-    import { FileShareMessageType, Message, MessageBodyType, SharedFileInterface } from '@/types';
-    import { AppType } from '@/types/apps';
+    import { FileShareMessageType, Message } from '@/types';
 
     import { ref } from 'vue';
     import { useRouter } from 'vue-router';

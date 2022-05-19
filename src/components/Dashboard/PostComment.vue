@@ -1,5 +1,5 @@
 <template>
-    <div :class="{ 'ml-10': comment.type === MESSAGE_TYPE.COMMENT_REPLY }" class="flex items-center space-x-2 relative">
+    <div :class="{ 'ml-10': comment.type === CommentType.COMMENT_REPLY }" class="flex items-center space-x-2 relative">
         <VMenu placement="top">
             <AvatarImg :id="comment.owner.id" :showOnlineStatus="false" :small="true" alt="avatar" />
 
@@ -23,15 +23,10 @@
                 </div>
                 <div class="flex justify-start items-center text-xs w-full">
                     <div class="font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1">
-                        <!--                        <a @click='handleLikeComment' class='hover:underline' href='#'>-->
-                        <!--                            <small>Like</small>-->
-                        <!--                        </a>-->
-                        <!--                        <small v-if='comment.type === MESSAGE_TYPE.COMMENT' class='self-center'>.</small>-->
-                        <a v-if="comment.type === MESSAGE_TYPE.COMMENT" class="hover:underline" href="#" @click="reply">
+                        <a v-if="comment.type === CommentType.COMMENT" class="hover:underline" href="#" @click="reply">
                             <small>Reply</small>
                         </a>
-                        <small v-if="comment.type === MESSAGE_TYPE.COMMENT" class="self-center">.</small>
-                        <!--                        <small class='self-center'>.</small>-->
+                        <small v-if="comment.type === CommentType.COMMENT" class="self-center">.</small>
                         <small>{{ moment(comment.createdOn).fromNow() }}</small>
                     </div>
                 </div>
@@ -69,8 +64,8 @@
         </div>
     </div>
     <ReplyComment
-        v-for="(reply, idx) in commentsSorted"
-        v-if="commentsSorted.length > 0 && MESSAGE_TYPE.COMMENT"
+        v-for="reply in commentsSorted"
+        v-if="commentsSorted.length > 0 && CommentType.COMMENT"
         :key="reply.id"
         :comment="reply"
     />
@@ -80,7 +75,7 @@
         @submit.prevent="handleReplyForm"
     >
         <div class="pr-1">
-            <AvatarImg :id="user.id" :showOnlineStatus="false" :xsmall="true" />
+            <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :xsmall="true" />
         </div>
         <input
             v-model="replyInput"
@@ -93,22 +88,17 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onBeforeMount, ref, watch } from 'vue';
+    import { computed, onBeforeMount, ref } from 'vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import ReplyComment from '@/components/Dashboard/PostComment.vue';
     import moment from 'moment';
     import { ThumbUpIcon } from '@heroicons/vue/solid';
-    import { COMMENT_MODEL, MESSAGE_TYPE } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
-    import { TransitionRoot } from '@headlessui/vue';
-    import { likeComment } from '@/services/socialService';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { CommentType, PostComment } from 'types/post.type';
 
-    const openPanel = ref<boolean>(false);
-    const mouseFocussed = ref(false);
-    const showComments = ref<boolean>(false);
-    const props = defineProps<{ comment: COMMENT_MODEL }>();
+    const props = defineProps<{ comment: PostComment }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
     const myLocation = ref<string>('');
@@ -120,27 +110,14 @@
         myLocation.value = await myYggdrasilAddress();
     });
 
-    //only shows user panel if mouse stays focussed for a moment
-    const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
-
     const commentsSorted = computed(() => {
         return props.comment?.replies.sort(function (a, b) {
             return new Date(a.createdOn).getTime() - new Date(b.createdOn).getTime();
         });
     });
 
-    const handleLikeComment = async e => {
-        e.preventDefault();
-        const { post, owner, id, isReplyToComment, replyTo } = props.comment;
-        await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
-    };
-
     const avatarImg = computed(() => {
         return calcExternalResourceLink(`http://[${props.comment.owner.location}]/api/v1/user/avatar/default`);
-    });
-
-    const myAvatar = computed(() => {
-        return calcExternalResourceLink(`http://[${myLocation.value}]/api/v1/user/avatar/default`);
     });
 
     const handleReplyForm = () => {
@@ -154,7 +131,7 @@
     };
 
     const reply = () => {
-        if (props.comment.type === MESSAGE_TYPE.COMMENT) {
+        if (props.comment.type === CommentType.COMMENT) {
             showReplyInput.value = !showReplyInput.value;
         }
     };

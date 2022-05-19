@@ -104,53 +104,6 @@
                             <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                         </div>
                     </div>
-                    <!--
-                        Enkel terugzetten als er een unieke optie is nu staat share er 2 keer in
-                    <div class='group absolute right-0 top-0 z-40'>
-                        <Popover v-slot='{ open }' class='relative z-40'>
-                            <PopoverButton
-                                :class="open ? '' : 'text-opacity-90'"
-                                class='items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75'
-                            >
-                                <DotsVerticalIcon
-                                    class='text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600'
-                                />
-                                <ChevronDownIcon
-                                    :class="open ? '' : 'text-opacity-70'"
-                                    aria-hidden='true'
-                                    class='w-5 h-5 ml-2 text-orange-300 transition duration-150 ease-in-out group-hover:text-opacity-80'
-                                />
-                            </PopoverButton>
-                            <transition
-                                enter-active-class='transition duration-200 ease-out'
-                                enter-from-class='translate-y-1 opacity-0'
-                                enter-to-class='translate-y-0 opacity-100'
-                                leave-active-class='transition duration-150 ease-in'
-                                leave-from-class='translate-y-0 opacity-100'
-                                leave-to-class='translate-y-1 opacity-0'
-                            >
-                                <PopoverPanel class='absolute z-50 w-64 px-4 transform -translate-x-1/2 left-1/2'>
-                                    <div class='rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
-                                        <div class='relative grid gap-8 bg-white p-6 rounded'>
-                                            <a
-                                                v-for='item in solutions'
-                                                :key='item.name'
-                                                :href='item.href'
-                                                class='items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50'
-                                                @click='() => item.action()'
-                                            >
-                                                <div class='w-full'>
-                                                    <p class='text-sm font-medium text-gray-900 w-full'>
-                                                        {{ item.name }}
-                                                    </p>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </PopoverPanel>
-                            </transition>
-                        </Popover>
-                    </div> -->
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
@@ -201,16 +154,18 @@
                             src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
                         />
                     </div>
-                    <div class="hidden ml-4">
-                        <p class="font-medium text-primary flex text-xs">
-                            <span v-for="(name, idx) in props.item.persons" :key="name">
-                                {{ name }}<span v-if="idx === 0" class="mr-1">,</span>
-                            </span>
-                        </p>
-                        <p v-if="false" class="text-gray-600 text-xs">
-                            and {{ Math.abs(props.item.comments - 2) }} other liked this
-                        </p>
-                    </div>
+                    <!-- <div> -->
+                    <!--     <p class="font-medium text-primary flex text-xs"> -->
+                    <!--         <span> -->
+                    <!--             {{ props.item.likes[0].id -->
+                    <!--             }}<span class="mr-1" v-if="props.item.likes.length > 2">,</span -->
+                    <!--             ><span v-else>&nbsp;likes this</span> -->
+                    <!--         </span> -->
+                    <!--     </p> -->
+                    <!--     <p class="text-gray-600 text-xs" v-if="props.item.likes.length > 2"> -->
+                    <!--         and {{ props.item.likes.length }} others liked this -->
+                    <!--     </p> -->
+                    <!-- </div> -->
                     <div class="flex items-center">
                         <HeartIconSolid class="hidden text-red-500 w-5 h-5 mr-2" />
                         <p class="text-gray-600 font-medium flex-shrink-0 text-sm">
@@ -291,7 +246,7 @@
                     @submit.prevent="handleAddComment(false)"
                 >
                     <div>
-                        <AvatarImg :id="user.id" :showOnlineStatus="false" :small="true" alt="avatar" />
+                        <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :small="true" alt="avatar" />
                     </div>
                     <input
                         :ref="inputRef"
@@ -341,26 +296,24 @@
 </template>
 
 <script lang="ts" setup>
-    import { DotsVerticalIcon, HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
+    import { HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
     import { HeartIcon, ChatAltIcon, ShareIcon, TrashIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState, myYggdrasilAddress } from '@/store/authStore';
     import { ref, computed, onBeforeMount, watch } from 'vue';
     import moment from 'moment';
-    import { Popover, PopoverButton, PopoverPanel, TransitionRoot } from '@headlessui/vue';
-    import { ChevronDownIcon } from '@heroicons/vue/solid';
+    import { TransitionRoot } from '@headlessui/vue';
     import { showComingSoonToUhuru } from '@/services/dashboardService';
     import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue';
-    import MarkdownIt from 'markdown-it';
-    import { uuidv4 } from '@/common';
-    import { SOCIAL_POST, LIKE_STATUS } from '@/store/socialStore';
+    import { LIKE_STATUS } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { commentOnPost, deletePost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
+    import { deletePost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
     import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import Alert from '@/components/Alert.vue';
+    import { PostContainerDTO } from 'types/post.type';
 
-    const props = defineProps<{ item: SOCIAL_POST }>();
+    const props = defineProps<{ item: PostContainerDTO }>();
     const inputRef = ref<HTMLInputElement>(null);
     const messageInput = ref<string>('');
     const showComments = ref<boolean>(false);
@@ -380,19 +333,9 @@
     //only shows user panel if mouse stays focussed for a moment
     const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
 
-    const md = new MarkdownIt({
-        html: true,
-        linkify: true,
-        typographer: true,
-    });
-
     watch([showComments, amount_likes], () => {
         getSinglePost(props.item.post.id, props.item.owner.location);
     });
-
-    const renderMarkdown = content => {
-        return md.render(content);
-    };
 
     const doDeletePost = () => {
         deletePost(props.item);
@@ -411,27 +354,11 @@
         return props.item?.isTyping && props.item?.isTyping?.length !== 0 && showComments.value ? true : false;
     });
 
-    interface IProps {
-        item: {
-            id: string;
-            content_html: string;
-            url: string;
-            title: string;
-            date_modified: Date;
-            likes: number;
-            comments: number;
-            persons: string[];
-            author: string;
-        };
-    }
-
     watch(messageInput, async (n, o) => {
         if (n.length > o.length) {
             await setSomeoneIsTyping(props.item.post.id, props.item.owner.location, user.id.toString());
         }
     });
-
-    const uuid1 = uuidv4();
 
     const localLike = ref(false);
 
@@ -452,11 +379,7 @@
         return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/user/avatar/default`);
     });
 
-    const myAvatar = computed(() => {
-        return calcExternalResourceLink(`http://[${myLocation.value}]/api/v1/user/avatar/default`);
-    });
-
-    const fetchPostImage = image => {
+    const fetchPostImage = (image: { path: string }) => {
         return calcExternalResourceLink(
             `http://[${props.item.owner.location}]/api/v1/posts/download/${btoa(image.path)}`
         );
@@ -466,12 +389,11 @@
         return moment(time).fromNow();
     };
 
-    const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
+    const handleAddComment = async (isReplyToComment: boolean = false, _comment_id?: string, message?: string) => {
         if (postingCommentInProgress.value) return;
         const comment_value = isReplyToComment ? message : messageInput.value;
         if (!comment_value || comment_value === '' || !/\S/.test(comment_value)) return;
         postingCommentInProgress.value = true;
-        const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id);
         messageInput.value = '';
         const response = await getSinglePost(props.item.post.id, props.item.owner.location);
         postingCommentInProgress.value = false;
@@ -521,74 +443,6 @@
             },
         },
     ]);
-
-    const solutions = [
-        // {
-        //     action: () => (showComingSoonToUhuru.value = true),
-        //     name: 'Send private message',
-        //     description: 'Measure actions your users take',
-        //     href: '##',
-        //     icon: `
-        //     <svg
-        //       width='48'
-        //       height='48'
-        //       viewBox='0 0 48 48'
-        //       fill='none'
-        //       aria-hidden='true'
-        //       xmlns='http://www.w3.org/2000/svg'
-        //     >
-        //       <rect width='48' height='48' rx='8' fill='#FFEDD5' />
-        //       <path
-        //         d='M24 11L35.2583 17.5V30.5L24 37L12.7417 30.5V17.5L24 11Z'
-        //         stroke='#FB923C'
-        //         stroke-width='2'
-        //       />
-        //       <path
-        //         fill-rule='evenodd'
-        //         clip-rule='evenodd'
-        //         d='M16.7417 19.8094V28.1906L24 32.3812L31.2584 28.1906V19.8094L24 15.6188L16.7417 19.8094Z'
-        //         stroke='#FDBA74'
-        //         stroke-width='2'
-        //       />
-        //       <path
-        //         fill-rule='evenodd'
-        //         clip-rule='evenodd'
-        //         d='M20.7417 22.1196V25.882L24 27.7632L27.2584 25.882V22.1196L24 20.2384L20.7417 22.1196Z'
-        //         stroke='#FDBA74'
-        //         stroke-width='2'
-        //       />
-        //     </svg>
-        //   `,
-        // },
-        {
-            action: () => (showShareDialog.value = true),
-            name: 'Share with a friend',
-            description: 'Create your own targeted content',
-            href: '##',
-            icon: `
-            <svg
-              width='48'
-              height='48'
-              viewBox='0 0 48 48'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <rect width='48' height='48' rx='8' fill='#FFEDD5' />
-              <path
-                d='M28.0413 20L23.9998 13L19.9585 20M32.0828 27.0001L36.1242 34H28.0415M19.9585 34H11.8755L15.9171 27'
-                stroke='#FB923C'
-                stroke-width='2'
-              />
-              <path
-                fill-rule='evenodd'
-                clip-rule='evenodd'
-                d='M18.804 30H29.1963L24.0001 21L18.804 30Z'
-                stroke='#FDBA74'
-                stroke-width='2'
-              />
-            </svg>`,
-        },
-    ];
 </script>
 
 <style scoped>

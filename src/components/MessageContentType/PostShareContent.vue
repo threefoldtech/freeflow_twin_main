@@ -55,17 +55,18 @@
 
 <script setup lang="ts">
     import { Message } from '@/types';
-    import { MESSAGE_POST_SHARE_BODY, SOCIAL_POST } from '@/store/socialStore';
+    import { MESSAGE_POST_SHARE_BODY } from '@/store/socialStore';
     import { computed, nextTick, ref, watch } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { getSinglePost } from '@/services/socialService';
     import { TransitionRoot } from '@headlessui/vue';
     import Post from '@/components/Dashboard/Post.vue';
     import { XIcon } from '@heroicons/vue/solid';
+    import { PostContainerDTO } from 'types/post.type';
 
     const props = defineProps<{ message: Message<MESSAGE_POST_SHARE_BODY> }>();
     const showPost = ref<boolean>(false);
-    const postData = ref<SOCIAL_POST | null>(null);
+    const postData = ref<PostContainerDTO | null>(null);
     const dialogRef = ref<HTMLElement>(null);
 
     const truncatedText = computed(() => {
@@ -80,7 +81,7 @@
             });
     });
 
-    const refreshPost = (post: SOCIAL_POST) => {
+    const refreshPost = (post: PostContainerDTO) => {
         postData.value = post;
     };
 

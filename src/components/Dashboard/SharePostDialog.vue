@@ -102,12 +102,11 @@
 <script lang="ts" setup>
     import { computed, onBeforeMount, onMounted, onBeforeUnmount, ref } from 'vue';
     import { usechatsActions, useChatsState } from '@/store/chatStore';
-    import { SOCIAL_POST } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import Spinner from '@/components/Spinner.vue';
     import { PhotographIcon, XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
-    import { Contact } from '@/types';
+    import { PostContainerDTO } from 'types/post.type';
 
     const emit = defineEmits(['close']);
 
@@ -119,7 +118,7 @@
     const dialogRef = ref<HTMLElement>(null);
     let escListener = null;
 
-    const props = defineProps<{ item: SOCIAL_POST; avatar: any }>();
+    const props = defineProps<{ item: PostContainerDTO; avatar: any }>();
 
     onMounted(() => {
         dialogRef.value.focus();

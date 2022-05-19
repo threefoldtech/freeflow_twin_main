@@ -73,15 +73,15 @@
     import { usechatsActions } from '@/store/chatStore';
     import { computed, nextTick, onBeforeMount, ref } from 'vue';
     import { myYggdrasilAddress } from '@/store/authStore';
-    import { SOCIAL_POST } from '@/store/socialStore';
     import { fetchStatus } from '@/store/statusStore';
+    import { PostContainerDTO } from 'types/post.type';
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
     const { getChat } = usechatsActions();
 
     const props = defineProps<{
-        comment: SOCIAL_POST;
+        comment: PostContainerDTO;
         avatar: string;
     }>();
     const location = ref<string>();

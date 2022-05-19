@@ -5,7 +5,7 @@ import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
-import { CommentType, PostComment, PostContainerDTO, PostImage, PostType } from 'types/post.type';
+import { CommentType, PostComment, PostContainerDTO, PostType } from 'types/post.type';
 
 const endpoint = `${config.baseUrl}api/v1/posts`;
 const { user } = useAuthState();
@@ -76,7 +76,7 @@ export const getAllPosts = async () => {
     allSocialPosts.value = sortPosts(posts);
 };
 
-export const likePost = async (postId: string, location: string, _commentId: string) => {
+export const likePost = async (postId: string, location: string, _commentId?: string) => {
     const myAddress = await myYggdrasilAddress();
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {
