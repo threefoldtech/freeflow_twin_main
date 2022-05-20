@@ -5,8 +5,8 @@
     <div class="bg-gray-100 h-full relative text-sm">
         <NotificationSection />
         <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
-            <div class="top h-20 md:hidden">
-                <Topbar @clicked="showNav = !showNav">
+            <!--<div class="top h-20 md:hidden">
+                <Topbar @clicked="showNav = !showNav" class='border border-8'>
                     <template v-slot:default>
                         <slot name="top"></slot>
                     </template>
@@ -18,10 +18,11 @@
             <slot name="side">
                 <Sidebar
                     @clicked="showNav = false"
-                    class="bg-accent-800 md:block"
+                    class="bg-accent-800 md:block border border-8"
                     :class="[showNav ? '' : 'hidden', smallScreen ? 'top' : 'side']"
                 ></Sidebar>
-            </slot>
+            </slot>-->
+            <Navigation :class="[smallScreen ? 'top' : 'side']"/>
             <div class="content w-full h-full overflow-y-auto relative flex flex-col">
                 <div class="relative w-full h-full overflow-y-auto">
                     <div class="absolute w-full h-full">
@@ -42,6 +43,7 @@
     import { useSocketState } from '../store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
+    import Navigation from '@/components/Navigation.vue';
 
     const { notification } = useSocketState();
     const showNav = ref(false);

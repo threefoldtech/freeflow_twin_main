@@ -1,9 +1,9 @@
 <template>
-    <div class="items-center bg-accent-800 flex justify-between md:topgrid relative h-full">
+    <div class="items-center bg-white flex justify-between md:topgrid relative h-full">
         <div class="flex">
             <div class="ml-5 mr-3 items-center">
                 <button
-                    class="text-3xl text-white md:hidden mr-2"
+                    class="text-3xl text-primary md:hidden mr-2"
                     @click="backOrMenu"
                     :class="{ 'md:hidden': !(route.meta && route.meta.back) }"
                 >
@@ -14,8 +14,8 @@
 
             <div class="h-8 flex items-center col-span-3 md:col-span-1 md:hidden">
                 <slot>
-                    <!--                    <img src="/digitaltwin.svg" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />-->
-                    <svg
+                    <img src="/Logo_secundary.png" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />
+                    <!-- <svg
                         class="md:hidden md:ml-4 h-full"
                         fill="none"
                         viewBox="0 0 180 47"
@@ -39,7 +39,7 @@
                                 <stop stop-color="#C1E257" offset="1" />
                             </linearGradient>
                         </defs>
-                    </svg>
+                    </svg>-->
                 </slot>
             </div>
         </div>
