@@ -1,0 +1,5 @@
+.eslintrc.js
+src/seeds/*.ts
+src/migration/*.ts
+src/notmgratn/*.ts
+node_modules

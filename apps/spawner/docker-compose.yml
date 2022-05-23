@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+    digitaltwin-spawner:
+        image: threefoldjimber/digitaltwin-spawner:${digitaltwin_spawner_tag}
+        container_name: digitaltwin-spawner
+        build: server
+        restart: always
+        env_file:
+            - ./.env
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+            - /etc/digitaltwin:/config
+        networks:
+            - chatnet
+        environment:
+            - DIGITALTWIN_APPID=${DIGITALTWIN_APPID}
+            - ENVIRONMENT=${ENVIRONMENT}
+
+    digitaltwin-proxy:
+        image: nginx:alpine
+        container_name: digitaltwin-proxy
+        restart: always
+        volumes:
+            - ../../docker/certs:/etc/nginx/certs
+            - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+        ports:
+            - 443:443
+            - 80:80
+        networks:
+            - chatnet
+
+    digitaltwin-frontend:
+        image: threefoldjimber/digitaltwin-frontend:${digitaltwin_frontend_tag}
+        container_name: digitaltwin-frontend
+        restart: always
+        build: frontend
+        networks:
+            - chatnet
+
+    onlyoffice-documentserver:
+        image: jimbersoftware/onlyoffice_yggdrasil
+        container_name: onlyoffice-documentserver
+        restart: always
+        networks:
+            - chatnet
+        sysctls:
+            - net.ipv6.conf.all.disable_ipv6=0
+        privileged: true
+        devices:
+            - /dev/net/tun:/dev/net/tun
+
+networks:
+    chatnet:
+        external: true

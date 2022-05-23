@@ -1,0 +1,12 @@
+{
+    "name": "types",
+    "version": "1.0.0",
+    "description": "Shared types",
+    "main": "index.js",
+    "license": "MIT",
+    "private": true,
+    "files": [
+        "file-actions.type.ts",
+        "status.type.ts"
+    ]
+}
