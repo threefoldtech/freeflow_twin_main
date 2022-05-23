@@ -39,7 +39,7 @@ export abstract class EntityRepository<TEntity extends Entity> {
         offset?: number;
         count?: number;
         where: string;
-        eq: string;
+        eq: string | boolean;
     }): Promise<TEntity[]> {
         return await this._entityRepository.search().where(where).eq(eq).return.page(offset, count);
     }

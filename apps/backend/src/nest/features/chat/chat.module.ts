@@ -11,6 +11,7 @@ import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 import { ChatController } from './chat.controller';
 import { ChatGateway } from './chat.gateway';
 import { ChatService } from './chat.service';
+import { ChatRedisRepository } from './repositories/chat-redis.repository';
 
 @Module({
     imports: [
@@ -24,7 +25,7 @@ import { ChatService } from './chat.service';
         forwardRef(() => ContactModule),
     ],
     controllers: [ChatController],
-    providers: [ChatService, ChatGateway],
+    providers: [ChatService, ChatGateway, ChatRedisRepository],
     exports: [ChatService, ChatGateway],
 })
 export class ChatModule {}
