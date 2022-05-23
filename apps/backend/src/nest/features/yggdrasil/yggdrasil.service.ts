@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { execSync, spawn } from 'child_process';
+import { exec, execSync, spawn } from 'child_process';
 import PATH from 'path';
 
 import { EncryptionService } from '../encryption/encryption.service';
@@ -74,6 +74,25 @@ export class YggdrasilService {
     }
 
     /**
+     * Gets current location (IPv6) of own connection.
+     * @return {string} - Own address.
+     * @return {Error} - Error.
+     */
+    async getSelf(): Promise<string | Error> {
+        return new Promise((res, rej) => {
+            exec(
+                "yggdrasilctl -v getSelf | sed -n -e 's/^.*IPv6 address.* //p'",
+                (err: Error, stdout: string, sterr: string) => {
+                    if (err) return rej(err);
+                    if (sterr) return rej(sterr);
+                    const formattedAddress = stdout.replace('\n', '');
+                    res(formattedAddress);
+                }
+            );
+        });
+    }
+
+    /**
      * Generates and returns replacement private and public keys. Both signed and encrypted.
      * @param {string} seed - Seed to create hash and keys from.
      * @return {string} - Existing yggdrasil replacements found, returns config file.
@@ -106,8 +125,9 @@ export class YggdrasilService {
 
     /**
      * Replaces old config values with new ones.
-     * @param {string} generatedConfig - Newly generated config.
-     * @param {YggdrasilConfig} replaceConfig - config to replace generatedConfig with.
+     * @param {Object} obj - Object.
+     * @param {string} obj.generatedConfig - Newly generated config.
+     * @param {YggdrasilConfig} obj.replaceConfig - config to replace generatedConfig with.
      * @return {string} - Generated config in string format.
      */
     private replaceConfigValues({
@@ -131,8 +151,9 @@ export class YggdrasilService {
 
     /**
      * Saves config files to file system.
-     * @param {string} config - Confiuration.
-     * @param {string} replacements - Replacements.
+     * @param {Object} obj - Object.
+     * @param {string} obj.config - Confiuration.
+     * @param {string} obj.replacements - Replacements.
      */
     private saveConfigs({ config, replacements }: { config: string; replacements: YggdrasilConfig }): void {
         try {

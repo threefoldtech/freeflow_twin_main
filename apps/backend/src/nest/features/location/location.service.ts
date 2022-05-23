@@ -1,13 +1,17 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { exec } from 'child_process';
 
 import { ApiService } from '../api/api.service';
 import { EncryptionService } from '../encryption/encryption.service';
+import { YggdrasilService } from '../yggdrasil/yggdrasil.service';
 import { LocationResponse } from './types/responses';
 
 @Injectable()
 export class LocationService {
-    constructor(private readonly _encryptionService: EncryptionService, private readonly _apiService: ApiService) {}
+    constructor(
+        private readonly _encryptionService: EncryptionService,
+        private readonly _apiService: ApiService,
+        private readonly _yggdrasilService: YggdrasilService
+    ) {}
 
     /**
      * Gets locations (IPv6) of all registered Yggdrasil twins.
@@ -34,24 +38,15 @@ export class LocationService {
      * @return {Error} - Error.
      */
     getOwnLocation(): Promise<string | Error> {
-        return new Promise((res, rej) => {
-            exec(
-                "yggdrasilctl -v getSelf | sed -n -e 's/^.*IPv6 address.* //p'",
-                (err: Error, stdout: string, sterr: string) => {
-                    if (err) return rej(err);
-                    if (sterr) return rej(sterr);
-                    const formattedAddress = stdout.replace('\n', '');
-                    res(formattedAddress);
-                }
-            );
-        });
+        return this._yggdrasilService.getSelf();
     }
 
     /**
-     * Registers a digital twin to the central users backend API.
-     * @param {string} doubleName - Username paired with .3bot.
-     * @param {string} derivedSeed - The derived seed.
-     * @param {string} yggdrasilAddress - Unsigned Yggdrasil address.
+     * Registers digital twin location to the central users backend API.
+     * @param {Object} obj - Object.
+     * @param {string} obj.doubleName - Username paired with .3bot.
+     * @param {string} obj.derivedSeed - The derived seed.
+     * @param {string} obj.yggdrasilAddress - Unsigned Yggdrasil address.
      */
     async registerDigitalTwin({
         doubleName,
