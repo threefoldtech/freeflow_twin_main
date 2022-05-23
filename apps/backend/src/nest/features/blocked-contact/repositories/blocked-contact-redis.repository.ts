@@ -13,6 +13,8 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
 
     /**
      * Gets a blocked contact by id.
+     * @param {Object} obj - Object.
+     * @param {string} obj.id - Contact Id.
      * @return {BlockedContact} - Found blocked contact.
      */
     async getBlockedContact({ id }: { id: string }): Promise<BlockedContact> {
@@ -20,7 +22,7 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
     }
 
     /**
-     * Gets blocked contacts using pagination.
+     * Gets blocked contacts.
      * @return {BlockedContact[]} - Found blocked contacts.
      */
     async getBlockedContacts(): Promise<BlockedContact[]> {
@@ -30,7 +32,7 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
     /**
      * Adds a contact to blocked list and removes it from contacts.
      * @param {Object} obj - Object.
-     * @param {string} obj.id - Contact ID.
+     * @param {string} obj.id - Contact Id.
      * @return {BlockedContact} - Blocked contact.
      */
     async addBlockedContact({ id }: CreateBlockedContactDTO): Promise<BlockedContact> {
@@ -38,9 +40,9 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
     }
 
     /**
-     * Deletes a contact from blocked list and adds it to contacts.
+     * Deletes a contact from blocked list.
      * @param {Object} obj - Object.
-     * @param {string} obj.id - Contact ID.
+     * @param {string} obj.id - Contact Id.
      */
     async deleteBlockedContact({ id }: DeleteBlockedContactDTO): Promise<void> {
         return await this.delete(id);
