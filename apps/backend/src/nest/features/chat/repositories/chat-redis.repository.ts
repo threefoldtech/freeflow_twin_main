@@ -60,11 +60,11 @@ export class ChatRedisRepository extends EntityRepository<Chat> {
      * Gets chats using pagination.
      * @param {Object} obj - Object.
      * @param {number} obj.offset - Chat offset, defaults to 0.
-     * @param {number} obj.count - Amount of chats to fetch, defaults to 25.
+     * @param {number} obj.count - Amount of chats to fetch, defaults to 50.
      * @return {ChatDTO[]} - Found chats.
      */
-    async getChats({ offset = 0, count = 25 }: { offset?: number; count?: number } = {}): Promise<Chat[]> {
-        return await this.findAll({ offset, count });
+    async getChats({ offset = 0, count = 50 }: { offset?: number; count?: number } = {}): Promise<Chat[]> {
+        return await this.findAllPaginated({ offset, count });
     }
 
     /**

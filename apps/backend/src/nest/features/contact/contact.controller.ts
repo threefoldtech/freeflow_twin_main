@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { MessageBody } from '../../types/message-types';
@@ -12,8 +12,8 @@ export class ContactController {
 
     @Get()
     @UseGuards(AuthGuard)
-    async getContacts(@Query('offset') offset = 0, @Query('count') count = 25): Promise<Contact[]> {
-        return await this._contactService.getContacts({ offset, count });
+    async getContacts(): Promise<Contact[]> {
+        return await this._contactService.getContacts();
     }
 
     @Post()

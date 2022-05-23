@@ -14,13 +14,10 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
 
     /**
      * Gets contacts using pagination.
-     * @param {Object} obj - Object.
-     * @param {number} obj.offset - Contact offset, defaults to 0.
-     * @param {number} obj.count - Amount of contacts to fetch, defaults to 50.
      * @return {Contact[]} - Found contacts.
      */
-    async getContacts({ offset = 0, count = 50 }: { offset?: number; count?: number } = {}): Promise<Contact[]> {
-        return await this.findAll({ offset, count });
+    async getContacts(): Promise<Contact[]> {
+        return await this.findAll();
     }
 
     /**

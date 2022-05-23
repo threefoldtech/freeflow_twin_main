@@ -12,12 +12,25 @@ export abstract class EntityRepository<TEntity extends Entity> {
 
     /**
      * Finds all entities.
+     * @return {TEntity[]} - Found entities.
+     */
+    protected async findAll(): Promise<TEntity[]> {
+        return await this._entityRepository.search().return.all();
+    }
+    /**
+     * Finds all entities using pagination.
      * @param {Object} obj - Object.
      * @param {number} obj.offset - Paginated offset.
      * @param {number} obj.count - Paginated count.
      * @return {TEntity[]} - Found entities.
      */
-    protected async findAll({ offset = 0, count = 100 }: { offset?: number; count?: number }): Promise<TEntity[]> {
+    protected async findAllPaginated({
+        offset = 0,
+        count = 100,
+    }: {
+        offset?: number;
+        count?: number;
+    }): Promise<TEntity[]> {
         return await this._entityRepository.search().return.page(offset, count);
     }
 

@@ -18,7 +18,7 @@ export class BlockedContactController {
 
     @Get()
     async getBlockedContacts(): Promise<string[]> {
-        return await this._blockedContacService.getBlockedContactList({ offset: 0, count: 100 });
+        return await this._blockedContacService.getBlockedContactList();
     }
 
     @Delete(':id')

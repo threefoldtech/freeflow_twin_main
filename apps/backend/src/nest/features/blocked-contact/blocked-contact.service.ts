@@ -40,9 +40,9 @@ export class BlockedContactService {
      * Gets blocked contacts using pagination.
      * @return {string[]} - Found blocked contacts ids.
      */
-    async getBlockedContactList({ offset, count }: { offset: number; count: number }): Promise<string[]> {
+    async getBlockedContactList(): Promise<string[]> {
         try {
-            const contacts = await this._blockedContactRepo.getBlockedContacts({ offset, count });
+            const contacts = await this._blockedContactRepo.getBlockedContacts();
             return contacts.map(c => c.id);
         } catch (error) {
             return [];

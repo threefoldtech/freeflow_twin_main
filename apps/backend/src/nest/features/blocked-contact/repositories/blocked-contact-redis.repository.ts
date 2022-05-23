@@ -23,8 +23,8 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
      * Gets blocked contacts using pagination.
      * @return {BlockedContact[]} - Found blocked contacts.
      */
-    async getBlockedContacts({ offset, count }: { offset: number; count: number }): Promise<BlockedContact[]> {
-        return await this.findAll({ offset, count });
+    async getBlockedContacts(): Promise<BlockedContact[]> {
+        return await this.findAll();
     }
 
     /**
