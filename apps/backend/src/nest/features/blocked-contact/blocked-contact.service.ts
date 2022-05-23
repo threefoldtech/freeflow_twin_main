@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
 import { CreateBlockedContactDTO, DeleteBlockedContactDTO } from './dtos/blocked-contact.dto';
-import { BlockedContactRepository } from './types/blocked-contact.repository';
+import { BlockedContactRedisRepository } from './repositories/blocked-contact-redis.repository';
 
 @Injectable()
 export class BlockedContactService {
-    constructor(private _blockedContactRepo: BlockedContactRepository) {}
+    constructor(private _blockedContactRepo: BlockedContactRedisRepository) {}
 
     /**
      * Adds a contact to blocked list and removes it from contacts.

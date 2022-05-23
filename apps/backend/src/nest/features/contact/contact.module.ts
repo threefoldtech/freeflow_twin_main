@@ -13,9 +13,9 @@ import { ContactService } from './contact.service';
 @Module({
     imports: [
         DbModule,
-        LocationModule,
         KeyModule,
         ApiModule,
+        forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => ChatModule),
         forwardRef(() => MessageModule),

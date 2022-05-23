@@ -11,7 +11,7 @@ import { FileService } from './file.service';
 import { FileSchedulingService } from './file-scheduling.service';
 
 @Module({
-    imports: [forwardRef(() => YggdrasilModule), ApiModule, LocationModule, KeyModule, ChatModule],
+    imports: [forwardRef(() => YggdrasilModule), ApiModule, forwardRef(() => LocationModule), KeyModule, ChatModule],
     controllers: [FileController],
     providers: [FileService, FileSchedulingService, FileGateway],
     exports: [FileService, FileGateway],

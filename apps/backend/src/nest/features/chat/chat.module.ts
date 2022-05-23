@@ -16,9 +16,9 @@ import { ChatService } from './chat.service';
     imports: [
         DbModule,
         KeyModule,
-        LocationModule,
         ApiModule,
         BlockedContactModule,
+        forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => MessageModule),
         forwardRef(() => ContactModule),
