@@ -1,16 +1,4 @@
-# digitaltwin-dev
-
-## Init submodules
-
-The necessary modules are added to this repo as submodules:
-
--   /backend: https://github.com/threefoldtech/digitaltwin-lib
--   /frontend: https://github.com/threefoldtech/twin_aydo
--   /spawner: https://github.com/threefoldtech/digitaltwin_spawner
-
-```console
-git submodule update --init --recursive
-```
+# twin_aydo
 
 # Development setup
 
@@ -27,7 +15,7 @@ docker network create chatnet
 Go to the Spawner
 
 ```console
-cd spawner
+cd apps/spawner
 ```
 
 In the docker-compose.yaml you need to adjust 2 lines to make it work.
@@ -48,7 +36,7 @@ Use `-d` to detach the process.
 Go into dev folder
 
 ```console
-cd ../dev
+cd ../docker/dev
 ```
 
 Creation of appdata
@@ -57,7 +45,7 @@ Creation of appdata
 mkdir ./appdata
 mkdir ./appdata/chats
 mkdir ./appdata/user
-cp avatar.jpg ./appdata/user/avatar-default
+cp ../avatar.jpg ./appdata/user/avatar-default
 ```
 
 Add or edit instances for the chat application in the docker-compose file. There should be an example commented where `$3bot` can be replace with any 3bot name.
