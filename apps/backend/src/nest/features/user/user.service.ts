@@ -1,58 +1,41 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'redis-om';
 
-import { DbService } from '../db/db.service';
 import { LocationService } from '../location/location.service';
-import { User, userSchema } from './models/user.model';
+import { User } from './models/user.model';
+import { UserRedisRepository } from './repositories/user-redis.repository';
 
 @Injectable()
 export class UserService {
-    private _userRepo: Repository<User>;
+    private myAddress: string;
 
     constructor(
-        private readonly _dbService: DbService,
+        private readonly _userRepo: UserRedisRepository,
         private readonly _configService: ConfigService,
         private readonly _locationService: LocationService
-    ) {
-        this._userRepo = this._dbService.createRepository(userSchema);
-        this._userRepo.createIndex();
-    }
+    ) {}
 
     /**
      * Adds user data to Redis.
-     * @param {string} status - Users status (online/offline)
-     * @param {string} avatar - Users avatar URL.
-     * @param {string} lastSeen - When the user was last active.
+     * @param {Object} userData - Object.
      * @return {User} - Created entity.
      */
-    async addUserData({
-        userId,
-        status,
-        avatar,
-        lastSeen,
-    }: {
-        userId: string;
-        status: string;
-        avatar: string;
-        lastSeen: Date;
-    }): Promise<User> {
+    async addUserData(userData: { userId: string; status: string; avatar: string; lastSeen: Date }): Promise<User> {
         try {
-            return await this._userRepo.createAndSave({ userId, status, avatar, lastSeen });
+            return await this._userRepo.addUserData(userData);
         } catch (error) {
             throw new BadRequestException(error);
         }
     }
 
     /**
-     * Gets user data from Redis.
-     * @param {string} ID - User data entity ID.
+     * Gets user data.
      * @return {User} - Found User data.
      */
     async getUserData(): Promise<User> {
         const userId = this._configService.get<string>('userId');
         try {
-            const user = await this._userRepo.search().where('userId').equals(userId).return.first();
+            const user = await this._userRepo.getUserData({ id: userId });
             if (!user)
                 return await this.addUserData({
                     userId,
@@ -69,8 +52,8 @@ export class UserService {
 
     async getUserAvatar(): Promise<string> {
         const { avatar } = await this.getUserData();
-        const myAddress = await this._locationService.getOwnLocation();
-        return `http://[${myAddress}]/api/v2/user/avatar/${avatar}`;
+        if (!this.myAddress) this.myAddress = (await this._locationService.getOwnLocation()) as string;
+        return `http://[${this.myAddress}]/api/v2/user/avatar/${avatar}`;
     }
 
     /**
@@ -84,7 +67,7 @@ export class UserService {
             userToUpdate.status = userData.status;
             userToUpdate.avatar = userData.avatar;
             userToUpdate.lastSeen = userData.lastSeen;
-            return await this._userRepo.save(userToUpdate);
+            return await this._userRepo.updateUserData(userToUpdate);
         } catch (error) {
             throw new NotFoundException(error);
         }
@@ -100,11 +83,11 @@ export class UserService {
             const userToUpdate = await this.getUserData();
             userToUpdate.avatar = path;
             userToUpdate.lastSeen = new Date();
-            await this._userRepo.save(userToUpdate);
-            const myAddress = await this._locationService.getOwnLocation();
-            return `http://[${myAddress}]/api/v2/user/avatar/${path}`;
+            await this._userRepo.updateUserData(userToUpdate);
+            if (!this.myAddress) this.myAddress = (await this._locationService.getOwnLocation()) as string;
+            return `http://[${this.myAddress}]/api/v2/user/avatar/${path}`;
         } catch (error) {
-            throw new BadRequestException(error);
+            throw new BadRequestException(`failed to update avatar: ${error}`);
         }
     }
 
@@ -117,7 +100,7 @@ export class UserService {
             const userToUpdate = await this.getUserData();
             userToUpdate.status = status;
             userToUpdate.lastSeen = new Date();
-            await this._userRepo.save(userToUpdate);
+            await this._userRepo.updateUserData(userToUpdate);
             return true;
         } catch (error) {
             throw new BadRequestException(error);
