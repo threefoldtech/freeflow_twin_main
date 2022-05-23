@@ -8,6 +8,7 @@ import { DbModule } from '../db/db.module';
 import { KeyModule } from '../key/key.module';
 import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
+import { MessageRedisRepository } from './repositories/message-redis.repository';
 
 @Module({
     imports: [
@@ -19,7 +20,7 @@ import { MessageService } from './message.service';
         ApiModule,
     ],
     controllers: [MessageController],
-    providers: [MessageService],
+    providers: [MessageService, MessageRedisRepository],
     exports: [MessageService],
 })
 export class MessageModule {}

@@ -1,56 +1,29 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'redis-om';
 
 import { Chat } from '../chat/models/chat.model';
 import { ContactDTO } from '../contact/dtos/contact.dto';
-import { DbService } from '../db/db.service';
 import { KeyService } from '../key/key.service';
 import { CreateMessageDTO, MessageDTO } from './dtos/message.dto';
-import { Message, messageSchema, stringifyMessageBody, stringifyReplies } from './models/message.model';
+import { Message } from './models/message.model';
+import { MessageRedisRepository } from './repositories/message-redis.repository';
 
 @Injectable()
 export class MessageService {
-    private _messageRepo: Repository<Message>;
-
     constructor(
-        private readonly _dbService: DbService,
+        private readonly _messageRepo: MessageRedisRepository,
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService
-    ) {
-        this._messageRepo = this._dbService.createRepository(messageSchema);
-        this._messageRepo.createIndex();
-    }
+    ) {}
 
     /**
      * Creates a new message.
-     * @param {string} id - Contact ID.
-     * @param {string} location - Contact IPv6.
-     * @return {Contact} - Created entity.
+     * @param {CreateMessageDTO} createMessageDTO - CreateMessageDTO.
+     * @return {Message} - Created message.
      */
-    async createMessage<T>({
-        id,
-        from,
-        to,
-        body,
-        timeStamp,
-        replies,
-        subject,
-        type,
-        signatures,
-    }: CreateMessageDTO<T>): Promise<Message> {
+    async createMessage<T>(createMessageDTO: CreateMessageDTO<T>): Promise<Message> {
         try {
-            return await this._messageRepo.createAndSave({
-                id,
-                from,
-                to,
-                body: stringifyMessageBody(body),
-                timeStamp,
-                replies: stringifyReplies(replies),
-                subject,
-                type,
-                signatures: signatures ?? null,
-            });
+            return await this._messageRepo.createMessage(createMessageDTO);
         } catch (error) {
             throw new BadRequestException(`unable to create message: ${error}`);
         }
@@ -58,10 +31,11 @@ export class MessageService {
 
     /**
      * Verifies a message's signature.
-     * @param {boolean} isGroup - Is group chat or not.
-     * @param {Contact} admin - Admin contact.
-     * @param {Contact} from - From contact.
-     * @param {MessageDTO} signedMessage - Signed message to verify.
+     * @param {Object} obj - Object.
+     * @param {boolean} obj.isGroup - Is group chat or not.
+     * @param {Contact} obj.admin - Admin contact.
+     * @param {Contact} obj.from - From contact.
+     * @param {MessageDTO} obj.signedMessage - Signed message to verify.
      * @return {boolean} - Valid signature or not.
      */
     async verifySignedMessage<T>({
@@ -99,8 +73,9 @@ export class MessageService {
 
     /**
      * Verifies a message's signature by given chat.
-     * @param {Chat} chat - Chat containing message.
-     * @param {MessageDTO} signedMessage - Signed message to verify.
+     * @param {Object} obj - Object.
+     * @param {Chat} obj.chat - Chat containing message.
+     * @param {MessageDTO} obj.signedMessage - Signed message to verify.
      * @return {boolean} - Valid signature or not.
      */
     async verifySignedMessageByChat<T>({

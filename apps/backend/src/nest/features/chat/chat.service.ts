@@ -209,7 +209,8 @@ export class ChatService {
 
         chat.read[0] = message.body;
         this._chatGateway.emitMessageToConnectedClients('message', message);
-        return await this._chatRepository.updateChat(chat);
+        await this._chatRepository.updateChat(chat);
+        return chat
     }
 
     /**
