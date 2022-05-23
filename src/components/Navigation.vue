@@ -51,7 +51,7 @@
                             style="position: relative"
                             @click="changePage(app.name)"
                         >
-                            <img alt="icon of navigation item" :src="app.icon" class="w-8 first:h-8 first:w-auto" />
+                            <img alt="icon of navigation item" :src="app.icon" class="w-8 first:h-8" />
                             <span class="mt-2 capitalize">{{ app.name }}</span>
                         </div>
                     </div>
@@ -181,7 +181,7 @@
         TransitionRoot,
     } from '@headlessui/vue';
 
-    import { MenuIcon } from '@heroicons/vue/solid';
+    import { MenuIcon, XIcon } from '@heroicons/vue/solid';
 
     const apps: Array<AppItemType> = [
         {

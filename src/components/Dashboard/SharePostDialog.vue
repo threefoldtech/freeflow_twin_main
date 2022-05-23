@@ -6,30 +6,54 @@
         @keydown.esc="$emit('close')"
         @click="$emit('close')"
     >
-        <div class="bg-white w-11/12 md:max-w-2xl md:w-3/4 p-4 rounded-lg relative" @click.stop>
-            <XIcon class="w-5 h-5 text-gray-500 absolute right-4 top-4 cursor-pointer" @click="$emit('close')" />
-            <h1 class="font-medium">Share post</h1>
-            <div class="p-4 rounded bg-gray-100 my-4" :class="{ 'min-h-[200px]': item?.images?.length !== 0 }">
-                <div class="flex items-center">
-                    <img :src="avatarImg" class="w-10 h-10 rounded-full" />
-                    <p class="ml-3 font-medium">{{ item.owner.id }}</p>
+        <div
+            class="bg-white w-full h-full md:h-auto md:max-w-2xl md:w-3/4 md:rounded-lg overflow-y-auto hide-scrollbar md:overflow-hidden"
+            @click.stop
+        >
+            <div class="bg-accent-700 text-white md:rounded-t-lg">
+                <div class="px-4 pt-8 flex items-center justify-between">
+                    <h1 class="font-medium">Share post</h1>
+                    <XIcon class="w-6 h-6 text-accent-300 cursor-pointer" @click="$emit('close')" />
                 </div>
-                <div class="mt-2 text-gray-600">
-                    <p class="break-words">{{ item.post.body }}</p>
-                </div>
-                <div v-if="item?.images?.length !== 0">
-                    <img :src="fetchPostImage(item.images[0])" class="rounded-lg max-h-[200px] object-cover mt-2" />
-                    <div class="mt-4 flex items-center">
-                        <PhotographIcon class="w-6 h-6 text-gray-500" />
-                        <span class="ml-2 font-medium text-gray-500">{{ item.images.length }} images</span>
+                <div class="p-4" :class="{ 'min-h-[200px]': item?.images?.length !== 0 }">
+                    <div class="flex items-center">
+                        <img :src="avatarImg" class="w-10 h-10 rounded-full" />
+                        <div class="ml-3">
+                            <p class="font-medium">{{ item.owner.id }}</p>
+                            <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-gray-600">
+                        <p v-if="!readMore && item.post.body.length > 200" class="break-words text-accent-300">
+                            {{ item.post.body.slice(0, 200) }}
+                        </p>
+                        <p v-else class="break-words text-accent-300">{{ item.post.body }}</p>
+                        <a class="text-white" v-if="item.post.body.length > 200" @click="readMore = !readMore" href="#">
+                            {{ readMore ? 'Show less' : 'Read more' }}
+                        </a>
+                    </div>
+                    <div :class="{ 'grid-cols-1': item.images.length === 1 }" class="grid grid-cols-2 my-4 gap-1">
+                        <div
+                            v-for="(image, idx) in item.images.slice(0, showAllImages ? item.images.length : 4)"
+                            :key="idx"
+                            class="relative overflow-hidden cursor-pointer max-h-96"
+                        >
+                            <div
+                                v-if="!showAllImages && idx === 3 && item.images.length >= 5"
+                                class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center"
+                            >
+                                <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
+                            </div>
+                            <img :src="fetchPostImage(image)" class="object-cover" @click="openImagePreview(image)" />
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col">
-                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                    <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                        <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                            <table class="min-w-full divide-y divide-gray-200">
+            <div class="flex flex-col md:max-h-80 md:overflow-y-auto md:overflow-x-hidden">
+                <div class="-my-2 sm:-mx-6 lg:-mx-8">
+                    <div class="pt-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
+                        <div class="overflow-hidden border-b md:border-r border-gray-200">
+                            <table class="w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
                                         <th
@@ -45,22 +69,24 @@
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr v-for="chat in chats" :key="chat.adminId">
-                                        <td class="px-6 py-4 whitespace-nowrap">
+                                        <td class="pl-6 py-4">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full">
                                                     <img
-                                                        :src="getAvatar(parseContactLocation(chat.chatId, chat.adminId))"
+                                                        :src="
+                                                            getAvatar(parseContactLocation(chat.chatId, chat.adminId))
+                                                        "
                                                         class="h-10 w-10 rounded-full"
                                                     />
                                                 </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm font-medium text-gray-900">
-                                                        {{ chat.chatId }}
+                                                <div class="ml-4 w-full">
+                                                    <div class="text-sm font-medium w-1/2 truncate text-gray-900">
+                                                        {{ chat.name }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                        <td class="pr-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div
                                                 v-if="!isAlreadySharedWWithPerson(chat.adminId)"
                                                 class="flex items-center justify-end"
@@ -74,7 +100,18 @@
                                                     Cancel
                                                 </p>
                                             </div>
-                                            <a
+                                            <button
+                                                v-if="
+                                                    !isInQueue(chat.adminId) &&
+                                                    !isAlreadySharedWWithPerson(chat.adminId)
+                                                "
+                                                @click="sharePostWithFriend(chat.adminId)"
+                                                type="button"
+                                                class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none"
+                                            >
+                                                Share
+                                            </button>
+                                            <!--<a
                                                 v-if="
                                                     !isInQueue(chat.adminId) &&
                                                     !isAlreadySharedWWithPerson(chat.adminId)
@@ -83,7 +120,7 @@
                                                 href="#"
                                                 @click="sharePostWithFriend(chat.adminId)"
                                                 >Share</a
-                                            >
+                                            >-->
                                             <p v-if="isAlreadySharedWWithPerson(chat.adminId)">Post shared</p>
                                         </td>
                                     </tr>
@@ -106,6 +143,7 @@
     import { PhotographIcon, XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
     import { Contact } from '@/types';
+    import moment from 'moment';
 
     const emit = defineEmits(['close']);
 
@@ -115,18 +153,24 @@
     const queue = ref<string[]>([]);
     const peopleIHaveSharedWith = ref<string[]>([]);
     const dialogRef = ref<HTMLElement>(null);
+    const readMore = ref<boolean>(false);
     let escListener = null;
 
     const props = defineProps<{ item: SOCIAL_POST; avatar: any }>();
 
     onMounted(() => {
         dialogRef.value.focus();
+        console.log(chats);
     });
 
     const fetchPostImage = (image: { path: string }) => {
         return calcExternalResourceLink(
             `http://[${props.item.owner.location}]/api/v1/posts/download/${btoa(image.path)}`
         );
+    };
+
+    const timeAgo = time => {
+        return moment(time).fromNow();
     };
 
     const sharePostWithFriend = async (id: string) => {

@@ -23,8 +23,8 @@
                 ></Sidebar>
             </slot>-->
             <Navigation :class="[smallScreen ? 'top' : 'side']"/>
-            <div class="content w-full h-full overflow-y-auto relative flex flex-col">
-                <div class="relative w-full h-full overflow-y-auto">
+            <div class="content w-full h-full overflow-y-auto relative flex flex-col hide-scrollbar">
+                <div class="relative w-full h-full overflow-y-auto hide-scrollbar">
                     <div class="absolute w-full h-full">
                         <ImagePreview />
                         <slot></slot>

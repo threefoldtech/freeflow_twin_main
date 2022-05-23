@@ -104,57 +104,72 @@
                             <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                         </div>
                     </div>
-                    <!--
-                        Enkel terugzetten als er een unieke optie is nu staat share er 2 keer in
-                    <div class='group absolute right-0 top-0 z-40'>
-                        <Popover v-slot='{ open }' class='relative z-40'>
+                    <div class="group absolute right-0 top-0 z-40">
+                        <Popover v-slot="{ open }" class="relative z-40">
                             <PopoverButton
                                 :class="open ? '' : 'text-opacity-90'"
-                                class='items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75'
+                                class="items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none"
                             >
                                 <DotsVerticalIcon
-                                    class='text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600'
+                                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
                                 />
                                 <ChevronDownIcon
                                     :class="open ? '' : 'text-opacity-70'"
-                                    aria-hidden='true'
-                                    class='w-5 h-5 ml-2 text-orange-300 transition duration-150 ease-in-out group-hover:text-opacity-80'
+                                    aria-hidden="true"
+                                    class="w-5 h-5 ml-2 text-orange-300 transition duration-150 ease-in-out group-hover:text-opacity-80"
                                 />
                             </PopoverButton>
                             <transition
-                                enter-active-class='transition duration-200 ease-out'
-                                enter-from-class='translate-y-1 opacity-0'
-                                enter-to-class='translate-y-0 opacity-100'
-                                leave-active-class='transition duration-150 ease-in'
-                                leave-from-class='translate-y-0 opacity-100'
-                                leave-to-class='translate-y-1 opacity-0'
+                                enter-active-class="transition duration-200 ease-out"
+                                enter-from-class="translate-y-1 opacity-0"
+                                enter-to-class="translate-y-0 opacity-100"
+                                leave-active-class="transition duration-150 ease-in"
+                                leave-from-class="translate-y-0 opacity-100"
+                                leave-to-class="translate-y-1 opacity-0"
                             >
-                                <PopoverPanel class='absolute z-50 w-64 px-4 transform -translate-x-1/2 left-1/2'>
-                                    <div class='rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
-                                        <div class='relative grid gap-8 bg-white p-6 rounded'>
-                                            <a
-                                                v-for='item in solutions'
-                                                :key='item.name'
-                                                :href='item.href'
-                                                class='items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50'
-                                                @click='() => item.action()'
+                                <PopoverPanel class="absolute z-50 top-0 right-9">
+                                    <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                        <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
+                                            <div
+                                                v-if="props.item.owner.id === user.id.toString()"
+                                                class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
+                                                @click="showDeletePostDialog = true"
                                             >
-                                                <div class='w-full'>
-                                                    <p class='text-sm font-medium text-gray-900 w-full'>
+                                                <TrashIcon class="w-6 mr-4" />
+                                                <p>Delete</p>
+                                            </div>
+                                            <!--<a
+                                                v-for="item in solutions"
+                                                :key="item.name"
+                                                :href="item.href"
+                                                class="items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-gray-50 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                                                @click="() => item.action()"
+                                            >
+                                                <div class="w-full">
+                                                    <p class="text-sm font-medium text-gray-900 w-full">
                                                         {{ item.name }}
                                                     </p>
                                                 </div>
-                                            </a>
+                                            </a>-->
                                         </div>
                                     </div>
                                 </PopoverPanel>
                             </transition>
                         </Popover>
-                    </div> -->
+                    </div>
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <p class="my-2 break-words">{{ item.post.body }}</p>
+                <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
+                <div class="my-2 break-words">
+                    <p v-if="!readMore && item.post.body.length > 200">
+                        {{ item.post.body.slice(0, 200) }}
+                    </p>
+                    <p v-else>{{ item.post.body }}</p>
+                    <a class="text-gray-800" v-if="item.post.body.length > 200" @click="readMore = !readMore" href="#">
+                        {{ readMore ? 'Show less' : 'Read more' }}
+                    </a>
+                </div>
                 <div :class="{ 'grid-cols-1': item.images.length === 1 }" class="grid grid-cols-2 my-4 gap-1">
                     <div
                         v-for="(image, idx) in item.images.slice(0, showAllImages ? item.images.length : 4)"
@@ -265,14 +280,6 @@
                 <ShareIcon class="w-6 mr-4" />
                 <p>Share</p>
             </div>
-            <div
-                v-if="props.item.owner.id === user.id.toString()"
-                class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
-                @click="showDeletePostDialog = true"
-            >
-                <TrashIcon class="w-6 mr-4" />
-                <p>Delete</p>
-            </div>
         </div>
         <div>
             <TransitionRoot
@@ -284,6 +291,14 @@
                 leave-from="opacity-100"
                 leave-to="opacity-0"
             >
+                <CommentsContainer
+                    v-if="showComments && item.replies.length > 0"
+                    :comments="item.replies"
+                    :postingCommentInProgress="postingCommentInProgress"
+                    class="border-t-2 rounded-b-lg"
+                    :class="{ 'max-h-[35rem]': $route.name === 'single' }"
+                    @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"
+                />
                 <form
                     v-if="showComments"
                     :class="{ 'opacity-50': postingCommentInProgress }"
@@ -297,26 +312,15 @@
                         :ref="inputRef"
                         v-model="messageInput"
                         :disabled="postingCommentInProgress"
-                        class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
+                        class="text-xs font-medium rounded-lg border border-gray-300 outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
                         placeholder="Type your message here"
                         type="text"
                         @focus="focusInput"
                     />
-                    <input
-                        class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"
-                        type="submit"
-                        value="Send"
-                    />
+                    <button type="submit" class="bg-transparent">
+                        <span class="material-symbols-rounded text-primary text-4xl"> send </span>
+                    </button>
                 </form>
-
-                <CommentsContainer
-                    v-if="showComments && item.replies.length > 0"
-                    :comments="item.replies"
-                    :postingCommentInProgress="postingCommentInProgress"
-                    class="border-t-2 rounded-b-lg"
-                    :class="{ 'max-h-[35rem]': $route.name === 'single' }"
-                    @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"
-                />
             </TransitionRoot>
             <TransitionRoot
                 :show="showIsUserTyping"
@@ -374,6 +378,7 @@
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
     const postingCommentInProgress = ref<boolean>(false);
+    const readMore = ref<boolean>(false);
     const { user } = useAuthState();
     const emit = defineEmits(['refreshPost']);
 
