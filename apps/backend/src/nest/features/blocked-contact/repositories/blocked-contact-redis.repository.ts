@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { DbService } from '../../db/db.service';
 import { EntityRepository } from '../../db/entity.repository';
@@ -12,32 +12,29 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
     }
 
     /**
-     * Gets blocked contacts using pagination.
-     * @return {string[]} - Found blocked contacts ids.
+     * Gets a blocked contact by id.
+     * @return {BlockedContact} - Found blocked contact.
      */
-    async getBlockedContacts(): Promise<string[]> {
-        try {
-            const contacts = await this.findAll({});
-            return contacts.map(c => c.id);
-        } catch (error) {
-            console.log(error);
-            return [];
-        }
+    async getBlockedContact({ id }: { id: string }): Promise<BlockedContact> {
+        return await this.findOne({ where: 'id', eq: id });
+    }
+
+    /**
+     * Gets blocked contacts using pagination.
+     * @return {BlockedContact[]} - Found blocked contacts.
+     */
+    async getBlockedContacts({ offset, count }: { offset: number; count: number }): Promise<BlockedContact[]> {
+        return await this.findAll({ offset, count });
     }
 
     /**
      * Adds a contact to blocked list and removes it from contacts.
      * @param {Object} obj - Object.
      * @param {string} obj.id - Contact ID.
-     * @return {string} - Blocked contact id.
+     * @return {BlockedContact} - Blocked contact.
      */
-    async addBlockedContact({ id }: CreateBlockedContactDTO): Promise<string> {
-        try {
-            const contact = await this.save({ id });
-            return contact.id;
-        } catch (error) {
-            throw new BadRequestException(`unable to add contact to blocked list: ${error}`);
-        }
+    async addBlockedContact({ id }: CreateBlockedContactDTO): Promise<BlockedContact> {
+        return await this.save({ id });
     }
 
     /**
@@ -46,11 +43,6 @@ export class BlockedContactRedisRepository extends EntityRepository<BlockedConta
      * @param {string} obj.id - Contact ID.
      */
     async deleteBlockedContact({ id }: DeleteBlockedContactDTO): Promise<void> {
-        try {
-            const contact = await this.findOne({ where: 'id', eq: id });
-            return await this.delete(contact.entityId);
-        } catch (error) {
-            throw new BadRequestException(`unable to remove contact from blocked list: ${error}`);
-        }
+        return await this.delete(id);
     }
 }
