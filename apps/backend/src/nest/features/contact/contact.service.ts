@@ -1,27 +1,24 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'redis-om';
 
 import { ContactRequest, MessageBody, MessageType } from '../../types/message-types';
 import { uuidv4 } from '../../utils/uuid';
 import { ApiService } from '../api/api.service';
 import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
-import { DbService } from '../db/db.service';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { Message } from '../message/models/message.model';
 import { CreateContactDTO, DeleteContactDTO } from './dtos/contact.dto';
-import { Contact, contactSchema } from './models/contact.model';
+import { Contact } from './models/contact.model';
+import { ContactRedisRepository } from './repositories/contact-redis.repository';
 
 @Injectable()
 export class ContactService {
-    private _contactRepo: Repository<Contact>;
-
     constructor(
-        private readonly _dbService: DbService,
+        private readonly _contactRepo: ContactRedisRepository,
         private readonly _messageService: MessageService,
         private readonly _locationService: LocationService,
         private readonly _configService: ConfigService,
@@ -31,10 +28,7 @@ export class ContactService {
         private readonly _chatService: ChatService,
         @Inject(forwardRef(() => ChatGateway))
         private readonly _chatGateway: ChatGateway
-    ) {
-        this._contactRepo = this._dbService.createRepository(contactSchema);
-        this._contactRepo.createIndex();
-    }
+    ) {}
 
     /**
      * Gets contacts using pagination.
@@ -45,7 +39,7 @@ export class ContactService {
      */
     async getContacts({ offset = 0, count = 50 }: { offset?: number; count?: number } = {}): Promise<Contact[]> {
         try {
-            return await this._contactRepo.search().return.page(offset, count);
+            return await this._contactRepo.getContacts({ offset, count });
         } catch {
             return [];
         }
@@ -58,7 +52,7 @@ export class ContactService {
      */
     async getContact({ id }: { id: string }): Promise<Contact> {
         try {
-            return await this._contactRepo.search().where('id').equals(id).return.first();
+            return await this._contactRepo.getContact({ id });
         } catch (error) {
             throw new NotFoundException('contact not found');
         }
@@ -74,25 +68,24 @@ export class ContactService {
      */
     async createNewContact({ id, location, message }: CreateContactDTO<MessageBody>): Promise<Contact> {
         const yggdrasilAddress = await this._locationService.getOwnLocation();
-        // createEntity without saving to Redis
-        const me = this._contactRepo.createEntity({
+        const me = {
             id: this._configService.get<string>('userId'),
             location: yggdrasilAddress as string,
-        });
+        };
 
         const newMessage = await this._messageService.createMessage(message);
 
-        let newContact;
-        try {
-            newContact = await this.getContact({ id });
-            if (!newContact)
-                newContact = await this._contactRepo.createAndSave({
+        let newContact = await this.getContact({ id });
+        if (!newContact) {
+            try {
+                newContact = await this._contactRepo.addNewContact({
                     id,
                     location,
                     contactRequest: false,
                 });
-        } catch (error) {
-            throw new BadRequestException(`unable to create contact: ${error}`);
+            } catch (error) {
+                throw new BadRequestException(`unable to create contact: ${error}`);
+            }
         }
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message: newMessage });
@@ -148,22 +141,22 @@ export class ContactService {
         message,
     }: CreateContactDTO<ContactRequest>): Promise<Contact> {
         const yggdrasilAddress = await this._locationService.getOwnLocation();
-        const me = this._contactRepo.createEntity({
+        const me = {
             id: this._configService.get<string>('userId'),
             location: yggdrasilAddress as string,
-        });
+        };
 
-        let newContact;
-        try {
-            newContact = await this.getContact({ id });
-            if (!newContact)
-                newContact = await this._contactRepo.createAndSave({
+        let newContact = await this.getContact({ id });
+        if (!newContact) {
+            try {
+                newContact = await this._contactRepo.addNewContact({
                     id,
                     location,
                     contactRequest,
                 });
-        } catch (error) {
-            throw new BadRequestException(`unable to create contact: ${error}`);
+            } catch (error) {
+                throw new BadRequestException(`unable to create contact: ${error}`);
+            }
         }
 
         const contactRequestMsg: MessageDTO<string> = {
@@ -199,15 +192,9 @@ export class ContactService {
      * @param {string} contactId - Contacts Id.
      * @return {Contact} - Found contact.
      */
-    async getAcceptedContact({ contactId }: { contactId: string }): Promise<Contact> {
+    async getAcceptedContact({ id }: { id: string }): Promise<Contact> {
         try {
-            return await this._contactRepo
-                .search()
-                .where('id')
-                .eq(contactId)
-                .and('contactRequest')
-                .false()
-                .return.first();
+            return await this._contactRepo.getAcceptedContact({ id });
         } catch (error) {
             throw new NotFoundException(`contact not found`);
         }
@@ -224,9 +211,10 @@ export class ContactService {
         const existingContact = await this.getContact({ id });
         if (existingContact) return;
         try {
-            return await this._contactRepo.createAndSave({
+            return await this._contactRepo.addNewContact({
                 id,
                 location,
+                contactRequest: false,
             });
         } catch (error) {
             throw new BadRequestException(`unable to add contact: ${error}`);
@@ -238,9 +226,9 @@ export class ContactService {
      * @param {string} id - Contact ID.
      */
     async deleteContact({ id }: DeleteContactDTO): Promise<void> {
+        const contact = await this.getContact({ id });
         try {
-            const contact = await this._contactRepo.search().where('id').eq(id).return.first();
-            return await this._contactRepo.remove(contact.entityId);
+            return await this._contactRepo.deleteContact({ id: contact.entityId });
         } catch (error) {
             throw new BadRequestException(`unable remove contact: ${error}`);
         }

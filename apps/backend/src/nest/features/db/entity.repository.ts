@@ -56,6 +56,29 @@ export abstract class EntityRepository<TEntity extends Entity> {
     }
 
     /**
+     * Finds one entity based on nested search.
+     * @param {Object} obj - Object.
+     * @param {string} obj.where - Where entity field.
+     * @param {string|boolean} obj.eq - Equals.
+     * @param {string} obj.and - And nested where.
+     * @param {string|boolean} obj.andEq - Nested Equals.
+     * @return {TEntity} - Found entity.
+     */
+    protected async findOneAnd({
+        where,
+        eq,
+        and,
+        andEq,
+    }: {
+        where: string;
+        eq: string | boolean;
+        and: string;
+        andEq: string | boolean;
+    }): Promise<TEntity> {
+        return await this._entityRepository.search().where(where).eq(eq).and(and).eq(andEq).return.first();
+    }
+
+    /**
      * Creates a new entity in the database.
      * @param {EntityCreationData} entity - Entity creation data.
      * @return {TEntity} - Created entity.

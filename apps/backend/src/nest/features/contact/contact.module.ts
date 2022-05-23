@@ -9,6 +9,7 @@ import { MessageModule } from '../message/message.module';
 import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 import { ContactController } from './contact.controller';
 import { ContactService } from './contact.service';
+import { ContactRedisRepository } from './repositories/contact-redis.repository';
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { ContactService } from './contact.service';
         forwardRef(() => MessageModule),
     ],
     controllers: [ContactController],
-    providers: [ContactService],
+    providers: [ContactService, ContactRedisRepository],
     exports: [ContactService],
 })
 export class ContactModule {}
