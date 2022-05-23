@@ -1,0 +1,172 @@
+{
+    "info": {
+        "_postman_id": "26a61995-230c-41fa-b3e9-0d4d02a92760",
+        "name": "DigitalTwin",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Is authenticated",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/nest/auth/authenticated",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "auth", "authenticated"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Sign in",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/nest/auth/signin?username=edward",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "auth", "signin"],
+                            "query": [
+                                {
+                                    "key": "username",
+                                    "value": "edward"
+                                }
+                            ]
+                        },
+                        "description": "Sign in using new NestJS endpoint."
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "User",
+            "item": [
+                {
+                    "name": "Get public key",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/nest/user/publickey",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "user", "publickey"]
+                        },
+                        "description": "Get users public key (needs to be authenticated)."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get status",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/nest/user/avatar/1",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "user", "avatar", "1"]
+                        },
+                        "description": "Gets the avatar of given user ID."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get avatar",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/nest/user/avatar",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "user", "avatar"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Upload avatar",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "/home/edward/Pictures/ape.jpg"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "http://localhost:3000/nest/user/avatar",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "user", "avatar"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Chat",
+            "item": [
+                {
+                    "name": "Get accepted chats",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/nest/chats",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "chats"]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create new chat",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"test\",\n    \"contacts\": [\n        {\"id\": \"1\", \"location\": \"localhost\"}, \n        {\"id\": \"2\", \"location\": \"localhost\"}\n    ],\n    \"messages\": [\n        {\n            \"chatId\": \"testchat\", \n            \"from\": \"edward\", \n            \"to\": \"jens\", \n            \"body\": \"Test message\", \n            \"timestamp\": \"2022-03-02\", \n            \"type\": \"MESSAGE\", \n            \"subject\": \"Subject\", \n            \"signatures\": [\"edward\"], \n            \"replies\": [\n                {\n                    \"chatId\": \"testchat\", \n                    \"from\": \"jens\", \n                    \"to\": \"edward\", \n                    \"body\": \"Test reply\", \n                    \"timestamp\": \"2022-03-02\", \n                    \"type\": \"MESSAGE\", \n                    \"subject\": \"Reply\", \n                    \"signatures\": [\"jens\"], \n                    \"replies\": []\n                }\n            ]\n        },\n        {\n            \"chatId\": \"testchat\", \n            \"from\": \"jens\", \n            \"to\": \"edward\", \n            \"body\": \"Test reply\", \n            \"timestamp\": \"2022-03-02\", \n            \"type\": \"MESSAGE\", \n            \"subject\": \"Reply\", \n            \"signatures\": [\"jens\"], \n            \"replies\": []\n        }\n    ],\n    \"acceptedChat\": true,\n    \"adminId\": \"edward\",\n    \"read\": [\"edward\"],\n    \"isGroup\": false,\n    \"draft\": [\n        {\n            \"chatId\": \"testchat\", \n            \"from\": \"edward\", \n            \"to\": \"jent\", \n            \"body\": \"Test draft\", \n            \"timestamp\": \"2022-03-02\", \n            \"type\": \"MESSAGE\", \n            \"subject\": \"Draft\", \n            \"signatures\": [], \n            \"replies\": []\n        }\n    ]\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "http://localhost:3000/nest/chats",
+                            "protocol": "http",
+                            "host": ["localhost"],
+                            "port": "3000",
+                            "path": ["nest", "chats"]
+                        }
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

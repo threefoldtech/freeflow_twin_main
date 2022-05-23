@@ -1,0 +1,36 @@
+.DS_Store
+node_modules/
+/dist/
+# Ignore built ts files
+dist/**/*
+/frontend/dist/
+# local env files
+.env
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+uploads/
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+*.so.*
+*.node
+digitaltwin
+build
+package-lock.json
+.greenlockrci
+publisher/greenlock.d/config.json*
+*.log
+*.lock
+tmp
