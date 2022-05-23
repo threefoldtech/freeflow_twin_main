@@ -32,7 +32,12 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
         return await this.findOne({ where: 'id', eq: id });
     }
 
-    async getAcceptedContact({ id }: { id: string }) {
+    /**
+     * Gets a contact that has accepted the chat request (contactRequest is false).
+     * @param {string} id - Contacts Id.
+     * @return {Contact} - Found contact.
+     */
+    async getAcceptedContact({ id }: { id: string }): Promise<Contact> {
         return await this.findOneAnd({ where: 'id', eq: id, and: 'contactRequest', andEq: false });
     }
 

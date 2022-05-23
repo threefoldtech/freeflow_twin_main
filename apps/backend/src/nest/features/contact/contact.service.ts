@@ -189,7 +189,7 @@ export class ContactService {
 
     /**
      * Gets a contact that has accepted the chat request (contactRequest is false).
-     * @param {string} contactId - Contacts Id.
+     * @param {string} id - Contacts Id.
      * @return {Contact} - Found contact.
      */
     async getAcceptedContact({ id }: { id: string }): Promise<Contact> {

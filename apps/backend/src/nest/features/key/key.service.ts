@@ -1,27 +1,21 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'redis-om';
 
 import { ApiService } from '../api/api.service';
 import { ContactDTO } from '../contact/dtos/contact.dto';
-import { DbService } from '../db/db.service';
 import { EncryptionService } from '../encryption/encryption.service';
 import { MessageDTO } from '../message/dtos/message.dto';
-import { Key, keySchema, KeyType } from './models/key.model';
+import { Key, KeyType } from './models/key.model';
+import { KeyRedisRepository } from './repositories/key-redis.repository';
 
 @Injectable()
 export class KeyService {
-    private _keyRepo: Repository<Key>;
-
     constructor(
+        private readonly _keyRepo: KeyRedisRepository,
         private readonly _configService: ConfigService,
-        private readonly _dbService: DbService,
         private readonly _encryptionService: EncryptionService,
         private readonly _apiService: ApiService
-    ) {
-        this._keyRepo = this._dbService.createRepository(keySchema);
-        this._keyRepo.createIndex();
-    }
+    ) {}
 
     /**
      * Updates either private or public key based on the key type.
@@ -33,33 +27,38 @@ export class KeyService {
     async updateKey({ pk, keyType }: { pk: Uint8Array; keyType: KeyType }): Promise<Key> {
         const pkString = this._encryptionService.uint8ToBase64(pk);
         const userId = this._configService.get<string>('userId');
-        try {
-            const existingKey = await this.getKey({ keyType, userId });
-            if (!existingKey)
-                return this._keyRepo.createAndSave({
+        const existingKey = await this.getKey({ keyType, userId });
+
+        if (!existingKey)
+            try {
+                return this._keyRepo.createKey({
                     userId,
                     key: pkString,
                     keyType,
-                });
-        } catch (error) {
-            throw new BadRequestException(error);
-        }
+                } as Key);
+            } catch (error) {
+                throw new BadRequestException(error);
+            }
+
+        existingKey.key = pkString;
+        await this._keyRepo.updateKey(existingKey);
+        return existingKey;
     }
 
     /**
      * Adds an external contacts public key to cache.
      * @param {Object} obj - Object.
      * @param {Uint8Array} obj.pk - Private/Public key in Uint8Array format.
-     * @param {string} obj.userID - Contact ID.
+     * @param {string} obj.userId - Contact Id.
      * @return {Key} - Created Key entity.
      */
-    async addContactPublicKey({ key, userID }: { key: string; userID: string }): Promise<Key> {
+    async addContactPublicKey({ key, userId }: { key: string; userId: string }): Promise<Key> {
         try {
-            return this._keyRepo.createAndSave({
-                userID,
+            return this._keyRepo.createKey({
+                userId,
                 key,
                 keyType: KeyType.Public,
-            });
+            } as Key);
         } catch (error) {
             throw new BadRequestException(error);
         }
@@ -74,7 +73,7 @@ export class KeyService {
      */
     async getKey({ keyType, userId }: { keyType: KeyType; userId: string }): Promise<Key> {
         try {
-            return this._keyRepo.search().where('keyType').equals(keyType).and('userId').equals(userId).return.first();
+            return this._keyRepo.getKey({ keyType, userId });
         } catch (error) {
             throw new NotFoundException(error);
         }
