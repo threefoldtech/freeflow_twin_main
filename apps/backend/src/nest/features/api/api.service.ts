@@ -64,6 +64,13 @@ export class ApiService {
         }
     }
 
+    /**
+     * Sends a delete chat request to contacts in a chat.
+     * There is a security check so that only the group admin can delete chats.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to send request to.
+     * @param {string} obj.chatId - Chat id to delete.
+     */
     async sendRemoveChat({ location, chatId }: { location: string; chatId: string }) {
         const destinationUrl = `http://[${location}]/api/v2/chats/${chatId}`;
         try {

@@ -127,7 +127,7 @@
                                     rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE;
                                 }
                             "
-                            >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete user' }}
+                            >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete chat' }}
                         </v-contextmenu-item>
                     </v-contextmenu>
                     <ul role="list" class="divide-y divide-gray-200 border-t border-gray-200 w-full">

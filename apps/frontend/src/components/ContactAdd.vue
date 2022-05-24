@@ -182,7 +182,6 @@
     onMounted(async () => {
         const { retrieveContacts } = useContactsActions();
         await retrieveContacts();
-        console.log(`CONTACT: ${JSON.stringify(contacts.value)}`);
     });
 
     const contactAdd = (contact: Contact) => {
@@ -265,8 +264,8 @@
     axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
         const { user } = useAuthState();
         const posContacts = <Contact[]>r.data;
-        const alreadyExistingChatIds = [...contacts.value.map(c => c.id), user.id];
-        possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
+        // const alreadyExistingChatIds = [...chats.value.map(c => c.id), user.id];
+        possibleUsers.value = posContacts;
     });
 </script>
 

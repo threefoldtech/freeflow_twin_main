@@ -1,4 +1,4 @@
-import { ForbiddenException, forwardRef, Inject, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
     MessageBody,
@@ -96,11 +96,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     @SubscribeMessage('remove_chat')
     async handleRemoveCHat(@MessageBody() id: string) {
         const chat = await this._chatService.getChat(id);
-        if (chat.adminId !== this.userId) throw new ForbiddenException('not chat admin');
-        const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
-        contacts.map(async c => {
-            await this._apiService.sendRemoveChat({ location: c.location, chatId: id });
-        });
+        // only adming can delete group chat for everyone
+        if (chat.isGroup && chat.adminId === this.userId) {
+            const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
+            contacts.map(async c => {
+                await this._apiService.sendRemoveChat({ location: c.location, chatId: id });
+            });
+        }
         await this._chatService.deleteChat(id);
 
         this.emitMessageToConnectedClients('chat_removed', id);

@@ -144,17 +144,18 @@ export class ContactService {
             location: yggdrasilAddress as string,
         };
 
-        let newContact = await this.getContact({ id });
-        if (!newContact) {
-            try {
-                newContact = await this._contactRepo.addNewContact({
-                    id,
-                    location,
-                    contactRequest,
-                });
-            } catch (error) {
-                throw new BadRequestException(`unable to create contact: ${error}`);
-            }
+        const existingContact = await this.getContact({ id });
+        if (existingContact) return;
+
+        let newContact;
+        try {
+            newContact = await this._contactRepo.addNewContact({
+                id,
+                location,
+                contactRequest,
+            });
+        } catch (error) {
+            throw new BadRequestException(`unable to create contact: ${error}`);
         }
 
         const contactRequestMsg: MessageDTO<string> = {
