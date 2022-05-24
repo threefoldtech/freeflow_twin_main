@@ -178,12 +178,12 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
         ],
         name: name,
         adminId: user.id.toString(),
-        read: {},
+        read: null,
         acceptedChat: true,
         draft: null,
     };
     axios
-        .put(`${config.baseUrl}api/v1/group`, newGroupchat)
+        .post(`${config.baseUrl}api/v2/chats/group`, newGroupchat)
         .then(res => {
             console.log(res);
         })

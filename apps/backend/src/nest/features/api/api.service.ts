@@ -4,7 +4,6 @@ import axios, { ResponseType } from 'axios';
 import { StatusUpdate } from 'types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
-import { Chat } from '../chat/models/chat.model';
 import { MessageDTO } from '../message/dtos/message.dto';
 
 @Injectable()
@@ -69,7 +68,7 @@ export class ApiService {
      * Sends a group invitation to contacts in chat.
      * @param {Object} obj - Object.
      * @param {string} obj.location - IPv6 location to send invite to.
-     * @param {Chat} obj.chat - Chat with contacts to invite.
+     * @param {ChatDTO} obj.chat - Chat with contacts to invite.
      * @param {ResponseType} obj.responseType - Axios optional response type.
      */
     async sendGroupInvitation({
@@ -78,12 +77,11 @@ export class ApiService {
         responseType,
     }: {
         location: string;
-        chat: Chat;
+        chat: ChatDTO;
         responseType?: ResponseType;
     }) {
         try {
-            // TODO: change to /nest/group/invite when implemented
-            return await axios.put(`http://[${location}]/api/v1/group/invite`, chat, {
+            return await axios.post(`http://[${location}]/api/v2/chats/group/invite`, chat, {
                 responseType: responseType || 'json',
             });
         } catch (error) {

@@ -8,7 +8,6 @@ import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
-import { StatusUpdate } from 'types/status.type';
 import { FileAction } from 'types/file-actions.type';
 import { statusList } from './statusStore';
 

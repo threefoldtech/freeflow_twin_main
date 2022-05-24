@@ -16,6 +16,8 @@ export class ChatDTO {
     draft?: Message[];
 }
 
+export class GroupChatDTO extends ChatDTO {}
+
 export class CreateChatDTO {
     @IsString()
     chatId: string;
@@ -44,3 +46,5 @@ export class CreateChatDTO {
     @IsArray()
     draft?: Message[];
 }
+
+export class CreateGroupChatDTO extends CreateChatDTO {}

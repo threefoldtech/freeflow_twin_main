@@ -1,8 +1,8 @@
-import { BadRequestException, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { ChatService } from './chat.service';
-import { ChatDTO } from './dtos/chat.dto';
+import { ChatDTO, CreateChatDTO, GroupChatDTO } from './dtos/chat.dto';
 
 @Controller('chats')
 export class ChatController {
@@ -15,12 +15,28 @@ export class ChatController {
         return await this._chatService.acceptChatRequest(id);
     }
 
+    @Post('group')
+    @UseGuards(AuthGuard)
+    async createGroupChat(@Body() groupChatDTO: GroupChatDTO) {
+        await this._chatService.createGroupChat(groupChatDTO);
+        return { success: true };
+    }
+
+    @Post('group/invite')
+    @UseGuards(AuthGuard)
+    async acceptGroupInvite(@Body() createChatDTO: CreateChatDTO) {
+        await this._chatService.acceptGroupInvite(createChatDTO);
+        return { success: true };
+    }
+
     @Get()
+    @UseGuards(AuthGuard)
     async getAllChats(@Query('offset') offset = 0, @Query('count') count = 50): Promise<ChatDTO[]> {
         return await this._chatService.getChats({ offset, count });
     }
 
     @Get('accepted')
+    @UseGuards(AuthGuard)
     async getAcceptedChats(@Query('offset') offset = 0, @Query('count') count = 50): Promise<ChatDTO[]> {
         return await this._chatService.getAcceptedChats({ offset, count });
     }

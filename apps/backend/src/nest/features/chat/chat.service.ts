@@ -16,7 +16,7 @@ import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { stringifyMessage } from '../message/models/message.model';
 import { ChatGateway } from './chat.gateway';
-import { ChatDTO, CreateChatDTO } from './dtos/chat.dto';
+import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
 import { Chat, stringifyContacts } from './models/chat.model';
 import { ChatRedisRepository } from './repositories/chat-redis.repository';
 
@@ -47,6 +47,23 @@ export class ChatService {
     }
 
     /**
+     * Creates a new group chat.
+     * @param {CreateGroupChatDTO} createGroupChatDTO - Chat data to create.
+     * @return {Chat} - Created entity.
+     */
+    async createGroupChat(createGroupChatDTO: CreateGroupChatDTO): Promise<Chat> {
+        try {
+            const chat = await this._chatRepository.createChat(createGroupChatDTO);
+            chat.parseContacts().map(async c => {
+                await this._apiService.sendGroupInvitation({ location: c.location, chat: chat.toJSON() });
+            });
+            return chat;
+        } catch (error) {
+            throw new BadRequestException(`unable to create group chat: ${error}`);
+        }
+    }
+
+    /**
      * Accepts a chat request.
      * @param {string} chatId - Chat Id.
      * @return {ChatDTO} - Accepted chat.
@@ -64,6 +81,18 @@ export class ChatService {
         } catch (error) {
             throw new BadRequestException(`unable to accept chat request: ${error}`);
         }
+    }
+
+    /**
+     * Accepts a chat request.
+     * @param {ChatDTO} chat - Chat Id.
+     * @return {ChatDTO} - Accepted chat.
+     */
+    async acceptGroupInvite(chat: ChatDTO): Promise<ChatDTO> {
+        await this.createChat(chat);
+
+        this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
+        return chat;
     }
 
     /**

@@ -41,9 +41,9 @@ export class ChatRedisRepository extends EntityRepository<Chat> {
             messages: stringifyMessages(messages),
             acceptedChat,
             adminId,
-            read,
+            read: read ? read : [],
             isGroup,
-            draft: stringifyMessages(draft),
+            draft: draft ? stringifyMessages(draft) : [],
         });
     }
 

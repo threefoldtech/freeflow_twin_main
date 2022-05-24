@@ -56,7 +56,7 @@ export class MessageController {
 
     @Put()
     async handleIncomingMessage(@Body() message: CreateMessageDTO<unknown>) {
-        const blockedContacts = await this._blockedContactService.getBlockedContactList({ offset: 0, count: 200 });
+        const blockedContacts = await this._blockedContactService.getBlockedContactList();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
         if (isBlocked) throw new ForbiddenException('blocked');
