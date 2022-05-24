@@ -40,7 +40,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
      */
     @SubscribeMessage('message')
     async handleIncomingMessage(@MessageBody() { message }: { chatId: string; message: Message }) {
-        console.log(`INC GATEWAY: ${message.from}`);
         // get chat data
         const chat = await this._chatService.getChat(message.to);
         if (!chat) return;
@@ -88,6 +87,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     async handleBlockChat(@MessageBody() id: string) {
         await this._blockedContactService.addBlockedContact({ id });
         this.emitMessageToConnectedClients('chat_blocked', id);
+    }
+
+    @SubscribeMessage('remove_chat')
+    async handleRemoveCHat(@MessageBody() id: string) {
+        await this._chatService.deleteChat(id)
+        this.emitMessageToConnectedClients('chat_removed', id);
     }
 
     /**
