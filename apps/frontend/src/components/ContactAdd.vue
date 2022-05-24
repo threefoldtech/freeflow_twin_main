@@ -148,7 +148,7 @@
 
 <script lang="ts" setup>
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { ref } from 'vue';
+    import { ref, onMounted } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
     import { useAuthState, myYggdrasilAddress } from '../store/authStore';
     import { Contact } from '../types/index';
@@ -162,7 +162,6 @@
 
     const emit = defineEmits(['closeDialog']);
     const { contacts } = useContactsState();
-    //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
     const userAddLocation = ref('');
     const usernameAddError = ref('');
     const groupnameAdd = ref('');
@@ -179,6 +178,12 @@
         { name: 'user', text: 'Add a user' },
         { name: 'group', text: 'Create a group' },
     ]);
+
+    onMounted(async () => {
+        const { retrieveContacts } = useContactsActions();
+        await retrieveContacts();
+        console.log(`CONTACT: ${JSON.stringify(contacts.value)}`);
+    });
 
     const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
@@ -260,7 +265,7 @@
     axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
         const { user } = useAuthState();
         const posContacts = <Contact[]>r.data;
-        const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
+        const alreadyExistingChatIds = [...contacts.value.map(c => c.id), user.id];
         possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
     });
 </script>

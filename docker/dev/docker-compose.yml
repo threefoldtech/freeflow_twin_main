@@ -57,7 +57,7 @@ services:
       - chatnet
     restart: always
     environment:
-      - REDIS_HOSTS=local:edwardker-digitaltwin:6379
+      - REDIS_HOSTS=local:edwardker-digitaltwin:6379,local:debug-digitaltwin:6379
     ports:
       - "8081:8081"
     depends_on:

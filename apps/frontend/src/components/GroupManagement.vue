@@ -227,7 +227,7 @@
     const { contacts } = useContactsState();
 
     const filteredMembers = computed(() => {
-        return contacts
+        return contacts.value
             .filter(con => !props.chat.contacts.some(c => c.id === con.id))
             .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()));
     });
@@ -243,7 +243,7 @@
 
     onMounted(() => {
         //Calculating already existent objects
-        const computed = contacts.map(contact => {
+        const computed = contacts.value.map(contact => {
             for (const i of props.chat.contacts) {
                 if (contact.id === i.id && contact.location === i.location) {
                     return contact;
@@ -268,7 +268,7 @@
         updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
     const filteredContacts = computed(() => {
-        return contacts.filter(
+        return contacts.value.filter(
             //@ts-ignore
             c => !props.chat.contacts.map(x => x.id).includes(c.id)
         );

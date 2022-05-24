@@ -91,7 +91,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage('remove_chat')
     async handleRemoveCHat(@MessageBody() id: string) {
-        await this._chatService.deleteChat(id)
+        await this._chatService.deleteChat(id);
         this.emitMessageToConnectedClients('chat_removed', id);
     }
 

@@ -516,19 +516,17 @@
     };
 
     const doDeleteChat = async () => {
-        if (!chat.value.isGroup) {
-            await sendRemoveChat(chat.value.chatId);
-            return;
-        }
-        let contacts = chat.value.contacts.filter(c => c.id.toString() !== user.id.toString());
-        //admin gets removed as last from the group
-        contacts.push({ id: user.id, location: user.location });
-        for (const contact of contacts) {
-            if ('location' in contact) {
-                const { updateContactsInGroup } = usechatsActions();
-                await updateContactsInGroup(chat.value.chatId, contact, SystemMessageTypes.REMOVE_USER);
-            }
-        }
+        await sendRemoveChat(chat.value.chatId);
+        // let contacts = chat.value.contacts.filter(c => c.id.toString() !== user.id.toString());
+        // const chatAdmin = [...chat.value.contacts].filter(c => c.id === chat.value.adminId)
+        // //admin gets removed as last from the group
+        // contacts.push({ id: user.id, location: user.location });
+        // for (const contact of contacts) {
+        //     if ('location' in contact) {
+        //         const { updateContactsInGroup } = usechatsActions();
+        //         await updateContactsInGroup(chat.value.chatId, contact, SystemMessageTypes.DELETE_CHAT);
+        //     }
+        // }
     };
 
     const blockChat = () => (showDialog.value = true);

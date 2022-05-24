@@ -1,5 +1,6 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { EntityData } from 'redis-om';
 
 import { ContactRequest, MessageBody, MessageType } from '../../types/message-types';
 import { uuidv4 } from '../../utils/uuid';
@@ -32,11 +33,11 @@ export class ContactService {
 
     /**
      * Gets contacts using pagination.
-     * @return {Contact[]} - Found contacts.
+     * @return {EntityData[]} - Found contacts entity data.
      */
-    async getContacts(): Promise<Contact[]> {
+    async getContacts(): Promise<EntityData[]> {
         try {
-            return await this._contactRepo.getContacts();
+            return (await this._contactRepo.getContacts()).map(c => c.entityData);
         } catch {
             return [];
         }

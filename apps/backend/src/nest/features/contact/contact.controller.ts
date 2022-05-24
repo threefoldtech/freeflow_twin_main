@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { EntityData } from 'redis-om';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { MessageBody } from '../../types/message-types';
@@ -12,7 +13,7 @@ export class ContactController {
 
     @Get()
     @UseGuards(AuthGuard)
-    async getContacts(): Promise<Contact[]> {
+    async getContacts(): Promise<EntityData[]> {
         return await this._contactService.getContacts();
     }
 

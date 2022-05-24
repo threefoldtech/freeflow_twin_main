@@ -1,25 +1,23 @@
 import axios from 'axios';
-import { MessageTypes, SystemBody, SystemMessageTypes } from '../types';
+import { Contact, MessageTypes, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
 import { Chat } from '../types';
 import { usechatsActions, useChatsState } from './chatStore';
 import { useAuthState } from './authStore';
 import { Message, DtId } from '../types/index';
+import { reactive, toRefs } from 'vue';
 
-// const state = reactive<State>({
-//     contacts:[]
-// });
+const state = reactive<ContactState>({
+    contacts: [],
+});
 
-// const retrieveContacts = async () => {
-//     return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
-//         const contacts = response.data
-//         console.log(`here are the contacts`, contacts)
-
-//         state.contacts = contacts;
-//     })
-
-// }
+const retrieveContacts = async () => {
+    return axios.get(`${config.baseUrl}api/v2/contacts`).then(function (response) {
+        const contacts = response.data;
+        state.contacts = contacts;
+    });
+};
 
 // const contactIsHealthy = (location) => {
 //     let isAvailable = false
@@ -32,7 +30,7 @@ import { Message, DtId } from '../types/index';
 //     return isAvailable
 // }
 
-const addContact = (username: DtId, location, dontCheck = false) => {
+const addContact = (username: DtId, location: string, _dontCheck = false) => {
     const { user } = useAuthState();
     const addMessage: Message<SystemBody> = {
         id: uuidv4(),
@@ -47,7 +45,6 @@ const addContact = (username: DtId, location, dontCheck = false) => {
         replies: [],
         subject: null,
     };
-    const chatname: String = username;
     axios
         .post(`${config.baseUrl}api/v2/contacts`, {
             id: username,
@@ -57,30 +54,20 @@ const addContact = (username: DtId, location, dontCheck = false) => {
         .then(res => {});
 };
 
-const calculateContacts = () => {
-    const { chats } = useChatsState();
-    const { user } = useAuthState();
-    const contacts = chats.value
-        .filter(chat => !chat.isGroup && chat.acceptedChat)
-        .map(chat => chat.contacts.find(contact => contact.id !== user.id));
-    return contacts;
-};
-
 export const useContactsState = () => {
     return {
-        contacts: calculateContacts(),
-        // ...toRefs(state),
+        ...toRefs(state),
     };
 };
 
 export const useContactsActions = () => {
     return {
-        // retrieveContacts,
+        retrieveContacts,
         // setLastMessage,
         addContact,
     };
 };
 
-// interface State {
-//     contacts: Contact[]
-// }
+interface ContactState {
+    contacts: Contact[];
+}
