@@ -68,6 +68,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         return await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
     }
 
+    @SubscribeMessage('update_message')
+    async handleUpdateMessage(@MessageBody() { message }: { message: Message }) {
+        console.log(`UPDATE MSG TYPE: ${JSON.stringify(message)}`);
+        // const chat = await this._chatService.getChat(message.to);
+        // if (!chat) return;
+
+        // message.from = this._configService.get<string>('userId');
+        // // await this._chatService.handleEditMessage({ chatId: message.chatId, message });
+
+        // const signedMessage = await this._keyService.appendSignatureToMessage({ message });
+        // this._chatService.addMessageToChat({ chat, message: signedMessage });
+
+        // const location = chat.parseContacts().find(c => c.id === chat.adminId).location;
+        // return await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
+    }
+
     @SubscribeMessage('block_chat')
     async handleBlockChat(@MessageBody() id: string) {
         await this._blockedContactService.addBlockedContact({ id });

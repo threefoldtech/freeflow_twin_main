@@ -48,11 +48,13 @@ export class RemoveUserSystemState implements SubSystemMessageState {
             const { chatId } = chat;
             await this._chatService.deleteChat(chatId);
             this._chatGateway.emitMessageToConnectedClients('chat_removed', chatId);
+            return;
         }
-        this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
 
         await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
         await this._chatService.addMessageToChat({ chat, message });
+
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
         return await this._apiService.sendMessageToApi({ location: contact.location, message });
     }
 }

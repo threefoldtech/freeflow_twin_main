@@ -87,8 +87,8 @@ export interface Workspace extends GroupChat {
 }
 
 export enum SystemMessageTypes {
-    REMOVE_USER = 'REMOVEUSER',
-    ADD_USER = 'ADDUSER',
+    REMOVE_USER = 'REMOVE_USER',
+    ADD_USER = 'ADD_USER',
     JOINED_VIDEOROOM = 'JOINED_VIDEOROOM',
     CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND',
     USER_LEFT_GROUP = 'USER_LEFT_GROUP',

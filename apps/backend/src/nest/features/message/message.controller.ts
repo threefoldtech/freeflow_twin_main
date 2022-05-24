@@ -68,6 +68,16 @@ export class MessageController {
         const chatId = this._messageService.determineChatID(message);
         const chat = await this._chatService.getChat(chatId);
 
+        if (!chat) return;
+
+        console.log(`CHAT: ${JSON.stringify(chat)}`);
+        // TODO: fix encryption
+        // const validSignature = await this._messageService.verifySignedMessageByChat({
+        //     chat,
+        //     signedMessage: message,
+        // });
+        // if (!validSignature) throw new ForbiddenException('not allowed');
+
         if (message.type === MessageType.SYSTEM && chat.adminId !== message.from)
             throw new ForbiddenException(`not allowed`);
 

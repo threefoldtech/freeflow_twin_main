@@ -52,9 +52,14 @@ export class ChatService {
      * @return {Chat} - Created entity.
      */
     async createGroupChat(createGroupChatDTO: CreateGroupChatDTO): Promise<Chat> {
+        const userId = this._configService.get<string>('userId');
         try {
-            const chat = await this._chatRepository.createChat(createGroupChatDTO);
+            const chat = await this.createChat(createGroupChatDTO);
             chat.parseContacts().map(async c => {
+                if (c.id === userId) {
+                    this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
+                    return chat;
+                }
                 await this._apiService.sendGroupInvitation({ location: c.location, chat: chat.toJSON() });
             });
             return chat;
