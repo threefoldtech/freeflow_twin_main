@@ -148,6 +148,8 @@ export class EncryptionService {
      * @return {boolean} - Is a valid signature or not.
      */
     verifySignature({ data, signature, publicKey }: { data: unknown; signature: string; publicKey: string }): boolean {
+        console.log(`DATA: ${new Buffer(String(data)).toString('base64')}`);
+        console.log(`KEY: ${publicKey}`);
         return sign.detached.verify(
             this.objectToUint8Array(data),
             this.base64ToUint8Array(signature),

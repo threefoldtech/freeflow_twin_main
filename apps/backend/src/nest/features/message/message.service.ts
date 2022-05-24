@@ -53,8 +53,11 @@ export class MessageService {
 
         if (!fromContact) return false;
 
+        console.log(`FROM CONTACT: ${fromContact.id}`);
+
         const userID = this._configService.get<string>('userId');
         if (isGroup && adminContact?.id !== userID) {
+            console.log(`JAJA`);
             const adminVerified = await this._keyService.verifyMessageSignature({
                 contact: adminContact,
                 message: signedMessage,

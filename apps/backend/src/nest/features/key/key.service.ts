@@ -88,6 +88,7 @@ export class KeyService {
         const userId = this._configService.get<string>('userId');
         const { key } = await this.getKey({ keyType: KeyType.Private, userId });
         if (!key) return;
+        console.log(`UNSIGNED MSG: ${new Buffer(String(message)).toString('base64')}`);
         const signature = this._encryptionService.createBase64Signature({ data: message, secretKey: key });
         message.signatures ? message.signatures.unshift(signature) : (message.signatures = [signature]);
 
@@ -116,6 +117,7 @@ export class KeyService {
 
         // let pk: Key | { key: string } = await this.getPublicKeyByUserID(contact.id);
         const key = await this._apiService.getContactPublicKey({ location: contact.location });
+        console.log(`KEY: ${key}`);
         if (!key) return false;
         // await this.addContactPublicKey({ key, userID: contact.id });
         const messageWithoutSignature = {

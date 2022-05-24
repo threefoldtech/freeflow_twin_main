@@ -174,7 +174,7 @@ export class ContactService {
             contacts: [me, newContact],
             messages: [contactRequestMsg as Message],
             acceptedChat: false,
-            adminId: message.to,
+            adminId: message.from,
             read: [],
             isGroup: false,
             draft: [],

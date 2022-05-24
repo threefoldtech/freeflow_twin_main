@@ -601,11 +601,11 @@ export const useChatsState = () => {
 
 export const draftMessage = (chatId: string, message: any) => {
     getChat(chatId).draft = message;
-    axios.post(`${config.baseUrl}api/v1/updateDraft`, {
-        params: {
-            draftMessage: message,
-        },
-    });
+    // axios.post(`${config.baseUrl}api/v1/updateDraft`, {
+    //     params: {
+    //         draftMessage: message,
+    //     },
+    // });
 };
 
 export const usechatsActions = () => {

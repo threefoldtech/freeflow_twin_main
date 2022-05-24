@@ -40,6 +40,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
      */
     @SubscribeMessage('message')
     async handleIncomingMessage(@MessageBody() { message }: { chatId: string; message: Message }) {
+        console.log(`INC GATEWAY: ${message.from}`);
         // get chat data
         const chat = await this._chatService.getChat(message.to);
         if (!chat) return;
@@ -52,10 +53,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         // set correct chatId to message
         signedMessage.id = message.id;
 
-        const contacts = chat.parseContacts();
-        const location = contacts.find(c => c.id === message.to).location;
+        const location = chat.parseContacts().find(c => c.id === chat.adminId).location;
         if (signedMessage.type === MessageType.READ) {
-            return await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
+            await this._chatService.handleMessageRead(<MessageDTO<string>>signedMessage);
+            return await this._apiService.sendMessageToApi({
+                location,
+                message: <MessageDTO<string>>signedMessage,
+            });
         }
 
         // persist message
