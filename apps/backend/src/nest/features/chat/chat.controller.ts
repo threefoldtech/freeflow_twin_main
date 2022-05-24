@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { ChatService } from './chat.service';
@@ -39,5 +39,10 @@ export class ChatController {
     @UseGuards(AuthGuard)
     async getAcceptedChats(@Query('offset') offset = 0, @Query('count') count = 50): Promise<ChatDTO[]> {
         return await this._chatService.getAcceptedChats({ offset, count });
+    }
+
+    @Delete(':id')
+    async deleteChat(@Param('id') id: string) {
+        return await this._chatService.deleteChat(id);
     }
 }

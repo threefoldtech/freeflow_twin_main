@@ -297,6 +297,54 @@
             </div>
         </Dialog>
 
+        <Dialog
+            v-model="showDeleteChatDialog"
+            class="max-w-10"
+            :noActions="true"
+            @update-model-value="showDeleteChatDialog = false"
+        >
+            <template v-slot:title class="center">
+                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
+            </template>
+            <div v-if="chat?.isGroup">
+                <p v-if="chat?.contacts.length > 1" class="mb-5">
+                    Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
+                </p>
+                <div
+                    v-for="(contact, i) in chat?.contacts.filter(c => c.id !== user.id)"
+                    :key="i"
+                    @click="setNextAdmin"
+                    class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
+                    :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
+                >
+                    <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
+                        <AvatarImg :id="contact.id" small />
+                    </div>
+                    <p
+                        class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"
+                    >
+                        {{ contact.id }}
+                    </p>
+                </div>
+            </div>
+            <div v-else>
+                Do you really want to delete
+                <b> {{ chat?.name }} </b>
+                from your connections?
+            </div>
+            <div class="flex justify-end mt-2">
+                <button
+                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    @click="showLeaveDialog = false"
+                >
+                    Cancel
+                </button>
+                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred" @click="doLeaveChat">
+                    {{ chat?.isGroup ? 'Leave' : 'Delete' }}
+                </button>
+            </div>
+        </Dialog>
+
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
             <template #title> Deleting group </template>
             <template #content>
@@ -380,7 +428,7 @@
     const showDialog = ref(false);
     const showLeaveDialog = ref(false);
     const showDeleteDialog = ref(false);
-    const showRemoveUserDialog = ref(false);
+    const showDeleteChatDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
 
     watch(
@@ -561,6 +609,7 @@
         nextTick(() => scrollToBottom(true));
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
         if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
+        showDeleteChatDialog.value = false;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
     });
@@ -569,6 +618,7 @@
         //For when component is already mounted
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
         if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
+        showDeleteChatDialog.value = false;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
     });

@@ -64,6 +64,15 @@ export class ApiService {
         }
     }
 
+    async sendRemoveChat({ location, chatId }: { location: string; chatId: string }) {
+        const destinationUrl = `http://[${location}]/api/v2/chats/${chatId}`;
+        try {
+            return await axios.delete(destinationUrl);
+        } catch (error) {
+            throw new BadRequestException(`unable to delete chat: ${error}`);
+        }
+    }
+
     /**
      * Sends a group invitation to contacts in chat.
      * @param {Object} obj - Object.

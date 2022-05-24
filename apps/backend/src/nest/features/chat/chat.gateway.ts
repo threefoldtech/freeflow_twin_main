@@ -1,4 +1,4 @@
-import { forwardRef, Inject, Logger } from '@nestjs/common';
+import { ForbiddenException, forwardRef, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
     MessageBody,
@@ -26,6 +26,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     private logger: Logger = new Logger('ChatGateway');
 
+    private userId: string;
+
     constructor(
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService,
@@ -33,7 +35,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly _apiService: ApiService,
         @Inject(forwardRef(() => ChatService))
         private readonly _chatService: ChatService
-    ) {}
+    ) {
+        this.userId = this._configService.get<string>('userId');
+    }
 
     /**
      * Sends a new incoming message to all connected clients.
@@ -91,7 +95,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
     @SubscribeMessage('remove_chat')
     async handleRemoveCHat(@MessageBody() id: string) {
+        const chat = await this._chatService.getChat(id);
+        if (chat.adminId !== this.userId) throw new ForbiddenException('not chat admin');
+        const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
+        contacts.map(async c => {
+            await this._apiService.sendRemoveChat({ location: c.location, chatId: id });
+        });
         await this._chatService.deleteChat(id);
+
         this.emitMessageToConnectedClients('chat_removed', id);
     }
 

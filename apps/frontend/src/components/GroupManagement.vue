@@ -233,6 +233,7 @@
     });
 
     const showRemoveUserDialog = ref(false);
+    const showRemoveChatDialog = ref(false);
     const toBeRemovedUser = ref();
 
     const truncate = ({ body, extension }) => {

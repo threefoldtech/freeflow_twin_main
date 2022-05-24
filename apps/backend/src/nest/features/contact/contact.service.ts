@@ -35,9 +35,9 @@ export class ContactService {
      * Gets contacts using pagination.
      * @return {EntityData[]} - Found contacts entity data.
      */
-    async getContacts(): Promise<EntityData[]> {
+    async getContacts(): Promise<Contact[]> {
         try {
-            return (await this._contactRepo.getContacts()).map(c => c.entityData);
+            return await this._contactRepo.getContacts();
         } catch {
             return [];
         }
