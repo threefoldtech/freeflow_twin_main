@@ -21,6 +21,7 @@ import {
     PersistSystemMessage,
     RemoveUserSystemState,
     SubSystemMessageState,
+    UserLeftGroupMessageState,
 } from './system-message.state';
 
 export abstract class MessageState<T> {
@@ -109,6 +110,11 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.CONTACT_REQUEST_SEND,
             new PersistSystemMessage(this._chatService)
+        );
+        // user leaves group message handler
+        this._subSystemMessageStateHandlers.set(
+            SystemMessageType.USER_LEFT_GROUP,
+            new UserLeftGroupMessageState(this._chatService, this._configService, this._chatGateway)
         );
         // system default message handler
         this._subSystemMessageStateHandlers.set(SystemMessageType.DEFAULT, new PersistSystemMessage(this._chatService));

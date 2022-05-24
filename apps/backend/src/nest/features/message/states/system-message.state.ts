@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 
-import { GroupUpdate, SystemMessage } from '../../../types/message-types';
+import { GroupUpdate, SystemMessage, UserLeftGroupMessage } from '../../../types/message-types';
 import { ApiService } from '../../api/api.service';
 import { ChatGateway } from '../../chat/chat.gateway';
 import { ChatService } from '../../chat/chat.service';
@@ -64,5 +64,31 @@ export class PersistSystemMessage implements SubSystemMessageState {
 
     handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<string> {
         return this._chatService.addMessageToChat({ chat, message });
+    }
+}
+
+export class UserLeftGroupMessageState implements SubSystemMessageState {
+    constructor(
+        private readonly _chatService: ChatService,
+        private readonly _configService: ConfigService,
+        private readonly _chatGateway: ChatGateway
+    ) {}
+
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<void> {
+        const userId = this._configService.get<string>('userId');
+        const { contact, nextAdmin } = message.body as UserLeftGroupMessage;
+        if (contact.id === userId) {
+            await this._chatService.deleteChat(chat.chatId);
+            this._chatGateway.emitMessageToConnectedClients('chat_removed', chat.chatId);
+            return;
+        }
+        if (contact.id === chat.adminId && chat.contacts.length > 1) {
+            let newAdmin = chat.parseContacts().find(c => c.id === nextAdmin);
+            if (!newAdmin) newAdmin = chat.parseContacts().find(c => c.id !== contact.id)[0];
+            chat.adminId = newAdmin.id;
+        }
+        await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
+        await this._chatService.addMessageToChat({ chat, message });
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
     }
 }

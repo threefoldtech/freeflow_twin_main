@@ -70,7 +70,6 @@ export class MessageController {
 
         if (!chat) return;
 
-        console.log(`CHAT: ${JSON.stringify(chat)}`);
         // TODO: fix encryption
         // const validSignature = await this._messageService.verifySignedMessageByChat({
         //     chat,

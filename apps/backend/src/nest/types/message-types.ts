@@ -25,6 +25,11 @@ export interface SystemMessage {
     type: SystemMessageType;
 }
 
+export interface UserLeftGroupMessage extends SystemMessage {
+    contact: ContactDTO;
+    nextAdmin: string;
+}
+
 export interface GroupUpdate extends SystemMessage {
     contact: ContactDTO;
     adminLocation: string;
@@ -55,5 +60,6 @@ export enum SystemMessageType {
     REMOVE_USER = 'REMOVE_USER',
     JOINED_VIDEOROOM = 'JOINED_VIDEOROOM',
     CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND',
+    USER_LEFT_GROUP = 'USER_LEFT_GROUP',
     DEFAULT = 'DEFAULT',
 }
