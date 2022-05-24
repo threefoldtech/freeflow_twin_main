@@ -81,7 +81,7 @@
                 >
                     <div class="text-center">
                         <ChatIcon class="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No messages yet</h3>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts yet</h3>
                         <p class="mt-1 text-sm text-gray-500">Start chatting by adding a contact</p>
                         <div class="mt-6">
                             <button
