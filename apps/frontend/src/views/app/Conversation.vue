@@ -221,6 +221,7 @@
                                 @app-unblock="unBlockChat"
                                 @app-leave="leaveChat"
                                 @app-delete="deleteChat"
+                                @app-delete-user="deleteUser"
                             >
                             </group-management>
                         </div>
@@ -519,6 +520,8 @@
     const leaveChat = () => (showLeaveDialog.value = true);
 
     const deleteChat = () => (showDeleteDialog.value = true);
+
+    const deleteUser = () => (showDeleteUserDialog.value = true);
 
     const doLeaveChat = async () => {
         if (chat.value.isGroup && chat.value.contacts.length > 1) {

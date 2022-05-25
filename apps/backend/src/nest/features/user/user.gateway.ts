@@ -23,14 +23,12 @@ export class UserGateway implements OnGatewayInit {
         private readonly _contactService: ContactService,
         private readonly _apiService: ApiService,
         private readonly _configService: ConfigService,
-        private readonly _messageService: MessageService,
         private readonly _chatService: ChatService
     ) {}
 
     @SubscribeMessage('remove_user')
     async handleRemoveUserFromConnections(@MessageBody() chatId: string) {
         await this._contactService.deleteContact({ id: chatId });
-        await this._messageService.deleteMessagesFromChat(chatId);
         await this._chatService.deleteChat(chatId);
         this.emitMessageToConnectedClients('chat_removed', chatId);
     }
