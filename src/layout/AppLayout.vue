@@ -4,25 +4,12 @@
     </suspense>
     <div class="bg-gray-100 h-full relative text-sm">
         <NotificationSection />
-        <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
-            <!--<div class="top h-20 md:hidden">
-                <Topbar @clicked="showNav = !showNav" class='border border-8'>
-                    <template v-slot:default>
-                        <slot name="top"></slot>
-                    </template>
-                    <template v-slot:actions>
-                        <slot name="actions"></slot>
-                    </template>
-                </Topbar>
-            </div>
-            <slot name="side">
-                <Sidebar
-                    @clicked="showNav = false"
-                    class="bg-accent-800 md:block border border-8"
-                    :class="[showNav ? '' : 'hidden', smallScreen ? 'top' : 'side']"
-                ></Sidebar>
-            </slot>-->
-            <Navigation :class="[smallScreen ? 'top' : 'side']"/>
+        <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
+            <Navigation :class="[smallScreen ? 'top' : 'side']">
+                <template #content>
+                    <slot name="topbar" />
+                </template>
+            </Navigation>
             <div class="content w-full h-full overflow-y-auto relative flex flex-col hide-scrollbar">
                 <div class="relative w-full h-full overflow-y-auto hide-scrollbar">
                     <div class="absolute w-full h-full">
@@ -47,13 +34,13 @@
 
     const { notification } = useSocketState();
     const showNav = ref(false);
-    const smallScreen = ref(window.innerWidth < 768);
+    const smallScreen = ref(window.innerWidth < 1024);
 
     let audio = null;
 
     window.onresize = () => {
-        smallScreen.value = window.innerWidth < 768;
-        if (window.innerWidth > 768) showNav.value = false;
+        smallScreen.value = window.innerWidth < 1024;
+        if (window.innerWidth > 1024) showNav.value = false;
     };
 
     watch(notification, (newNot: any, oldNot: any) => {

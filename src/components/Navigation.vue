@@ -1,7 +1,7 @@
 <template>
     <div class="h-full flex">
         <!-- Narrow sidebar -->
-        <div class="hidden w-28 bg-accent-700 overflow-y-auto md:block">
+        <div class="hidden w-28 bg-accent-700 overflow-y-auto lg:block">
             <div class="w-full py-6 flex flex-col items-center">
                 <div class="flex-shrink-0 flex items-center" @click="changePage('dashboard')">
                     <svg class="sm:w-10 w-8" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
@@ -61,7 +61,7 @@
 
         <!-- Mobile menu -->
         <TransitionRoot as="template" :show="mobileMenuOpen">
-            <Dialog as="div" class="relative z-50 md:hidden" @close="mobileMenuOpen = false">
+            <Dialog as="div" class="relative z-50 lg:hidden" @close="mobileMenuOpen = false">
                 <TransitionChild
                     as="template"
                     enter="transition-opacity ease-linear duration-300"
@@ -146,11 +146,11 @@
                 </div>
             </Dialog>
         </TransitionRoot>
-        <header class="w-full md:hidden">
-            <div class="relative z-10 flex-shrink-0 h-16 bg-white border-b border-gray-200 shadow-sm flex">
+        <header class="w-full lg:hidden">
+            <div class="relative z-10 flex-shrink-0 h-16 bg-white border-b border-gray-200 flex">
                 <button
                     type="button"
-                    class="px-4 text-gray-500 focus:outline-none md:hidden"
+                    class="px-4 text-gray-500 focus:outline-none lg:hidden"
                     @click="mobileMenuOpen = true"
                 >
                     <span class="sr-only">Open sidebar</span>
@@ -158,6 +158,7 @@
                 </button>
                 <img alt="logo uhuru" src="/Logo_secundary.png" class="h-6 ml-4 mt-4" />
             </div>
+            <slot name='content'/>
         </header>
     </div>
 </template>

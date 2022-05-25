@@ -1,6 +1,65 @@
 <template>
-    <div v-if="chat.isGroup" class="bg-white w-full relative rounded-lg md:grid grid-cols-1">
-        <div class="flex justify-between items-center mb-6 mt-4 mx-4">
+    <div class="px-2 py-2 w-full flex flex-col justify-start">
+        <!--<h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>-->
+        <div class="flex items-center justify-evenly lg:justify-between">
+            <!--<div v-if="!chat.isGroup" class="flex flex-col px-2 py-4 w-full cursor-pointer">
+                <i class="fas fa-minus-circle m-3"></i>
+                <p class="text-xs text-gray-300">Bio</p>
+                <p class="text-xs text-gray-500">Block user</p>
+            </div>-->
+            <div
+                v-if="!blocked"
+                class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-call')"
+            >
+                <span class="material-symbols-rounded"> videocam </span>
+                <p class="text-xs mt-1">Video</p>
+            </div>
+            <!--<div
+                v-if="!blocked"
+                class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-mute')"
+            >
+                <span class="material-symbols-rounded"> notifications_off </span>
+                <p class="text-xs mt-1">{{ chat.isMute ? 'Unmute' : 'Mute' }}</p>
+            </div>-->
+            <div
+                v-if="!chat.isGroup && !blocked"
+                class="flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-block')"
+            >
+                <span class="material-symbols-rounded"> block </span>
+                <p class="text-xs mt-1">Block</p>
+            </div>
+            <div
+                v-if="!chat.isGroup && blocked"
+                class="flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-unblock')"
+            >
+                <span class="material-symbols-rounded"> unblock_flipped </span>
+                <p class="text-xs mt-1">Unblock</p>
+            </div>
+
+            <div
+                class="delete flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-leave')"
+            >
+                <span class="material-symbols-rounded"> {{ chat.isGroup ? 'logout' : 'delete' }} </span>
+                <p class="text-xs mt-1">{{ chat.isGroup ? 'Leave' : 'Delete' }}</p>
+            </div>
+
+            <div
+                v-if="isAdmin"
+                class="delete flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-delete')"
+            >
+                <span class="material-symbols-rounded"> delete </span>
+                <p class="text-xs mt-1">Delete</p>
+            </div>
+        </div>
+    </div>
+    <div v-if="chat.isGroup" class="m-2 border border-gray-300 bg-white relative rounded-lg md:grid grid-cols-1">
+        <div class="flex justify-between items-center p-4">
             <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
             <UserAddIcon
                 v-if="isAdmin"
@@ -29,7 +88,6 @@
                 </button>
             </li>
         </ul>
-        <div id="spacer" class="bg-gray-100 h-2 w-full mt-2"></div>
     </div>
     <div v-if="sidebarFileList?.length !== 0" class="px-2">
         <h3 class="mt-2 ml-2 text-base text-left mb-4">Files</h3>
@@ -48,53 +106,6 @@
         </ul>
     </div>
     <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full"></div>
-    <div class="bg-white p-2 w-full h-full flex flex-col justify-start">
-        <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
-        <div class="flex items-center flex-col w-full">
-            <div
-                class="call bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-call')"
-            >
-                <i class="fas fa-video m-3"></i>
-                <p class="m-3 text-xs">Join video room</p>
-            </div>
-            <div
-                v-if="!chat.isGroup && !blocked"
-                class="block bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-block')"
-            >
-                <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3 text-xs">Block user</p>
-            </div>
-
-            <div
-                v-if="!chat.isGroup && blocked"
-                class="block bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-unblock')"
-            >
-                <i class="fas fa-plus-circle m-3"></i>
-                <p class="m-3 text-xs">Unblock user</p>
-            </div>
-
-            <div
-                class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-leave')"
-            >
-                <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete user' }}</p>
-            </div>
-
-            <div
-                v-if="isAdmin"
-                class="delete bg-red-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-delete')"
-            >
-                <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete group</p>
-            </div>
-        </div>
-        <div class="flex-grow-0 w-full h-full"></div>
-    </div>
     <!-- ADD USER TO GROUP MODAL -->
     <div
         v-if="isAdmin && openAddUserToGroup"

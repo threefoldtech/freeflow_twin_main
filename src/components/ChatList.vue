@@ -2,25 +2,25 @@
     <section
         :class="{
             'collapsed-bar': collapsed,
-            'md:w-16': collapsed,
-            'md:w-[400px]': !collapsed,
+            'lg:w-16': collapsed,
+            'lg:w-[400px]': !collapsed,
         }"
         class="bg-white w-full flex flex-col overflow-hidden border-r"
     >
-        <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
+        <div class="relative h-full w-full lg:pt-4 flex-grow-0 flex flex-col">
             <div
-                class="flex items-center collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 mb-2 flex-grow-0"
+                class="flex items-center collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 lg:mb-2 flex-grow-0"
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
-                        class="bg-primary hover:bg-accent-800 transition duration:300 rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                        class="absolute lg:static bottom-5 right-5 bg-primary hover:bg-accent-800 transition duration:300 rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
                         @click="showAddUserDialog = true"
                     >
                         <i class="fas fa-plus"></i>
                     </button>
-                    <h1 class="collapsed-bar:hidden pt-1 text-lg">Messages</h1>
+                    <h1 class="collapsed-bar:hidden hidden lg:block pt-1 text-lg">Messages</h1>
                 </div>
-                <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
+                <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden lg:block relative">
                     <button
                         :class="{
                             'mr-2': !collapsed,
@@ -46,7 +46,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!collapsed" class="mt-1 mx-2 relative rounded-md shadow-sm">
+            <div v-if="!collapsed" class="m-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
                 </div>
@@ -97,7 +97,7 @@
                 </div>
                 <div
                     v-if="filteredChats && filteredChats.length"
-                    class="flex flex-col justify-center items-center pt-2 collapsed-bar:px-0"
+                    class="flex flex-col justify-center items-center collapsed-bar:px-0"
                 >
                     <v-contextmenu ref="contextmenu-chat-card">
                         <v-contextmenu-item

@@ -1,8 +1,8 @@
 <template>
     <app-layout>
-        <div class="relative h-full w-full grid md:customgrid">
+        <div class="relative h-full w-full grid lg:customgrid">
             <ChatList v-model="showAddUserDialog" />
-            <div class="hidden w-full h-full md:grid place-items-center">
+            <div class="hidden w-full h-full lg:grid place-items-center">
                 <div class="text-center">
                     <ChatAlt2Icon class="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
                     <h3 class="mt-2 text-sm font-medium text-gray-900">No chat selected</h3>
