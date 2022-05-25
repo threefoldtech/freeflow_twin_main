@@ -1,6 +1,6 @@
 import { Entity, Schema } from 'redis-om';
 
-import { MessageType, SystemMessageType } from '../../../types/message-types';
+import { MessageType } from '../../../types/message-types';
 import { MessageDTO } from '../dtos/message.dto';
 
 export interface Message {

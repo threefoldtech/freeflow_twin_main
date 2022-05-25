@@ -58,6 +58,7 @@ const initializeSocket = (username: string) => {
         addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
     });
     state.socket.on('connection_request', (newContactRequest: Chat) => {
+        console.log(`newContactrequest: ${JSON.stringify(newContactRequest)}`);
         const { addChat } = usechatsActions();
         addChat(newContactRequest);
     });

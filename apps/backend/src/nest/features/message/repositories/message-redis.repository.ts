@@ -51,6 +51,10 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         });
     }
 
+    async findMessageById(id: string): Promise<Message> {
+        return await this.findOne({ where: 'id', eq: id });
+    }
+
     /**
      * Gets messages from given chat Id using pagination.
      * @param {Object} obj - Object.

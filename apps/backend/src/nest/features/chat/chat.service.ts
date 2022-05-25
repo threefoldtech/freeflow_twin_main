@@ -54,13 +54,16 @@ export class ChatService {
         const userId = this._configService.get<string>('userId');
         try {
             const chat = await this.createChat(createGroupChatDTO);
-            await this._messageService.createMessage(createGroupChatDTO.messages[0]);
+            const msg = await this._messageService.createMessage(createGroupChatDTO.messages[0]);
             chat.parseContacts().map(async c => {
                 if (c.id === userId) {
-                    this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
+                    this._chatGateway.emitMessageToConnectedClients('connection_request', {
+                        ...chat.toJSON(),
+                        messages: [msg.toJSON()],
+                    });
                     return chat;
                 }
-                await this._apiService.sendGroupInvitation({ location: c.location, chat: chat.toJSON() });
+                await this._apiService.sendGroupInvitation({ location: c.location, chat: { ...chat.toJSON() } });
             });
             return chat;
         } catch (error) {
@@ -89,7 +92,7 @@ export class ChatService {
     }
 
     /**
-     * Accepts a chat request.
+     * Accepts a group chat request.
      * @param {ChatDTO} chat - Chat Id.
      * @return {ChatDTO} - Accepted chat.
      */
@@ -206,6 +209,7 @@ export class ChatService {
      * Handles a message read.
      * @param {MessateDTO} message - Message that is read.
      */
+    // TODO: Update this
     async handleMessageRead(message: MessageDTO<string>) {
         const chatId = this._messageService.determineChatID(message);
         const chat = await this.getChat(chatId);

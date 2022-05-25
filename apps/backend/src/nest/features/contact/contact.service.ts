@@ -118,7 +118,10 @@ export class ContactService {
 
         await this._apiService.sendMessageToApi({ location: newContact.location, message: signedContactRequest });
 
-        this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
+        this._chatGateway.emitMessageToConnectedClients('connection_request', {
+            ...chat.toJSON(),
+            messages: [signedMessage],
+        });
 
         return newContact;
     }
