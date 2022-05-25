@@ -132,7 +132,7 @@ export class ContactService {
      * @param {CreateMessageDTO} obj.message - Contact request message.
      * @return {Contact} - Created entity.
      */
-    async createNewContactRequest({
+    async handleIncomingContactRequest({
         id,
         location,
         contactRequest,

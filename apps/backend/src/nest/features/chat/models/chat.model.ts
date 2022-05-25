@@ -1,5 +1,6 @@
 import { Entity, Schema } from 'redis-om';
 
+import { SystemMessageType } from '../../../../types';
 import { MessageType } from '../../../types/message-types';
 import { ContactDTO } from '../../contact/dtos/contact.dto';
 import { Contact } from '../../contact/models/contact.model';
@@ -45,7 +46,7 @@ export class Chat extends Entity {
     parseMessages(draft = false): Message[] {
         if (draft && this.draft.length) return this.draft.map(m => JSON.parse(m));
 
-        return this.messages.map(m => JSON.parse(m));
+        return this.messages.map(m => this.parseMessageBody(m));
     }
 
     /**
@@ -55,7 +56,13 @@ export class Chat extends Entity {
      */
     parseMessageBody(m: string): Message {
         const msg: Message = JSON.parse(m);
-        if (msg.type === MessageType.SYSTEM) msg.body = JSON.parse(msg.body);
+        try {
+            const body = JSON.parse(msg.body);
+            if (msg.type === MessageType.SYSTEM && body?.type === SystemMessageType.CONTACT_REQUEST_SEND)
+                msg.body = JSON.parse(msg.body);
+        } catch (error) {
+            return msg;
+        }
         return msg;
     }
 

@@ -20,7 +20,7 @@ export class UserService {
      * @param {Object} userData - Object.
      * @return {User} - Created entity.
      */
-    async addUserData(userData: { userId: string; status: string; avatar: string; lastSeen: Date }): Promise<User> {
+    async addUserData(userData: { userId: string; status: string; avatar: string; lastSeen: number }): Promise<User> {
         try {
             return await this._userRepo.addUserData(userData);
         } catch (error) {
@@ -41,7 +41,7 @@ export class UserService {
                     userId,
                     status: 'Exploring the new DigitalTwin',
                     avatar: 'default',
-                    lastSeen: new Date(),
+                    lastSeen: new Date().getTime(),
                 });
 
             return user;
@@ -82,7 +82,7 @@ export class UserService {
         try {
             const userToUpdate = await this.getUserData();
             userToUpdate.avatar = path;
-            userToUpdate.lastSeen = new Date();
+            userToUpdate.lastSeen = new Date().getTime();
             await this._userRepo.updateUserData(userToUpdate);
             if (!this.myAddress) this.myAddress = (await this._locationService.getOwnLocation()) as string;
             return `http://[${this.myAddress}]/api/v2/user/avatar/${path}`;
@@ -99,7 +99,7 @@ export class UserService {
         try {
             const userToUpdate = await this.getUserData();
             userToUpdate.status = status;
-            userToUpdate.lastSeen = new Date();
+            userToUpdate.lastSeen = new Date().getTime();
             await this._userRepo.updateUserData(userToUpdate);
             return true;
         } catch (error) {

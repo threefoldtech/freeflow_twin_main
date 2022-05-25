@@ -96,7 +96,7 @@ export class EncryptionService {
 
     /**
      * Decodes an address to a Uint8Array using Buffer.
-     * @param {string} hexString - the address to decode.
+     * @param {string} address - the address to decode.
      * @return {Uint8Array} - The decoded address.
      */
     decodeAddress(address: string): Uint8Array {
@@ -105,8 +105,9 @@ export class EncryptionService {
 
     /**
      * Signs an address to a string.
-     * @param {Uint8Array} data - the address data.
-     * @param {Uint8Array} secretKey - secret key to sign address with.
+     * @param {Object} obj - Object.
+     * @param {Uint8Array} obj.data - the address data.
+     * @param {Uint8Array} obj.secretKey - secret key to sign address with.
      * @return {string} - The signed address.
      */
     signAddress({ data, secretKey }: { data: Uint8Array; secretKey: Uint8Array }): string {
@@ -115,8 +116,9 @@ export class EncryptionService {
 
     /**
      * Creates a Uint8Array signature with a secret key.
-     * @param {unknown} data - The data needed in the signature.
-     * @param {string} secretKey - the secret key to for the signature.
+     * @param {Object} obj - Object.
+     * @param {unknown} obj.data - The data needed in the signature.
+     * @param {string} obj.secretKey - the secret key to for the signature.
      * @return {Uint8Array} - The signed signature.
      */
     createSignature({ data, secretKey }: { data: unknown; secretKey: string }): Uint8Array {
@@ -130,8 +132,9 @@ export class EncryptionService {
 
     /**
      * Creates a base64 string from a Uint8Array signature.
-     * @param {unknown} data - The data needed in the signature.
-     * @param {string} secretKey - The secret key to for the signature.
+     * @param {Object} obj - Object.
+     * @param {unknown} obj.data - The data needed in the signature.
+     * @param {string} obj.secretKey - The secret key to for the signature.
      * @return {Uint8Array} - The signed signature in base64.
      */
     createBase64Signature({ data, secretKey }: { data: unknown; secretKey: string }): string {
@@ -142,14 +145,13 @@ export class EncryptionService {
 
     /**
      * Verifies data signature using public key.
-     * @param {unknown} data - The data with the signature.
-     * @param {string} signature - The signature to be verified.
-     * @param {string} publicKey - The public key to verify signature.
+     * @param {Object} obj - Object.
+     * @param {unknown} obj.data - The data with the signature.
+     * @param {string} obj.signature - The signature to be verified.
+     * @param {string} obj.publicKey - The public key to verify signature.
      * @return {boolean} - Is a valid signature or not.
      */
     verifySignature({ data, signature, publicKey }: { data: unknown; signature: string; publicKey: string }): boolean {
-        console.log(`DATA: ${new Buffer(String(data)).toString('base64')}`);
-        console.log(`KEY: ${publicKey}`);
         return sign.detached.verify(
             this.objectToUint8Array(data),
             this.base64ToUint8Array(signature),

@@ -108,8 +108,8 @@
                                         </span>
                                     </p>
                                     <p v-if="!blocked" class="font-thin">
-                                        {{ getChatStatus.message }}
-                                        <span v-if="getChatStatus?.lastSeen" class="group-chat:hidden"
+                                        {{ getChatStatus.message.trim()
+                                        }}<span v-if="getChatStatus?.lastSeen" class="group-chat:hidden"
                                             >, active <TimeContent :time="getChatStatus.lastSeen.toDate()"
                                         /></span>
                                     </p>
@@ -464,12 +464,10 @@
         }
 
         const status = statusList[<string>chat.value.chatId];
-        let lastSeen: string | undefined = undefined;
-        lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
-        lastSeen = lastSeen?.slice(0, -3);
+        const lastSeen = status?.isOnline ? undefined : status?.lastSeen?.toString();
         return {
             message: status?.isOnline ? 'Online' : 'Offline',
-            lastSeen: lastSeen ? moment.unix(Number(lastSeen)) : undefined,
+            lastSeen: lastSeen ? moment.unix(lastSeen.slice(0, -3)) : undefined,
         };
     });
 

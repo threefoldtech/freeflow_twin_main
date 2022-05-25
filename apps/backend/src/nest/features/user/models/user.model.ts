@@ -4,7 +4,7 @@ export interface User {
     userId: string;
     status: string;
     avatar: string;
-    lastSeen: Date;
+    lastSeen: number;
 }
 
 export class User extends Entity {}
@@ -13,5 +13,5 @@ export const userSchema = new Schema(User, {
     userId: { type: 'string' },
     status: { type: 'string' },
     avatar: { type: 'string' },
-    lastSeen: { type: 'date' },
+    lastSeen: { type: 'number' },
 });

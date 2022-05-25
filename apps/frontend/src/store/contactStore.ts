@@ -45,13 +45,11 @@ const addContact = (username: DtId, location: string, _dontCheck = false) => {
         replies: [],
         subject: null,
     };
-    axios
-        .post(`${config.baseUrl}api/v2/contacts`, {
-            id: username,
-            location,
-            message: addMessage,
-        })
-        .then(res => {});
+    axios.post(`${config.baseUrl}api/v2/contacts`, {
+        id: username,
+        location,
+        message: addMessage,
+    });
 };
 
 export const useContactsState = () => {

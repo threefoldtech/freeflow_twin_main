@@ -93,7 +93,7 @@ export class ChatService {
      * @param {ChatDTO} chat - Chat Id.
      * @return {ChatDTO} - Accepted chat.
      */
-    async acceptGroupInvite(chat: ChatDTO): Promise<ChatDTO> {
+    async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
         await this.createChat(chat);
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
         return chat;
@@ -256,7 +256,7 @@ export class ChatService {
     async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }): Promise<Chat> {
         const chat = await this._apiService.getAdminChat({ location: adminLocation, chatId });
         this._chatGateway.emitMessageToConnectedClients('new_chat', chat);
-        return await this._chatRepository.createChat(chat);
+        return await this._chatRepository.createChat(chat as CreateChatDTO);
     }
 
     /**

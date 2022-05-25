@@ -28,7 +28,7 @@ export class UserRedisRepository extends EntityRepository<User> {
         userId: string;
         status: string;
         avatar: string;
-        lastSeen: Date;
+        lastSeen: number;
     }): Promise<User> {
         return await this.save({ userId, status, avatar, lastSeen });
     }

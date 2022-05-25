@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query,
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { ChatService } from './chat.service';
-import { ChatDTO, CreateChatDTO, GroupChatDTO } from './dtos/chat.dto';
+import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
 
 @Controller('chats')
 export class ChatController {
@@ -17,7 +17,7 @@ export class ChatController {
 
     @Post('group')
     @UseGuards(AuthGuard)
-    async createGroupChat(@Body() groupChatDTO: GroupChatDTO) {
+    async createGroupChat(@Body() groupChatDTO: CreateGroupChatDTO) {
         await this._chatService.createGroupChat(groupChatDTO);
         return { success: true };
     }

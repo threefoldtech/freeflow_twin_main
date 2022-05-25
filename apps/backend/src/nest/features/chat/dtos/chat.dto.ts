@@ -13,7 +13,7 @@ export class ChatDTO {
     acceptedChat: boolean;
     adminId: string;
     read: string[];
-    draft?: Message[];
+    draft?: MessageDTO<unknown>[];
 }
 
 export class GroupChatDTO extends ChatDTO {}
