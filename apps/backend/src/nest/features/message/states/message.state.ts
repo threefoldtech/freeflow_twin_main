@@ -44,7 +44,6 @@ export class ContactRequestMessageState implements MessageState<ContactRequest> 
             fromContact: from,
             signedMessage: message,
         });
-        console.log(`VALID SIGNATURE: ${validSignature}`);
         if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
         return await this._contactService.handleIncomingContactRequest({
             id: from.id,
@@ -65,19 +64,31 @@ export class ReadMessageState implements MessageState<string> {
 }
 
 export class StringMessageState implements MessageState<string> {
-    constructor(private readonly _chatService: ChatService, private readonly _chatGateway: ChatGateway) {}
+    constructor(
+        private readonly _chatService: ChatService,
+        private readonly _chatGateway: ChatGateway,
+        private readonly _messageService: MessageService
+    ) {}
 
     async handle({ message, chat }: { message: MessageDTO<string>; chat: Chat }): Promise<string> {
         this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._messageService.createMessage(message);
+        // TODO: change all add message to chat handlers
         return await this._chatService.addMessageToChat({ chat, message });
     }
 }
 
 export class FileMessageState implements MessageState<FileMessage> {
-    constructor(private readonly _chatService: ChatService, private readonly _chatGateway: ChatGateway) {}
+    constructor(
+        private readonly _chatService: ChatService,
+        private readonly _chatGateway: ChatGateway,
+        private readonly _messageService: MessageService
+    ) {}
 
     async handle({ message, chat }: { message: MessageDTO<FileMessage>; chat: Chat }): Promise<string> {
         this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._messageService.createMessage(message);
+        // TODO: change all add message to chat handlers
         return await this._chatService.addMessageToChat({ chat, message });
     }
 }
@@ -89,35 +100,56 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         private readonly _chatService: ChatService,
         private readonly _configService: ConfigService,
         private readonly _apiService: ApiService,
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _messageService: MessageService
     ) {
         // system add user message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.ADD_USER,
-            new AddUserSystemState(this._apiService, this._chatService, this._configService, this._chatGateway)
+            new AddUserSystemState(
+                this._apiService,
+                this._chatService,
+                this._configService,
+                this._chatGateway,
+                this._messageService
+            )
         );
         // system remove user message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.REMOVE_USER,
-            new RemoveUserSystemState(this._apiService, this._chatService, this._configService, this._chatGateway)
+            new RemoveUserSystemState(
+                this._apiService,
+                this._chatService,
+                this._configService,
+                this._chatGateway,
+                this._messageService
+            )
         );
         // system joined video room message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.JOINED_VIDEOROOM,
-            new PersistSystemMessage(this._chatService)
+            new PersistSystemMessage(this._chatService, this._messageService)
         );
         // system contact request send message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.CONTACT_REQUEST_SEND,
-            new PersistSystemMessage(this._chatService)
+            new PersistSystemMessage(this._chatService, this._messageService)
         );
         // user leaves group message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.USER_LEFT_GROUP,
-            new UserLeftGroupMessageState(this._chatService, this._configService, this._chatGateway)
+            new UserLeftGroupMessageState(
+                this._chatService,
+                this._configService,
+                this._chatGateway,
+                this._messageService
+            )
         );
         // system default message handler
-        this._subSystemMessageStateHandlers.set(SystemMessageType.DEFAULT, new PersistSystemMessage(this._chatService));
+        this._subSystemMessageStateHandlers.set(
+            SystemMessageType.DEFAULT,
+            new PersistSystemMessage(this._chatService, this._messageService)
+        );
     }
 
     async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }) {

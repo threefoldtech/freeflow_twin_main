@@ -51,6 +51,7 @@ export class ChatFileState implements FileState<ChatFile> {
         const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${fileId}`;
         const message: MessageDTO<FileMessage> = {
             id: messageId,
+            chatId,
             from: this._configService.get<string>('userId'),
             to: chatId,
             body: {

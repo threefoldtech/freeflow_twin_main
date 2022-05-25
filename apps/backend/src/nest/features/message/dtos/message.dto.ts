@@ -5,6 +5,7 @@ import { Message } from '../models/message.model';
 
 export class MessageDTO<T> {
     id: string;
+    chatId: string;
     from: string;
     to: string;
     body: T;
@@ -18,6 +19,8 @@ export class MessageDTO<T> {
 export class CreateMessageDTO<T> {
     @IsString()
     id: string;
+
+    chatId: string;
 
     @IsString()
     from: string;

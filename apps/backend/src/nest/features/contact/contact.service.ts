@@ -1,6 +1,5 @@
 import { BadRequestException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { EntityData } from 'redis-om';
 
 import { ContactRequest, MessageBody, MessageType } from '../../types/message-types';
 import { uuidv4 } from '../../utils/uuid';
@@ -71,8 +70,6 @@ export class ContactService {
             location: yggdrasilAddress as string,
         };
 
-        const newMessage = await this._messageService.createMessage(message);
-
         let newContact = await this.getContact({ id });
         if (!newContact) {
             try {
@@ -86,7 +83,8 @@ export class ContactService {
             }
         }
 
-        const signedMessage = await this._keyService.appendSignatureToMessage({ message: newMessage });
+        const signedMessage = await this._keyService.appendSignatureToMessage({ message });
+        const newMessage = await this._messageService.createMessage(signedMessage);
         const chat = await this._chatService.createChat({
             chatId: newContact.id,
             name: newMessage.to,
@@ -101,6 +99,7 @@ export class ContactService {
 
         const contactRequest: MessageDTO<ContactRequest> = {
             id: uuidv4(),
+            chatId: chat.chatId,
             from: newMessage.from,
             to: newContact.id,
             body: {
@@ -160,6 +159,7 @@ export class ContactService {
 
         const contactRequestMsg: MessageDTO<string> = {
             id: uuidv4(),
+            chatId: message.from,
             from: message.from,
             to: message.to,
             body: JSON.stringify(`You have received a new message request from ${message.from}`),

@@ -48,4 +48,16 @@ export class MessageRedisRepository extends EntityRepository<Message> {
             signatures: signatures ?? null,
         });
     }
+
+    async getMessagesFromChat({
+        chatId,
+        offset,
+        count,
+    }: {
+        chatId: string;
+        offset: number;
+        count: number;
+    }): Promise<Message[]> {
+        return await this.findAllWhereEq({ offset, count, where: 'chatId', eq: chatId });
+    }
 }

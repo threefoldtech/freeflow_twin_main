@@ -16,6 +16,7 @@ import { ApiService } from '../api/api.service';
 import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 import { KeyService } from '../key/key.service';
 import { MessageDTO } from '../message/dtos/message.dto';
+import { MessageService } from '../message/message.service';
 import { Message } from '../message/models/message.model';
 import { ChatService } from './chat.service';
 
@@ -33,6 +34,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         private readonly _keyService: KeyService,
         private readonly _blockedContactService: BlockedContactService,
         private readonly _apiService: ApiService,
+        private readonly _messageService: MessageService,
         @Inject(forwardRef(() => ChatService))
         private readonly _chatService: ChatService
     ) {
@@ -66,6 +68,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         }
 
         // persist message
+        this._messageService.createMessage(signedMessage);
         this._chatService.addMessageToChat({ chat, message: signedMessage });
 
         return await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });

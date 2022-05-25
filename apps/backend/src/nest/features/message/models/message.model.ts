@@ -5,6 +5,7 @@ import { MessageDTO } from '../dtos/message.dto';
 
 export interface Message {
     id: string;
+    chatId: string;
     from: string;
     to: string;
     body: string;
@@ -43,6 +44,7 @@ export function stringifyMessageBody<T>(body: T): string {
 
 export const messageSchema = new Schema(Message, {
     id: { type: 'string' },
+    chatId: { type: 'string' },
     from: { type: 'string' },
     to: { type: 'string' },
     body: { type: 'text' },
