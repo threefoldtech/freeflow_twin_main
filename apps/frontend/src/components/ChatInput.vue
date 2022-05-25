@@ -220,7 +220,7 @@
             replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
         }
         if (!props.chat.draft.action) {
-            messageInput.value = String(props.chat.draft.body ?? "");
+            messageInput.value = String(props.chat.draft.body ?? '');
         }
     }
     const selectedId = String(props.chat.chatId);
