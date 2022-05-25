@@ -230,10 +230,11 @@ export class ContactService {
      */
     async deleteContact({ id }: DeleteContactDTO): Promise<void> {
         const contact = await this.getContact({ id });
-        try {
-            return await this._contactRepo.deleteContact({ id: contact.entityId });
-        } catch (error) {
-            throw new BadRequestException(`unable remove contact: ${error}`);
-        }
+        if (contact?.entityId)
+            try {
+                return await this._contactRepo.deleteContact({ id: contact.entityId });
+            } catch (error) {
+                throw new BadRequestException(`unable remove contact: ${error}`);
+            }
     }
 }

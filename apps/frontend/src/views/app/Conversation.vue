@@ -256,7 +256,7 @@
             @update-model-value="showLeaveDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
+                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting Chat' }}</h1>
             </template>
             <div v-if="chat?.isGroup">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
@@ -292,6 +292,25 @@
                 </button>
             </div>
         </Dialog>
+
+        <Alert v-if="showDeleteUserDialog" :showAlert="showDeleteUserDialog" @close="showDeleteUserDialog = false">
+            <template #title> Deleting user </template>
+            <template #content> Do you really want to delete this user from your connections? </template>
+            <template #actions>
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="doDeleteUser"
+                >
+                    Delete
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                    @click="showDeleteUserDialog = false"
+                >
+                    Cancel
+                </button>
+            </template>
+        </Alert>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
             <template #title> Deleting group </template>
@@ -334,7 +353,7 @@
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
+    import { sendBlockChat, sendRemoveChat, sendRemoveUser } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
     import ChatList from '@/components/ChatList.vue';
@@ -358,6 +377,7 @@
         conversationComponentRerender,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
+        openDeleteUserDialogFromOtherFile,
     } from '@/store/contextmenuStore';
     import { useOnline } from '@vueuse/core';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
@@ -376,6 +396,7 @@
     const showDialog = ref(false);
     const showLeaveDialog = ref(false);
     const showDeleteDialog = ref(false);
+    const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
 
@@ -513,6 +534,10 @@
         await sendRemoveChat(chat.value.chatId);
     };
 
+    const doDeleteUser = async () => {
+        await sendRemoveUser(chat.value.chatId);
+    };
+
     const blockChat = () => (showDialog.value = true);
 
     const doBlockChat = () => {
@@ -545,6 +570,7 @@
         nextTick(() => scrollToBottom(true));
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
         if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
+        if (openDeleteUserDialogFromOtherFile.value) showDeleteUserDialog.value = true;
         showDeleteChatDialog.value = false;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
@@ -554,6 +580,7 @@
         //For when component is already mounted
         if (openBlockDialogFromOtherFile.value) showDialog.value = true;
         if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
+        if (openDeleteUserDialogFromOtherFile.value) showDeleteUserDialog.value = true;
         showDeleteChatDialog.value = false;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;

@@ -1,12 +1,14 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { OnGatewayInit, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { StatusUpdate } from 'types/status.type';
 
 import { ApiService } from '../api/api.service';
+import { ChatService } from '../chat/chat.service';
 import { ContactService } from '../contact/contact.service';
 import { Contact } from '../contact/models/contact.model';
+import { MessageService } from '../message/message.service';
 
 @WebSocketGateway({ cors: '*' })
 export class UserGateway implements OnGatewayInit {
@@ -20,8 +22,18 @@ export class UserGateway implements OnGatewayInit {
     constructor(
         private readonly _contactService: ContactService,
         private readonly _apiService: ApiService,
-        private readonly _configService: ConfigService
+        private readonly _configService: ConfigService,
+        private readonly _messageService: MessageService,
+        private readonly _chatService: ChatService
     ) {}
+
+    @SubscribeMessage('remove_user')
+    async handleRemoveUserFromConnections(@MessageBody() chatId: string) {
+        await this._contactService.deleteContact({ id: chatId });
+        await this._messageService.deleteMessagesFromChat(chatId);
+        await this._chatService.deleteChat(chatId);
+        this.emitMessageToConnectedClients('chat_removed', chatId);
+    }
 
     /**
      * Handles socket initialization.

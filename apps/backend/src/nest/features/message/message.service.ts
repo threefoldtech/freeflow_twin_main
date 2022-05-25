@@ -24,7 +24,8 @@ export class MessageService {
     async createMessage<T>(createMessageDTO: CreateMessageDTO<T>): Promise<Message> {
         try {
             const existingMessage = await this._messageRepo.findMessageById(createMessageDTO.id);
-            if (!existingMessage) return await this._messageRepo.createMessage(createMessageDTO);
+            if (existingMessage) return;
+            return await this._messageRepo.createMessage(createMessageDTO);
         } catch (error) {
             throw new BadRequestException(`unable to create message: ${error}`);
         }

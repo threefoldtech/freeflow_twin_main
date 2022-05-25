@@ -102,6 +102,9 @@ const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate
 export const sendRemoveChat = async (id: Id) => {
     state.socket.emit('remove_chat', id);
 };
+export const sendRemoveUser = async (id: Id) => {
+    state.socket.emit('remove_user', id);
+};
 export const sendBlockChat = async (id: Id) => {
     state.socket.emit('block_chat', id);
 };

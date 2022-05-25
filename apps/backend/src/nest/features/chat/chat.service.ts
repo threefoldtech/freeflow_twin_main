@@ -163,12 +163,13 @@ export class ChatService {
      */
     async deleteChat(chatId: string): Promise<void> {
         const chatToDelete = await this.getChat(chatId);
-        try {
-            await this._messageService.deleteMessagesFromChat(chatId);
-            await this._chatRepository.deleteChat(chatToDelete.entityId);
-        } catch (error) {
-            throw new InternalServerErrorException(`unable to delete chat: ${error}`);
-        }
+        if (chatToDelete)
+            try {
+                await this._messageService.deleteMessagesFromChat(chatId);
+                await this._chatRepository.deleteChat(chatToDelete.entityId);
+            } catch (error) {
+                throw new InternalServerErrorException(`unable to delete chat: ${error}`);
+            }
     }
 
     /**

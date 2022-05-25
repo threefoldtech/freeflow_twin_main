@@ -22,6 +22,7 @@ export enum RIGHT_CLICK_ACTIONS_MESSAGE {
 export enum RIGHT_CLICK_ACTIONS_CHAT_CARD {
     BLOCK = 'BLOCK',
     DELETE = 'DELETE',
+    DELETE_USER = 'DELETE_USER',
     OPEN_CHAT = 'OPEN_CHAT',
 }
 
@@ -58,6 +59,7 @@ export const rightClickItemAction = ref<RIGHT_CLICK_ACTIONS | null>(null);
 export const triggerWatchOnRightClickItem = ref<boolean>(false);
 export const openBlockDialogFromOtherFile = ref<boolean>(false);
 export const openDeleteDialogFromOtherFile = ref<boolean>(false);
+export const openDeleteUserDialogFromOtherFile = ref<boolean>(false);
 
 //This is so used to rerender a component
 export const conversationComponentRerender = ref<number>(0);

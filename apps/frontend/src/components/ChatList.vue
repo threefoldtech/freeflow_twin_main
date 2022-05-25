@@ -129,6 +129,17 @@
                             "
                             >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete chat' }}
                         </v-contextmenu-item>
+
+                        <v-contextmenu-item
+                            v-if="!currentRightClickedItem?.data?.isGroup"
+                            @click="
+                                () => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE_USER;
+                                }
+                            "
+                            >Delete user
+                        </v-contextmenu-item>
                     </v-contextmenu>
                     <ul role="list" class="divide-y divide-gray-200 border-t border-gray-200 w-full">
                         <ChatCard
@@ -188,6 +199,7 @@
         setCurrentRightClickedItem,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
+        openDeleteUserDialogFromOtherFile,
         conversationComponentRerender,
     } from '@/store/contextmenuStore';
     import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
@@ -235,6 +247,13 @@
                         break;
                     case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
                         openDeleteDialogFromOtherFile.value = true;
+                        if (router.currentRoute.value.name === 'single') {
+                            conversationComponentRerender.value = conversationComponentRerender.value++;
+                        }
+                        await router.push({ name: 'single', params: { id: chatId } });
+                        break;
+                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE_USER:
+                        openDeleteUserDialogFromOtherFile.value = true;
                         if (router.currentRoute.value.name === 'single') {
                             conversationComponentRerender.value = conversationComponentRerender.value++;
                         }
