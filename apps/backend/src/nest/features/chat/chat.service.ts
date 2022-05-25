@@ -54,6 +54,7 @@ export class ChatService {
         const userId = this._configService.get<string>('userId');
         try {
             const chat = await this.createChat(createGroupChatDTO);
+            await this._messageService.createMessage(createGroupChatDTO.messages[0]);
             chat.parseContacts().map(async c => {
                 if (c.id === userId) {
                     this._chatGateway.emitMessageToConnectedClients('connection_request', chat);

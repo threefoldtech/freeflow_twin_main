@@ -37,13 +37,11 @@ export class CreateChatDTO {
     @IsString()
     adminId: string;
 
-    @IsArray()
     read: string[];
 
     @IsBoolean()
     isGroup: boolean;
 
-    @IsArray()
     draft?: Message[];
 }
 

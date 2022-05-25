@@ -156,12 +156,14 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
             return x !== undefined;
         });
 
+    const chatId = uuidv4();
     const newGroupchat: GroupChat = {
         isGroup: true,
-        chatId: uuidv4(),
+        chatId,
         contacts: contacts,
         messages: [
             {
+                chatId,
                 from: user.id,
                 to: name,
                 body: {

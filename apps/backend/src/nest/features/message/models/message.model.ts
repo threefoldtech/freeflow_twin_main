@@ -37,9 +37,9 @@ export class Message extends Entity {
      */
     parseMessageBody(body: string, type: MessageType): unknown {
         try {
-            const b = JSON.parse(body);
-            if (type === MessageType.SYSTEM && b?.type === SystemMessageType.CONTACT_REQUEST_SEND)
-                body = JSON.parse(body);
+            // const b = JSON.parse(body);
+            // if (type === MessageType.SYSTEM && b?.type === SystemMessageType.CONTACT_REQUEST_SEND)
+            body = JSON.parse(body);
         } catch (error) {
             return body;
         }
