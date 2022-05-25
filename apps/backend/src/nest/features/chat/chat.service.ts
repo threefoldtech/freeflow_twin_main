@@ -95,6 +95,7 @@ export class ChatService {
     async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
         await this.createChat(chat);
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
+        chat.messages = [];
         return chat;
     }
 
@@ -109,16 +110,14 @@ export class ChatService {
         try {
             const chats = await this._chatRepository.getChats({ offset, count });
             const chatDTOs = chats.map(c => c.toJSON());
-            console.log(`CHAT DTOS :${JSON.stringify(chats)}`);
-            chatDTOs.map(async c => {
+            for (let i = 0; i < chatDTOs.length; i++) {
                 const chatMessages = await this._messageService.getMessagesFromChat({
-                    chatId: c.chatId,
+                    chatId: chatDTOs[i].chatId,
                     offset,
                     count,
                 });
-                console.log(`CHAT MESSAGE :${JSON.stringify(chatMessages)}`);
-                c.messages = chatMessages ?? [];
-            });
+                chatDTOs[i].messages = chatMessages ?? [];
+            }
             return chatDTOs;
         } catch (error) {
             throw new NotFoundException('no chats found');

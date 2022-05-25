@@ -27,6 +27,7 @@ export class MessageRedisRepository extends EntityRepository<Message> {
      */
     async createMessage<T>({
         id,
+        chatId,
         from,
         to,
         body,
@@ -38,6 +39,7 @@ export class MessageRedisRepository extends EntityRepository<Message> {
     }: CreateMessageDTO<T>): Promise<Message> {
         return await this.save({
             id,
+            chatId,
             from,
             to,
             body: stringifyMessageBody(body),

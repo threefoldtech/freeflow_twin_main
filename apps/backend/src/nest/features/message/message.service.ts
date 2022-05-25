@@ -37,9 +37,9 @@ export class MessageService {
         chatId: string;
         offset: number;
         count: number;
-    }): Promise<Message[]> {
+    }): Promise<MessageDTO<unknown>[]> {
         try {
-            return await this._messageRepo.getMessagesFromChat({ chatId, offset, count });
+            return (await this._messageRepo.getMessagesFromChat({ chatId, offset, count })).map(m => m.toJSON());
         } catch (error) {
             throw new BadRequestException(`unable to fetch messages from chat: ${error}`);
         }

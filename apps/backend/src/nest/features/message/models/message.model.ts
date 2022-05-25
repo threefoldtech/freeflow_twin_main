@@ -1,6 +1,6 @@
 import { Entity, Schema } from 'redis-om';
 
-import { MessageType } from '../../../types/message-types';
+import { MessageType, SystemMessageType } from '../../../types/message-types';
 import { MessageDTO } from '../dtos/message.dto';
 
 export interface Message {
@@ -16,7 +16,36 @@ export interface Message {
     replies: Message[];
 }
 
-export class Message extends Entity {}
+export class Message extends Entity {
+    toJSON(): MessageDTO<unknown> {
+        return {
+            id: this.id,
+            chatId: this.chatId,
+            from: this.from,
+            to: this.to,
+            body: this.parseMessageBody(this.body, this.type),
+            timeStamp: this.timeStamp,
+            type: this.type,
+            subject: this.subject,
+            signatures: this.signatures,
+            replies: this.replies,
+        };
+    }
+
+    /**
+     * Parses message body strings to valid JSON.
+     */
+    parseMessageBody(body: string, type: MessageType): unknown {
+        try {
+            const b = JSON.parse(body);
+            if (type === MessageType.SYSTEM && b?.type === SystemMessageType.CONTACT_REQUEST_SEND)
+                body = JSON.parse(body);
+        } catch (error) {
+            return body;
+        }
+        return body;
+    }
+}
 
 /**
  * Stringifies the message JSON to a string for Redis.

@@ -84,7 +84,7 @@ export class ContactService {
         }
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
-        const newMessage = await this._messageService.createMessage({ ...signedMessage, chatId: newContact.id });
+        const newMessage = await this._messageService.createMessage(signedMessage);
         const chat = await this._chatService.createChat({
             chatId: newContact.id,
             name: newMessage.to,
@@ -94,6 +94,7 @@ export class ContactService {
             read: [],
             isGroup: false,
             draft: [],
+            messages: [signedMessage],
         });
 
         const contactRequest: MessageDTO<ContactRequest> = {
@@ -117,9 +118,7 @@ export class ContactService {
 
         await this._apiService.sendMessageToApi({ location: newContact.location, message: signedContactRequest });
 
-        this._chatGateway.emitMessageToConnectedClients('connection_request', {
-            ...chat,
-        });
+        this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
 
         return newContact;
     }
@@ -170,7 +169,7 @@ export class ContactService {
             signatures: message.signatures ?? [],
             replies: [],
         };
-        await this._messageService.createMessage({ ...contactRequestMsg, chatId: message.from });
+        await this._messageService.createMessage(contactRequestMsg);
 
         const chat = await this._chatService.createChat({
             chatId: message.from,
@@ -181,11 +180,10 @@ export class ContactService {
             read: [],
             isGroup: false,
             draft: [],
+            messages: [contactRequestMsg],
         });
 
-        this._chatGateway.emitMessageToConnectedClients('connection_request', {
-            ...chat,
-        });
+        this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
         return newContact;
     }
 

@@ -32,6 +32,7 @@ export class Chat extends Entity {
             adminId: this.adminId,
             isGroup: this.isGroup,
             draft: this.parseMessages(),
+            messages: [],
         };
     }
     /**
@@ -41,23 +42,6 @@ export class Chat extends Entity {
     parseMessages(): Message[] {
         return this.draft.map(m => JSON.parse(m));
     }
-
-    /**
-     * Parses message or draft body strings to valid JSON.
-     * @param m - Message
-     * @return {Message} - The message with parsed body.
-     */
-    // parseMessageBody(m: string): Message {
-    //     const msg: Message = JSON.parse(m);
-    //     try {
-    //         const body = JSON.parse(msg.body);
-    //         if (msg.type === MessageType.SYSTEM && body?.type === SystemMessageType.CONTACT_REQUEST_SEND)
-    //             msg.body = JSON.parse(msg.body);
-    //     } catch (error) {
-    //         return msg;
-    //     }
-    //     return msg;
-    // }
 
     /**
      * Parses contact strings to valid JSON.
