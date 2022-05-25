@@ -73,7 +73,7 @@ export class ChatRedisRepository extends EntityRepository<Chat> {
      * @return {Chat[]} - Found chats.
      */
     async getAcceptedChats({ offset = 0, count = 25 }: { offset?: number; count?: number } = {}): Promise<Chat[]> {
-        return await this.findAllWhereEq({ offset, count, where: 'acceptedChat', eq: true });
+        return await this.findAllWhereEqPaginated({ offset, count, where: 'acceptedChat', eq: true });
     }
 
     /**

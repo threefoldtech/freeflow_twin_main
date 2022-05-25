@@ -170,8 +170,8 @@ export enum MESSAGE_TYPE {
     COMMENT_REPLY = 'COMMENT_REPLY',
 }
 
-type LIKE_MODEL = POST_OWNER
-type COMMENT_OWNER = POST_OWNER
+type LIKE_MODEL = POST_OWNER;
+type COMMENT_OWNER = POST_OWNER;
 
 interface POST_IMAGE {
     name: string;

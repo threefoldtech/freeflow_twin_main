@@ -29,6 +29,13 @@ export class MessageService {
         }
     }
 
+    /**
+     * Gets messages from given chat Id using pagination.
+     * @param {Object} obj - Object.
+     * @param {string} obj.chatId - Chat Id to get messages from.
+     * @param {number} obj.offset - Pagination offset.
+     * @param {number} obj.count - Pagination count.
+     */
     async getMessagesFromChat({
         chatId,
         offset,
@@ -42,6 +49,14 @@ export class MessageService {
             return (await this._messageRepo.getMessagesFromChat({ chatId, offset, count })).map(m => m.toJSON());
         } catch (error) {
             throw new BadRequestException(`unable to fetch messages from chat: ${error}`);
+        }
+    }
+
+    async deleteMessagesFromChat(chatId: string) {
+        try {
+            return await this._messageRepo.deleteMessagesFromChat(chatId);
+        } catch (error) {
+            throw new BadRequestException(`unable to delete messages from chat: ${error}`);
         }
     }
 

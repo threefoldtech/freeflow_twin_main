@@ -154,45 +154,13 @@ export class ChatService {
     }
 
     /**
-     * Gets messages from a chat by given chat Id.
-     * @param {Object} obj - Object.
-     * @param {string} obj.chatId - Chat Id to get messages from.
-     * @param {string|null} obj.from - Optional from sender.
-     * @param {number|null} obj.page - Optional page parameter.
-     * @param {number} obj.limit - Limit, defaults to 50.
-     */
-    async getChatMessages({
-        chatId,
-        from,
-        page,
-        limit,
-    }: {
-        chatId: string;
-        from: string | null;
-        page: number | null;
-        limit: number;
-    }): Promise<{ hasMore: boolean; messages: MessageDTO<unknown>[] }> {
-        const chat = await this.getChat(chatId);
-        const parsedMessages = chat.parseMessages();
-
-        let end = parsedMessages.length;
-        if (page) end = parsedMessages.length - page * limit;
-        else if (from) end = parsedMessages.findIndex(m => m.id === from);
-
-        const start = end - limit;
-        return {
-            hasMore: start !== 0,
-            messages: parsedMessages.slice(start, end),
-        };
-    }
-
-    /**
      * Deletes a chat by its ID.
      * @param {string} chatId - Chat ID.
      */
     async deleteChat(chatId: string): Promise<void> {
         const chatToDelete = await this.getChat(chatId);
         try {
+            await this._messageService.deleteMessagesFromChat(chatId);
             await this._chatRepository.deleteChat(chatToDelete.entityId);
         } catch (error) {
             throw new InternalServerErrorException(`unable to delete chat: ${error}`);

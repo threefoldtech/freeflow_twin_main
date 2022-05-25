@@ -51,6 +51,13 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         });
     }
 
+    /**
+     * Gets messages from given chat Id using pagination.
+     * @param {Object} obj - Object.
+     * @param {string} obj.chatId - Chat Id to get messages from.
+     * @param {number} obj.offset - Pagination offset.
+     * @param {number} obj.count - Pagination count.
+     */
     async getMessagesFromChat({
         chatId,
         offset,
@@ -60,6 +67,11 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         offset: number;
         count: number;
     }): Promise<Message[]> {
-        return await this.findAllWhereEq({ offset, count, where: 'chatId', eq: chatId });
+        return await this.findAllWhereEqPaginated({ offset, count, where: 'chatId', eq: chatId });
+    }
+
+    async deleteMessagesFromChat(chatId: string) {
+        const messages = await this.findAllWhereEq({ where: 'chatId', eq: chatId });
+        messages.forEach(m => this.delete(m.entityId));
     }
 }

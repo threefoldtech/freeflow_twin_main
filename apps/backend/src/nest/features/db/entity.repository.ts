@@ -37,13 +37,24 @@ export abstract class EntityRepository<TEntity extends Entity> {
     /**
      * Finds all entities based on search.
      * @param {Object} obj - Object.
+     * @param {string} obj.where - Where entity field.
+     * @param {string} obj.eq - Equals.
+     * @return {TEntity[]} - Found entities.
+     */
+    protected async findAllWhereEq({ where, eq }: { where: string; eq: string | boolean }): Promise<TEntity[]> {
+        return await this._entityRepository.search().where(where).eq(eq).return.all();
+    }
+
+    /**
+     * Finds all entities based on search using pagination.
+     * @param {Object} obj - Object.
      * @param {number} obj.offset - Paginated offset.
      * @param {number} obj.count - Paginated count.
      * @param {string} obj.where - Where entity field.
      * @param {string} obj.eq - Equals.
      * @return {TEntity[]} - Found entities.
      */
-    protected async findAllWhereEq({
+    protected async findAllWhereEqPaginated({
         offset,
         count,
         where,
