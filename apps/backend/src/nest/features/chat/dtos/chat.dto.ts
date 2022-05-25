@@ -7,8 +7,8 @@ import { Message } from '../../message/models/message.model';
 export class ChatDTO {
     chatId: string;
     contacts: ContactDTO[];
+    messages?: MessageDTO<unknown>[];
     isGroup: boolean;
-    messages: MessageDTO<unknown>[];
     name: string;
     acceptedChat: boolean;
     adminId: string;
@@ -27,9 +27,6 @@ export class CreateChatDTO {
 
     @IsArray()
     contacts: ContactDTO[];
-
-    @IsArray()
-    messages: MessageDTO<unknown>[];
 
     @IsBoolean()
     acceptedChat: boolean;

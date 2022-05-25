@@ -20,6 +20,7 @@ export class CreateMessageDTO<T> {
     @IsString()
     id: string;
 
+    @IsString()
     chatId: string;
 
     @IsString()

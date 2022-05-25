@@ -34,6 +34,7 @@ const addContact = (username: DtId, location: string, _dontCheck = false) => {
     const { user } = useAuthState();
     const addMessage: Message<SystemBody> = {
         id: uuidv4(),
+        chatId: String(username),
         body: {
             type: SystemMessageTypes.CONTACT_REQUEST_SEND,
             message: `Request has been sent to ${username}`,

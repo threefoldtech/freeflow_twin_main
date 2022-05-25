@@ -16,6 +16,7 @@ import { ContactService } from '../../contact/contact.service';
 import { CreateContactDTO } from '../../contact/dtos/contact.dto';
 import { CreateMessageDTO, MessageDTO } from '../dtos/message.dto';
 import { MessageService } from '../message.service';
+import { Message } from '../models/message.model';
 import {
     AddUserSystemState,
     PersistSystemMessage,
@@ -25,18 +26,13 @@ import {
 } from './system-message.state';
 
 export abstract class MessageState<T> {
-    abstract handle({ message, chat }: { message: MessageDTO<T>; chat: Chat }): Promise<unknown>;
+    abstract handle({ message }: { message: MessageDTO<T>; chat?: Chat }): Promise<unknown>;
 }
 
 export class ContactRequestMessageState implements MessageState<ContactRequest> {
     constructor(private readonly _messageService: MessageService, private readonly _contactService: ContactService) {}
 
-    async handle({
-        message,
-    }: {
-        message: MessageDTO<ContactRequest>;
-        chat: Chat;
-    }): Promise<CreateContactDTO<ContactRequest>> {
+    async handle({ message }: { message: MessageDTO<ContactRequest> }): Promise<CreateContactDTO<ContactRequest>> {
         const from = message.body;
         const validSignature = await this._messageService.verifySignedMessage({
             isGroup: false,
@@ -57,39 +53,27 @@ export class ContactRequestMessageState implements MessageState<ContactRequest> 
 export class ReadMessageState implements MessageState<string> {
     constructor(private readonly _chatService: ChatService, private readonly _chatGateway: ChatGateway) {}
 
-    async handle({ message }: { message: MessageDTO<string>; chat: Chat }): Promise<Chat> {
+    async handle({ message }: { message: MessageDTO<string> }): Promise<Chat> {
         this._chatGateway.emitMessageToConnectedClients('message', message);
         return await this._chatService.handleMessageRead(message);
     }
 }
 
 export class StringMessageState implements MessageState<string> {
-    constructor(
-        private readonly _chatService: ChatService,
-        private readonly _chatGateway: ChatGateway,
-        private readonly _messageService: MessageService
-    ) {}
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
-    async handle({ message, chat }: { message: MessageDTO<string>; chat: Chat }): Promise<string> {
+    async handle({ message }: { message: MessageDTO<string> }): Promise<Message> {
         this._chatGateway.emitMessageToConnectedClients('message', message);
-        await this._messageService.createMessage(message);
-        // TODO: change all add message to chat handlers
-        return await this._chatService.addMessageToChat({ chat, message });
+        return await this._messageService.createMessage(message);
     }
 }
 
 export class FileMessageState implements MessageState<FileMessage> {
-    constructor(
-        private readonly _chatService: ChatService,
-        private readonly _chatGateway: ChatGateway,
-        private readonly _messageService: MessageService
-    ) {}
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
-    async handle({ message, chat }: { message: MessageDTO<FileMessage>; chat: Chat }): Promise<string> {
+    async handle({ message }: { message: MessageDTO<FileMessage> }): Promise<Message> {
         this._chatGateway.emitMessageToConnectedClients('message', message);
-        await this._messageService.createMessage(message);
-        // TODO: change all add message to chat handlers
-        return await this._chatService.addMessageToChat({ chat, message });
+        return await this._messageService.createMessage(message);
     }
 }
 
@@ -128,12 +112,12 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         // system joined video room message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.JOINED_VIDEOROOM,
-            new PersistSystemMessage(this._chatService, this._messageService)
+            new PersistSystemMessage(this._messageService)
         );
         // system contact request send message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.CONTACT_REQUEST_SEND,
-            new PersistSystemMessage(this._chatService, this._messageService)
+            new PersistSystemMessage(this._messageService)
         );
         // user leaves group message handler
         this._subSystemMessageStateHandlers.set(
@@ -148,7 +132,7 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         // system default message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.DEFAULT,
-            new PersistSystemMessage(this._chatService, this._messageService)
+            new PersistSystemMessage(this._messageService)
         );
     }
 

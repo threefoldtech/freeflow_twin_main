@@ -8,7 +8,7 @@ import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
-import { MessageDTO } from '../message/dtos/message.dto';
+import { CreateMessageDTO, MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { Message } from '../message/models/message.model';
 import { CreateContactDTO, DeleteContactDTO } from './dtos/contact.dto';
@@ -84,12 +84,11 @@ export class ContactService {
         }
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
-        const newMessage = await this._messageService.createMessage(signedMessage);
+        const newMessage = await this._messageService.createMessage({ ...signedMessage, chatId: newContact.id });
         const chat = await this._chatService.createChat({
             chatId: newContact.id,
             name: newMessage.to,
             contacts: [newContact, me],
-            messages: [signedMessage],
             acceptedChat: true,
             adminId: newContact.id,
             read: [],
@@ -118,7 +117,9 @@ export class ContactService {
 
         await this._apiService.sendMessageToApi({ location: newContact.location, message: signedContactRequest });
 
-        this._chatGateway.emitMessageToConnectedClients('connection_request', chat.toJSON());
+        this._chatGateway.emitMessageToConnectedClients('connection_request', {
+            ...chat,
+        });
 
         return newContact;
     }
@@ -157,7 +158,7 @@ export class ContactService {
             throw new BadRequestException(`unable to create contact: ${error}`);
         }
 
-        const contactRequestMsg: MessageDTO<string> = {
+        const contactRequestMsg: CreateMessageDTO<string> = {
             id: uuidv4(),
             chatId: message.from,
             from: message.from,
@@ -169,12 +170,12 @@ export class ContactService {
             signatures: message.signatures ?? [],
             replies: [],
         };
+        await this._messageService.createMessage({ ...contactRequestMsg, chatId: message.from });
 
         const chat = await this._chatService.createChat({
             chatId: message.from,
             name: message.from,
             contacts: [me, newContact],
-            messages: [contactRequestMsg as Message],
             acceptedChat: false,
             adminId: message.from,
             read: [],
@@ -182,7 +183,9 @@ export class ContactService {
             draft: [],
         });
 
-        this._chatGateway.emitMessageToConnectedClients('connection_request', chat.toJSON());
+        this._chatGateway.emitMessageToConnectedClients('connection_request', {
+            ...chat,
+        });
         return newContact;
     }
 

@@ -52,18 +52,15 @@ export class MessageController {
         // string message handler
         this._messageStateHandlers.set(
             MessageType.STRING,
-            new StringMessageState(this._chatService, this._chatGateway, this._messageService)
+            new StringMessageState(this._chatGateway, this._messageService)
         );
         // GIF message handler
         this._messageStateHandlers.set(
             MessageType.GIF,
-            new StringMessageState(this._chatService, this._chatGateway, this._messageService)
+            new StringMessageState(this._chatGateway, this._messageService)
         );
         // file message handler
-        this._messageStateHandlers.set(
-            MessageType.FILE,
-            new FileMessageState(this._chatService, this._chatGateway, this._messageService)
-        );
+        this._messageStateHandlers.set(MessageType.FILE, new FileMessageState(this._chatGateway, this._messageService));
     }
 
     @Put()
@@ -75,7 +72,7 @@ export class MessageController {
 
         // needs to be checked first otherwise chat will always show as unaccepted
         if (message.type === MessageType.CONTACT_REQUEST)
-            return await this._messageStateHandlers.get(MessageType.CONTACT_REQUEST).handle({ message, chat: null });
+            return await this._messageStateHandlers.get(MessageType.CONTACT_REQUEST).handle({ message });
 
         const chatId = this._messageService.determineChatID(message);
         const chat = await this._chatService.getChat(chatId);

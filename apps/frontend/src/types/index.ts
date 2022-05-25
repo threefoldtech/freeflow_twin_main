@@ -27,6 +27,7 @@ export interface userMessagesContainer {
 
 export interface Message<T> {
     id: Id;
+    chatId: string;
     from: DtId;
     to: Id | DtId;
     body: T;

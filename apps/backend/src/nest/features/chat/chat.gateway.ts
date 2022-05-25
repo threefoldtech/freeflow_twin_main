@@ -69,7 +69,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
 
         // persist message
         this._messageService.createMessage(signedMessage);
-        this._chatService.addMessageToChat({ chat, message: signedMessage });
 
         return await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
     }

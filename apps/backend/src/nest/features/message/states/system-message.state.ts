@@ -7,6 +7,7 @@ import { ChatService } from '../../chat/chat.service';
 import { Chat } from '../../chat/models/chat.model';
 import { MessageDTO } from '../dtos/message.dto';
 import { MessageService } from '../message.service';
+import { Message } from '../models/message.model';
 
 export abstract class SubSystemMessageState {
     abstract handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<unknown>;
@@ -30,8 +31,7 @@ export class AddUserSystemState implements SubSystemMessageState {
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
 
         await this._apiService.sendGroupInvitation({ location: contact.location, chat: chat.toJSON() });
-        // await this._messageService.createMessage(message);
-        await this._chatService.addMessageToChat({ chat, message });
+        await this._messageService.createMessage(message);
         return await this._apiService.sendMessageToApi({ location: contact.location, message });
     }
 }
@@ -57,7 +57,6 @@ export class RemoveUserSystemState implements SubSystemMessageState {
 
         await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
         await this._messageService.createMessage(message);
-        await this._chatService.addMessageToChat({ chat, message });
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
         return await this._apiService.sendMessageToApi({ location: contact.location, message });
@@ -65,11 +64,10 @@ export class RemoveUserSystemState implements SubSystemMessageState {
 }
 
 export class PersistSystemMessage implements SubSystemMessageState {
-    constructor(private readonly _chatService: ChatService, private readonly _messageService: MessageService) {}
+    constructor(private readonly _messageService: MessageService) {}
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<string> {
-        await this._messageService.createMessage(message);
-        return this._chatService.addMessageToChat({ chat, message });
+    async handle({ message }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<Message> {
+        return await this._messageService.createMessage(message);
     }
 }
 
@@ -96,7 +94,6 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
         }
         await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
         await this._messageService.createMessage(message);
-        await this._chatService.addMessageToChat({ chat, message });
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
     }
 }

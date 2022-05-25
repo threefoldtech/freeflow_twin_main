@@ -14,7 +14,6 @@ import { ContactService } from '../contact/contact.service';
 import { KeyService } from '../key/key.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
-import { stringifyMessage } from '../message/models/message.model';
 import { ChatGateway } from './chat.gateway';
 import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
 import { Chat, stringifyContacts } from './models/chat.model';
@@ -103,13 +102,24 @@ export class ChatService {
      * Gets chats using pagination.
      * @param {Object} obj - Object.
      * @param {number} obj.offset - Chat offset, defaults to 0.
-     * @param {number} obj.count - Amount of chats to fetch, defaults to 25.
+     * @param {number} obj.count - Amount of chats to fetch, defaults to 50.
      * @return {ChatDTO[]} - Found chats.
      */
-    async getChats({ offset = 0, count = 25 }: { offset?: number; count?: number } = {}): Promise<ChatDTO[]> {
+    async getChats({ offset = 0, count = 50 }: { offset?: number; count?: number } = {}): Promise<ChatDTO[]> {
         try {
             const chats = await this._chatRepository.getChats({ offset, count });
-            return chats.map(chat => chat.toJSON());
+            const chatDTOs = chats.map(c => c.toJSON());
+            console.log(`CHAT DTOS :${JSON.stringify(chats)}`);
+            chatDTOs.map(async c => {
+                const chatMessages = await this._messageService.getMessagesFromChat({
+                    chatId: c.chatId,
+                    offset,
+                    count,
+                });
+                console.log(`CHAT MESSAGE :${JSON.stringify(chatMessages)}`);
+                c.messages = chatMessages ?? [];
+            });
+            return chatDTOs;
         } catch (error) {
             throw new NotFoundException('no chats found');
         }
@@ -197,16 +207,16 @@ export class ChatService {
      * @param {Message} obj.message - Signed message to add to chat.
      * @return {string} - Chat entity ID.
      */
-    async addMessageToChat({ chat, message }: { chat: Chat; message: MessageDTO<unknown> }): Promise<string> {
-        try {
-            chat.messages
-                ? chat.messages.push(stringifyMessage(message))
-                : (chat.messages = [stringifyMessage(message)]);
-            return await this._chatRepository.updateChat(chat);
-        } catch (error) {
-            throw new BadRequestException(`unable to add message to chat: ${error}`);
-        }
-    }
+    // async addMessageToChat({ chat, message }: { chat: Chat; message: MessageDTO<unknown> }): Promise<string> {
+    //     try {
+    //         chat.messages
+    //             ? chat.messages.push(stringifyMessage(message))
+    //             : (chat.messages = [stringifyMessage(message)]);
+    //         return await this._chatRepository.updateChat(chat);
+    //     } catch (error) {
+    //         throw new BadRequestException(`unable to add message to chat: ${error}`);
+    //     }
+    // }
 
     /**
      * Removes a contact from a chat.

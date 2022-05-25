@@ -29,6 +29,22 @@ export class MessageService {
         }
     }
 
+    async getMessagesFromChat({
+        chatId,
+        offset,
+        count,
+    }: {
+        chatId: string;
+        offset: number;
+        count: number;
+    }): Promise<Message[]> {
+        try {
+            return await this._messageRepo.getMessagesFromChat({ chatId, offset, count });
+        } catch (error) {
+            throw new BadRequestException(`unable to fetch messages from chat: ${error}`);
+        }
+    }
+
     /**
      * Verifies a message's signature.
      * @param {Object} obj - Object.

@@ -69,7 +69,6 @@ export class ChatFileState implements FileState<ChatFile> {
         const chat = await this._chatService.getChat(chatId);
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
         const location = chat.parseContacts().find(c => c.id === message.to).location;
-        await this._chatService.addMessageToChat({ chat, message });
         await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
         return true;
     }
