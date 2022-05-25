@@ -285,11 +285,13 @@
 
     const createMessage = () => {
         const { user } = useAuthState();
+        const chatId = props.chat.chatId;
 
         switch (action?.value?.type) {
             case MessageAction.REPLY: {
                 return {
                     id: uuidv4(),
+                    chatId,
                     from: user.id,
                     to: <string>selectedId,
                     body: <QuoteBodyType>{
@@ -309,6 +311,7 @@
 
                 const editMessage = {
                     id: <string>action.value.message.id,
+                    chatId,
                     from: user.id,
                     to: <string>selectedId,
                     body: newBody,
@@ -321,6 +324,7 @@
                 };
                 const editWrapperMessage = {
                     id: uuidv4(),
+                    chatId,
                     from: user.id,
                     to: <string>selectedId,
                     body: editMessage,
@@ -337,6 +341,7 @@
             default: {
                 return {
                     id: uuidv4(),
+                    chatId,
                     from: user.id,
                     to: <string>selectedId,
                     body: message.value.value,

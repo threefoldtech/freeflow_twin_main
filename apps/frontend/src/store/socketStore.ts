@@ -92,7 +92,7 @@ const initializeSocket = (username: string) => {
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
     const data = {
         chatId,
-        message,
+        message: { ...message, chatId },
     };
     const messageType = isUpdate ? 'update_message' : 'message';
     await state.socket.emit(messageType, data);

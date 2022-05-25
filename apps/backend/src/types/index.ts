@@ -170,8 +170,8 @@ export enum MESSAGE_TYPE {
     COMMENT_REPLY = 'COMMENT_REPLY',
 }
 
-interface LIKE_MODEL extends POST_OWNER {}
-interface COMMENT_OWNER extends POST_OWNER {}
+type LIKE_MODEL = POST_OWNER
+type COMMENT_OWNER = POST_OWNER
 
 interface POST_IMAGE {
     name: string;
@@ -207,6 +207,6 @@ export interface SOCIAL_POST {
     likes: LIKE_MODEL[];
     images: POST_IMAGE[];
     replies: COMMENT_MODEL[];
-    isTyping?: String[];
+    isTyping?: string[];
     action?: POST_ACTIONS;
 }
