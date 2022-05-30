@@ -1,3 +1,5 @@
+import { IsBoolean, IsDate, IsNotEmpty, IsString } from 'class-validator';
+
 export enum PostType {
     SOCIAL_POST = 'SOCIAL_POST',
 }
@@ -7,8 +9,8 @@ export interface PostOwner {
     location: string;
 }
 
-interface PostLike extends PostOwner {}
-interface CommentOwner extends PostOwner {}
+export interface PostLike extends PostOwner {}
+export interface CommentOwner extends PostOwner {}
 
 export enum CommentType {
     COMMENT = 'COMMENT',
@@ -47,13 +49,36 @@ export interface PostDTO {
     isGroupPost: boolean;
     lastModified: Date;
     type: PostType;
+    images: string[];
 }
 
 export interface PostContainerDTO {
     post: PostDTO;
     owner: PostOwner;
     likes: PostLike[];
-    images: PostImage[];
+    images: string[];
     replies: PostComment[];
     isTyping?: String[];
+}
+
+export class CreatePostDTO {
+    @IsString()
+    id: string;
+
+    @IsString()
+    body: string;
+
+    @IsDate()
+    createdOn: Date;
+
+    @IsDate()
+    lastModified: Date;
+
+    @IsBoolean()
+    isGroupPost: boolean;
+
+    @IsNotEmpty()
+    type: PostType;
+
+    images: string[];
 }

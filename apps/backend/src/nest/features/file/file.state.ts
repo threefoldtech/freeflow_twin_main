@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
-import { ChatFile } from 'types/file-actions.type';
+import { ChatFile, PostFile } from 'types/file-actions.type';
 
 import { FileMessage, MessageType } from '../../types/message-types';
 import { ApiService } from '../api/api.service';
@@ -13,6 +13,7 @@ import { FileService } from './file.service';
 
 export enum FileAction {
     ADD_TO_CHAT = 'ADD_TO_CHAT',
+    ADD_TO_POST = 'ADD_TO_POST',
     CHANGE_AVATAR = 'CHANGE_AVATAR',
 }
 
@@ -70,6 +71,29 @@ export class ChatFileState implements FileState<ChatFile> {
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
         const location = chat.parseContacts().find(c => c.id === message.to).location;
         await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
+        return true;
+    }
+}
+
+export class PostFileState implements FileState<PostFile> {
+    private storageDir = '';
+
+    constructor(private readonly _configService: ConfigService, private readonly _fileService: FileService) {
+        this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
+    }
+
+    async handle({ fileId }: { fileId: string; payload: PostFile }) {
+        // const { postId, filename } = payload;
+        const fromPath = `tmp/${fileId}`;
+
+        try {
+            this._fileService.makeDirectory({ path: this.storageDir });
+            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, fileId) });
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+
         return true;
     }
 }

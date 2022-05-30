@@ -6,6 +6,8 @@ import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
 import { CommentType, PostComment, PostContainerDTO, PostType } from 'types/post.type';
+import { useSocketActions } from '../store/socketStore';
+import { FileAction } from 'types/file-actions.type';
 
 const endpoint = `${config.baseUrl}api/v1/posts`;
 const { user } = useAuthState();
@@ -27,18 +29,12 @@ export interface socialPostModel extends socialMeta {
     signatures: string;
 }
 
-type createPostModel = Omit<socialPostModel, 'images'>;
-
 export const createSocialPost = async (text?: string, files: File[] = []) => {
     if (files?.length > 10) return;
-    const formData = new FormData();
 
-    files?.forEach(file => {
-        formData.append(`images`, file);
-    });
-
-    const post: createPostModel = {
-        id: uuidv4(),
+    const postId = uuidv4();
+    const post: socialPostModel = {
+        id: postId,
         type: PostType.SOCIAL_POST,
         body: text,
         isGroupPost: false,
@@ -48,9 +44,26 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
         signatures: '',
     };
 
-    Object.keys(post).forEach(key => formData.append(key, post[key]));
+    files?.map(async file => {
+        const formData = new FormData();
+        formData.append(`images`, file);
+        // Upload file to tmp
+        const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        if (!data.id) return false;
+        post.images ? post.images.push(data.id) : (post.images = [data.id]);
+        const { sendHandleUploadedFile } = useSocketActions();
+        sendHandleUploadedFile({
+            fileId: String(data.id),
+            payload: { postId, filename: data.filename },
+            action: FileAction.ADD_TO_POST,
+        });
+    });
 
-    return await axios.post<any>(`${endpoint}`, formData, {
+    return await axios.post<any>(`${endpoint}`, post, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -200,6 +213,7 @@ export const createMessage = async (
 ): Promise<Message<MESSAGE_POST_SHARE_BODY>> => {
     const { user } = useAuthState();
     return {
+        chatId: '',
         id: uuidv4(),
         from: user.id,
         to: <string>chatId,

@@ -1,13 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { PostContainerDTO } from 'types/post.type';
 
 import { DbService } from '../../db/db.service';
 import { EntityRepository } from '../../db/entity.repository';
-import { Post, postSchema } from '../models/post.model';
+import { Post, postSchema, stringifyPost, stringifyPostOwner } from '../models/post.model';
 
 @Injectable()
 export class PostRedisRepository extends EntityRepository<Post> {
     constructor(readonly dbService: DbService) {
         super(dbService, postSchema);
+    }
+
+    /**
+     * Create a post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.post - Post.
+     * @param {string} obj.owner - Post owner.
+     * @param {string} obj.replies - Post replies.
+     * @return {Post} - Created post.
+     */
+    async createPost({ post, owner, images }: PostContainerDTO): Promise<Post> {
+        return await this.save({
+            post: stringifyPost(post),
+            owner: stringifyPostOwner(owner),
+            images,
+            replies: [],
+            likes: [],
+        });
     }
 
     /**

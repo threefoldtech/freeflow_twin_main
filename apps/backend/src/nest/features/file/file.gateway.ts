@@ -9,7 +9,7 @@ import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { FileService } from './file.service';
-import { ChatFileState, FileAction, FileState } from './file.state';
+import { ChatFileState, FileAction, FileState, PostFileState } from './file.state';
 
 @WebSocketGateway({ cors: '*' })
 export class FileGateway implements OnGatewayInit {
@@ -42,6 +42,9 @@ export class FileGateway implements OnGatewayInit {
                 this._chatGateway
             )
         );
+
+        // handles files for a post
+        this._fileStateHandlers.set(FileAction.ADD_TO_POST, new PostFileState(this._configService, this._fileService));
     }
 
     afterInit(server: Server) {
