@@ -5,14 +5,6 @@
         }"
         class="h-screen"
     >
-        <!-- <template v-if="false"> -->
-        <!--     <div -->
-        <!--         class="fixed left-0 top-0 bg-red-700 text-white uppercase text-xl z-[9999] px-16 transform -rotate-45 -translate-x-16 translate-y-2 opacity-50 pointer-events-none" -->
-        <!--     > -->
-        <!--         Beta -->
-        <!--     </div> -->
-        <!-- </template> -->
-        <!-- <router-view /> -->
         <router-view v-show="path !== '/glass'" />
 
         <app-layout>
