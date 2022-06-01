@@ -353,6 +353,7 @@ const sendMessage = (chatId: string, message: any, type: string = 'STRING') => {
     const { user } = useAuthState();
 
     const msg: Message<String> = {
+        chatId,
         id: uuidv4(),
         body: message,
         from: user.id,
@@ -547,6 +548,7 @@ const readMessage = (chatId: string, messageId: string) => {
     const { user } = useAuthState();
 
     const newMessage: Message<string> = {
+        chatId,
         id: uuidv4(),
         from: user.id,
         to: chatId,
@@ -576,6 +578,7 @@ const updateContactsInGroup = async (
     if (type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
 
     const message: Message<GroupManagementBody> = {
+        chatId: groupId,
         id: uuidv4(),
         from: user.id,
         to: groupId,

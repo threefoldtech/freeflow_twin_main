@@ -1,3 +1,5 @@
+import { FileType } from 'custom-types/file-actions.type';
+
 import { ContactDTO } from '../features/contact/dtos/contact.dto';
 
 export interface MessageBody {
@@ -8,11 +10,6 @@ export interface MessageBody {
 export interface ContactRequest {
     id: string;
     location: string;
-}
-
-export enum FileType {
-    RECORDING = 'RECORDING',
-    OTHER = 'OTHER',
 }
 
 export interface FileMessage {

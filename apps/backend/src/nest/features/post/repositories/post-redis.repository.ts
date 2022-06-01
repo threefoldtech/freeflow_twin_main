@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostContainerDTO } from 'custom-types/post.type';
+import { IPostContainerDTO } from 'custom-types/post.type';
 
 import { DbService } from '../../db/db.service';
 import { EntityRepository } from '../../db/entity.repository';
@@ -19,7 +19,7 @@ export class PostRedisRepository extends EntityRepository<Post> {
      * @param {string} obj.replies - Post replies.
      * @return {Post} - Created post.
      */
-    async createPost({ post, owner, images }: PostContainerDTO): Promise<Post> {
+    async createPost({ post, owner, images }: IPostContainerDTO): Promise<Post> {
         return await this.save({
             post: stringifyPost(post),
             owner: stringifyPostOwner(owner),

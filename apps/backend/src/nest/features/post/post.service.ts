@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CreatePostDTO, PostContainerDTO, PostDTO, PostOwner } from 'custom-types/post.type';
+import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 import { LocationService } from '../location/location.service';
 import { PostRedisRepository } from './repositories/post-redis.repository';
@@ -13,11 +13,11 @@ export class PostService {
 
     constructor(private readonly _locationService: LocationService, private readonly _configService: ConfigService) {}
 
-    async createPost(createPostDTO: CreatePostDTO) {
+    async createPost(createPostDTO: IPostDTO) {
         const { id, body, createdOn, lastModified, isGroupPost, type, images } = createPostDTO;
         try {
             if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
-            const postDTO: PostDTO = {
+            const postDTO: IPostDTO = {
                 id,
                 body,
                 createdOn,
@@ -26,11 +26,11 @@ export class PostService {
                 type,
                 images,
             };
-            const postOwner: PostOwner = {
+            const postOwner: IPostOwner = {
                 id: this._configService.get<string>('userId'),
                 location: this.ownLocation,
             };
-            const postContainer: PostContainerDTO = {
+            const postContainer: IPostContainerDTO = {
                 post: postDTO,
                 owner: postOwner,
                 images,

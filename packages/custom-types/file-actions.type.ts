@@ -1,13 +1,15 @@
-export enum FileAction {
-    ADD_TO_CHAT = 'ADD_TO_CHAT',
-    CHANGE_AVATAR = 'CHANGE_AVATAR',
-    ADD_TO_POST = 'ADD_TO_POST',
-}
+export const FileAction = {
+    ADD_TO_CHAT: 'ADD_TO_CHAT',
+    CHANGE_AVATAR: 'CHANGE_AVATAR',
+    ADD_TO_POST: 'ADD_TO_POST',
+};
+export type FileAction = typeof FileAction[keyof typeof FileAction];
 
-export enum FileType {
-    RECORDING = 'RECORDING',
-    OTHER = 'OTHER',
-}
+const FileType = {
+    RECORDING: 'RECORDING',
+    OTHER: 'OTHER',
+};
+export type FileType = typeof FileType[keyof typeof FileType];
 
 export interface ChatFile {
     messageId: string;

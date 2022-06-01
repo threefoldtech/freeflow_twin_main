@@ -5,7 +5,7 @@ import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
-import { CommentType, PostComment, PostContainerDTO, PostType } from 'custom-types/post.type';
+import { CommentType, IPostComment, IPostContainerDTO, PostType } from 'custom-types/post.type';
 import { useSocketActions } from '../store/socketStore';
 import { FileAction } from 'custom-types/file-actions.type';
 
@@ -70,7 +70,7 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
     });
 };
 
-export const sortPosts = (posts: PostContainerDTO[]) => {
+export const sortPosts = (posts: IPostContainerDTO[]) => {
     if (!posts) {
         allSocialPosts.value.sort(function (a, b) {
             return new Date(b.post.createdOn).getTime() - new Date(a.post.createdOn).getTime();
@@ -142,12 +142,12 @@ export const setSomeoneIsTyping = async (postId: string, location: string, userI
 
 export const commentOnPost = async (
     message: string,
-    item: PostContainerDTO,
+    item: IPostContainerDTO,
     isReplyToComment: boolean,
     comment_id?: string
 ) => {
     const myAddress = await myYggdrasilAddress();
-    const data: PostComment = {
+    const data: IPostComment = {
         id: uuidv4(),
         body: message,
         owner: {
@@ -209,7 +209,7 @@ export const destroySomeoneIsTyping = (chatId: string, queueId: string) => {
 
 export const createMessage = async (
     chatId: string,
-    post: PostContainerDTO
+    post: IPostContainerDTO
 ): Promise<Message<MESSAGE_POST_SHARE_BODY>> => {
     const { user } = useAuthState();
     return {
@@ -230,12 +230,12 @@ export const createMessage = async (
     };
 };
 
-export const sendMessageSharePost = async (chatId: string, post: PostContainerDTO) => {
+export const sendMessageSharePost = async (chatId: string, post: IPostContainerDTO) => {
     const newMessage: Message<MESSAGE_POST_SHARE_BODY> = await createMessage(chatId, post);
     sendMessageObject(chatId, newMessage);
 };
 
-export const deletePost = async (item: PostContainerDTO) => {
+export const deletePost = async (item: IPostContainerDTO) => {
     const post = item.post.id;
     return await axios.delete(`${endpoint}/${post}`);
 };

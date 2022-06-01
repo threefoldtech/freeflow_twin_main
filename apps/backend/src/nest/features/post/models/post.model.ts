@@ -1,4 +1,4 @@
-import { PostComment, PostContainerDTO, PostDTO, PostLike, PostOwner } from 'custom-types/post.type';
+import { IPostComment, IPostContainerDTO, IPostDTO, IPostLike, IPostOwner } from 'custom-types/post.type';
 import { Entity, Schema } from 'redis-om';
 
 /**
@@ -15,7 +15,7 @@ export interface Post {
 }
 
 export class Post extends Entity {
-    toJSON(): PostContainerDTO {
+    toJSON(): IPostContainerDTO {
         return {
             post: this.parsePost(),
             owner: this.parsePostOwner(),
@@ -26,19 +26,19 @@ export class Post extends Entity {
         };
     }
 
-    parsePost(): PostDTO {
+    parsePost(): IPostDTO {
         return JSON.parse(this.post);
     }
 
-    parsePostOwner(): PostOwner {
+    parsePostOwner(): IPostOwner {
         return JSON.parse(this.owner);
     }
 
-    parseLikes(): PostLike[] {
+    parseLikes(): IPostLike[] {
         return this.likes.map(l => JSON.parse(l));
     }
 
-    parseReplies(): PostComment[] {
+    parseReplies(): IPostComment[] {
         return this.replies.map(r => JSON.parse(r));
     }
 }
@@ -48,28 +48,28 @@ export class Post extends Entity {
  * @param {PostDTO} post - Post to stringify.
  * @return {string} - The stringified post.
  */
-export const stringifyPost = (post: PostDTO): string => JSON.stringify(post);
+export const stringifyPost = (post: IPostDTO): string => JSON.stringify(post);
 
 /**
  * Stringifies PostOwner JSON to a string for Redis.
  * @param {PostOwner} postOwner - Post owner to stringify.
  * @return {string} - The stringified post owner.
  */
-export const stringifyPostOwner = (postOwner: PostOwner): string => JSON.stringify(postOwner);
+export const stringifyPostOwner = (postOwner: IPostOwner): string => JSON.stringify(postOwner);
 
 /**
  * Stringifies likes JSON to a string for Redis.
  * @param {PostLike[]} likes - Post likes to stringify.
  * @return {string[]} - The stringified likes.
  */
-export const stringifyLikes = (likes: PostLike[]): string[] => likes.map(like => JSON.stringify(like));
+export const stringifyLikes = (likes: IPostLike[]): string[] => likes.map(like => JSON.stringify(like));
 
 /**
  * Stringifies replies JSON to a string for Redis.
  * @param {PostComment[]} replies - Post replies to stringify.
  * @return {string[]} - The stringified replies.
  */
-export const stringifyReplies = (replies: PostComment[]): string[] => replies.map(reply => JSON.stringify(reply));
+export const stringifyReplies = (replies: IPostComment[]): string[] => replies.map(reply => JSON.stringify(reply));
 
 export const postSchema = new Schema(Post, {
     post: { type: 'string' },
