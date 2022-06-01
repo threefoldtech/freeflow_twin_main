@@ -12,8 +12,8 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Status, StatusUpdate } from 'custom-types/status.type';
 import { createReadStream } from 'fs-extra';
-import { Status, StatusUpdate } from 'types/status.type';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { imageFileFilter } from '../../utils/file-filters';

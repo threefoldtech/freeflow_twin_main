@@ -1,5 +1,5 @@
+import { PostComment, PostContainerDTO, PostDTO, PostLike, PostOwner } from 'custom-types/post.type';
 import { Entity, Schema } from 'redis-om';
-import { PostComment, PostContainerDTO, PostDTO, PostLike, PostOwner } from 'types/post.type';
 
 /**
  * Every model with string[] will later be parsed to the correct model type.

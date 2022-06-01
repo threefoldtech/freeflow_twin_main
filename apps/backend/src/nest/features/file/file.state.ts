@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
+import { ChatFile, PostFile } from 'custom-types/file-actions.type';
 import { join } from 'path';
-import { ChatFile, PostFile } from 'types/file-actions.type';
 
 import { FileMessage, MessageType } from '../../types/message-types';
 import { ApiService } from '../api/api.service';

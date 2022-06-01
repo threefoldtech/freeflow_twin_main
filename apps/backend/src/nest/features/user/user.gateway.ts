@@ -1,14 +1,13 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import { StatusUpdate } from 'custom-types/status.type';
 import { Server } from 'socket.io';
-import { StatusUpdate } from 'types/status.type';
 
 import { ApiService } from '../api/api.service';
 import { ChatService } from '../chat/chat.service';
 import { ContactService } from '../contact/contact.service';
 import { Contact } from '../contact/models/contact.model';
-import { MessageService } from '../message/message.service';
 
 @WebSocketGateway({ cors: '*' })
 export class UserGateway implements OnGatewayInit {
