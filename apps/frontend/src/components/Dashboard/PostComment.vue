@@ -96,9 +96,9 @@
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { CommentType, PostComment } from 'custom-types/post.type';
+    import { CommentType, IPostComment } from 'custom-types';
 
-    const props = defineProps<{ comment: PostComment }>();
+    const props = defineProps<{ comment: IPostComment }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
     const myLocation = ref<string>('');

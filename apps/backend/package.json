@@ -4,8 +4,8 @@
     "version": "1.0.7",
     "description": "Digitaltwin backend",
     "scripts": {
-        "dev": "concurrently 'tsc --watch' 'nodemon out-tsc/src/server.js'",
-        "serve": "concurrently 'tsc --watch' 'nodemon out-tsc/src/server.js'",
+        "dev": "concurrently 'tsc --watch' 'nodemon dist/src/server.js'",
+        "serve": "concurrently 'tsc --watch' 'nodemon dist/src/server.js'",
         "build": "rimraf dist && tsc",
         "lint": "eslint src/nest/* --fix",
         "format": "prettier --write \"src/nest/**/*.ts\"",

@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { StatusUpdate } from 'custom-types/status.type';
+import { StatusUpdate } from 'custom-types';
 import { Server } from 'socket.io';
 
 import { ApiService } from '../api/api.service';

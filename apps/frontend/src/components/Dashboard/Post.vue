@@ -311,9 +311,9 @@
     import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import Alert from '@/components/Alert.vue';
-    import { PostContainerDTO } from 'types/post.type';
+    import { IPostContainerDTO } from 'custom-types';
 
-    const props = defineProps<{ item: PostContainerDTO }>();
+    const props = defineProps<{ item: IPostContainerDTO }>();
     const inputRef = ref<HTMLInputElement>(null);
     const messageInput = ref<string>('');
     const showComments = ref<boolean>(false);

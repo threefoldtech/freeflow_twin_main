@@ -74,14 +74,14 @@
     import { computed, nextTick, onBeforeMount, ref } from 'vue';
     import { myYggdrasilAddress } from '@/store/authStore';
     import { fetchStatus } from '@/store/statusStore';
-    import { PostContainerDTO } from 'types/post.type';
+    import { IPostContainerDTO } from 'custom-types';
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
     const { getChat } = usechatsActions();
 
     const props = defineProps<{
-        comment: PostContainerDTO;
+        comment: IPostContainerDTO;
         avatar: string;
     }>();
     const location = ref<string>();

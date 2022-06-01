@@ -62,11 +62,11 @@
     import { TransitionRoot } from '@headlessui/vue';
     import Post from '@/components/Dashboard/Post.vue';
     import { XIcon } from '@heroicons/vue/solid';
-    import { PostContainerDTO } from 'types/post.type';
+    import { IPostContainerDTO } from 'custom-types';
 
     const props = defineProps<{ message: Message<MESSAGE_POST_SHARE_BODY> }>();
     const showPost = ref<boolean>(false);
-    const postData = ref<PostContainerDTO | null>(null);
+    const postData = ref<IPostContainerDTO | null>(null);
     const dialogRef = ref<HTMLElement>(null);
 
     const truncatedText = computed(() => {
@@ -81,7 +81,7 @@
             });
     });
 
-    const refreshPost = (post: PostContainerDTO) => {
+    const refreshPost = (post: IPostContainerDTO) => {
         postData.value = post;
     };
 

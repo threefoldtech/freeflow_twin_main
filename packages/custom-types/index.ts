@@ -1,3 +1,30 @@
+// FILE ACTIONS
+export const FileAction = {
+    ADD_TO_CHAT: 'ADD_TO_CHAT',
+    CHANGE_AVATAR: 'CHANGE_AVATAR',
+    ADD_TO_POST: 'ADD_TO_POST',
+};
+export type FileAction = typeof FileAction[keyof typeof FileAction];
+
+const FileType = {
+    RECORDING: 'RECORDING',
+    OTHER: 'OTHER',
+};
+export type FileType = typeof FileType[keyof typeof FileType];
+
+export interface ChatFile {
+    messageId: string;
+    chatId: string;
+    type: FileType;
+    filename: string;
+}
+
+export interface PostFile {
+    postId: string;
+    filename: string;
+}
+
+// POSTS
 export const PostType = {
     SOCIAL_POST: 'SOCIAL_POST',
 };
@@ -42,7 +69,7 @@ export interface IPostComment {
     type: CommentType;
 }
 
-export interface IPostDTO {
+export class IPostDTO {
     id: string;
     body: string;
     createdOn: Date;
@@ -59,4 +86,16 @@ export interface IPostContainerDTO {
     images: string[];
     replies: IPostComment[];
     isTyping?: String[];
+}
+
+// STATUS
+import * as redis from 'redis-om';
+export interface Status extends redis.EntityData {
+    avatar: string;
+    isOnline: boolean;
+}
+
+export interface StatusUpdate extends redis.EntityData {
+    id: string;
+    isOnline: boolean;
 }

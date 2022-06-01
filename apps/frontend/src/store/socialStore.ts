@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { PostContainerDTO, PostDTO, PostImage, PostOwner } from 'types/post.type';
+import { IPostContainerDTO, IPostDTO, IPostImage, IPostOwner } from 'custom-types';
 
 export enum LIKE_STATUS {
     LIKED = 'liked',
@@ -7,11 +7,11 @@ export enum LIKE_STATUS {
 }
 
 export interface MESSAGE_POST_SHARE_BODY {
-    post: PostDTO;
-    images: PostImage[];
-    owner: PostOwner;
+    post: IPostDTO;
+    images: IPostImage[];
+    owner: IPostOwner;
     message: string;
 }
 
-export const allSocialPosts = ref<PostContainerDTO[]>([]);
+export const allSocialPosts = ref<IPostContainerDTO[]>([]);
 export const isLoadingSocialPosts = ref<boolean>(false);

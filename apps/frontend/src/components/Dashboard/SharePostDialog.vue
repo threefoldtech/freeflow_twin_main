@@ -106,7 +106,7 @@
     import Spinner from '@/components/Spinner.vue';
     import { PhotographIcon, XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
-    import { PostContainerDTO } from 'types/post.type';
+    import { IPostContainerDTO } from 'custom-types';
 
     const emit = defineEmits(['close']);
 
@@ -118,7 +118,7 @@
     const dialogRef = ref<HTMLElement>(null);
     let escListener = null;
 
-    const props = defineProps<{ item: PostContainerDTO; avatar: any }>();
+    const props = defineProps<{ item: IPostContainerDTO; avatar: any }>();
 
     onMounted(() => {
         dialogRef.value.focus();

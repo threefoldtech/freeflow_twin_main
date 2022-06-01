@@ -1,4 +1,4 @@
-import { FileType } from 'custom-types/file-actions.type';
+import { FileType } from 'custom-types';
 
 import { ContactDTO } from '../features/contact/dtos/contact.dto';
 

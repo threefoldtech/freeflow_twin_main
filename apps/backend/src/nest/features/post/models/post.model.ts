@@ -1,4 +1,4 @@
-import { IPostComment, IPostContainerDTO, IPostDTO, IPostLike, IPostOwner } from 'custom-types/post.type';
+import { IPostComment, IPostContainerDTO, IPostDTO, IPostLike, IPostOwner } from 'custom-types';
 import { Entity, Schema } from 'redis-om';
 
 /**

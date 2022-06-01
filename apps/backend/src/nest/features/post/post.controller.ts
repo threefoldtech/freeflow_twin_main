@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { IPostDTO } from 'custom-types/post.type';
+import { IPostDTO } from 'custom-types';
 
 import { PostService } from './post.service';
 

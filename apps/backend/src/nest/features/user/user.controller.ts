@@ -12,7 +12,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Status, StatusUpdate } from 'custom-types/status.type';
+import { Status, StatusUpdate } from 'custom-types';
 import { createReadStream } from 'fs-extra';
 
 import { AuthGuard } from '../../guards/auth.guard';

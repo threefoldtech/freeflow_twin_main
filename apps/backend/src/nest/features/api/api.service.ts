@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { ResponseType } from 'axios';
-import { StatusUpdate } from 'custom-types/status.type';
+import { StatusUpdate } from 'custom-types';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
