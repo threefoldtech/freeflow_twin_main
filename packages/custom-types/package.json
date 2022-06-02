@@ -5,6 +5,9 @@
     "main": "index.js",
     "license": "MIT",
     "private": true,
+    "scripts": {
+        "build": "rm -rf dist && tsc"
+    },
     "files": [
         "file-actions.type.ts",
         "status.type.ts",

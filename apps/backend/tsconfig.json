@@ -8,7 +8,7 @@
         "strictNullChecks": false,
         "strictPropertyInitialization": false,
         "moduleResolution": "node",
-        "typeRoots": ["types", "./node_modules/@types"],
+        "typeRoots": ["custom-types", "./node_modules/@types"],
         "types": ["node"],
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
