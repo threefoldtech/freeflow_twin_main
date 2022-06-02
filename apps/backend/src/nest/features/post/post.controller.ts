@@ -41,7 +41,6 @@ export class PostController {
         @Param() { postId }: LikePostQueryDTO,
         @Body() likePostDTO: LikePostDTO
     ): Promise<IPostContainerDTO> {
-        // TODO: handle dislike
         return await this._postService.likePost({ postId, likePostDTO });
     }
 }

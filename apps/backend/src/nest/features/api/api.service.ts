@@ -6,6 +6,7 @@ import { IStatusUpdate } from 'custom-types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
+import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 
 @Injectable()
 export class ApiService {
@@ -165,6 +166,30 @@ export class ApiService {
             return (await axios.get<IPostContainerDTO[]>(destinationUrl)).data;
         } catch (error) {
             throw new BadRequestException(`unable to get external posts: ${error}`);
+        }
+    }
+
+    /**
+     * Likes an external post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to get the post from.
+     * @param {LikePostDTO} obj.likePost - Like post DTO.
+     * @param {string} obj.postId - Post Id to lik.e
+     */
+    async likeExternalPost({
+        location,
+        likePostDTO,
+        postId,
+    }: {
+        location: string;
+        likePostDTO: LikePostDTO;
+        postId: string;
+    }): Promise<IPostContainerDTO> {
+        const destinationUrl = `http://[${location}]/api/v2/posts/like/${postId}`;
+        try {
+            return (await axios.put<IPostContainerDTO>(destinationUrl, likePostDTO)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to get like post: ${error}`);
         }
     }
 

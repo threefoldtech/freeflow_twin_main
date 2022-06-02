@@ -112,11 +112,22 @@ export class PostService {
         return await this._apiService.getExternalPost({ location: ownerLocation, postId });
     }
 
-    async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }) {
-        const { likerId: id, likerLocation: location } = likePostDTO;
+    async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }): Promise<IPostContainerDTO> {
+        const { likerId: id, likerLocation: location, owner } = likePostDTO;
+
+        if (await this.isBlocked({ userId: id })) throw new BadRequestException('blocked');
+
+        if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
+
+        if (owner !== this.ownLocation)
+            return await this._apiService.likeExternalPost({ location: owner, likePostDTO, postId });
+
         const post = await this._postRepo.getPost({ id: postId });
         const likes = post.parseLikes();
-        likes.push({ id, location });
+
+        if (likes.some(l => l.location === location && l.id === id)) likes.splice(likes.indexOf({ id, location }), 1);
+        else likes.push({ id, location });
+
         post.likes = stringifyLikes(likes);
         try {
             await this._postRepo.updatePost(post);
@@ -135,5 +146,14 @@ export class PostService {
         if (!this.blockedContacts) this.blockedContacts = await this._blockedContactService.getBlockedContactList();
 
         return this.contacts.filter(contact => !this.blockedContacts.includes(contact.id));
+    }
+
+    /**
+     * Checks if a user is blocked or not.
+     * @returb {boolean} - True if the user is blocked, false otherwise.
+     */
+    private async isBlocked({ userId }: { userId: string }): Promise<boolean> {
+        if (!this.blockedContacts) this.blockedContacts = await this._blockedContactService.getBlockedContactList();
+        return this.blockedContacts.includes(userId);
     }
 }
