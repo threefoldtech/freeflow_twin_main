@@ -16,13 +16,15 @@ export class PostRedisRepository extends EntityRepository<Post> {
      * @param {Object} obj - Object.
      * @param {string} obj.post - Post.
      * @param {string} obj.owner - Post owner.
+     * @param {string} obj.ownerId - Post owner Id for searching.
      * @param {string} obj.replies - Post replies.
      * @return {Post} - Created post.
      */
-    async createPost({ post, owner, images }: IPostContainerDTO): Promise<Post> {
+    async createPost({ post, owner, ownerId, images }: IPostContainerDTO): Promise<Post> {
         return await this.save({
             post: stringifyPost(post),
             owner: stringifyPostOwner(owner),
+            ownerId,
             images,
             replies: [],
             likes: [],
@@ -31,10 +33,13 @@ export class PostRedisRepository extends EntityRepository<Post> {
 
     /**
      * Gets posts using pagination.
+     * @param {Object} obj - Object.
+     * @param {string} obj.offset - Pagination offset.
+     * @param {string} obj.count - Pagination count.
      * @return {Post[]} - Found posts.
      */
-    async getPosts({ offset, count }: { offset: number; count: number }): Promise<Post[]> {
-        return await this.findAllWhereEqPaginated({ offset, count, where: 'owner', eq: '' });
+    async getPosts({ offset, count, username }: { offset: number; count: number; username: string }): Promise<Post[]> {
+        return await this.findAllWhereEqPaginated({ offset, count, where: 'ownerId', eq: username });
     }
 
     /**

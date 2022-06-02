@@ -57,6 +57,7 @@ export interface IPostDTO {
 export interface IPostContainerDTO {
     post: IPostDTO;
     owner: IPostOwner;
+    ownerId: string;
     likes: IPostLike[];
     images: string[];
     replies: IPostComment[];

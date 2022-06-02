@@ -8,6 +8,7 @@ import { Entity, Schema } from 'redis-om';
 export interface Post {
     post: string;
     owner: string;
+    ownerId: string;
     likes: string[];
     images: string[];
     replies: string[];
@@ -19,6 +20,7 @@ export class Post extends Entity {
         return {
             post: this.parsePost(),
             owner: this.parsePostOwner(),
+            ownerId: this.ownerId,
             likes: this.parseLikes(),
             images: this.images,
             replies: this.parseReplies(),
@@ -74,6 +76,7 @@ export const stringifyReplies = (replies: IPostComment[]): string[] => replies.m
 export const postSchema = new Schema(Post, {
     post: { type: 'string' },
     owner: { type: 'string' },
+    ownerId: { type: 'string' },
     likes: { type: 'string[]' },
     images: { type: 'string[]' },
     replies: { type: 'string[]' },

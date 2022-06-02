@@ -38,6 +38,7 @@ export class PostService {
             const postContainer: IPostContainerDTO = {
                 post: postDTO,
                 owner: postOwner,
+                ownerId: postOwner.id,
                 images: images || [],
                 replies,
                 likes: [],
@@ -51,13 +52,14 @@ export class PostService {
     async getPosts({
         offset,
         count,
+        username,
     }: {
         offset: number;
         count: number;
         username: string;
     }): Promise<IPostContainerDTO[]> {
         try {
-            return (await this._postRepo.getPosts({ offset, count })).map(post => post.toJSON());
+            return (await this._postRepo.getPosts({ offset, count, username })).map(post => post.toJSON());
         } catch (error) {
             return [];
         }
