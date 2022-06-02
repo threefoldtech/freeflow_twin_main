@@ -3,6 +3,7 @@ import { IPostContainerDTO } from 'custom-types/post.type';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
+import { GetPostQueryDto } from './dtos/request/get-post-query.dto';
 import { GetPostsQueryDto } from './dtos/request/get-posts-query.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { LikePostQueryDTO } from './dtos/request/like-post-query.dto';
@@ -23,16 +24,26 @@ export class PostController {
         return await this._postService.getPosts({ offset, count, username });
     }
 
+    @Get('/:owner/:postId')
+    @UseGuards(AuthGuard)
+    async getPost(@Param() { owner, postId }: GetPostQueryDto): Promise<IPostContainerDTO> {
+        // TODO: get posts from others
+        return await this._postService.getPost({ postId });
+    }
+
     @Post()
     @UseGuards(AuthGuard)
-    async createPost(@Body() createPostDTO: CreatePostDTO) {
+    async createPost(@Body() createPostDTO: CreatePostDTO): Promise<IPostContainerDTO> {
         // TODO: add validation, handle images
         return await this._postService.createPost(createPostDTO);
     }
 
     @Put('like/:postId')
     @UseGuards(AuthGuard)
-    async likePost(@Param() { postId }: LikePostQueryDTO, @Body() likePostDTO: LikePostDTO) {
+    async likePost(
+        @Param() { postId }: LikePostQueryDTO,
+        @Body() likePostDTO: LikePostDTO
+    ): Promise<IPostContainerDTO> {
         // TODO: handle dislike
         return await this._postService.likePost({ postId, likePostDTO });
     }

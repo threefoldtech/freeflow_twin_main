@@ -120,14 +120,7 @@ export const likeComment = async (
 };
 
 export const getSinglePost = async (postId: string, location: string) => {
-    const response = (
-        await axios.get<any>(`${endpoint}/single/post`, {
-            params: {
-                postId: postId,
-                location: location,
-            },
-        })
-    ).data;
+    const response = (await axios.get<IPostContainerDTO>(`${endpoint}/${location}/${postId}`)).data;
     allSocialPosts.value = allSocialPosts.value.map(item => (item.post.id === postId ? response : { ...item }));
     return response;
 };
