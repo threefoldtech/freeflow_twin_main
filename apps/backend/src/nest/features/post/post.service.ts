@@ -30,6 +30,11 @@ export class PostService {
         private readonly _userGateway: UserGateway
     ) {}
 
+    /**
+     * Creates a new post.
+     * @param {CreatePostDTO} createPostDTO - Post creation data.
+     * @return {IPostContainerDTO} - The created post.
+     */
     async createPost({
         id,
         body,
@@ -40,7 +45,7 @@ export class PostService {
         images,
         replies,
         signatures,
-    }: CreatePostDTO) {
+    }: CreatePostDTO): Promise<IPostContainerDTO> {
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
         const userId = this._configService.get<string>('userId');
         try {
@@ -72,6 +77,14 @@ export class PostService {
         }
     }
 
+    /**
+     * Gets all posts.
+     * @param {Object} obj - Object.
+     * @param {number} obj.offset - Pagination offset.
+     * @param {number} obj.count - Pagination count.
+     * @param {string} obj.username - User to get posts from.
+     * @return {IPostContainerDTO[]} - Found posts.
+     */
     async getPosts({
         offset,
         count,
@@ -105,6 +118,13 @@ export class PostService {
         return posts;
     }
 
+    /**
+     * Gets a single post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.ownerLocation - Location to get post from.
+     * @param {string} obj.postId - PostId.
+     * @return {IPostContainerDTO} - Found post.
+     */
     async getPost({ ownerLocation, postId }: { ownerLocation: string; postId: string }): Promise<IPostContainerDTO> {
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
 
@@ -118,6 +138,13 @@ export class PostService {
         return await this._apiService.getExternalPost({ location: ownerLocation, postId });
     }
 
+    /**
+     * Likes or dislikes a post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.postId - PostId.
+     * @param {LikePostDTO} obj.likePostDTO - Like post data.
+     * @return {{status: string}} - Liked or unliked.
+     */
     async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }): Promise<{ status: string }> {
         const { likerId: id, likerLocation: location, owner } = likePostDTO;
 
@@ -147,6 +174,12 @@ export class PostService {
         }
     }
 
+    /**
+     * Deletes a post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.postId - PostId to delete.
+     * @return {string} - Deleted post Id.
+     */
     async deletePost({ postId }: { postId: string }): Promise<string> {
         try {
             const post = await this._postRepo.getPost({ id: postId });
@@ -159,6 +192,11 @@ export class PostService {
         }
     }
 
+    /**
+     * Handles typing event when a user is writing a comment.
+     * @param {TypingDTO} typingDTO - Typing data.
+     * @return {{post: string; user: string}} - Post on which is being commented on and user id of who is commenting.
+     */
     async handleTyping(typingDTO: TypingDTO): Promise<{ post: string; user: string }> {
         const { location, postId, userId } = typingDTO;
 
@@ -176,12 +214,24 @@ export class PostService {
         return { post: postId, user: userId };
     }
 
+    /**
+     * Handles typing event when someone else is writing a comment.
+     * @param {TypingDTO} typingDTO - Typing data.
+     * @return {boolean} - Success or not.
+     */
     async handleSendSomeoneIsTyping(typingDTO: TypingDTO): Promise<boolean> {
         const { postId, userId } = typingDTO;
         this._userGateway.emitMessageToConnectedClients('post_typing', { post: postId, user: userId });
         return true;
     }
 
+    /**
+     * Comments on a post
+     * @param {Object} obj - Object.
+     * @param {string} obj.postId - PostId.
+     * @param {IPostComment} obj.commentDTO - Comment data.
+     * @return {{status: string}} - Commented status.
+     */
     async commentOnPost({
         postId,
         commentDTO,
