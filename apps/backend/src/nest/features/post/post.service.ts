@@ -39,12 +39,27 @@ export class PostService {
                 post: postDTO,
                 owner: postOwner,
                 images: images || [],
-                replies: [],
+                replies,
                 likes: [],
             };
             return (await this._postRepo.createPost(postContainer)).toJSON();
         } catch (error) {
             throw new BadRequestException(`unable to create post: ${error}`);
+        }
+    }
+
+    async getPosts({
+        offset,
+        count,
+    }: {
+        offset: number;
+        count: number;
+        username: string;
+    }): Promise<IPostContainerDTO[]> {
+        try {
+            return (await this._postRepo.getPosts({ offset, count })).map(post => post.toJSON());
+        } catch (error) {
+            return [];
         }
     }
 }

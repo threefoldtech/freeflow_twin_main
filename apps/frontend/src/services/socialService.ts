@@ -63,7 +63,7 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
         });
     });
 
-    return await axios.post(`${endpoint}`, post, {
+    return await axios.post<IPostContainerDTO>(`${endpoint}`, post, {
         headers: {
             'Content-Type': 'application/json',
         },
