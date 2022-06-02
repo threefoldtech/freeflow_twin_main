@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { ResponseType } from 'axios';
+import { IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
@@ -133,6 +134,22 @@ export class ApiService {
             return res.data;
         } catch (error) {
             throw new BadRequestException(`unable to get admins chat: ${error}`);
+        }
+    }
+
+    /**
+     * Gets an external post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to get the post from.
+     * @param {string} obj.postId - post Id to fetch from location.
+     * @return {IPostContainerDTO} - Found post.
+     */
+    async getExternalPost({ location, postId }: { location: string; postId: string }): Promise<IPostContainerDTO> {
+        const destinationUrl = `http://[${location}]/api/v2/posts/${location}/${postId}`;
+        try {
+            return (await axios.get<IPostContainerDTO>(destinationUrl)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to get external post: ${error}`);
         }
     }
 

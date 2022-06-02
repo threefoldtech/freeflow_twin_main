@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 
+import { ApiModule } from '../api/api.module';
+import { BlockedContactModule } from '../blocked-contact/blocked-contact.module';
 import { DbModule } from '../db/db.module';
 import { LocationModule } from '../location/location.module';
 import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
@@ -8,7 +10,7 @@ import { PostService } from './post.service';
 import { PostRedisRepository } from './repositories/post-redis.repository';
 
 @Module({
-    imports: [DbModule, LocationModule, YggdrasilModule],
+    imports: [DbModule, LocationModule, YggdrasilModule, ApiModule, BlockedContactModule],
     controllers: [PostController],
     providers: [PostService, PostRedisRepository],
     exports: [PostService],

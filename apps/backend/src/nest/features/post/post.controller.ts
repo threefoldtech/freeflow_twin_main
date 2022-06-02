@@ -28,7 +28,7 @@ export class PostController {
     @UseGuards(AuthGuard)
     async getPost(@Param() { owner, postId }: GetPostQueryDto): Promise<IPostContainerDTO> {
         // TODO: get posts from others
-        return await this._postService.getPost({ postId });
+        return await this._postService.getPost({ ownerLocation: owner, postId });
     }
 
     @Post()
