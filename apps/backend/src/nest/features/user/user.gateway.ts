@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { StatusUpdate } from 'custom-types';
+import { IStatusUpdate } from 'custom-types/status.type';
 import { Server } from 'socket.io';
 
 import { ApiService } from '../api/api.service';
@@ -54,7 +54,7 @@ export class UserGateway implements OnGatewayInit {
      */
     async handleConnection() {
         this.contacts = await this._contactService.getContacts();
-        const status: StatusUpdate = {
+        const status: IStatusUpdate = {
             id: this._configService.get<string>('userId'),
             isOnline: true,
         };
@@ -66,14 +66,14 @@ export class UserGateway implements OnGatewayInit {
      */
     async handleDisconnect() {
         this.contacts = await this._contactService.getContacts();
-        const status: StatusUpdate = {
+        const status: IStatusUpdate = {
             id: this._configService.get<string>('userId'),
             isOnline: false,
         };
         this.handleStatusEmit({ status });
     }
 
-    private async handleStatusEmit({ status }: { status: StatusUpdate }) {
+    private async handleStatusEmit({ status }: { status: IStatusUpdate }) {
         Promise.all(
             this.contacts.map(async c => {
                 await this._apiService.sendStatusUpdate({ location: c.location, status });

@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import { IPostContainerDTO, IPostDTO, IPostImage, IPostOwner } from 'custom-types';
+import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 export enum LIKE_STATUS {
     LIKED = 'liked',
@@ -8,7 +8,7 @@ export enum LIKE_STATUS {
 
 export interface MESSAGE_POST_SHARE_BODY {
     post: IPostDTO;
-    images: IPostImage[];
+    images: string[];
     owner: IPostOwner;
     message: string;
 }

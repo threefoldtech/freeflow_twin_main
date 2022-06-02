@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { ChatFile, PostFile } from 'custom-types';
+import { IChatFile, IPostFile } from 'custom-types/file-actions.type';
 import { join } from 'path';
 
 import { FileMessage, MessageType } from '../../types/message-types';
@@ -21,7 +21,7 @@ export abstract class FileState<T> {
     abstract handle({ fileId, payload }: { fileId: string; payload: T }): Promise<boolean>;
 }
 
-export class ChatFileState implements FileState<ChatFile> {
+export class ChatFileState implements FileState<IChatFile> {
     private storageDir = '';
 
     constructor(
@@ -36,7 +36,7 @@ export class ChatFileState implements FileState<ChatFile> {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
-    async handle({ fileId, payload }: { fileId: string; payload: ChatFile }) {
+    async handle({ fileId, payload }: { fileId: string; payload: IChatFile }) {
         const { chatId, messageId, type, filename } = payload;
         const fromPath = `tmp/${fileId}`;
 
@@ -75,14 +75,14 @@ export class ChatFileState implements FileState<ChatFile> {
     }
 }
 
-export class PostFileState implements FileState<PostFile> {
+export class PostFileState implements FileState<IPostFile> {
     private storageDir = '';
 
     constructor(private readonly _configService: ConfigService, private readonly _fileService: FileService) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
-    async handle({ fileId }: { fileId: string; payload: PostFile }) {
+    async handle({ fileId }: { fileId: string; payload: IPostFile }) {
         // const { postId, filename } = payload;
         const fromPath = `tmp/${fileId}`;
 

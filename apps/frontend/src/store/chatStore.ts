@@ -23,7 +23,7 @@ import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
-import { FileAction } from 'custom-types';
+import { FileAction } from 'custom-types/file-actions.type';
 
 const messageLimit = 50;
 const state = reactive<ChatState>({

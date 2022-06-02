@@ -62,7 +62,7 @@
     import { TransitionRoot } from '@headlessui/vue';
     import Post from '@/components/Dashboard/Post.vue';
     import { XIcon } from '@heroicons/vue/solid';
-    import { IPostContainerDTO } from 'custom-types';
+    import { IPostContainerDTO } from 'custom-types/post.type';
 
     const props = defineProps<{ message: Message<MESSAGE_POST_SHARE_BODY> }>();
     const showPost = ref<boolean>(false);
@@ -87,9 +87,7 @@
 
     const thumbnailImage = computed(() => {
         return calcExternalResourceLink(
-            `http://[${props.message.body.owner.location}]/api/v1/posts/download/${btoa(
-                props.message.body.images[0].path
-            )}`
+            `http://[${props.message.body.owner.location}]/api/v1/posts/download/${btoa(props.message.body.images[0])}`
         );
     });
 

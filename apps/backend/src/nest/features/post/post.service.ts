@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types';
+import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 import { LocationService } from '../location/location.service';
 import { PostRedisRepository } from './repositories/post-redis.repository';

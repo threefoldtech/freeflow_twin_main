@@ -12,7 +12,7 @@ import {
     UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Status, StatusUpdate } from 'custom-types';
+import { IStatus, IStatusUpdate } from 'custom-types/status.type';
 import { createReadStream } from 'fs-extra';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -44,7 +44,7 @@ export class UserController {
 
     @Get('status')
     @UseGuards(AuthGuard)
-    async getStatus(): Promise<Status> {
+    async getStatus(): Promise<IStatus> {
         const isOnline = (await this._userGateway.getConnections()) > 0 ? true : false;
         const userData = await this._userService.getUserData();
         const avatar = await this._userService.getUserAvatar();
@@ -59,7 +59,7 @@ export class UserController {
 
     @Put('update-status')
     @UseGuards(AuthGuard)
-    async updateContactStatus(@Body() status: StatusUpdate) {
+    async updateContactStatus(@Body() status: IStatusUpdate) {
         this._userGateway.emitMessageToConnectedClients('update_status', status);
         return true;
     }

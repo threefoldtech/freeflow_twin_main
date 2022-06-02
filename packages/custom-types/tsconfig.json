@@ -1,13 +1,9 @@
 {
     "compilerOptions": {
         "target": "esnext",
-        "module": "ESNext",
+        "module": "esnext",
         "strict": false,
         "jsx": "preserve",
-        "declaration": true,
-        "declarationMap": true,
-        "emitDeclarationOnly": true,
-        "outDir": "dist",
         "importHelpers": true,
         "moduleResolution": "node",
         "skipLibCheck": true,

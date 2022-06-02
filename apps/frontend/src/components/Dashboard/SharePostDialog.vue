@@ -106,7 +106,7 @@
     import Spinner from '@/components/Spinner.vue';
     import { PhotographIcon, XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
-    import { IPostContainerDTO } from 'custom-types';
+    import { IPostContainerDTO } from 'custom-types/post.type';
 
     const emit = defineEmits(['close']);
 

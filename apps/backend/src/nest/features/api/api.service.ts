@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { ResponseType } from 'axios';
-import { StatusUpdate } from 'custom-types';
+import { IStatusUpdate } from 'custom-types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
@@ -56,7 +56,7 @@ export class ApiService {
         }
     }
 
-    async sendStatusUpdate({ location, status }: { location: string; status: StatusUpdate }) {
+    async sendStatusUpdate({ location, status }: { location: string; status: IStatusUpdate }) {
         try {
             return await axios.put(`http://[${location}]/api/v2/user/update-status`, status);
         } catch (error) {

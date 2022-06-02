@@ -74,7 +74,7 @@
     import { computed, nextTick, onBeforeMount, ref } from 'vue';
     import { myYggdrasilAddress } from '@/store/authStore';
     import { fetchStatus } from '@/store/statusStore';
-    import { IPostContainerDTO } from 'custom-types';
+    import { IPostContainerDTO } from 'custom-types/post.type';
 
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();

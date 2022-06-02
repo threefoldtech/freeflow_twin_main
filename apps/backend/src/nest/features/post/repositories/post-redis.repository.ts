@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { IPostContainerDTO } from 'custom-types';
+import { IPostContainerDTO } from 'custom-types/post.type';
 
 import { DbService } from '../../db/db.service';
 import { EntityRepository } from '../../db/entity.repository';

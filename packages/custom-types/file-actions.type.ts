@@ -11,14 +11,14 @@ const FileType = {
 };
 export type FileType = typeof FileType[keyof typeof FileType];
 
-export interface ChatFile {
+export interface IChatFile {
     messageId: string;
     chatId: string;
     type: FileType;
     filename: string;
 }
 
-export interface PostFile {
+export interface IPostFile {
     postId: string;
     filename: string;
 }

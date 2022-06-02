@@ -5,8 +5,9 @@ import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
-import { FileAction, CommentType, IPostComment, IPostContainerDTO, PostType } from 'custom-types';
+import { CommentType, IPostComment, IPostContainerDTO, PostType } from 'custom-types/post.type';
 import { useSocketActions } from '../store/socketStore';
+import { FileAction } from 'custom-types/file-actions.type';
 
 const endpoint = `${config.baseUrl}api/v1/posts`;
 const { user } = useAuthState();

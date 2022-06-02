@@ -311,7 +311,7 @@
     import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import Alert from '@/components/Alert.vue';
-    import { IPostContainerDTO } from 'custom-types';
+    import { IPostContainerDTO } from 'custom-types/post.type';
 
     const props = defineProps<{ item: IPostContainerDTO }>();
     const inputRef = ref<HTMLInputElement>(null);
@@ -379,10 +379,8 @@
         return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/user/avatar/default`);
     });
 
-    const fetchPostImage = (image: { path: string }) => {
-        return calcExternalResourceLink(
-            `http://[${props.item.owner.location}]/api/v1/posts/download/${btoa(image.path)}`
-        );
+    const fetchPostImage = (image: string) => {
+        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/posts/download/${image}`);
     };
 
     const timeAgo = time => {
