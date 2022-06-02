@@ -20,21 +20,18 @@ export class PostController {
         @Query('offset') offset = 0,
         @Query('count') count = 50
     ): Promise<IPostContainerDTO[]> {
-        // TODO: get posts from others
         return await this._postService.getPosts({ offset, count, username });
     }
 
     @Get('/:owner/:postId')
     @UseGuards(AuthGuard)
     async getPost(@Param() { owner, postId }: GetPostQueryDto): Promise<IPostContainerDTO> {
-        // TODO: get posts from others
         return await this._postService.getPost({ ownerLocation: owner, postId });
     }
 
     @Post()
     @UseGuards(AuthGuard)
     async createPost(@Body() createPostDTO: CreatePostDTO): Promise<IPostContainerDTO> {
-        // TODO: add validation, handle images
         return await this._postService.createPost(createPostDTO);
     }
 

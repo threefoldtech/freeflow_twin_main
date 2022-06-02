@@ -3,6 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { IPostContainerDTO } from 'custom-types/post.type';
 
 import { ApiService } from '../api/api.service';
+import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
+import { ContactService } from '../contact/contact.service';
+import { Contact } from '../contact/models/contact.model';
 import { LocationService } from '../location/location.service';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
@@ -12,12 +15,16 @@ import { PostRedisRepository } from './repositories/post-redis.repository';
 @Injectable()
 export class PostService {
     private ownLocation = '';
+    private contacts: Contact[] = [];
+    private blockedContacts: string[] = [];
 
     constructor(
         private readonly _postRepo: PostRedisRepository,
         private readonly _locationService: LocationService,
         private readonly _configService: ConfigService,
-        private readonly _apiService: ApiService
+        private readonly _apiService: ApiService,
+        private readonly _contactService: ContactService,
+        private readonly _blockedContactService: BlockedContactService
     ) {}
 
     async createPost({
@@ -71,12 +78,25 @@ export class PostService {
         count: number;
         username: string;
     }): Promise<IPostContainerDTO[]> {
-        try {
-            if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
-            return (await this._postRepo.getPosts({ offset, count, username })).map(post => post.toJSON());
-        } catch (error) {
-            return [];
-        }
+        if (username === this._configService.get<string>('userId'))
+            try {
+                return (await this._postRepo.getPosts({ offset, count, username })).map(post => post.toJSON());
+            } catch (error) {
+                return [];
+            }
+
+        const contacts = await this.getContacts();
+        const posts: IPostContainerDTO[] = [];
+        await Promise.all(
+            contacts.map(async contact => {
+                const data = await this._apiService.getExternalPosts({
+                    location: contact.location,
+                    userId: contact.id,
+                });
+                posts.push(...data);
+            })
+        );
+        return posts;
     }
 
     async getPost({ ownerLocation, postId }: { ownerLocation: string; postId: string }): Promise<IPostContainerDTO> {
@@ -104,5 +124,16 @@ export class PostService {
         } catch (error) {
             throw new BadRequestException(`unable to like post: ${error}`);
         }
+    }
+
+    /**
+     * Gets all contacts that are not blocked.
+     * @return {Contact[]} - Contacts.
+     */
+    private async getContacts(): Promise<Contact[]> {
+        if (!this.contacts) this.contacts = await this._contactService.getContacts();
+        if (!this.blockedContacts) this.blockedContacts = await this._blockedContactService.getBlockedContactList();
+
+        return this.contacts.filter(contact => !this.blockedContacts.includes(contact.id));
     }
 }

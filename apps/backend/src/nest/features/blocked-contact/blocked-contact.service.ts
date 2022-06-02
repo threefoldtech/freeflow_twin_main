@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 import { CreateBlockedContactDTO, DeleteBlockedContactDTO } from './dtos/blocked-contact.dto';
+import { BlockedContact } from './models/blocked-contact.model';
 import { BlockedContactRedisRepository } from './repositories/blocked-contact-redis.repository';
 
 @Injectable()
@@ -37,13 +38,25 @@ export class BlockedContactService {
     }
 
     /**
-     * Gets blocked contacts using pagination.
+     * Gets blocked contact ids using pagination.
      * @return {string[]} - Found blocked contacts ids.
      */
     async getBlockedContactList(): Promise<string[]> {
         try {
             const contacts = await this._blockedContactRepo.getBlockedContacts();
             return contacts.map(c => c.id);
+        } catch (error) {
+            return [];
+        }
+    }
+
+    /**
+     * Gets blocked contacts using pagination.
+     * @return {string[]} - Found blocked contacts ids.
+     */
+    async getBlockedContacts(): Promise<BlockedContact[]> {
+        try {
+            return await this._blockedContactRepo.getBlockedContacts();
         } catch (error) {
             return [];
         }
