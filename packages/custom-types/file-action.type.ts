@@ -1,0 +1,24 @@
+export const FileAction = {
+    ADD_TO_CHAT: 'ADD_TO_CHAT',
+    CHANGE_AVATAR: 'CHANGE_AVATAR',
+    ADD_TO_POST: 'ADD_TO_POST',
+};
+export type FileAction = typeof FileAction[keyof typeof FileAction];
+
+const FileType = {
+    RECORDING: 'RECORDING',
+    OTHER: 'OTHER',
+};
+export type FileType = typeof FileType[keyof typeof FileType];
+
+export interface ChatFile {
+    messageId: string;
+    chatId: string;
+    type: FileType;
+    filename: string;
+}
+
+export interface PostFile {
+    postId: string;
+    filename: string;
+}

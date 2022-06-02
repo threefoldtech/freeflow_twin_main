@@ -11244,14 +11244,6 @@ redis-om@^0.2.0:
     redis "^4.0.4"
     ulid "^2.3.0"
 
-redis-om@^0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/redis-om/-/redis-om-0.3.3.tgz#691ee1f780f2c709029f31f59207f32f09897915"
-  integrity sha512-mEgKZLnzK9aY+ElETJ+GaDEAdu8IiBM+9sHocfNXvidb8lo8V+6djm5uG5KBdcmConyntbpTGL4QlXlVbp9Auw==
-  dependencies:
-    redis "^4.0.4"
-    ulid "^2.3.0"
-
 redis@^4.0.4:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/redis/-/redis-4.1.0.tgz#6e400e8edf219e39281afe95e66a3d5f7dcf7289"

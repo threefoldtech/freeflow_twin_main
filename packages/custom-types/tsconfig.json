@@ -4,7 +4,7 @@
         "module": "ESNext",
         "strict": false,
         "jsx": "preserve",
-        "declaration": true,  
+        "declaration": true,
         "declarationMap": true,
         "emitDeclarationOnly": true,
         "outDir": "dist",
