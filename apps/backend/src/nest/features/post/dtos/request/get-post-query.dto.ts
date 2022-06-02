@@ -1,8 +1,9 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class GetPostQueryDto {
+    @IsOptional()
     @IsNotEmpty()
-    owner: string;
+    owner?: string;
 
     @IsNotEmpty()
     postId: string;

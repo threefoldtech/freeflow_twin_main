@@ -137,6 +137,16 @@ export class PostService {
         }
     }
 
+    async deletePost({ postId }: { postId: string }): Promise<string> {
+        try {
+            const post = await this._postRepo.getPost({ id: postId });
+            await this._postRepo.deletePost({ id: post.entityId });
+            return postId;
+        } catch (error) {
+            throw new BadRequestException(`unable to delete post: ${error}`);
+        }
+    }
+
     /**
      * Gets all contacts that are not blocked.
      * @return {Contact[]} - Contacts.

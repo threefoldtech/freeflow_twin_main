@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { IPostContainerDTO } from 'custom-types/post.type';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -33,6 +33,12 @@ export class PostController {
     @UseGuards(AuthGuard)
     async createPost(@Body() createPostDTO: CreatePostDTO): Promise<IPostContainerDTO> {
         return await this._postService.createPost(createPostDTO);
+    }
+
+    @Delete(':postId')
+    @UseGuards(AuthGuard)
+    async deletePost(@Param() { postId }: GetPostQueryDto): Promise<string> {
+        return await this._postService.deletePost({ postId });
     }
 
     @Put('like/:postId')
