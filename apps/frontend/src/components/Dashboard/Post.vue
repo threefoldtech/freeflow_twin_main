@@ -256,6 +256,7 @@
                         placeholder="Type your message here"
                         type="text"
                         @focus="focusInput"
+                        @input="onInput"
                     />
                     <input
                         class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"
@@ -354,11 +355,23 @@
         return props.item?.isTyping && props.item?.isTyping?.length !== 0 && showComments.value ? true : false;
     });
 
-    watch(messageInput, async (n, o) => {
-        if (n.length > o.length) {
-            await setSomeoneIsTyping(props.item.post.id, props.item.owner.location, user.id.toString());
-        }
-    });
+    const debounce = (fn: Function, delay: number) => {
+        let timeout: number;
+
+        return (...args: any) => {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+
+            timeout = setTimeout(() => {
+                fn(...args);
+            }, delay);
+        };
+    };
+
+    const onInput = debounce(() => {
+        setSomeoneIsTyping(props.item.post.id, props.item.owner.location, user.id.toString());
+    }, 1000);
 
     const localLike = ref(false);
 
