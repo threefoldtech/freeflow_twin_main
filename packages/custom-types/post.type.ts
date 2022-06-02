@@ -49,7 +49,9 @@ export interface IPostDTO {
     isGroupPost: boolean;
     lastModified: Date;
     type: PostType;
-    images: string[];
+    replies: IPostComment[];
+    signatures: string;
+    images?: string[];
 }
 
 export interface IPostContainerDTO {

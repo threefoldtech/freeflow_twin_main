@@ -3,18 +3,21 @@ import { ConfigService } from '@nestjs/config';
 import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 import { LocationService } from '../location/location.service';
+import { CreatePostDTO } from './dtos/create-post.dto';
 import { PostRedisRepository } from './repositories/post-redis.repository';
 
 @Injectable()
 export class PostService {
-    private _postRepo: PostRedisRepository;
-
     private ownLocation = '';
 
-    constructor(private readonly _locationService: LocationService, private readonly _configService: ConfigService) {}
+    constructor(
+        private readonly _postRepo: PostRedisRepository,
+        private readonly _locationService: LocationService,
+        private readonly _configService: ConfigService
+    ) {}
 
-    async createPost(createPostDTO: IPostDTO) {
-        const { id, body, createdOn, lastModified, isGroupPost, type, images } = createPostDTO;
+    async createPost(createPostDTO: CreatePostDTO) {
+        const { id, body, createdOn, lastModified, isGroupPost, type, images, replies, signatures } = createPostDTO;
         try {
             if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
             const postDTO: IPostDTO = {
@@ -24,7 +27,9 @@ export class PostService {
                 lastModified,
                 isGroupPost,
                 type,
-                images,
+                images: images || [],
+                replies,
+                signatures,
             };
             const postOwner: IPostOwner = {
                 id: this._configService.get<string>('userId'),
@@ -33,11 +38,11 @@ export class PostService {
             const postContainer: IPostContainerDTO = {
                 post: postDTO,
                 owner: postOwner,
-                images,
+                images: images || [],
                 replies: [],
                 likes: [],
             };
-            return await this._postRepo.createPost(postContainer);
+            return (await this._postRepo.createPost(postContainer)).toJSON();
         } catch (error) {
             throw new BadRequestException(`unable to create post: ${error}`);
         }

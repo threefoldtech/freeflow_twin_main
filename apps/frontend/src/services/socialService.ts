@@ -5,11 +5,11 @@ import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@
 import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
-import { CommentType, IPostComment, IPostContainerDTO, PostType } from 'custom-types/post.type';
+import { CommentType, IPostComment, IPostContainerDTO, IPostDTO, PostType } from 'custom-types/post.type';
 import { useSocketActions } from '../store/socketStore';
 import { FileAction } from 'custom-types/file-actions.type';
 
-const endpoint = `${config.baseUrl}api/v1/posts`;
+const endpoint = `${config.baseUrl}api/v2/posts`;
 const { user } = useAuthState();
 
 interface socialMeta {
@@ -33,7 +33,7 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
     if (files?.length > 10) return;
 
     const postId = uuidv4();
-    const post: socialPostModel = {
+    const post: IPostDTO = {
         id: postId,
         type: PostType.SOCIAL_POST,
         body: text,
@@ -63,9 +63,9 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
         });
     });
 
-    return await axios.post<any>(`${endpoint}`, post, {
+    return await axios.post(`${endpoint}`, post, {
         headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Type': 'application/json',
         },
     });
 };

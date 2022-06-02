@@ -23,7 +23,7 @@ export default async function bootstrap(): Promise<INestApplication> {
     app.useLogger(getLogLevels(configService.get<string>('node_env') === 'production'));
 
     // global validation pipe for class-validator
-    app.useGlobalPipes(new ValidationPipe());
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     // global class serialization for class-transformer
     app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
