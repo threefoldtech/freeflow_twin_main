@@ -7,6 +7,7 @@ import { GetPostQueryDto } from './dtos/request/get-post-query.dto';
 import { GetPostsQueryDto } from './dtos/request/get-posts-query.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { LikePostQueryDTO } from './dtos/request/like-post-query.dto';
+import { TypingDTO } from './dtos/request/typing.dto';
 import { PostService } from './post.service';
 
 @Controller('posts')
@@ -48,5 +49,17 @@ export class PostController {
         @Body() likePostDTO: LikePostDTO
     ): Promise<IPostContainerDTO> {
         return await this._postService.likePost({ postId, likePostDTO });
+    }
+
+    @Put('typing')
+    @UseGuards(AuthGuard)
+    async handleTyping(@Body() typingDTO: TypingDTO) {
+        return await this._postService.handleTyping(typingDTO);
+    }
+
+    @Post('someone-is-typing')
+    @UseGuards(AuthGuard)
+    async handleSendSomeoneIsTyping(@Body() typingDTO: TypingDTO) {
+        return await this._postService.handleSendSomeoneIsTyping(typingDTO);
     }
 }

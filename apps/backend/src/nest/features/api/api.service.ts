@@ -7,6 +7,7 @@ import { IStatusUpdate } from 'custom-types/status.type';
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
+import { TypingDTO } from '../post/dtos/request/typing.dto';
 
 @Injectable()
 export class ApiService {
@@ -175,6 +176,7 @@ export class ApiService {
      * @param {string} obj.location - IPv6 location to get the post from.
      * @param {LikePostDTO} obj.likePost - Like post DTO.
      * @param {string} obj.postId - Post Id to lik.e
+     * @return {IPostContainerDTO} - Liked post.
      */
     async likeExternalPost({
         location,
@@ -190,6 +192,38 @@ export class ApiService {
             return (await axios.put<IPostContainerDTO>(destinationUrl, likePostDTO)).data;
         } catch (error) {
             throw new BadRequestException(`unable to get like post: ${error}`);
+        }
+    }
+
+    /**
+     * Sends a typing event to the post owner, so the owner can send it to his contacts.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to send event to.
+     * @param {string} obj.typingDTO - TypingDTO.
+     * @return {boolean} - True if success.
+     */
+    async handleTyping({ location, typingDTO }: { location: string; typingDTO: TypingDTO }): Promise<boolean> {
+        const destinationUrl = `http://[${location}]/api/v2/posts/typing`;
+        try {
+            return (await axios.put<boolean>(destinationUrl, typingDTO)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to handle typing: ${error}`);
+        }
+    }
+
+    /**
+     * Sends a typing event to given contact location.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 contact location.
+     * @param {string} obj.typingDTO - TypingDTO.
+     * @return {boolean} - True if success.
+     */
+    async sendSomeoneIsTyping({ location, typingDTO }: { location: string; typingDTO: TypingDTO }): Promise<boolean> {
+        const destinationUrl = `http://[${location}]/api/v2/posts/someone-is-typing`;
+        try {
+            return (await axios.post<boolean>(destinationUrl, typingDTO)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to handle typing: ${error}`);
         }
     }
 

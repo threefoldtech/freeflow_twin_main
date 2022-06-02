@@ -7,8 +7,10 @@ import { BlockedContactService } from '../blocked-contact/blocked-contact.servic
 import { ContactService } from '../contact/contact.service';
 import { Contact } from '../contact/models/contact.model';
 import { LocationService } from '../location/location.service';
+import { UserGateway } from '../user/user.gateway';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
+import { TypingDTO } from './dtos/request/typing.dto';
 import { stringifyLikes } from './models/post.model';
 import { PostRedisRepository } from './repositories/post-redis.repository';
 
@@ -24,7 +26,8 @@ export class PostService {
         private readonly _configService: ConfigService,
         private readonly _apiService: ApiService,
         private readonly _contactService: ContactService,
-        private readonly _blockedContactService: BlockedContactService
+        private readonly _blockedContactService: BlockedContactService,
+        private readonly _userGateway: UserGateway
     ) {}
 
     async createPost({
@@ -145,6 +148,30 @@ export class PostService {
         } catch (error) {
             throw new BadRequestException(`unable to delete post: ${error}`);
         }
+    }
+
+    async handleTyping(typingDTO: TypingDTO): Promise<boolean> {
+        const { location, postId, userId } = typingDTO;
+
+        if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
+
+        if (location !== this.ownLocation) return this._apiService.handleTyping({ location, typingDTO });
+
+        const contacts = await this.getContacts();
+        Promise.all(
+            contacts.map(async contact => {
+                await this._apiService.sendSomeoneIsTyping({ location: contact.location, typingDTO });
+            })
+        );
+
+        this._userGateway.emitMessageToConnectedClients('post_typing', { post: postId, user: userId });
+        return true;
+    }
+
+    async handleSendSomeoneIsTyping(typingDTO: TypingDTO): Promise<boolean> {
+        const { postId, userId } = typingDTO;
+        this._userGateway.emitMessageToConnectedClients('post_typing', { post: postId, user: userId });
+        return true;
     }
 
     /**
