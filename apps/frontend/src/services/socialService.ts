@@ -44,24 +44,26 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
         signatures: '',
     };
 
-    files?.map(async file => {
-        const formData = new FormData();
-        formData.append(`images`, file);
-        // Upload file to tmp
-        const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
-        if (!data.id) return false;
-        post.images ? post.images.push(data.id) : (post.images = [data.id]);
-        const { sendHandleUploadedFile } = useSocketActions();
-        sendHandleUploadedFile({
-            fileId: String(data.id),
-            payload: { postId, filename: data.filename },
-            action: FileAction.ADD_TO_POST,
-        });
-    });
+    await Promise.all(
+        files?.map(async file => {
+            const formData = new FormData();
+            formData.append(`file`, file);
+            // Upload file to tmp
+            const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (!data.id) return false;
+            post.images ? post.images.push(data.id) : (post.images = [data.id]);
+            const { sendHandleUploadedFile } = useSocketActions();
+            sendHandleUploadedFile({
+                fileId: String(data.id),
+                payload: { postId, filename: data.filename },
+                action: FileAction.ADD_TO_POST,
+            });
+        })
+    );
 
     return await axios.post<IPostContainerDTO>(`${endpoint}`, post, {
         headers: {

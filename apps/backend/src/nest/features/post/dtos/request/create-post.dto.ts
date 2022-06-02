@@ -1,4 +1,4 @@
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ArrayMaxSize, IsBoolean, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 import { IPostComment, PostType } from 'custom-types/post.type';
 
 export class CreatePostDTO {
@@ -6,6 +6,7 @@ export class CreatePostDTO {
     id: string;
 
     @IsString()
+    @MaxLength(2000)
     body: string;
 
     @IsNotEmpty()
@@ -26,5 +27,6 @@ export class CreatePostDTO {
     signatures: string;
 
     @IsOptional()
+    @ArrayMaxSize(10)
     images?: string[];
 }

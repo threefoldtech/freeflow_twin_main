@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 import { ApiService } from '../api/api.service';
-import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 import { LocationService } from '../location/location.service';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
@@ -13,20 +12,18 @@ import { PostRedisRepository } from './repositories/post-redis.repository';
 @Injectable()
 export class PostService {
     private ownLocation = '';
-    private blockedContacts: string[] = [];
 
     constructor(
         private readonly _postRepo: PostRedisRepository,
         private readonly _locationService: LocationService,
         private readonly _configService: ConfigService,
-        private readonly _apiService: ApiService,
-        private readonly _blockedContactService: BlockedContactService
+        private readonly _apiService: ApiService
     ) {}
 
     async createPost(createPostDTO: CreatePostDTO) {
         const { id, body, createdOn, lastModified, isGroupPost, type, images, replies, signatures } = createPostDTO;
+        if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
         try {
-            if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
             const postDTO: IPostDTO = {
                 id,
                 body,
@@ -88,13 +85,12 @@ export class PostService {
     }
 
     async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }) {
-        const { likerId, likerLocation } = likePostDTO;
+        const { likerId: id, likerLocation: location } = likePostDTO;
         const post = await this._postRepo.getPost({ id: postId });
         const likes = post.parseLikes();
-        likes.push({ id: likerId, location: likerLocation });
+        likes.push({ id, location });
         post.likes = stringifyLikes(likes);
         try {
-            if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
             await this._postRepo.updatePost(post);
             return post.toJSON();
         } catch (error) {

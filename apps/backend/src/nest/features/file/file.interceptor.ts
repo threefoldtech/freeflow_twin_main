@@ -3,6 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { diskStorage } from 'multer';
 
+import { hasSpecialCharacters } from '../../utils/special-characters';
 import { uuidv4 } from '../../utils/uuid';
 
 interface LocalFilesInterceptorOptions {
@@ -22,7 +23,10 @@ export function LocalFilesInterceptor(options: LocalFilesInterceptorOptions): Ty
             const multerOptions: MulterOptions = {
                 storage: diskStorage({
                     destination,
-                    filename: (_req, _file, callback) => {
+                    filename: (_req, file, callback) => {
+                        const fileName = file.originalname.split('.')[0];
+                        if (hasSpecialCharacters(fileName))
+                            return callback(new Error('no special characters allowed'), null);
                         return callback(null, uuidv4());
                     },
                 }),
