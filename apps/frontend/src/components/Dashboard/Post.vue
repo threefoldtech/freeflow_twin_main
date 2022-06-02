@@ -380,7 +380,7 @@
     });
 
     const fetchPostImage = (image: string) => {
-        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/posts/download/${image}`);
+        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/files/${image}`);
     };
 
     const timeAgo = time => {

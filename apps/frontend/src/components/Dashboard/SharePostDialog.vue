@@ -124,10 +124,8 @@
         dialogRef.value.focus();
     });
 
-    const fetchPostImage = (image: { path: string }) => {
-        return calcExternalResourceLink(
-            `http://[${props.item.owner.location}]/api/v1/posts/download/${btoa(image.path)}`
-        );
+    const fetchPostImage = (image: string) => {
+        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/files/${image}`);
     };
 
     const sharePostWithFriend = async (id: string) => {

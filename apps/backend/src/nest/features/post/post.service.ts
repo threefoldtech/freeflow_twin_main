@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IPostContainerDTO, IPostDTO, IPostOwner } from 'custom-types/post.type';
+import { IPostContainerDTO } from 'custom-types/post.type';
 
 import { ApiService } from '../api/api.service';
 import { LocationService } from '../location/location.service';
@@ -20,30 +20,38 @@ export class PostService {
         private readonly _apiService: ApiService
     ) {}
 
-    async createPost(createPostDTO: CreatePostDTO) {
-        const { id, body, createdOn, lastModified, isGroupPost, type, images, replies, signatures } = createPostDTO;
+    async createPost({
+        id,
+        body,
+        createdOn,
+        lastModified,
+        isGroupPost,
+        type,
+        images,
+        replies,
+        signatures,
+    }: CreatePostDTO) {
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
+        const userId = this._configService.get<string>('userId');
         try {
-            const postDTO: IPostDTO = {
-                id,
-                body,
-                createdOn,
-                lastModified,
-                isGroupPost,
-                type,
-                images: images || [],
-                replies,
-                signatures,
-            };
-            const postOwner: IPostOwner = {
-                id: this._configService.get<string>('userId'),
-                location: this.ownLocation,
-            };
             const postContainer: IPostContainerDTO = {
                 id,
-                post: postDTO,
-                owner: postOwner,
-                ownerId: postOwner.id,
+                post: {
+                    id,
+                    body,
+                    createdOn,
+                    lastModified,
+                    isGroupPost,
+                    type,
+                    images: images || [],
+                    replies,
+                    signatures,
+                },
+                owner: {
+                    id: userId,
+                    location: this.ownLocation,
+                },
+                ownerId: userId,
                 images: images || [],
                 replies,
                 likes: [],

@@ -87,7 +87,7 @@
 
     const thumbnailImage = computed(() => {
         return calcExternalResourceLink(
-            `http://[${props.message.body.owner.location}]/api/v1/posts/download/${btoa(props.message.body.images[0])}`
+            `http://[${props.message.body.owner.location}]/api/v2/files/${btoa(props.message.body.images[0])}`
         );
     });
 
