@@ -186,10 +186,10 @@ export class ApiService {
         location: string;
         likePostDTO: LikePostDTO;
         postId: string;
-    }): Promise<IPostContainerDTO> {
+    }): Promise<{ status: string }> {
         const destinationUrl = `http://[${location}]/api/v2/posts/like/${postId}`;
         try {
-            return (await axios.put<IPostContainerDTO>(destinationUrl, likePostDTO)).data;
+            return (await axios.put<{ status: string }>(destinationUrl, likePostDTO)).data;
         } catch (error) {
             throw new BadRequestException(`unable to get like post: ${error}`);
         }

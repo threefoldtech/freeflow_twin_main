@@ -43,7 +43,10 @@ export class PostController {
 
     @Put('like/:postId')
     @UseGuards(AuthGuard)
-    async likePost(@Param() { postId }: GetPostQueryDto, @Body() likePostDTO: LikePostDTO): Promise<IPostContainerDTO> {
+    async likePost(
+        @Param() { postId }: GetPostQueryDto,
+        @Body() likePostDTO: LikePostDTO
+    ): Promise<{ status: string }> {
         return await this._postService.likePost({ postId, likePostDTO });
     }
 

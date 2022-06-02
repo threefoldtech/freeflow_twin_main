@@ -115,7 +115,7 @@ export class PostService {
         return await this._apiService.getExternalPost({ location: ownerLocation, postId });
     }
 
-    async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }): Promise<IPostContainerDTO> {
+    async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }): Promise<{ status: string }> {
         const { likerId: id, likerLocation: location, owner } = likePostDTO;
 
         if (await this.isBlocked({ userId: id })) throw new BadRequestException('blocked');
@@ -128,13 +128,17 @@ export class PostService {
         const post = await this._postRepo.getPost({ id: postId });
         const likes = post.parseLikes();
 
-        if (likes.some(l => l.location === location && l.id === id)) likes.splice(likes.indexOf({ id, location }), 1);
+        const res = {
+            status: likes.some(l => l.location === location && l.id === id) ? 'unliked' : 'liked',
+        };
+
+        if (res.status == 'unliked') likes.splice(likes.indexOf({ id, location }), 1);
         else likes.push({ id, location });
 
         post.likes = stringifyLikes(likes);
         try {
             await this._postRepo.updatePost(post);
-            return post.toJSON();
+            return res;
         } catch (error) {
             throw new BadRequestException(`unable to like post: ${error}`);
         }
