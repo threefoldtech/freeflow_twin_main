@@ -92,7 +92,7 @@
     });
 
     const avatarImg = computed(() => {
-        return calcExternalResourceLink(`http://[${props.message.body.owner.location}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${props.message.body.owner.location}]/api/v2/user/avatar/default`);
     });
 
     const goToSocialPost = async () => {

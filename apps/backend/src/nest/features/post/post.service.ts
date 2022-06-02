@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { IPostContainerDTO } from 'custom-types/post.type';
+import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 
 import { ApiService } from '../api/api.service';
 import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
@@ -11,7 +11,7 @@ import { UserGateway } from '../user/user.gateway';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
-import { stringifyLikes } from './models/post.model';
+import { stringifyLikes, stringifyReplies } from './models/post.model';
 import { PostRedisRepository } from './repositories/post-redis.repository';
 
 @Injectable()
@@ -143,6 +143,8 @@ export class PostService {
     async deletePost({ postId }: { postId: string }): Promise<string> {
         try {
             const post = await this._postRepo.getPost({ id: postId });
+            if (post.ownerId !== this._configService.get<string>('userId'))
+                throw new ForbiddenException("cannot delete someone else's post");
             await this._postRepo.deletePost({ id: post.entityId });
             return postId;
         } catch (error) {
@@ -150,7 +152,7 @@ export class PostService {
         }
     }
 
-    async handleTyping(typingDTO: TypingDTO): Promise<boolean> {
+    async handleTyping(typingDTO: TypingDTO): Promise<{ post: string; user: string }> {
         const { location, postId, userId } = typingDTO;
 
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
@@ -164,14 +166,44 @@ export class PostService {
             })
         );
 
-        this._userGateway.emitMessageToConnectedClients('post_typing', { post: postId, user: userId });
-        return true;
+        return { post: postId, user: userId };
     }
 
     async handleSendSomeoneIsTyping(typingDTO: TypingDTO): Promise<boolean> {
         const { postId, userId } = typingDTO;
         this._userGateway.emitMessageToConnectedClients('post_typing', { post: postId, user: userId });
         return true;
+    }
+
+    async commentOnPost({
+        postId,
+        commentDTO,
+    }: {
+        postId: string;
+        commentDTO: IPostComment;
+    }): Promise<{ status: string }> {
+        const { post, replyTo, isReplyToComment } = commentDTO;
+
+        if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
+
+        if (post.owner.location !== this.ownLocation)
+            return await this._apiService.commentOnExternalPost({ location: post.owner.location, commentDTO });
+
+        try {
+            const dbPost = await this._postRepo.getPost({ id: postId });
+            const comments = dbPost.parseReplies();
+            if (isReplyToComment) {
+                const commentIdx = comments.findIndex(r => r.id === replyTo);
+                if (commentIdx < 0) throw new BadRequestException('comment not found');
+                comments[commentIdx].replies.push(commentDTO);
+            } else comments.push(commentDTO);
+            dbPost.replies = stringifyReplies(comments);
+            await this._postRepo.updatePost(dbPost);
+        } catch (error) {
+            throw new BadRequestException(`unable to comment on post: ${error}`);
+        }
+
+        return { status: 'commented' };
     }
 
     /**

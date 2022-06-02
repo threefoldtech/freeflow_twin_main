@@ -128,11 +128,15 @@ export const getSinglePost = async (postId: string, location: string) => {
 };
 
 export const setSomeoneIsTyping = async (postId: string, location: string, userId: string) => {
-    await axios.put(`${endpoint}/typing`, {
-        postId: postId,
-        location: location,
-        userId,
-    });
+    const res = (
+        await axios.put<{ post: string; user: string }>(`${endpoint}/typing`, {
+            postId: postId,
+            location: location,
+            userId,
+        })
+    ).data;
+
+    updateSomeoneIsTyping(res.post, res.user);
 };
 
 export const commentOnPost = async (
@@ -232,5 +236,6 @@ export const sendMessageSharePost = async (chatId: string, post: IPostContainerD
 
 export const deletePost = async (item: IPostContainerDTO) => {
     const post = item.post.id;
-    return await axios.delete(`${endpoint}/${post}`);
+    const postId = (await axios.delete(`${endpoint}/${post}`)).data;
+    allSocialPosts.value = allSocialPosts.value.filter(p => p.post.id !== postId);
 };

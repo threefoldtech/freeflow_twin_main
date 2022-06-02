@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { ResponseType } from 'axios';
-import { IPostContainerDTO } from 'custom-types/post.type';
+import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
@@ -200,12 +200,17 @@ export class ApiService {
      * @param {Object} obj - Object.
      * @param {string} obj.location - IPv6 location to send event to.
      * @param {string} obj.typingDTO - TypingDTO.
-     * @return {boolean} - True if success.
      */
-    async handleTyping({ location, typingDTO }: { location: string; typingDTO: TypingDTO }): Promise<boolean> {
+    async handleTyping({
+        location,
+        typingDTO,
+    }: {
+        location: string;
+        typingDTO: TypingDTO;
+    }): Promise<{ post: string; user: string }> {
         const destinationUrl = `http://[${location}]/api/v2/posts/typing`;
         try {
-            return (await axios.put<boolean>(destinationUrl, typingDTO)).data;
+            return (await axios.put<{ post: string; user: string }>(destinationUrl, typingDTO)).data;
         } catch (error) {
             throw new BadRequestException(`unable to handle typing: ${error}`);
         }
@@ -222,6 +227,28 @@ export class ApiService {
         const destinationUrl = `http://[${location}]/api/v2/posts/someone-is-typing`;
         try {
             return (await axios.post<boolean>(destinationUrl, typingDTO)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to handle typing: ${error}`);
+        }
+    }
+
+    /**
+     * Sends comment request to external post.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 contact location.
+     * @param {string} obj.commentDTO - CommentDTO.
+     * @return {boolean} - True if success.
+     */
+    async commentOnExternalPost({
+        location,
+        commentDTO,
+    }: {
+        location: string;
+        commentDTO: IPostComment;
+    }): Promise<{ status: string }> {
+        const destinationUrl = `http://[${location}]/api/v2/posts/comment/${commentDTO.post.id}`;
+        try {
+            return (await axios.put<{ status: string }>(destinationUrl, commentDTO)).data;
         } catch (error) {
             throw new BadRequestException(`unable to handle typing: ${error}`);
         }

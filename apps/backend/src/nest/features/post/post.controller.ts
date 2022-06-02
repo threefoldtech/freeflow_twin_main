@@ -1,12 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { IPostContainerDTO } from 'custom-types/post.type';
+import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { GetPostQueryDto } from './dtos/request/get-post-query.dto';
 import { GetPostsQueryDto } from './dtos/request/get-posts-query.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
-import { LikePostQueryDTO } from './dtos/request/like-post-query.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { PostService } from './post.service';
 
@@ -44,22 +43,28 @@ export class PostController {
 
     @Put('like/:postId')
     @UseGuards(AuthGuard)
-    async likePost(
-        @Param() { postId }: LikePostQueryDTO,
-        @Body() likePostDTO: LikePostDTO
-    ): Promise<IPostContainerDTO> {
+    async likePost(@Param() { postId }: GetPostQueryDto, @Body() likePostDTO: LikePostDTO): Promise<IPostContainerDTO> {
         return await this._postService.likePost({ postId, likePostDTO });
     }
 
     @Put('typing')
     @UseGuards(AuthGuard)
-    async handleTyping(@Body() typingDTO: TypingDTO) {
+    async handleTyping(@Body() typingDTO: TypingDTO): Promise<{ post: string; user: string }> {
         return await this._postService.handleTyping(typingDTO);
     }
 
     @Post('someone-is-typing')
     @UseGuards(AuthGuard)
-    async handleSendSomeoneIsTyping(@Body() typingDTO: TypingDTO) {
+    async handleSendSomeoneIsTyping(@Body() typingDTO: TypingDTO): Promise<boolean> {
         return await this._postService.handleSendSomeoneIsTyping(typingDTO);
+    }
+
+    @Put('comment/:postId')
+    @UseGuards(AuthGuard)
+    async commentOnPost(
+        @Param() { postId }: GetPostQueryDto,
+        @Body() commentDTO: IPostComment
+    ): Promise<{ status: string }> {
+        return await this._postService.commentOnPost({ postId, commentDTO });
     }
 }

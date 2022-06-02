@@ -308,7 +308,7 @@
     import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue';
     import { LIKE_STATUS } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { deletePost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
+    import { commentOnPost, deletePost, getSinglePost, likePost, setSomeoneIsTyping } from '@/services/socialService';
     import SharePostDialog from '@/components/Dashboard/SharePostDialog.vue';
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import Alert from '@/components/Alert.vue';
@@ -400,11 +400,12 @@
         return moment(time).fromNow();
     };
 
-    const handleAddComment = async (isReplyToComment: boolean = false, _comment_id?: string, message?: string) => {
+    const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
         if (postingCommentInProgress.value) return;
         const comment_value = isReplyToComment ? message : messageInput.value;
         if (!comment_value || comment_value === '' || !/\S/.test(comment_value)) return;
         postingCommentInProgress.value = true;
+        const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id);
         messageInput.value = '';
         const response = await getSinglePost(props.item.post.id, props.item.owner.location);
         postingCommentInProgress.value = false;

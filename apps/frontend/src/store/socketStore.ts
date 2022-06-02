@@ -70,14 +70,8 @@ const initializeSocket = (username: string) => {
         const { addChat } = usechatsActions();
         addChat(chat);
     });
-    state.socket.on('post_typing', (data: { post: string; user: string }) => {
-        updateSomeoneIsTyping(data.post, data.user);
-    });
     state.socket.on('posts_updated', () => {
         getAllPosts();
-    });
-    state.socket.on('post_deleted', (postId: string) => {
-        allSocialPosts.value = allSocialPosts.value.filter(p => p.post.id !== postId);
     });
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
