@@ -6,6 +6,7 @@ import { Entity, Schema } from 'redis-om';
  * string[] is needed for Redis.
  */
 export interface Post {
+    id: string;
     post: string;
     owner: string;
     ownerId: string;
@@ -18,6 +19,7 @@ export interface Post {
 export class Post extends Entity {
     toJSON(): IPostContainerDTO {
         return {
+            id: this.id,
             post: this.parsePost(),
             owner: this.parsePostOwner(),
             ownerId: this.ownerId,
@@ -74,6 +76,7 @@ export const stringifyLikes = (likes: IPostLike[]): string[] => likes.map(like =
 export const stringifyReplies = (replies: IPostComment[]): string[] => replies.map(reply => JSON.stringify(reply));
 
 export const postSchema = new Schema(Post, {
+    id: { type: 'string' },
     post: { type: 'string' },
     owner: { type: 'string' },
     ownerId: { type: 'string' },

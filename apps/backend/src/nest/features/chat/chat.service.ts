@@ -173,24 +173,6 @@ export class ChatService {
     }
 
     /**
-     * Adds a message to a chat.
-     * @param {Object} obj - Object.
-     * @param {Chat} obj.chat - Chat to add messages to.
-     * @param {Message} obj.message - Signed message to add to chat.
-     * @return {string} - Chat entity ID.
-     */
-    // async addMessageToChat({ chat, message }: { chat: Chat; message: MessageDTO<unknown> }): Promise<string> {
-    //     try {
-    //         chat.messages
-    //             ? chat.messages.push(stringifyMessage(message))
-    //             : (chat.messages = [stringifyMessage(message)]);
-    //         return await this._chatRepository.updateChat(chat);
-    //     } catch (error) {
-    //         throw new BadRequestException(`unable to add message to chat: ${error}`);
-    //     }
-    // }
-
-    /**
      * Removes a contact from a chat.
      * @param {Object} obj - Object.
      * @param {Chat} obj.chat - Chat to remove contact from.

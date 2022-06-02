@@ -93,8 +93,8 @@ export const likePost = async (postId: string, location: string, _commentId?: st
     const myAddress = await myYggdrasilAddress();
     return (
         await axios.put<any>(`${endpoint}/like/${postId}`, {
-            liker_location: myAddress,
-            liker_id: user.id,
+            likerLocation: myAddress,
+            likerId: user.id,
             owner: location,
         })
     ).data;
@@ -109,7 +109,7 @@ export const likeComment = async (
 ) => {
     return (
         await axios.put(`${endpoint}/comments/like`, {
-            liker_id: user.id,
+            likerId: user.id,
             postId,
             owner: location,
             commentId,

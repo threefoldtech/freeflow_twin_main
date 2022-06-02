@@ -55,6 +55,7 @@ export interface IPostDTO {
 }
 
 export interface IPostContainerDTO {
+    id: string;
     post: IPostDTO;
     owner: IPostOwner;
     ownerId: string;

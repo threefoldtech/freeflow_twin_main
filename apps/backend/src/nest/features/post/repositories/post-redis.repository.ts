@@ -20,8 +20,9 @@ export class PostRedisRepository extends EntityRepository<Post> {
      * @param {string} obj.replies - Post replies.
      * @return {Post} - Created post.
      */
-    async createPost({ post, owner, ownerId, images }: IPostContainerDTO): Promise<Post> {
+    async createPost({ id, post, owner, ownerId, images }: IPostContainerDTO): Promise<Post> {
         return await this.save({
+            id,
             post: stringifyPost(post),
             owner: stringifyPostOwner(owner),
             ownerId,
