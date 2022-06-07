@@ -9,6 +9,7 @@ import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
 import { statusList } from './statusStore';
+import config from '@/config';
 
 const state = reactive<State>({
     socket: '',
@@ -85,6 +86,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
         if (statusList[id]) statusList[id].isOnline = isOnline;
+    });
+    state.socket.on('appID', (url: string) => {
+        config.appId = url;
     });
 };
 
