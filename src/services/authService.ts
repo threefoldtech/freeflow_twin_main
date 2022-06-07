@@ -9,5 +9,5 @@ export const login = () => {
 export const doLogout = async () => {
     const res = (await axios.get(`${config.baseUrl}/api/v1/auth/signout`)).data;
     if (!res) return;
-    window.location.href = `https://${config.appId}`;
+    window.location.href = `https://${config.getAppId()}`;
 };

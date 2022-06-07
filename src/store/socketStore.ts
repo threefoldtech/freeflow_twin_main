@@ -88,7 +88,7 @@ const initializeSocket = (username: string) => {
         if (statusList[id]) statusList[id].isOnline = isOnline;
     });
     state.socket.on('appID', (url: string) => {
-        config.appId = url;
+        config.setAppId(url);
     });
 };
 

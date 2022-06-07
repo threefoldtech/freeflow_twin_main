@@ -152,13 +152,11 @@
         fileBrowserTypeView,
         isQuantumChatFiles,
     } from '@/store/fileBrowserStore';
-    import { onBeforeMount, watch, computed } from 'vue';
+    import { watch, computed } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import Spinner from '@/components/Spinner.vue';
 
-    onBeforeMount(async () => {
-        sharedBreadcrumbs.value = [];
-    });
+    sharedBreadcrumbs.value = [];
 
     watch(sharedFolderIsloading, () => {});
 
