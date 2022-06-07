@@ -163,7 +163,6 @@
 
 <script setup lang="ts">
     import moment from 'moment';
-    import { useSocketActions } from '@/store/socketStore';
     import { ref, computed, onBeforeMount, watch } from 'vue';
 
     import { usechatsActions, useChatsState } from '@/store/chatStore';
@@ -262,8 +261,6 @@
         return chats.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
     });
     onBeforeMount(() => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
         retrieveChats();
     });
 

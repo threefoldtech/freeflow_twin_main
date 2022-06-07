@@ -85,8 +85,6 @@
     const dashboardWindow = ref<HTMLElement>(null);
 
     onBeforeMount(async () => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
         await getAllPosts();
         await retrieveChats();
     });

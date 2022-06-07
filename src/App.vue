@@ -30,10 +30,18 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { myYggdrasilAddress } from '@/store/authStore';
-    import { ref, computed } from 'vue';
+    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+    import { ref, computed, onBeforeMount } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    import { useSocketActions } from '@/store/socketStore';
+
+    const { user } = useAuthState();
+
+    onBeforeMount(async () => {
+        const { initializeSocket } = useSocketActions();
+        initializeSocket(user.id.toString());
+    });
 
     console.log('Version: ' + version);
 
