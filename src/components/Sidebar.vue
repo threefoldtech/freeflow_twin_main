@@ -76,7 +76,7 @@
             <template #actions>
                 <button
                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
-                    @click="doLogout"
+                    @click="logout"
                 >
                     Logout
                 </button>
@@ -100,8 +100,7 @@
     import Button from '@/components/Button.vue';
     import Alert from '@/components/Alert.vue';
     import { ref } from 'vue';
-    import axios from 'axios';
-    import config from '@/config';
+    import { doLogout } from '@/services/authService';
 
     const apps: Array<AppItemType> = [
         {
@@ -145,10 +144,9 @@
 
     const showLogoutDialog = ref(false);
 
-    const doLogout = async () => {
+    const logout = async () => {
         showLogoutDialog.value = false;
-        const res = await axios.get(`${config.baseUrl}/api/v1/auth/signout`);
-        window.location.href = res.data.url;
+        await doLogout();
     };
 
     const changePage = (name: string) => {
