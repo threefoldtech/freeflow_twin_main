@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
     copyFile,
     Dirent,
@@ -77,8 +77,8 @@ export class FileService {
      * @return {boolean} success or not.
      */
     moveFile({ from, to }: { from: string; to: string }): boolean {
-        if (!from || !to) throw new Error('please specify a from and a to path to move the file to');
-        if (!this.fileExists({ path: from })) throw new Error('file does not exist');
+        if (!from || !to) throw new BadRequestException('please specify a from and a to path to move the file to');
+        if (!this.fileExists({ path: from })) throw new BadRequestException('file does not exist');
         copyFile(from, to, err => {
             if (err) throw err;
         });
@@ -125,7 +125,7 @@ export class FileService {
      * @return {Stats} stats.
      */
     getStats({ path }: { path: string }): Promise<Stats> {
-        if (!this.fileExists({ path })) throw new Error('path does not exist');
+        if (!this.fileExists({ path })) throw new BadRequestException('unable to get stats, path does not exist');
         return promises.lstat(path);
     }
 
@@ -136,7 +136,8 @@ export class FileService {
      * @return {ParsedPath} parsed path.
      */
     getPathDetails({ path }: { path: string }): ParsedPath {
-        if (!this.fileExists({ path })) throw new Error('path does not exist');
+        if (!this.fileExists({ path }))
+            throw new BadRequestException('unable to get path details, path does not exist');
         return parse(path);
     }
 

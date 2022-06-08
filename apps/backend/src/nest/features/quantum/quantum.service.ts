@@ -13,6 +13,12 @@ export class QuantumService {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
+    /**
+     * Get the contents of a directory by given path.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path to the directory.
+     * @returns {PathInfoDTO[]} - PathInfoDTO[].
+     */
     async getDirectoryContent({ path }: { path: string }): Promise<PathInfoDTO[]> {
         try {
             const actualPath = path === '/' ? this.storageDir : path;
@@ -22,7 +28,6 @@ export class QuantumService {
                 path: actualPath,
                 options: { withFileTypes: true },
             });
-            console.log(`CONTENS: ${JSON.stringify(contents)}`);
 
             return Promise.all(
                 contents.map(async file => {
