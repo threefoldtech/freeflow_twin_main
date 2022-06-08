@@ -27,7 +27,7 @@ export class FileService {
      * @param {string} obj.content - File contents.
      */
     writeFile({ path, content, flag }: { path: string; content: string; flag?: WriteFileOptions }) {
-        if (!this.fileExists({ path })) writeFileSync(path, content, flag);
+        if (!this.exists({ path })) writeFileSync(path, content, flag);
     }
 
     /**
@@ -61,12 +61,12 @@ export class FileService {
     }
 
     /**
-     * Checks if a file exists given its path.
+     * Checks if a path exists.
      * @param {Object} obj - Object.
-     * @param {string} obj.path - File path.
-     * @return {boolean} file exists or not.
+     * @param {string} obj.path - Path.
+     * @return {boolean} path exists or not.
      */
-    fileExists({ path }: { path: string }): boolean {
+    exists({ path }: { path: string }): boolean {
         return existsSync(path);
     }
 
@@ -79,7 +79,7 @@ export class FileService {
      */
     moveFile({ from, to }: { from: string; to: string }): boolean {
         if (!from || !to) throw new BadRequestException('please specify a from and a to path to move the file to');
-        if (!this.fileExists({ path: from })) throw new BadRequestException('file does not exist');
+        if (!this.exists({ path: from })) throw new BadRequestException('file does not exist');
         copyFile(from, to, err => {
             if (err) throw err;
         });
@@ -94,7 +94,7 @@ export class FileService {
      * @return {boolean} success or not.
      */
     deleteFile({ path }: { path: string }): boolean {
-        if (!this.fileExists({ path })) throw new BadRequestException('unable to delete file, path does not exist');
+        if (!this.exists({ path })) throw new BadRequestException('unable to delete file, path does not exist');
         unlink(path, err => {
             if (err) throw err;
         });
@@ -108,7 +108,7 @@ export class FileService {
      * @return {boolean} success or not.
      */
     deleteDirectory({ path }: { path: string }): boolean {
-        if (!this.fileExists({ path })) throw new BadRequestException('unable to delete folder, path does not exist');
+        if (!this.exists({ path })) throw new BadRequestException('unable to delete folder, path does not exist');
         rmdirSync(path, { recursive: true });
         return true;
     }
@@ -139,7 +139,7 @@ export class FileService {
      * @return {Stats} stats.
      */
     getStats({ path }: { path: string }): Promise<Stats> {
-        if (!this.fileExists({ path })) throw new BadRequestException('unable to get stats, path does not exist');
+        if (!this.exists({ path })) throw new BadRequestException('unable to get stats, path does not exist');
         return promises.lstat(path);
     }
 
@@ -150,8 +150,7 @@ export class FileService {
      * @return {ParsedPath} parsed path.
      */
     getPathDetails({ path }: { path: string }): ParsedPath {
-        if (!this.fileExists({ path }))
-            throw new BadRequestException('unable to get path details, path does not exist');
+        if (!this.exists({ path })) throw new BadRequestException('unable to get path details, path does not exist');
         return parse(path);
     }
 

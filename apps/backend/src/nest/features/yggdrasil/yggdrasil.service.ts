@@ -99,7 +99,7 @@ export class YggdrasilService {
      * @return {YggdrasilConfig} - New replacement keys if replacement was not found.
      */
     private getReplacements(seed: string): string | YggdrasilConfig {
-        if (this._fileService.fileExists({ path: this.jsonPath })) {
+        if (this._fileService.exists({ path: this.jsonPath })) {
             console.log('existing replacements for yggdrasil found');
             return this._fileService.readJSONFile({ path: this.jsonPath });
         }

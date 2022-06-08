@@ -28,7 +28,7 @@ export class FileController {
     @Get(':fileId')
     downloadFile(@Param('fileId') fileId: string): StreamableFile {
         const path = join(this.storageDir, fileId);
-        if (!fileId || !this._fileService.fileExists({ path }))
+        if (!fileId || !this._fileService.exists({ path }))
             throw new BadRequestException('please provide a valid file id');
 
         return new StreamableFile(createReadStream(path));

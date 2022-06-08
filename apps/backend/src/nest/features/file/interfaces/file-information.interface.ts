@@ -3,11 +3,6 @@ export interface FileInformation {
     name: string;
 }
 
-// export interface DirectoryDto {
-//     name: string;
-//     path: string;
-// }
-
 // export interface FileDto {
 //     path: string;
 // }

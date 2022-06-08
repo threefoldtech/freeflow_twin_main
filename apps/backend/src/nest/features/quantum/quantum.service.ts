@@ -69,6 +69,15 @@ export class QuantumService {
         }
     }
 
+    async createDirectoryWithRetry({ path, count = 0 }: { path: string; count?: number }): Promise<PathInfoDTO> {
+        const pathWithCount = count === 0 ? path : `${path} (${count})`;
+        if (this._fileService.exists({ path: pathWithCount }))
+            return await this.createDirectoryWithRetry({ path, count: count + 1 });
+
+        this._fileService.makeDirectory({ path });
+        return await this.formatFileDetails({ path });
+    }
+
     /**
      * Formats the file details to be returned to the client.
      * @param {Object} obj - Object.
