@@ -1,17 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import {
     copyFile,
+    Dirent,
     existsSync,
     MakeDirectoryOptions,
     mkdirSync,
+    ObjectEncodingOptions,
     openSync,
+    promises,
     readdir,
     readFileSync,
+    Stats,
     unlink,
     WriteFileOptions,
     writeFileSync,
 } from 'fs';
-import { join } from 'path';
+import { join, parse, ParsedPath } from 'path';
 
 @Injectable()
 export class FileService {
@@ -86,6 +90,7 @@ export class FileService {
      * Deletes a file by given path.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to delete file from.
+     * @return {boolean} success or not.
      */
     deleteFile({ path }: { path: string }): boolean {
         unlink(path, err => {
@@ -111,5 +116,46 @@ export class FileService {
             });
         });
         return true;
+    }
+
+    /**
+     * Get stats of given path.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path.
+     * @return {Stats} stats.
+     */
+    getStats({ path }: { path: string }): Promise<Stats> {
+        if (!this.fileExists({ path })) throw new Error('path does not exist');
+        return promises.lstat(path);
+    }
+
+    /**
+     * Gets details corresponding to given path.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path.
+     * @return {ParsedPath} parsed path.
+     */
+    getPathDetails({ path }: { path: string }): ParsedPath {
+        if (!this.fileExists({ path })) throw new Error('path does not exist');
+        return parse(path);
+    }
+
+    /**
+     * Reads and returns contents of a directory.
+     * @param {Object} obj - Object.
+     * @param {string} obj.dir - Directory path.
+     * @param {string} obj.options - Read options.
+     * @return {Dirent[]} contents.
+     */
+    async readDirectory({
+        path,
+        options,
+    }: {
+        path: string;
+        options?: ObjectEncodingOptions & {
+            withFileTypes: true;
+        };
+    }): Promise<Dirent[]> {
+        return await promises.readdir(path, options);
     }
 }

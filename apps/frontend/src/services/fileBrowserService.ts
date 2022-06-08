@@ -1,12 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
-import {
-    createErrorNotification,
-    createNotification,
-    createPercentProgressNotification,
-    fail,
-    success,
-} from '@/store/notificiationStore';
+import { createNotification, createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
 import { ProgressNotification, Status } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
@@ -56,7 +50,7 @@ export const getDirectoryContent = async (
     const params = new URLSearchParams();
     params.append('path', path);
     if (attachments) params.append('attachments', '1');
-    return await axios.get<PathInfo[]>(`${endpoint}/directories/content`, { params: params });
+    return await axios.get<PathInfo[]>(`${config.baseUrl}api/v2/quantum/dir/content`, { params: params });
 };
 
 export const getDirectoryInfo = async (path: string) => {
