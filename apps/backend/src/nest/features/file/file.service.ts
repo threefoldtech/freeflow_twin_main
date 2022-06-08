@@ -10,6 +10,7 @@ import {
     promises,
     readdir,
     readFileSync,
+    rmdirSync,
     Stats,
     unlink,
     WriteFileOptions,
@@ -93,9 +94,22 @@ export class FileService {
      * @return {boolean} success or not.
      */
     deleteFile({ path }: { path: string }): boolean {
+        if (!this.fileExists({ path })) throw new BadRequestException('unable to delete file, path does not exist');
         unlink(path, err => {
             if (err) throw err;
         });
+        return true;
+    }
+
+    /**
+     * Deletes a directory by given path.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path to delete directory from.
+     * @return {boolean} success or not.
+     */
+    deleteDirectory({ path }: { path: string }): boolean {
+        if (!this.fileExists({ path })) throw new BadRequestException('unable to delete folder, path does not exist');
+        rmdirSync(path, { recursive: true });
         return true;
     }
 

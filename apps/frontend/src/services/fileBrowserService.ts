@@ -123,7 +123,7 @@ export const uploadFile = async (
 };
 
 export const deleteFile = async (path: string) => {
-    return await axios.delete<PathInfo>(`${endpoint}/files`, { data: { filepath: path } });
+    return await axios.delete<PathInfo>(`${config.baseUrl}api/v2/quantum?path=${path}`);
 };
 
 export const downloadFileEndpoint = `${endpoint}/files`;

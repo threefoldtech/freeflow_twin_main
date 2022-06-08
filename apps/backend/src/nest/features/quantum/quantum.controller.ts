@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Query } from '@nestjs/common';
 
 import { QuantumService } from './quantum.service';
 
@@ -9,5 +9,10 @@ export class QuantumController {
     @Get('dir/content')
     async getDirectoryContent(@Query('path') path: string) {
         return await this._quantumService.getDirectoryContent({ path });
+    }
+
+    @Delete()
+    async deleteFileOrDirectory(@Query('path') path: string) {
+        return await this._quantumService.deleteFileOrDirectory({ path });
     }
 }
