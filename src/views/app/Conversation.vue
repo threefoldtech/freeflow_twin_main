@@ -229,7 +229,7 @@
             </template>
         </appLayout>
         <Alert v-if="showDialog" :showAlert="showDialog" @close="showDialog = false">
-            <template #title> Blocking </template>
+            <template #title> Blocking</template>
             <template #content>
                 Do you really want to block
                 <b> {{ chat.name }} </b>?
@@ -258,7 +258,7 @@
             <template v-slot:title class="center">
                 <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
             </template>
-            <div v-if="chat?.isGroup">
+            <div v-if="chat?.isGroup && chat?.adminId === user?.id">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
                     Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
                 </p>
@@ -279,6 +279,10 @@
                     </p>
                 </div>
             </div>
+            <div v-else-if="chat?.isGroup">
+                Do you really want to leave the group <b>{{ chat?.name }}</b
+                >?
+            </div>
             <div v-else>
                 Do you really want to delete
                 <b> {{ chat?.name }} </b>
@@ -298,7 +302,7 @@
         </Dialog>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
-            <template #title> Deleting group </template>
+            <template #title> Deleting group</template>
             <template #content>
                 Do you really want to delete this group
                 <b>{{ chat?.name }}</b
@@ -508,7 +512,7 @@
     const doLeaveChat = async () => {
         if (chat.value.isGroup && chat.value.contacts.length > 1) {
             const { updateContactsInGroup } = usechatsActions();
-            if (!nextAdmin.value) return;
+            if (!nextAdmin.value && user.id === chat.value.adminId) return;
             await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
             return;
         }
