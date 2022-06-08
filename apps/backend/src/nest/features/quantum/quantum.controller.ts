@@ -32,7 +32,7 @@ export class QuantumController {
     @Post('dir')
     @UseGuards(AuthGuard)
     async createDirectory(@Body() { path, name }: CreateDirectoryDTO): Promise<DirectoryInfoDTO> {
-        const actualPath = path === '/' ? join(this.storageDir, '/', name) : join(path, name);
+        const actualPath = path === '/' ? join(this.storageDir, name) : join(path, name);
         const details = await this._quantumService.createDirectoryWithRetry({ path: actualPath });
         return {
             isFile: false,

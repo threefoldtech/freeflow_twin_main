@@ -62,7 +62,7 @@ export const getDirectoryInfo = async (path: string) => {
 export const createDirectory = async (path: string, name: string): Promise<AxiosResponse<PathInfo>> => {
     const body = {
         path,
-        name,
+        name: `/${name}`,
     };
     return await axios.post<PathInfo>(`${config.baseUrl}api/v2/quantum/dir`, body);
 };

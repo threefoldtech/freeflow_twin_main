@@ -74,8 +74,8 @@ export class QuantumService {
         if (this._fileService.exists({ path: pathWithCount }))
             return await this.createDirectoryWithRetry({ path, count: count + 1 });
 
-        this._fileService.makeDirectory({ path });
-        return await this.formatFileDetails({ path });
+        this._fileService.makeDirectory({ path: pathWithCount });
+        return await this.formatFileDetails({ path: pathWithCount });
     }
 
     /**
