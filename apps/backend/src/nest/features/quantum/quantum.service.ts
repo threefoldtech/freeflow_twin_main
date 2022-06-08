@@ -12,7 +12,7 @@ export class QuantumService {
      * Get the contents of a directory by given path.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the directory.
-     * @returns {PathInfoDTO[]} - PathInfoDTO[].
+     * @return {PathInfoDTO[]} - PathInfoDTO[].
      */
     async getDirectoryContent({ path }: { path: string }): Promise<PathInfoDTO[]> {
         try {
@@ -39,7 +39,7 @@ export class QuantumService {
      * Get directory stats.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the directory.
-     * @returns {PathInfoDTO[]} - PathInfoDTO[].
+     * @return {PathInfoDTO[]} - PathInfoDTO[].
      */
     async getDirectoryInfo({ path }: { path: string }): Promise<PathInfoDTO> {
         try {
@@ -56,7 +56,7 @@ export class QuantumService {
      * Deletes a file or directory.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the file or directory.
-     * @returns {boolean} - True if the file or directory was deleted.
+     * @return {boolean} - True if the file or directory was deleted.
      */
     async deleteFileOrDirectory({ path }: { path: string }): Promise<boolean> {
         // TODO: remove share
@@ -69,6 +69,12 @@ export class QuantumService {
         }
     }
 
+    /**
+     * Creates a directory.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path to the directory.
+     * @return {PathInfoDTO} - PathInfoDTO.
+     */
     async createDirectoryWithRetry({ path, count = 0 }: { path: string; count?: number }): Promise<PathInfoDTO> {
         const pathWithCount = count === 0 ? path : `${path} (${count})`;
         if (this._fileService.exists({ path: pathWithCount }))
@@ -82,7 +88,7 @@ export class QuantumService {
      * Formats the file details to be returned to the client.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the file.
-     * @returns {PathInfoDTO} - PathInfoDTO.
+     * @return {PathInfoDTO} - PathInfoDTO.
      */
     private async formatFileDetails({ path }: { path: string }): Promise<PathInfoDTO> {
         try {
