@@ -15,7 +15,7 @@ export class QuantumService {
 
     async getDirectoryContent({ path }: { path: string }): Promise<PathInfoDTO[]> {
         try {
-            const actualPath = join(this.storageDir, path);
+            const actualPath = path === '/' ? this.storageDir : path;
             const stats = await this._fileService.getStats({ path: actualPath });
             if (!stats.isDirectory()) throw new BadRequestException('path is not a directory');
             const contents = await this._fileService.readDirectory({
