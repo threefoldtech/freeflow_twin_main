@@ -16,6 +16,7 @@ import { KeyModule } from '../key/key.module';
 import { LocationModule } from '../location/location.module';
 import { MessageModule } from '../message/message.module';
 import { PostModule } from '../post/post.module';
+import { QuantumModule } from '../quantum/quantum.module';
 import { UserModule } from '../user/user.module';
 import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 
@@ -51,6 +52,7 @@ import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
         BlockedContactModule,
         MessageModule,
         PostModule,
+        QuantumModule,
     ],
 })
 export class AppModule {

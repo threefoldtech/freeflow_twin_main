@@ -4,7 +4,7 @@ import { Interval } from '@nestjs/schedule';
 import { FileService } from './file.service';
 
 @Injectable()
-export class FileSchedulingService {
+export class FileTasks {
     constructor(private readonly _fileService: FileService) {}
 
     @Interval(60000)
