@@ -56,7 +56,7 @@ export const getDirectoryContent = async (
 export const getDirectoryInfo = async (path: string) => {
     const params = new URLSearchParams();
     params.append('path', path);
-    return await axios.get(`${endpoint}/directories/info`, { params: params });
+    return await axios.get(`${config.baseUrl}api/v2/quantum/dir/info`, { params: params });
 };
 
 export const createDirectory = async (path: string, name: string): Promise<AxiosResponse<PathInfo>> => {
