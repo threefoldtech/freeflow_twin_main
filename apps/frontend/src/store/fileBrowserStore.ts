@@ -379,7 +379,7 @@ export const searchDir = async () => {
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
-    if (result.data.toString() === 'None') {
+    if (result.data.length <= 0) {
         searchResults.value = 'None';
         return;
     }

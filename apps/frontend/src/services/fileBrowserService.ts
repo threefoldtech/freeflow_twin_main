@@ -155,9 +155,9 @@ export const getChatsWithAttachments = async () => {
 
 export const searchDir = async (searchTerm: string, currentDir: string) => {
     const params = new URLSearchParams();
-    params.append('searchTerm', searchTerm);
-    params.append('currentDir', currentDir);
-    return await axios.get<PathInfo[]>(`${endpoint}/files/search`, { params: params });
+    params.append('search', searchTerm);
+    params.append('dir', currentDir);
+    return await axios.get<PathInfo[]>(`${config.baseUrl}api/v2/quantum/search`, { params: params });
 };
 export const copyFiles = async (paths: string[], pathToPaste: string) => {
     return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste });

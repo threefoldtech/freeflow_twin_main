@@ -118,12 +118,31 @@ export class QuantumService {
      * @param {string} obj.to - Path to rename to.
      */
     async renameFileOrDirectory({ from, to }: RenameFileDTO): Promise<void> {
+        // TODO: handle shares
         if (!this._fileService.exists({ path: from }))
             throw new BadRequestException('unable to rename file, file does not exist');
         if (this._fileService.exists({ path: to }))
             throw new BadRequestException('unable to rename file, file with that name already exists');
 
         return await this._fileService.rename({ from, to });
+    }
+
+    async search({
+        search,
+        dir,
+        files = [],
+    }: {
+        search: string;
+        dir: string;
+        files?: PathInfoDTO[];
+    }): Promise<PathInfoDTO[]> {
+        const contents = await this.getDirectoryContent({ path: dir });
+        for (const file of contents) {
+            files.push(file);
+            const stats = await this._fileService.getStats({ path: join(dir, file.fullName) });
+            if (stats.isDirectory()) files = await this.search({ search, dir: join(dir, file.fullName), files });
+        }
+        return files.filter(content => content.fullName.toLowerCase().includes(search.toLowerCase()));
     }
 
     /**

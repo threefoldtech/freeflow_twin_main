@@ -32,6 +32,13 @@ export class QuantumController {
         return await this._quantumService.getDirectoryInfo({ path: actualPath });
     }
 
+    @Get('search')
+    @UseGuards(AuthGuard)
+    async search(@Query('search') search: string, @Query('dir') dir: string): Promise<PathInfoDTO[]> {
+        const path = dir === '/' ? this.storageDir : dir;
+        return await this._quantumService.search({ search, dir: path });
+    }
+
     @Post('dir')
     @UseGuards(AuthGuard)
     async createDirectory(@Body() { path, name }: CreateDirectoryDTO): Promise<DirectoryInfoDTO> {
