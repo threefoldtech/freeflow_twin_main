@@ -119,12 +119,11 @@ const sendHandleUploadedFile = async ({
     payload: unknown;
     action: FileAction;
 }) => {
-    const data = {
+    state.socket.emit('handle_uploaded_file', {
         fileId,
         payload,
         action,
-    };
-    state.socket.emit('handle_uploaded_file', data);
+    });
 };
 
 export const useSocketActions = () => {

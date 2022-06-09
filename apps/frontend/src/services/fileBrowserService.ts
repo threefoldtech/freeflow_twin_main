@@ -5,6 +5,8 @@ import { ProgressNotification, Status } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
 import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
+import { useSocketActions } from '@/store/socketStore';
+import { FileAction } from 'custom-types/file-actions.type';
 
 const endpoint = `${config.baseUrl}api/v1/browse`;
 
@@ -79,10 +81,12 @@ export const uploadFile = async (
     file: File,
     withNotification = true
 ): Promise<AxiosResponse<PathInfo>> => {
+    const { sendHandleUploadedFile } = useSocketActions();
+
     const formData = new FormData();
-    formData.append('newFiles', file);
+    formData.append('file', file);
     formData.append('path', path);
-    let config = {
+    let cfg = {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -91,8 +95,8 @@ export const uploadFile = async (
     let notification: ProgressNotification | undefined = undefined;
     if (withNotification) {
         notification = createPercentProgressNotification('Uploading file', file.name, 0);
-        config = {
-            ...config,
+        cfg = {
+            ...cfg,
             onUploadProgress: function (progressEvent) {
                 //console.log('test', Math.round((progressEvent.loaded * 100) / progressEvent.total));
                 notification.progress = Math.round(progressEvent.loaded / progressEvent.total);
@@ -100,7 +104,7 @@ export const uploadFile = async (
         };
     }
     try {
-        const response = await axios.post<PathInfo>(`${endpoint}/files`, formData, config);
+        const response = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, cfg);
         if (withNotification && response.status >= 300) {
             notification.title = 'Upload failed';
             fail(notification);
@@ -108,6 +112,14 @@ export const uploadFile = async (
             notification.title = 'Upload Success';
             success(notification);
         }
+
+        const { data } = response;
+        if (!data.id) return;
+        sendHandleUploadedFile({
+            fileId: String(data.id),
+            payload: { filename: data.filename, path },
+            action: FileAction.ADD_TO_QUANTUM,
+        });
 
         return response;
     } catch (ex) {

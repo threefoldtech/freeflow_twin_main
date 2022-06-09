@@ -2,6 +2,7 @@ export const FileAction = {
     ADD_TO_CHAT: 'ADD_TO_CHAT',
     CHANGE_AVATAR: 'CHANGE_AVATAR',
     ADD_TO_POST: 'ADD_TO_POST',
+    ADD_TO_QUANTUM: 'ADD_TO_QUANTUM',
 };
 export type FileAction = typeof FileAction[keyof typeof FileAction];
 
@@ -21,4 +22,9 @@ export interface IChatFile {
 export interface IPostFile {
     postId: string;
     filename: string;
+}
+
+export interface IQuantumFile {
+    filename: string;
+    path: string;
 }

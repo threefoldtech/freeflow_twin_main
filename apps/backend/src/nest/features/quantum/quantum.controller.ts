@@ -5,6 +5,7 @@ import { join } from 'path';
 import { AuthGuard } from '../../guards/auth.guard';
 import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
 import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
+import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { QuantumService } from './quantum.service';
 
 @Controller('quantum')
@@ -17,14 +18,14 @@ export class QuantumController {
 
     @Get('dir/content')
     @UseGuards(AuthGuard)
-    async getDirectoryContent(@Query('path') path: string) {
+    async getDirectoryContent(@Query('path') path: string): Promise<PathInfoDTO[]> {
         const actualPath = path === '/' ? this.storageDir : path;
         return await this._quantumService.getDirectoryContent({ path: actualPath });
     }
 
     @Get('dir/info')
     @UseGuards(AuthGuard)
-    async getDirectoryInfo(@Query('path') path: string) {
+    async getDirectoryInfo(@Query('path') path: string): Promise<PathInfoDTO> {
         const actualPath = path === '/' ? this.storageDir : path;
         return await this._quantumService.getDirectoryInfo({ path: actualPath });
     }
@@ -42,7 +43,7 @@ export class QuantumController {
     }
 
     @Delete()
-    async deleteFileOrDirectory(@Query('path') path: string) {
+    async deleteFileOrDirectory(@Query('path') path: string): Promise<boolean> {
         return await this._quantumService.deleteFileOrDirectory({ path });
     }
 }

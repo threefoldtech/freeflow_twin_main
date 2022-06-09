@@ -8,8 +8,9 @@ import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
+import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
-import { ChatFileState, FileAction, FileState, PostFileState } from './file.state';
+import { ChatFileState, FileAction, FileState, PostFileState, QuantumFileState } from './file.state';
 
 @WebSocketGateway({ cors: '*' })
 export class FileGateway implements OnGatewayInit {
@@ -27,7 +28,8 @@ export class FileGateway implements OnGatewayInit {
         private readonly _locationService: LocationService,
         private readonly _keyService: KeyService,
         private readonly _chatService: ChatService,
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _quantumService: QuantumService
     ) {
         // handles files being sent in chat
         this._fileStateHandlers.set(
@@ -45,6 +47,12 @@ export class FileGateway implements OnGatewayInit {
 
         // handles files for a post
         this._fileStateHandlers.set(FileAction.ADD_TO_POST, new PostFileState(this._configService, this._fileService));
+        //
+        // handles files for quantum
+        this._fileStateHandlers.set(
+            FileAction.ADD_TO_QUANTUM,
+            new QuantumFileState(this._configService, this._fileService, this._quantumService)
+        );
     }
 
     afterInit(server: Server) {

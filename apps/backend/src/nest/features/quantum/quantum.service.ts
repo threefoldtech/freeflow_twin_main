@@ -85,6 +85,31 @@ export class QuantumService {
     }
 
     /**
+     * Creates a directory.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path to the directory.
+     * @return {PathInfoDTO} - PathInfoDTO.
+     */
+    createFileWithRetry({
+        fromPath,
+        toPath,
+        filename,
+        count = 0,
+    }: {
+        fromPath: string;
+        toPath: string;
+        filename: string;
+        count?: number;
+    }): Promise<PathInfoDTO> {
+        const path = join(toPath, filename);
+        const pathWithCount = count === 0 ? path : `${path.insert(path.lastIndexOf('.'), ` (${count})`)}`;
+        if (this._fileService.exists({ path: pathWithCount }))
+            return this.createFileWithRetry({ fromPath, toPath, filename, count: count + 1 });
+
+        this._fileService.moveFile({ from: fromPath, to: pathWithCount });
+    }
+
+    /**
      * Formats the file details to be returned to the client.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the file.

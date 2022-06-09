@@ -41,7 +41,7 @@ export class FileController {
             fieldName: 'file',
             path: 'tmp',
             limits: {
-                fileSize: Math.pow(2048, 20), // 20MB in bytes
+                fileSize: Math.pow(2048, 2) * 10, // 20MB in bytes
             },
         })
     )

@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config';
-import { IChatFile, IPostFile } from 'custom-types/file-actions.type';
+import { IChatFile, IPostFile, IQuantumFile } from 'custom-types/file-actions.type';
 import { join } from 'path';
 
 import { FileMessage, MessageType } from '../../types/message-types';
@@ -9,11 +9,13 @@ import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
+import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
 
 export enum FileAction {
     ADD_TO_CHAT = 'ADD_TO_CHAT',
     ADD_TO_POST = 'ADD_TO_POST',
+    ADD_TO_QUANTUM = 'ADD_TO_QUANTUM',
     CHANGE_AVATAR = 'CHANGE_AVATAR',
 }
 
@@ -82,13 +84,41 @@ export class PostFileState implements FileState<IPostFile> {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
-    async handle({ fileId }: { fileId: string; payload: IPostFile }) {
-        // const { postId, filename } = payload;
+    async handle({ fileId, payload }: { fileId: string; payload: IPostFile }) {
+        const { filename } = payload;
         const fromPath = `tmp/${fileId}`;
 
         try {
             this._fileService.makeDirectory({ path: this.storageDir });
-            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, fileId) });
+            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, filename) });
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
+
+        return true;
+    }
+}
+
+export class QuantumFileState implements FileState<IQuantumFile> {
+    private storageDir = '';
+
+    constructor(
+        private readonly _configService: ConfigService,
+        private readonly _fileService: FileService,
+        private readonly _quantumService: QuantumService
+    ) {
+        this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
+    }
+
+    async handle({ fileId, payload }: { fileId: string; payload: IQuantumFile }) {
+        const { filename, path } = payload;
+        const fromPath = `tmp/${fileId}`;
+        const toPath = path === '/' ? this.storageDir : path;
+
+        try {
+            this._fileService.makeDirectory({ path: toPath });
+            this._quantumService.createFileWithRetry({ fromPath, toPath, filename });
         } catch (error) {
             console.error(error);
             return false;
