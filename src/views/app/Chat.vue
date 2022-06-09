@@ -1,12 +1,16 @@
 <template>
     <app-layout>
-        <div class="relative h-full w-full grid md:customgrid">
+        <div class="relative h-full w-full md:customgrid" :class="chats.length === 0 ? '' : 'grid'">
             <ChatList v-model="showAddUserDialog" />
-            <div class="hidden w-full h-full md:grid place-items-center">
+            <div class="hidden w-full h-full md:grid place-items-center border-2">
                 <div class="text-center">
-                    <ChatAlt2Icon class="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">No chat selected</h3>
-                    <p class="mt-1 text-sm text-gray-500">Start chatting by clicking on a chat</p>
+                    <ChatAlt2Icon class="mx-auto h-16 w-16 text-gray-400" aria-hidden="true" />
+                    <h3 class="mt-2 text-base font-medium text-gray-900">
+                        {{ chats.length === 0 ? "You don't have any contacts" : 'No chat selected' }}
+                    </h3>
+                    <p v-if="chats.length > 0" class="mt-1 text-sm text-gray-500">
+                        Start chatting by clicking on a chat
+                    </p>
                     <div class="mt-6">
                         <button
                             type="button"
@@ -14,7 +18,7 @@
                             @click="showAddUserDialog = true"
                         >
                             <PlusIcon class="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                            Or start a new chat
+                            Start a new chat
                         </button>
                     </div>
                 </div>
@@ -25,13 +29,15 @@
 
 <script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, watch } from 'vue';
     import ChatList from '@/components/ChatList.vue';
     import { showAddUserDialog } from '@/services/dialogService';
     import { useLocalStorage } from '@vueuse/core';
     import { useRouter } from 'vue-router';
     import { PlusIcon } from '@heroicons/vue/solid';
     import { ChatAlt2Icon } from '@heroicons/vue/outline';
+    import { useChatsState } from '@/store/chatStore';
+
+    const { chats } = useChatsState();
 
     const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');
     const router = useRouter();

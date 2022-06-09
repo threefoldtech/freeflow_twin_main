@@ -1,5 +1,6 @@
 <template>
     <section
+        v-if="chats.length > 0"
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,
@@ -81,7 +82,7 @@
                 >
                     <div class="text-center">
                         <ChatIcon class="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No messages yet</h3>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts yet</h3>
                         <p class="mt-1 text-sm text-gray-500">Start chatting by adding a contact</p>
                         <div class="mt-6">
                             <button
@@ -144,21 +145,20 @@
                 </div>
             </div>
         </div>
-
-        <Dialog
-            :modelValue="showAddUserDialog"
-            :noActions="true"
-            @closeDialog="sendUpdate(false)"
-            @update-model-value="sendUpdate"
-        >
-            <template v-slot:title>
-                <h1>Invite someone to chat</h1>
-            </template>
-            <template v-slot:default>
-                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
-            </template>
-        </Dialog>
     </section>
+    <Dialog
+        :modelValue="showAddUserDialog"
+        :noActions="true"
+        @closeDialog="sendUpdate(false)"
+        @update-model-value="sendUpdate"
+    >
+        <template v-slot:title>
+            <h1>Invite someone to chat</h1>
+        </template>
+        <template v-slot:default>
+            <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+        </template>
+    </Dialog>
 </template>
 
 <script setup lang="ts">
