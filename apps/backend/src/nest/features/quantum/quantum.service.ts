@@ -127,6 +127,13 @@ export class QuantumService {
         return await this._fileService.rename({ from, to });
     }
 
+    /**
+     * Search in folder and subfolders.
+     * @param {Object} obj - Object.
+     * @param {string} obj.search - Search term.
+     * @param {string} obj.dir - Path to the directory.
+     * @return {PathInfoDTO[]} - PathInfoDTO[].
+     */
     async search({
         search,
         dir,

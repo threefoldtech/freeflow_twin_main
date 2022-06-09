@@ -247,6 +247,7 @@ const fetchMessages = async (
     if (lastMessageId) params.append('fromId', lastMessageId);
     params.append('limit', limit.toString());
 
+    // TODO: handle in nest
     const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/v1/messages/${chatId}`, {
         params: params,
     });
@@ -475,6 +476,7 @@ const catchErrorsSendFile = (e: { message: string }, uuid: string) => {
 export const retrySendFile = async (file: { id: string; uuid: string; chatId: string; selectedFile: File }) => {
     //When a upload fails in chat and you retry
 
+    const { sendHandleUploadedFile } = useSocketActions();
     const { id: uuid, chatId, selectedFile } = file;
 
     let formData = new FormData();
@@ -495,7 +497,7 @@ export const retrySendFile = async (file: { id: string; uuid: string; chatId: st
             cancelToken: source,
         });
 
-        await axios.post(`${config.baseUrl}api/v1/files/${chatId}/${uuid}`, formData, {
+        const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
@@ -512,6 +514,13 @@ export const retrySendFile = async (file: { id: string; uuid: string; chatId: st
                 });
             },
         });
+        if (!data.id) return false;
+        sendHandleUploadedFile({
+            fileId: String(data.id),
+            payload: { chatId, messageId: uuid, type: formData.get('type').toString(), filename: data.filename },
+            action: FileAction.ADD_TO_CHAT,
+        });
+        return true;
     } catch (e) {
         catchErrorsSendFile(e, uuid);
     }
@@ -606,6 +615,7 @@ export const useChatsState = () => {
 
 export const draftMessage = (chatId: string, message: any) => {
     getChat(chatId).draft = message;
+    // TODO: implement draft in nest
     // axios.post(`${config.baseUrl}api/v1/updateDraft`, {
     //     params: {
     //         draftMessage: message,

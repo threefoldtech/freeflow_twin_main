@@ -192,7 +192,6 @@ export class ChatService {
      * Handles a message read.
      * @param {MessateDTO} message - Message that is read.
      */
-    // TODO: Update this
     async handleMessageRead(message: MessageDTO<string>) {
         const chatId = this._messageService.determineChatID(message);
         const chat = await this.getChat(chatId);
@@ -201,9 +200,7 @@ export class ChatService {
         const newRead = chatMessages.find(m => m.id === message.body);
         const oldRead = chatMessages.find(m => m.id === chat.read[message.from]);
 
-        if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) {
-            return;
-        }
+        if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
 
         chat.read[0] = message.body;
         this._chatGateway.emitMessageToConnectedClients('message', message);

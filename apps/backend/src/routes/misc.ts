@@ -52,7 +52,6 @@ router.get('/getexternalresource', async (req: express.Request, res: express.Res
     const openIdx = resource.indexOf('[');
     const closingIdx = resource.indexOf(']');
     if (openIdx < 0 || closingIdx < 0) throw new HttpError(StatusCodes.BAD_REQUEST, 'Invalid IPv6 resource');
-    // TODO: make sure to put this back in nestjs
     // const ipv6 = resource.substring(openIdx + 1, closingIdx);
     // const myLocation = await getMyLocation();
     // const contacts = getContacts();
@@ -85,7 +84,6 @@ router.get('/getexternalresource', async (req: express.Request, res: express.Res
             res.setHeader(resp.rawHeaders[index], resp.rawHeaders[index + 1]);
             index += 2;
         }
-        // TODO: test if pipe does not put file in memory
         resp.pipe(res);
     });
 });
