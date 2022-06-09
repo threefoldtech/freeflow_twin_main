@@ -171,7 +171,7 @@ export const moveFiles = async (paths: string[], pathToPaste: string) => {
 };
 
 export const renameFile = async (oldPath: string, newPath: string) => {
-    return await axios.put<PathInfo>(`${endpoint}/files/rename`, { oldPath: oldPath, newPath: newPath });
+    return await axios.put<PathInfo>(`${config.baseUrl}api/v2/quantum/rename`, { from: oldPath, to: newPath });
 };
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
     return await axios.post<GetShareToken>(`${endpoint}/files/share`, {

@@ -3,6 +3,7 @@ import { join } from 'path';
 
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { FileService } from '../file/file.service';
+import { RenameFileDTO } from './dtos/rename-file.dto';
 
 @Injectable()
 export class QuantumService {
@@ -107,6 +108,21 @@ export class QuantumService {
             return this.createFileWithRetry({ fromPath, toPath, filename, count: count + 1 });
 
         this._fileService.moveFile({ from: fromPath, to: pathWithCount });
+    }
+
+    /**
+     * Renames a file or directory.
+     * @param {Object} obj - Object.
+     * @param {string} obj.from - Path to rename from.
+     * @param {string} obj.to - Path to rename to.
+     */
+    async renameFileOrDirectory({ from, to }: RenameFileDTO) {
+        if (!this._fileService.exists({ path: from }))
+            throw new BadRequestException('unable to rename file, file does not exist');
+        if (this._fileService.exists({ path: to }))
+            throw new BadRequestException('unable to rename file, file with that name already exists');
+
+        return await this._fileService.rename({ from, to });
     }
 
     /**

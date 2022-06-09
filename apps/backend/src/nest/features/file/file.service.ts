@@ -18,6 +18,8 @@ import {
 } from 'fs';
 import { join, parse, ParsedPath } from 'path';
 
+import { RenameFileDTO } from '../quantum/dtos/rename-file.dto';
+
 @Injectable()
 export class FileService {
     /**
@@ -152,6 +154,16 @@ export class FileService {
     getPathDetails({ path }: { path: string }): ParsedPath {
         if (!this.exists({ path })) throw new BadRequestException('unable to get path details, path does not exist');
         return parse(path);
+    }
+
+    /**
+     * Renames a file or directory.
+     * @param {Object} obj - Object.
+     * @param {string} obj.from - Path to rename from.
+     * @param {string} obj.to - Path to rename to.
+     */
+    async rename({ from, to }: RenameFileDTO): Promise<void> {
+        return await promises.rename(from, to);
     }
 
     /**

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 
@@ -7,6 +7,7 @@ import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
 import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { MoveFileDTO } from './dtos/move-file.dto';
+import { RenameFileDTO } from './dtos/rename-file.dto';
 import { QuantumService } from './quantum.service';
 
 @Controller('quantum')
@@ -46,15 +47,19 @@ export class QuantumController {
     @Post('move-files')
     @UseGuards(AuthGuard)
     async moveFiles(@Body() { paths, destination }: MoveFileDTO) {
-        return await Promise.all(
-            paths.map(async path => {
-                return await this._quantumService.createFileWithRetry({
-                    fromPath: path,
-                    toPath: destination,
-                    filename: path.split('/').pop(),
-                });
-            })
-        );
+        return paths.map(path => {
+            return this._quantumService.createFileWithRetry({
+                fromPath: path,
+                toPath: destination,
+                filename: path.split('/').pop(),
+            });
+        });
+    }
+
+    @Put('rename')
+    @UseGuards(AuthGuard)
+    async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO) {
+        return await this._quantumService.renameFileOrDirectory({ from, to: join(this.storageDir, to) });
     }
 
     @Delete()
