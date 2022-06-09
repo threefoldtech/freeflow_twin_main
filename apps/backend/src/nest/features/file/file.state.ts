@@ -118,7 +118,7 @@ export class QuantumFileState implements FileState<IQuantumFile> {
 
         try {
             this._fileService.makeDirectory({ path: toPath });
-            this._quantumService.createFileWithRetry({ fromPath, toPath, filename });
+            await this._quantumService.createFileWithRetry({ fromPath, toPath, filename });
         } catch (error) {
             console.error(error);
             return false;

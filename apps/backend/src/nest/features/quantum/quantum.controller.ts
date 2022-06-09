@@ -6,6 +6,7 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
 import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
+import { MoveFileDTO } from './dtos/move-file.dto';
 import { QuantumService } from './quantum.service';
 
 @Controller('quantum')
@@ -40,6 +41,20 @@ export class QuantumController {
             name: details.name,
             isDirectory: true,
         } as DirectoryInfoDTO;
+    }
+
+    @Post('move-files')
+    @UseGuards(AuthGuard)
+    async moveFiles(@Body() { paths, destination }: MoveFileDTO) {
+        return await Promise.all(
+            paths.map(async path => {
+                return await this._quantumService.createFileWithRetry({
+                    fromPath: path,
+                    toPath: destination,
+                    filename: path.split('/').pop(),
+                });
+            })
+        );
     }
 
     @Delete()

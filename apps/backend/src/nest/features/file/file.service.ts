@@ -82,8 +82,8 @@ export class FileService {
         if (!this.exists({ path: from })) throw new BadRequestException('file does not exist');
         copyFile(from, to, err => {
             if (err) throw err;
+            this.deleteFile({ path: from });
         });
-        this.deleteFile({ path: from });
         return true;
     }
 
