@@ -19,7 +19,7 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
         location = `${window.location.origin}${locationApiEndpoint}`;
     } else {
         location = calcExternalResourceLink(
-            `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
+            `https://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
     try {

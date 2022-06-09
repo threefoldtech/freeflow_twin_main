@@ -42,7 +42,7 @@ export const getImage = () => {
 
 export const getAvatar = async () => {
     const myLocation = await getMyLocation();
-    return `http://[${myLocation}]/api/v1/user/avatar/${image}`;
+    return `https://[${myLocation}]/api/v1/user/avatar/${image}`;
 };
 
 export const getData = () => {

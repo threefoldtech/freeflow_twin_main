@@ -1041,7 +1041,7 @@ export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, sh
         location = `${window.location.origin}${locationApiEndpoint}`;
     } else {
         location = calcExternalResourceLink(
-            `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
+            `https://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
     // TODO: url encoding

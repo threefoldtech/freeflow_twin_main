@@ -199,7 +199,7 @@ export const getFileAccessDetails = async (
     path: string,
     attachments: boolean
 ) => {
-    let externalUrl = `http://[${owner.location}]`;
+    let externalUrl = `https://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
     path = encodeURIComponent(path);
@@ -218,7 +218,7 @@ export const getSharedFolderContent = async (
     _userId: string,
     path: string
 ) => {
-    let externalUrl = `http://[${owner.location}]`;
+    let externalUrl = `https://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
     let apiEndPointToCall = `/api/v1/browse/share/${shareId}/folder?path=${path}`;
