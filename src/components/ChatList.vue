@@ -1,5 +1,6 @@
 <template>
     <section
+        v-if="chats.length > 0"
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,
@@ -144,21 +145,20 @@
                 </div>
             </div>
         </div>
-
-        <Dialog
-            :modelValue="showAddUserDialog"
-            :noActions="true"
-            @closeDialog="sendUpdate(false)"
-            @update-model-value="sendUpdate"
-        >
-            <template v-slot:title>
-                <h1>Invite someone to chat</h1>
-            </template>
-            <template v-slot:default>
-                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
-            </template>
-        </Dialog>
     </section>
+    <Dialog
+        :modelValue="showAddUserDialog"
+        :noActions="true"
+        @closeDialog="sendUpdate(false)"
+        @update-model-value="sendUpdate"
+    >
+        <template v-slot:title>
+            <h1>Invite someone to chat</h1>
+        </template>
+        <template v-slot:default>
+            <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+        </template>
+    </Dialog>
 </template>
 
 <script setup lang="ts">
