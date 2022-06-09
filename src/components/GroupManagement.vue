@@ -249,6 +249,8 @@
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
 
+    const { updateContactsInGroup } = usechatsActions();
+
     interface IProps {
         chat: Chat;
     }
@@ -306,11 +308,10 @@
     };
 
     const doChangeUserRole = () => {
-        const { updateContactsInGroup } = usechatsActions();
+        const isModerator = selectedUser.value.roles.includes(Roles.MODERATOR);
 
-        if (selectedUser.value.roles.includes(Roles.MODERATOR)) {
-            selectedUser.value.roles.pop();
-        } else selectedUser.value.roles.push(Roles.MODERATOR);
+        if (isModerator) selectedUser.value.roles.pop();
+        if (!isModerator) selectedUser.value.roles.push(Roles.MODERATOR);
 
         updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.CHANGE_USER_ROLE);
         showChangeUserRoleDialog.value = false;
@@ -322,13 +323,11 @@
         selectedUser.value = contact;
     };
     const doRemoveFromGroup = () => {
-        const { updateContactsInGroup } = usechatsActions();
         updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
         selectedUser.value = null;
     };
     const addToGroup = contact => {
-        const { updateContactsInGroup } = usechatsActions();
         //@ts-ignore
         updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
