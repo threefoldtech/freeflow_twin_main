@@ -46,19 +46,20 @@ export class QuantumController {
 
     @Post('move-files')
     @UseGuards(AuthGuard)
-    async moveFiles(@Body() { paths, destination }: MoveFileDTO) {
-        return paths.map(path => {
-            return this._quantumService.createFileWithRetry({
+    moveFiles(@Body() { paths, destination }: MoveFileDTO): boolean {
+        paths.map(path => {
+            this._quantumService.createFileWithRetry({
                 fromPath: path,
                 toPath: destination,
-                filename: path.split('/').pop(),
+                name: path.split('/').pop(),
             });
         });
+        return true;
     }
 
     @Put('rename')
     @UseGuards(AuthGuard)
-    async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO) {
+    async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO): Promise<void> {
         return await this._quantumService.renameFileOrDirectory({ from, to: join(this.storageDir, to) });
     }
 

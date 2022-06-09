@@ -112,13 +112,13 @@ export class QuantumFileState implements FileState<IQuantumFile> {
     }
 
     async handle({ fileId, payload }: { fileId: string; payload: IQuantumFile }) {
-        const { filename, path } = payload;
+        const { filename: name, path } = payload;
         const fromPath = `tmp/${fileId}`;
         const toPath = path === '/' ? this.storageDir : path;
 
         try {
             this._fileService.makeDirectory({ path: toPath });
-            await this._quantumService.createFileWithRetry({ fromPath, toPath, filename });
+            this._quantumService.createFileWithRetry({ fromPath, toPath, name });
         } catch (error) {
             console.error(error);
             return false;

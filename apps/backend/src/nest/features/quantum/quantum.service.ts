@@ -86,26 +86,27 @@ export class QuantumService {
     }
 
     /**
-     * Creates a directory.
+     * Creates a file.
      * @param {Object} obj - Object.
-     * @param {string} obj.path - Path to the directory.
-     * @return {PathInfoDTO} - PathInfoDTO.
+     * @param {string} obj.fromPath - From path.
+     * @param {string} obj.toPath - To path.
+     * @param {string} obj.name - Name.
      */
     createFileWithRetry({
         fromPath,
         toPath,
-        filename,
+        name,
         count = 0,
     }: {
         fromPath: string;
         toPath: string;
-        filename: string;
+        name: string;
         count?: number;
-    }): Promise<PathInfoDTO> {
-        const path = join(toPath, filename);
+    }): void {
+        const path = join(toPath, name);
         const pathWithCount = count === 0 ? path : `${path.insert(path.lastIndexOf('.'), ` (${count})`)}`;
         if (this._fileService.exists({ path: pathWithCount }))
-            return this.createFileWithRetry({ fromPath, toPath, filename, count: count + 1 });
+            return this.createFileWithRetry({ fromPath, toPath, name, count: count + 1 });
 
         this._fileService.moveFile({ from: fromPath, to: pathWithCount });
     }
@@ -116,7 +117,7 @@ export class QuantumService {
      * @param {string} obj.from - Path to rename from.
      * @param {string} obj.to - Path to rename to.
      */
-    async renameFileOrDirectory({ from, to }: RenameFileDTO) {
+    async renameFileOrDirectory({ from, to }: RenameFileDTO): Promise<void> {
         if (!this._fileService.exists({ path: from }))
             throw new BadRequestException('unable to rename file, file does not exist');
         if (this._fileService.exists({ path: to }))
