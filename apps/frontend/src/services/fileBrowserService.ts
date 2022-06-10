@@ -192,9 +192,7 @@ export const removeFilePermissions = async (userId: string, path: string, locati
 };
 
 export const getShared = async (shareStatus: string) => {
-    const params = new URLSearchParams();
-    params.append('shareStatus', shareStatus);
-    return await axios.get<SharedFileInterface[]>(`${endpoint}/files/getShares`, { params: params });
+    return await axios.get<SharedFileInterface[]>(`${config.baseUrl}api/v2/quantum/shares/shared-with-me`);
 };
 export const getShareWithId = async (id: string) => {
     const params = new URLSearchParams();

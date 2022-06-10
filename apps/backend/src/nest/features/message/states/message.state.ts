@@ -78,9 +78,10 @@ export class FileMessageState implements MessageState<FileMessage> {
 }
 
 export class FileShareMessageState implements MessageState<FileMessage> {
-    constructor(private readonly _messageService: MessageService) {}
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
     async handle({ message }: { message: MessageDTO<FileMessage>; chat?: Chat }): Promise<Message> {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
         return await this._messageService.createMessage(message);
     }
 }

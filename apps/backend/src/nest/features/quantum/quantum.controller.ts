@@ -9,6 +9,7 @@ import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { MoveFileDTO } from './dtos/move-file.dto';
 import { RenameFileDTO } from './dtos/rename-file.dto';
 import { ShareFileRequesDTO } from './dtos/share-file.dto';
+import { IFileShare } from './interfaces/file-share.interface';
 import { QuantumService } from './quantum.service';
 
 @Controller('quantum')
@@ -75,5 +76,11 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO): Promise<void> {
         return await this._quantumService.renameFileOrDirectory({ from, to: join(this.storageDir, to) });
+    }
+
+    @Get('shares/shared-with-me')
+    @UseGuards(AuthGuard)
+    async getSharedWithMe(): Promise<IFileShare[]> {
+        return await this._quantumService.getSharedWithMe();
     }
 }

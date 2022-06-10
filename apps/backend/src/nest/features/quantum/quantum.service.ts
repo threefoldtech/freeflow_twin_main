@@ -165,6 +165,15 @@ export class QuantumService {
         return files.filter(content => content.fullName.toLowerCase().includes(search.toLowerCase()));
     }
 
+    /**
+     * Shares a file with a contact.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path to the file.
+     * @param {boolean} obj.isPublic - Public share.
+     * @param {boolean} obj.isWritable - Whether the share is writtable.
+     * @param {string} obj.userId - User Id to share file with.
+     * @param {string} obj.filename - Share filename.
+     */
     async shareFile({ path, isPublic, isWritable, userId: shareWith, filename }: ShareFileRequesDTO): Promise<boolean> {
         if (isWritable && isPublic) throw new BadRequestException('cannot share file as public and writable');
 
@@ -228,6 +237,18 @@ export class QuantumService {
     }
 
     /**
+     * Get shares that have been shared with the user.
+     * @return {IFileShare[]} - File shares.
+     */
+    async getSharedWithMe(): Promise<IFileShare[]> {
+        try {
+            return (await this._shareRepository.getSharedWithMe()).map(s => s.toJSON());
+        } catch {
+            return [];
+        }
+    }
+
+    /**
      * Formats the file details to be returned to the client.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the file.
@@ -258,6 +279,11 @@ export class QuantumService {
         }
     }
 
+    /**
+     * Creates a new file share.
+     * @param {CreateFileShareDTO} dto - Creation object.
+     * @return {IFileShare} - File share.
+     */
     private async createFileShare({
         id,
         path,
@@ -290,6 +316,12 @@ export class QuantumService {
         }
     }
 
+    /**
+     * Updates an existing file share.
+     * @param {Share} existingShare - Share to update.
+     * @param {CreateFileShareDTO} dto - Creation object.
+     * @return {IFileShare} - Updated file share.
+     */
     private async updateShare(
         existingShare: Share,
         { path, owner, name, isFolder, isSharedWithMe, permissions, size, lastModified }: CreateFileShareDTO

@@ -51,6 +51,10 @@ export class ShareRedisRepository extends EntityRepository<Share> {
         return await this.findAllWhereEq({ where: 'isSharedWithMe', eq: false });
     }
 
+    async getSharedWithMe(): Promise<Share[]> {
+        return await this.findAllWhereEq({ where: 'isSharedWithMe', eq: true });
+    }
+
     /**
      * Gets a share by its Id.
      * @param {string} id - Share Id.
