@@ -65,6 +65,15 @@ export class ShareRedisRepository extends EntityRepository<Share> {
     }
 
     /**
+     * Gets a share that has been shared with the user by its Id.
+     * @param {string} id - Share Id.
+     * @return {Chat} - Found share.
+     */
+    async getSharedWithMeById({ id }: { id: string }): Promise<Share> {
+        return await this.findOneAnd({ where: 'id', eq: id, and: 'isSharedWithMe', andEq: true });
+    }
+
+    /**
      * Gets a share by its path.
      * @param {string} path - Share path.
      * @return {Chat} - Found share.

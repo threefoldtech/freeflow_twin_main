@@ -83,4 +83,10 @@ export class QuantumController {
     async getSharedWithMe(): Promise<IFileShare[]> {
         return await this._quantumService.getSharedWithMe();
     }
+
+    @Get('share')
+    @UseGuards(AuthGuard)
+    async getShareById(@Query('id') id: string): Promise<IFileShare> {
+        return await this._quantumService.getShareById({ id });
+    }
 }

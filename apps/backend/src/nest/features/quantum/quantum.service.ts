@@ -248,6 +248,14 @@ export class QuantumService {
         }
     }
 
+    async getShareById({ id }: { id: string }): Promise<IFileShare> {
+        try {
+            return (await this._shareRepository.getSharedWithMeById({ id })).toJSON();
+        } catch (error) {
+            throw new BadRequestException('share does not exist');
+        }
+    }
+
     /**
      * Formats the file details to be returned to the client.
      * @param {Object} obj - Object.
