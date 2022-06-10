@@ -138,7 +138,7 @@ export const deleteFile = async (path: string) => {
     return await axios.delete<PathInfo>(`${config.baseUrl}api/v2/quantum?path=${path}`);
 };
 
-export const downloadFileEndpoint = `${endpoint}/files`;
+export const downloadFileEndpoint = `${config.baseUrl}api/v2/files/download/compressed`;
 export const getDownloadFileEndpoint = (path: string) => {
     return `${downloadFileEndpoint}?path=${path}`;
 };

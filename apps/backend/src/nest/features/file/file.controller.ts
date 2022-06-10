@@ -4,13 +4,16 @@ import {
     Get,
     Param,
     Post,
+    Query,
+    Req,
     StreamableFile,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createReadStream } from 'fs-extra';
+import { Request } from 'express';
+import { createReadStream } from 'fs';
 import { join } from 'path';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -32,6 +35,29 @@ export class FileController {
             throw new BadRequestException('please provide a valid file id');
 
         return new StreamableFile(createReadStream(path));
+    }
+
+    @Get('download/compressed')
+    @UseGuards(AuthGuard)
+    async downloadFilesCompressed(@Req() req: Request, @Query('path') path: string) {
+        try {
+            const stats = await this._fileService.getStats({ path });
+            if (!stats.isDirectory()) return new StreamableFile(createReadStream(path));
+
+            const contents = this._fileService.readdirSync({ path });
+            const paths = contents.map(file => join(path, '/', file));
+            const zip = this._fileService.compressFiles({ paths }).toBuffer();
+            if (req.res) {
+                req.res.set({
+                    'Content-Type': 'application/octet-stream',
+                    'Content-Disposition': 'attachment; filename="files.zip"',
+                    'Content-Length': zip.length.toString(),
+                });
+                req.res.send(zip);
+            }
+        } catch (error) {
+            throw new BadRequestException('unable to download file(s)');
+        }
     }
 
     @Post('upload')

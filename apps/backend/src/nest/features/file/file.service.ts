@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import AdmZip from 'adm-zip';
 import {
     copyFile,
     Dirent,
@@ -9,6 +10,7 @@ import {
     openSync,
     promises,
     readdir,
+    readdirSync,
     readFileSync,
     rmdirSync,
     Stats,
@@ -140,9 +142,9 @@ export class FileService {
      * @param {string} obj.path - Path.
      * @return {Stats} stats.
      */
-    getStats({ path }: { path: string }): Promise<Stats> {
+    async getStats({ path }: { path: string }): Promise<Stats> {
         if (!this.exists({ path })) throw new BadRequestException('unable to get stats, path does not exist');
-        return promises.lstat(path);
+        return await promises.lstat(path);
     }
 
     /**
@@ -164,6 +166,30 @@ export class FileService {
      */
     async rename({ from, to }: RenameFileDTO): Promise<void> {
         return await promises.rename(from, to);
+    }
+
+    /**
+     * Compresses files given their paths.
+     * @param {Object} obj - Object.
+     * @param {string} obj.paths - Paths to compress.
+     * @return {AdmZip} compressed files in zip.
+     */
+    compressFiles({ paths }: { paths: string[] }): AdmZip {
+        const zip = new AdmZip();
+        paths.forEach(path => {
+            zip.addLocalFile(path);
+        });
+        return zip;
+    }
+
+    /**
+     * Reads a directory and returns an array of file names.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path.
+     * @return {string[]} file names.
+     */
+    readdirSync({ path }: { path: string }): string[] {
+        return readdirSync(path);
     }
 
     /**
