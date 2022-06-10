@@ -1,4 +1,4 @@
-import { Chat, GroupContact, Id, Message, Roles } from '@/types';
+import { Chat, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
