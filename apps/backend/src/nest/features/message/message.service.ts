@@ -54,7 +54,12 @@ export class MessageService {
         }
     }
 
-    async deleteMessagesFromChat(chatId: string) {
+    /**
+     * Deletes messages from given chat Id.
+     * @param {Object} obj - Object.
+     * @param {string} obj.chatId - Chat Id to delete messages from.
+     */
+    async deleteMessagesFromChat({ chatId }: { chatId: string }): Promise<void> {
         try {
             return await this._messageRepo.deleteMessagesFromChat(chatId);
         } catch (error) {

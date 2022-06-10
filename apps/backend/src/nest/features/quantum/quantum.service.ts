@@ -1,13 +1,40 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 
+import { IFileShareMessage, MessageType } from '../../types/message-types';
+import { uuidv4 } from '../../utils/uuid';
+import { ApiService } from '../api/api.service';
+import { ChatGateway } from '../chat/chat.gateway';
+import { ChatService } from '../chat/chat.service';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { FileService } from '../file/file.service';
+import { KeyService } from '../key/key.service';
+import { LocationService } from '../location/location.service';
+import { MessageDTO } from '../message/dtos/message.dto';
+import { MessageService } from '../message/message.service';
 import { RenameFileDTO } from './dtos/rename-file.dto';
+import { CreateFileShareDTO, ShareFileRequesDTO } from './dtos/share-file.dto';
+import { SharePermissionType } from './enums/share-permission-type.enum';
+import { IFileShare } from './interfaces/file-share.interface';
+import { ISharePermission } from './interfaces/share-permission.interface';
 
 @Injectable()
 export class QuantumService {
-    constructor(private readonly _fileService: FileService) {}
+    private userId: string;
+
+    constructor(
+        private readonly _configService: ConfigService,
+        private readonly _messageService: MessageService,
+        private readonly _fileService: FileService,
+        private readonly _locationService: LocationService,
+        private readonly _keyService: KeyService,
+        private readonly _apiService: ApiService,
+        private readonly _chatService: ChatService,
+        private readonly _chatGateway: ChatGateway
+    ) {
+        this.userId = this._configService.get<string>('userId');
+    }
 
     /**
      * Get the contents of a directory by given path.
@@ -135,6 +162,59 @@ export class QuantumService {
         return files.filter(content => content.fullName.toLowerCase().includes(search.toLowerCase()));
     }
 
+    async shareFile({ path, isPublic, isWritable, userId: shareWith, filename }: ShareFileRequesDTO): Promise<boolean> {
+        if (isWritable && isPublic) throw new BadRequestException('cannot share file as public and writable');
+
+        const chat = await this._chatService.getChat(shareWith);
+
+        const sharePermissionTypes = [SharePermissionType.READ];
+        if (isWritable) sharePermissionTypes.push(SharePermissionType.WRITE);
+        const sharePermissions: ISharePermission[] = [{ userId: shareWith, sharePermissionTypes }];
+
+        const pathStats = await this._fileService.getStats({ path });
+
+        const myLocation = await this._locationService.getOwnLocation();
+        const me = {
+            id: this.userId,
+            location: myLocation as string,
+        };
+        const share = await this.createFileShare({
+            path,
+            owner: me,
+            name: filename,
+            isFolder: pathStats.isDirectory(),
+            permissions: sharePermissions,
+            size: pathStats.size,
+            lastModified: pathStats.mtime.getTime(),
+        });
+
+        const msg: MessageDTO<IFileShareMessage> = {
+            id: uuidv4(),
+            chatId: chat.chatId,
+            from: this.userId,
+            to: shareWith,
+            body: share,
+            timeStamp: new Date(),
+            type: MessageType.FILE_SHARE,
+            subject: null,
+            signatures: [],
+            replies: [],
+        };
+        const signedMsg = await this._keyService.appendSignatureToMessage({ message: msg });
+        await this._messageService.createMessage(signedMsg);
+
+        chat.parseContacts()
+            .filter(c => c.id !== this.userId)
+            .forEach(contact => {
+                // TODO: check existing share permissions
+                this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
+            });
+
+        this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
+
+        return true;
+    }
+
     /**
      * Formats the file details to be returned to the client.
      * @param {Object} obj - Object.
@@ -164,5 +244,30 @@ export class QuantumService {
         } catch (error) {
             throw new BadRequestException(`unable to get file details: ${error}`);
         }
+    }
+
+    private async createFileShare({
+        id,
+        path,
+        owner,
+        name,
+        isFolder,
+        permissions,
+        size,
+        lastModified,
+    }: CreateFileShareDTO): Promise<IFileShare> {
+        // TODO: handle existing share
+        // TODO: persist share in db
+        if (!id) id = uuidv4();
+        return {
+            id,
+            path,
+            owner,
+            name,
+            isFolder,
+            permissions,
+            size,
+            lastModified,
+        };
     }
 }

@@ -7,6 +7,8 @@ import { LocationResponse } from './types/responses';
 
 @Injectable()
 export class LocationService {
+    private location = '';
+
     constructor(
         private readonly _encryptionService: EncryptionService,
         private readonly _apiService: ApiService,
@@ -37,8 +39,9 @@ export class LocationService {
      * @return {string} - Own address.
      * @return {Error} - Error.
      */
-    getOwnLocation(): Promise<string | Error> {
-        return this._yggdrasilService.getSelf();
+    async getOwnLocation(): Promise<string | Error> {
+        if (this.location === '') this.location = (await this._yggdrasilService.getSelf()) as string;
+        return this.location;
     }
 
     /**

@@ -165,7 +165,7 @@ export class ChatService {
         const chatToDelete = await this.getChat(chatId);
         if (chatToDelete)
             try {
-                await this._messageService.deleteMessagesFromChat(chatId);
+                await this._messageService.deleteMessagesFromChat({ chatId });
                 await this._chatRepository.deleteChat(chatToDelete.entityId);
             } catch (error) {
                 throw new InternalServerErrorException(`unable to delete chat: ${error}`);

@@ -8,6 +8,7 @@ import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { MoveFileDTO } from './dtos/move-file.dto';
 import { RenameFileDTO } from './dtos/rename-file.dto';
+import { ShareFileRequesDTO } from './dtos/share-file.dto';
 import { QuantumService } from './quantum.service';
 
 @Controller('quantum')
@@ -62,6 +63,12 @@ export class QuantumController {
             });
         });
         return true;
+    }
+
+    @Post('share')
+    @UseGuards(AuthGuard)
+    async shareFile(@Body() shareFileDTO: ShareFileRequesDTO) {
+        return await this._quantumService.shareFile(shareFileDTO);
     }
 
     @Put('rename')
