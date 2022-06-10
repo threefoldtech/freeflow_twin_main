@@ -77,6 +77,14 @@ export class FileMessageState implements MessageState<FileMessage> {
     }
 }
 
+export class FileShareMessageState implements MessageState<FileMessage> {
+    constructor(private readonly _messageService: MessageService) {}
+
+    async handle({ message }: { message: MessageDTO<FileMessage>; chat?: Chat }): Promise<Message> {
+        return await this._messageService.createMessage(message);
+    }
+}
+
 export class SystemMessageState implements MessageState<SystemMessage> {
     private _subSystemMessageStateHandlers = new Map<SystemMessageType, SubSystemMessageState>();
 
