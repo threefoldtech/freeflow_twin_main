@@ -1,6 +1,7 @@
 import {
     BadRequestException,
     Controller,
+    Delete,
     Get,
     Param,
     Post,
@@ -39,7 +40,7 @@ export class FileController {
 
     @Get('download/compressed')
     @UseGuards(AuthGuard)
-    async downloadFilesCompressed(@Req() req: Request, @Query('path') path: string) {
+    async downloadFilesCompressed(@Req() req: Request, @Query('path') path: string): Promise<StreamableFile> {
         try {
             const stats = await this._fileService.getStats({ path });
             if (!stats.isDirectory()) return new StreamableFile(createReadStream(path));
@@ -60,6 +61,18 @@ export class FileController {
         }
     }
 
+    @Delete()
+    @UseGuards(AuthGuard)
+    async deleteFileOrFolder(@Query('path') path: string): Promise<boolean> {
+        try {
+            const stats = await this._fileService.getStats({ path });
+            if (stats.isDirectory()) return this._fileService.deleteDirectory({ path });
+            return this._fileService.deleteFile({ path });
+        } catch (error) {
+            throw new BadRequestException(`unable to get delete file or folder: ${error}`);
+        }
+    }
+
     @Post('upload')
     @UseGuards(AuthGuard)
     @UseInterceptors(
@@ -71,7 +84,7 @@ export class FileController {
             },
         })
     )
-    async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    async uploadFile(@UploadedFile() file: Express.Multer.File): Promise<{ id: string; filename: string }> {
         if (!file) throw new BadRequestException('please provide a valid file');
         return { id: file.filename, filename: file.originalname };
     }

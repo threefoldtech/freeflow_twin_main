@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 
@@ -68,10 +68,5 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO): Promise<void> {
         return await this._quantumService.renameFileOrDirectory({ from, to: join(this.storageDir, to) });
-    }
-
-    @Delete()
-    async deleteFileOrDirectory(@Query('path') path: string): Promise<boolean> {
-        return await this._quantumService.deleteFileOrDirectory({ path });
     }
 }

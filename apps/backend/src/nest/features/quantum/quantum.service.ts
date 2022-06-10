@@ -54,23 +54,6 @@ export class QuantumService {
     }
 
     /**
-     * Deletes a file or directory.
-     * @param {Object} obj - Object.
-     * @param {string} obj.path - Path to the file or directory.
-     * @return {boolean} - True if the file or directory was deleted.
-     */
-    async deleteFileOrDirectory({ path }: { path: string }): Promise<boolean> {
-        // TODO: remove share
-        try {
-            const stats = await this._fileService.getStats({ path });
-            if (stats.isDirectory()) return this._fileService.deleteDirectory({ path });
-            return this._fileService.deleteFile({ path });
-        } catch (error) {
-            throw new BadRequestException(`unable to get delete file or folder: ${error}`);
-        }
-    }
-
-    /**
      * Creates a directory.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to the directory.
