@@ -53,18 +53,15 @@ export class ApiService {
         try {
             return await axios.put(`http://[${location}]/api/v2/messages`, message, {
                 responseType: responseType || 'json',
+                timeout: 5000,
             });
-        } catch (error) {
-            throw new BadRequestException(`unable to send message: ${error}`);
-        }
+        } catch {}
     }
 
     async sendStatusUpdate({ location, status }: { location: string; status: IStatusUpdate }) {
         try {
-            return await axios.put(`http://[${location}]/api/v2/user/update-status`, status);
-        } catch (error) {
-            throw new BadRequestException(`unable to update status: ${error}`);
-        }
+            return await axios.put(`http://[${location}]/api/v2/user/update-status`, status, { timeout: 5000 });
+        } catch {}
     }
 
     /**

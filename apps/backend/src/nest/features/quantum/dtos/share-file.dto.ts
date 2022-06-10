@@ -38,6 +38,9 @@ export class CreateFileShareDTO {
     @IsBoolean()
     isFolder: boolean;
 
+    @IsBoolean()
+    isSharedWithMe: boolean;
+
     @IsOptional()
     @IsNumber()
     size?: number | undefined;

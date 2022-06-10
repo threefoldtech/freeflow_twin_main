@@ -10,6 +10,7 @@ export interface Share {
     owner: string;
     name?: string | undefined;
     isFolder: boolean;
+    isSharedWithMe: boolean;
     size?: number | undefined;
     lastModified?: number | undefined;
     permissions: string[];
@@ -23,6 +24,7 @@ export class Share extends Entity {
             owner: this.parseOwner(),
             name: this.name,
             isFolder: this.isFolder,
+            isSharedWithMe: this.isSharedWithMe,
             size: this.size,
             lastModified: this.lastModified,
             permissions: this.parsePermissions(),
@@ -49,6 +51,7 @@ export const shareSchema = new Schema(Share, {
     owner: { type: 'string' },
     name: { type: 'string' },
     isFolder: { type: 'boolean' },
+    isSharedWithMe: { type: 'boolean' },
     size: { type: 'number' },
     lastModified: { type: 'number' },
     permissions: { type: 'string[]' },

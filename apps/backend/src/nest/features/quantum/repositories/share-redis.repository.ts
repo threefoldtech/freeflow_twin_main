@@ -17,6 +17,7 @@ export class ShareRedisRepository extends EntityRepository<Share> {
      * @param {string} obj.path - Path of the share.
      * @param {ContactDTO} obj.owner - Owner of the share.
      * @param {boolean} obj.isFolder - Whether the share is a folder or a file.
+     * @param {boolean} obj.isSharedWithMe - Whether the share is shared with me.
      * @param {number} obj.size - Size of the share.
      * @param {number} obj.lastModified - Last modified date of the share.
      * @param {ISharePermission[]} obj.permissions - Permissions of the share.
@@ -28,6 +29,7 @@ export class ShareRedisRepository extends EntityRepository<Share> {
         owner,
         name,
         isFolder,
+        isSharedWithMe,
         size,
         lastModified,
         permissions,
@@ -38,9 +40,37 @@ export class ShareRedisRepository extends EntityRepository<Share> {
             owner: stringifyOwner(owner),
             name,
             isFolder,
+            isSharedWithMe,
             size,
             lastModified,
             permissions: stringifyPermissions(permissions),
         });
+    }
+
+    async getMyShares(): Promise<Share[]> {
+        return await this.findAllWhereEq({ where: 'isSharedWithMe', eq: false });
+    }
+
+    /**
+     * Gets a share by its Id.
+     * @param {string} id - Share Id.
+     * @return {Chat} - Found share.
+     */
+    async getShareById({ id }: { id: string }): Promise<Share> {
+        return await this.findOne({ where: 'id', eq: id });
+    }
+
+    /**
+     * Gets a share by its path.
+     * @param {string} path - Share path.
+     * @return {Chat} - Found share.
+     */
+    async getShareByPath({ path }: { path: string }): Promise<Share> {
+        return await this.findOneAnd({ where: 'path', eq: path, and: 'isSharedWithMe', andEq: false });
+    }
+
+    async updateShare({ share }: { share: Share }): Promise<Share> {
+        await this.update(share);
+        return share;
     }
 }

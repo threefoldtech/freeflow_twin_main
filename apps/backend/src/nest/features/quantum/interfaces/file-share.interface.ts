@@ -7,6 +7,7 @@ export interface IFileShare {
     owner: ContactDTO;
     name?: string | undefined;
     isFolder: boolean;
+    isSharedWithMe: boolean;
     size?: number | undefined;
     lastModified?: number | undefined;
     permissions: ISharePermission[];

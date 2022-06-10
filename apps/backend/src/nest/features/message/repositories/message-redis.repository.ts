@@ -78,4 +78,10 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         const messages = await this.findAllWhereEq({ where: 'chatId', eq: chatId });
         messages.forEach(m => this.delete(m.entityId));
     }
+
+    async deleteMessage({ id }: { id: string }): Promise<boolean> {
+        const message = await this.findOne({ where: 'id', eq: id });
+        await this.delete(message.entityId);
+        return true;
+    }
 }

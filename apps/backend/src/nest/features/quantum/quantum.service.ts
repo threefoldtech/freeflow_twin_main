@@ -18,6 +18,7 @@ import { CreateFileShareDTO, ShareFileRequesDTO } from './dtos/share-file.dto';
 import { SharePermissionType } from './enums/share-permission-type.enum';
 import { IFileShare } from './interfaces/file-share.interface';
 import { ISharePermission } from './interfaces/share-permission.interface';
+import { Share, stringifyOwner, stringifyPermissions } from './models/share.model';
 import { ShareRedisRepository } from './repositories/share-redis.repository';
 
 @Injectable()
@@ -181,15 +182,21 @@ export class QuantumService {
             location: myLocation as string,
         };
 
-        const share = await this.createFileShare({
+        const creationData = {
             path,
             owner: me,
             name: filename,
             isFolder: pathStats.isDirectory(),
+            isSharedWithMe: false,
             permissions: sharePermissions,
             size: pathStats.size,
             lastModified: pathStats.mtime.getTime(),
-        });
+        };
+
+        let share;
+        const existingShare = await this._shareRepository.getShareByPath({ path });
+        if (existingShare?.id) share = await this.updateShare(existingShare, { ...creationData });
+        else share = await this.createFileShare(creationData);
 
         const msg: MessageDTO<IFileShareMessage> = {
             id: uuidv4(),
@@ -204,14 +211,16 @@ export class QuantumService {
             replies: [],
         };
         const signedMsg = await this._keyService.appendSignatureToMessage({ message: msg });
+
         await this._messageService.createMessage(signedMsg);
 
-        chat.parseContacts()
-            .filter(c => c.id !== this.userId)
-            .forEach(contact => {
-                // TODO: check existing share permissions
-                this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
-            });
+        const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
+
+        for (const contact of contacts) {
+            const permission = existingShare?.parsePermissions().find(p => p.userId === contact.id);
+            if (permission?.sharePermissionTypes.length === sharePermissionTypes.length) continue;
+            this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
+        }
 
         this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
 
@@ -255,6 +264,7 @@ export class QuantumService {
         owner,
         name,
         isFolder,
+        isSharedWithMe,
         permissions,
         size,
         lastModified,
@@ -269,6 +279,7 @@ export class QuantumService {
                     owner,
                     name,
                     isFolder,
+                    isSharedWithMe,
                     size,
                     lastModified,
                     permissions,
@@ -277,5 +288,20 @@ export class QuantumService {
         } catch (error) {
             throw new BadRequestException(`unable to save file share to database: ${error}`);
         }
+    }
+
+    private async updateShare(
+        existingShare: Share,
+        { path, owner, name, isFolder, isSharedWithMe, permissions, size, lastModified }: CreateFileShareDTO
+    ): Promise<IFileShare> {
+        existingShare.path = path;
+        existingShare.owner = stringifyOwner(owner);
+        existingShare.name = name;
+        existingShare.isFolder = isFolder;
+        existingShare.isSharedWithMe = isSharedWithMe;
+        existingShare.permissions = stringifyPermissions(permissions);
+        existingShare.size = size;
+        existingShare.lastModified = lastModified;
+        return (await this._shareRepository.updateShare({ share: existingShare })).toJSON();
     }
 }

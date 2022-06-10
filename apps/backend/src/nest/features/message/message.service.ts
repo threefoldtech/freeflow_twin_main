@@ -67,6 +67,14 @@ export class MessageService {
         }
     }
 
+    async deleteMessage({ messageId }: { messageId: string }): Promise<boolean> {
+        try {
+            return await this._messageRepo.deleteMessage({ id: messageId });
+        } catch (error) {
+            throw new BadRequestException(`unable to delete message: ${error}`);
+        }
+    }
+
     /**
      * Verifies a message's signature.
      * @param {Object} obj - Object.
