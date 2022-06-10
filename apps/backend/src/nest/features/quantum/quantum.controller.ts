@@ -34,11 +34,29 @@ export class QuantumController {
         return await this._quantumService.getDirectoryInfo({ path: actualPath });
     }
 
+    @Get('file/info')
+    @UseGuards(AuthGuard)
+    async getFileInfo() {
+        // TODO: continue here
+    }
+
     @Get('search')
     @UseGuards(AuthGuard)
     async search(@Query('search') search: string, @Query('dir') dir: string): Promise<PathInfoDTO[]> {
         const path = dir === '/' ? this.storageDir : dir;
         return await this._quantumService.search({ search, dir: path });
+    }
+
+    @Get('shares/shared-with-me')
+    @UseGuards(AuthGuard)
+    async getSharedWithMe(): Promise<IFileShare[]> {
+        return await this._quantumService.getSharedWithMe();
+    }
+
+    @Get('share')
+    @UseGuards(AuthGuard)
+    async getShareById(@Query('id') id: string): Promise<IFileShare> {
+        return await this._quantumService.getShareById({ id });
     }
 
     @Post('dir')
@@ -76,17 +94,5 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO): Promise<void> {
         return await this._quantumService.renameFileOrDirectory({ from, to: join(this.storageDir, to) });
-    }
-
-    @Get('shares/shared-with-me')
-    @UseGuards(AuthGuard)
-    async getSharedWithMe(): Promise<IFileShare[]> {
-        return await this._quantumService.getSharedWithMe();
-    }
-
-    @Get('share')
-    @UseGuards(AuthGuard)
-    async getShareById(@Query('id') id: string): Promise<IFileShare> {
-        return await this._quantumService.getShareById({ id });
     }
 }

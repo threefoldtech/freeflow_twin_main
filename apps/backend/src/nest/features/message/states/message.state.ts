@@ -86,6 +86,15 @@ export class FileShareMessageState implements MessageState<FileMessage> {
     }
 }
 
+export class RenameFileShareMessageState implements MessageState<FileMessage> {
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+
+    async handle({ message }: { message: MessageDTO<FileMessage>; chat?: Chat }) {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
+        return await this._messageService.renameSharedMessage();
+    }
+}
+
 export class SystemMessageState implements MessageState<SystemMessage> {
     private _subSystemMessageStateHandlers = new Map<SystemMessageType, SubSystemMessageState>();
 

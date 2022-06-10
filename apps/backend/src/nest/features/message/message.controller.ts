@@ -15,6 +15,7 @@ import {
     FileShareMessageState,
     MessageState,
     ReadMessageState,
+    RenameFileShareMessageState,
     StringMessageState,
     SystemMessageState,
 } from './states/message.state';
@@ -66,6 +67,11 @@ export class MessageController {
         this._messageStateHandlers.set(
             MessageType.FILE_SHARE,
             new FileShareMessageState(this._chatGateway, this._messageService)
+        );
+        // rename file share message handler
+        this._messageStateHandlers.set(
+            MessageType.FILE_SHARE_UPDATE,
+            new RenameFileShareMessageState(this._chatGateway, this._messageService)
         );
     }
 

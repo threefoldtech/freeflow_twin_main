@@ -131,11 +131,13 @@ export class QuantumService {
      * @param {string} obj.to - Path to rename to.
      */
     async renameFileOrDirectory({ from, to }: RenameFileDTO): Promise<void> {
-        // TODO: handle shares
         if (!this._fileService.exists({ path: from }))
             throw new BadRequestException('unable to rename file, file does not exist');
         if (this._fileService.exists({ path: to }))
             throw new BadRequestException('unable to rename file, file with that name already exists');
+
+        const share = await this._shareRepository.getShareByPath({ path: from });
+        if (share) await this.updateShare(share, { ...share.toJSON(), path: to, name: to.split('/').pop() });
 
         return await this._fileService.rename({ from, to });
     }
@@ -342,6 +344,34 @@ export class QuantumService {
         existingShare.permissions = stringifyPermissions(permissions);
         existingShare.size = size;
         existingShare.lastModified = lastModified;
+
+        permissions.map(async p => {
+            const msg: MessageDTO<IFileShareMessage> = {
+                id: uuidv4(),
+                chatId: p.userId,
+                from: this.userId,
+                to: p.userId,
+                body: existingShare.toJSON(),
+                timeStamp: new Date(),
+                type: MessageType.FILE_SHARE_UPDATE,
+                subject: null,
+                signatures: [],
+                replies: [],
+            };
+            const signedMsg = await this._keyService.appendSignatureToMessage({ message: msg });
+
+            const chat = await this._chatService.getChat(p.userId);
+
+            // TODO: rename share in chat
+            await this._messageService.renameSharedMessage();
+
+            chat.parseContacts()
+                .filter(c => c.id !== this.userId)
+                .forEach(c => {
+                    this._apiService.sendMessageToApi({ location: c.location, message: signedMsg });
+                });
+        });
+
         return (await this._shareRepository.updateShare({ share: existingShare })).toJSON();
     }
 }

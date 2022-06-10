@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotImplementedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { Chat } from '../chat/models/chat.model';
@@ -135,6 +135,10 @@ export class MessageService {
         const adminContact = contacts.find(c => c.id === chat.adminId);
         const fromContact = contacts.find(c => c.id === signedMessage.from);
         return this.verifySignedMessage({ isGroup: chat.isGroup, adminContact, fromContact, signedMessage });
+    }
+
+    async renameSharedMessage() {
+        throw new NotImplementedException();
     }
 
     /**
