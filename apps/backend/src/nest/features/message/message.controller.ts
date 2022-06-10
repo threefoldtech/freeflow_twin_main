@@ -63,10 +63,7 @@ export class MessageController {
         // file message handler
         this._messageStateHandlers.set(MessageType.FILE, new FileMessageState(this._chatGateway, this._messageService));
         // file share message handler
-        this._messageStateHandlers.set(
-            MessageType.FILE_SHARE,
-            new FileShareMessageState(this._messageService)
-        );
+        this._messageStateHandlers.set(MessageType.FILE_SHARE, new FileShareMessageState(this._messageService));
     }
 
     @Put()

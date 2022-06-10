@@ -22,7 +22,7 @@ import { ChatRedisRepository } from './repositories/chat-redis.repository';
 @Injectable()
 export class ChatService {
     constructor(
-        private _chatRepository: ChatRedisRepository,
+        private readonly _chatRepository: ChatRedisRepository,
         private readonly _configService: ConfigService,
         private readonly _contactService: ContactService,
         private readonly _messageService: MessageService,

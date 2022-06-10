@@ -18,12 +18,14 @@ import { CreateFileShareDTO, ShareFileRequesDTO } from './dtos/share-file.dto';
 import { SharePermissionType } from './enums/share-permission-type.enum';
 import { IFileShare } from './interfaces/file-share.interface';
 import { ISharePermission } from './interfaces/share-permission.interface';
+import { ShareRedisRepository } from './repositories/share-redis.repository';
 
 @Injectable()
 export class QuantumService {
     private userId: string;
 
     constructor(
+        private readonly _shareRepository: ShareRedisRepository,
         private readonly _configService: ConfigService,
         private readonly _messageService: MessageService,
         private readonly _fileService: FileService,
@@ -178,6 +180,7 @@ export class QuantumService {
             id: this.userId,
             location: myLocation as string,
         };
+
         const share = await this.createFileShare({
             path,
             owner: me,
@@ -256,18 +259,23 @@ export class QuantumService {
         size,
         lastModified,
     }: CreateFileShareDTO): Promise<IFileShare> {
-        // TODO: handle existing share
-        // TODO: persist share in db
         if (!id) id = uuidv4();
-        return {
-            id,
-            path,
-            owner,
-            name,
-            isFolder,
-            permissions,
-            size,
-            lastModified,
-        };
+
+        try {
+            return (
+                await this._shareRepository.createShare({
+                    id,
+                    path,
+                    owner,
+                    name,
+                    isFolder,
+                    size,
+                    lastModified,
+                    permissions,
+                })
+            ).toJSON();
+        } catch (error) {
+            throw new BadRequestException(`unable to save file share to database: ${error}`);
+        }
     }
 }
