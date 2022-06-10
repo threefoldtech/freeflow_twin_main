@@ -14,7 +14,10 @@
                 :key="contact.id + chat.contacts.length"
                 class="py-3 px-4 sm:px-6 grid grid-cols-2 items-center"
             >
-                <div class="flex items-center justify-self-start overflow-hidden overflow-ellipsis">
+                <div
+                    @click="$emit('clickedProfile', contact)"
+                    class="flex items-center justify-self-start overflow-hidden overflow-ellipsis cursor-pointer"
+                >
                     <AvatarImg :id="contact.id" small />
                     <div class="ml-3">
                         <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
@@ -166,7 +169,7 @@
             toBeRemovedUser = null;
         "
     >
-        <template #title> Remove user </template>
+        <template #title> Remove user</template>
         <template #content>
             Do you really want to remove <b>{{ toBeRemovedUser.id }}</b> from the group?
         </template>
@@ -219,7 +222,7 @@
         return files;
     });
 
-    defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock', 'app-leave']);
+    defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock', 'app-leave', 'clickedProfile']);
 
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);
