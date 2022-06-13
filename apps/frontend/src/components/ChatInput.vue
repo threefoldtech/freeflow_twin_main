@@ -308,34 +308,18 @@
 
             case MessageAction.EDIT: {
                 const newBody = createEditBody(action.value);
-
-                const editMessage = {
+                return {
                     id: <string>action.value.message.id,
                     chatId,
                     from: user.id,
                     to: <string>selectedId,
                     body: newBody,
                     timeStamp: action.value.message.timeStamp,
-                    type: action.value.message.type,
+                    type: MessageTypes.EDIT,
                     replies: action.value.message.replies,
                     subject: null,
-                    updated: new Date(),
                     action: MessageAction.EDIT,
                 };
-                const editWrapperMessage = {
-                    id: uuidv4(),
-                    chatId,
-                    from: user.id,
-                    to: <string>selectedId,
-                    body: editMessage,
-                    timeStamp: new Date(),
-                    type: MessageTypes.EDIT,
-                    replies: [],
-                    subject: null,
-                    action: MessageAction.EDIT,
-                };
-
-                return editWrapperMessage;
             }
 
             default: {

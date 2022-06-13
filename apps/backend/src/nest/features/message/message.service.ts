@@ -28,6 +28,7 @@ export class MessageService {
      */
     async createMessage<T>(createMessageDTO: CreateMessageDTO<T>): Promise<Message> {
         try {
+            console.log(createMessageDTO.timeStamp);
             const existingMessage = await this._messageRepo.findMessageById(createMessageDTO.id);
             if (existingMessage) return;
             return await this._messageRepo.createMessage(createMessageDTO);

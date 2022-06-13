@@ -74,15 +74,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage('update_message')
-    async handleUpdateMessage(@MessageBody() { message }: { message: MessageDTO<MessageDTO<string>> }) {
+    async handleUpdateMessage(@MessageBody() { message }: { message: MessageDTO<string> }) {
+        // TODO: handle edit/delete message
         console.log(`UPDATE MSG TYPE: ${JSON.stringify(message)}`);
         const chat = await this._chatService.getChat(message.to);
         if (!chat) return;
 
         message.from = this._configService.get<string>('userId');
         const editedMessage = await this._messageService.editMessage({
-            messageId: message.body.id,
-            text: message.body.body,
+            messageId: message.id,
+            text: message.body,
         });
 
         this.emitMessageToConnectedClients('message', editedMessage);

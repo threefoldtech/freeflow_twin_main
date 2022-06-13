@@ -23,7 +23,7 @@ export class Message extends Entity {
             chatId: this.chatId,
             from: this.from,
             to: this.to,
-            body: this.parseMessageBody(this.body, this.type),
+            body: this.parseMessageBody(this.body),
             timeStamp: this.timeStamp,
             type: this.type,
             subject: this.subject,
@@ -35,10 +35,8 @@ export class Message extends Entity {
     /**
      * Parses message body strings to valid JSON.
      */
-    parseMessageBody(body: string, type: MessageType): unknown {
+    parseMessageBody(body: string): unknown {
         try {
-            // const b = JSON.parse(body);
-            // if (type === MessageType.SYSTEM && b?.type === SystemMessageType.CONTACT_REQUEST_SEND)
             body = JSON.parse(body);
         } catch (error) {
             return body;
@@ -77,7 +75,7 @@ export const messageSchema = new Schema(Message, {
     from: { type: 'string' },
     to: { type: 'string' },
     body: { type: 'text' },
-    timestamp: { type: 'date' },
+    timeStamp: { type: 'date' },
     type: { type: 'string' },
     subject: { type: 'string' },
     signatures: { type: 'string[]' },
