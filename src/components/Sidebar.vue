@@ -49,10 +49,15 @@
                 class="mb-4 grid"
             >
                 <div
-                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center mb-1"
+                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center mb-3 pt-6"
                     style="position: relative"
                     @click="changePage(app.name)"
                 >
+                    <p
+                        class="absolute text-xs right-0 top-0 inline-block bg-gradient text-white rounded-full text-center w-7 h-7 pt-2"
+                    >
+                        10
+                    </p>
                     <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
             </div>
