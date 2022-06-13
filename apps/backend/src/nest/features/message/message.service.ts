@@ -150,15 +150,26 @@ export class MessageService {
         }
     }
 
+    async editMessage({ messageId, text }: { messageId: string; text: string }) {
+        try {
+            const message = await this._messageRepo.findMessageById(messageId);
+            message.body = JSON.stringify(text);
+            await this._messageRepo.updateMessage({ message });
+            return message.toJSON();
+        } catch (error) {
+            throw new BadRequestException(`unable to edit message: ${error}`);
+        }
+    }
+
     async renameSharedMessage({ message, chatId }: { message: MessageDTO<IFileShareMessage>; chatId: string }) {
         const msgReferences = (await this.getAllMessagesFromChat({ chatId }))
             .filter(msg => msg.type === MessageType.FILE_SHARE)
             .filter(msg => (JSON.parse(msg.body) as IFileShareMessage).id === message.body.id);
         Promise.all(
-            msgReferences.map(async msg => {
-                msg.body = JSON.stringify(message.body);
+            msgReferences.map(async message => {
+                message.body = JSON.stringify(message.body);
                 await this._messageRepo.updateMessage({
-                    message: msg,
+                    message,
                 });
             })
         );

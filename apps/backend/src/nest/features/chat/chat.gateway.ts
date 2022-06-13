@@ -74,19 +74,29 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage('update_message')
-    async handleUpdateMessage(@MessageBody() { message }: { message: Message }) {
+    async handleUpdateMessage(@MessageBody() { message }: { message: MessageDTO<MessageDTO<string>> }) {
         console.log(`UPDATE MSG TYPE: ${JSON.stringify(message)}`);
-        // const chat = await this._chatService.getChat(message.to);
-        // if (!chat) return;
+        const chat = await this._chatService.getChat(message.to);
+        if (!chat) return;
 
-        // message.from = this._configService.get<string>('userId');
-        // // await this._chatService.handleEditMessage({ chatId: message.chatId, message });
+        message.from = this._configService.get<string>('userId');
+        const editedMessage = await this._messageService.editMessage({
+            messageId: message.body.id,
+            text: message.body.body,
+        });
 
-        // const signedMessage = await this._keyService.appendSignatureToMessage({ message });
-        // this._chatService.addMessageToChat({ chat, message: signedMessage });
+        this.emitMessageToConnectedClients('message', editedMessage);
+        const signedMessage = await this._keyService.appendSignatureToMessage({ message: editedMessage });
+        signedMessage.type = MessageType.EDIT;
 
-        // const location = chat.parseContacts().find(c => c.id === chat.adminId).location;
-        // return await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
+        chat.parseContacts()
+            .filter(c => c.id !== this.userId)
+            .map(async c => {
+                return await this._apiService.sendMessageToApi({
+                    location: c.location,
+                    message: signedMessage,
+                });
+            });
     }
 
     @SubscribeMessage('block_chat')

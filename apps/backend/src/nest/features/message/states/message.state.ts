@@ -70,6 +70,15 @@ export class StringMessageState implements MessageState<string> {
     }
 }
 
+export class EditMessageState implements MessageState<string> {
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+
+    async handle({ message }: { message: MessageDTO<string> }) {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._messageService.editMessage({ messageId: message.id, text: message.body });
+    }
+}
+
 export class FileMessageState implements MessageState<FileMessage> {
     constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
@@ -107,7 +116,6 @@ export class RenameFileShareMessageState implements MessageState<IFileShareMessa
         await this._messageService.renameSharedMessage({ message, chatId: owner });
         const share = await this._quantumService.getShareById({ id: message.body.id });
         if (!share) return;
-        if (!chat.isGroup) this._chatGateway.emitMessageToConnectedClients('message', message);
         await this._quantumService.updateShare(share, { ...message.body, isSharedWithMe: true }, true);
     }
 }

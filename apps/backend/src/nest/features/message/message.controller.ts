@@ -9,10 +9,11 @@ import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
 import { ContactService } from '../contact/contact.service';
 import { QuantumService } from '../quantum/quantum.service';
-import { CreateMessageDTO } from './dtos/message.dto';
+import { MessageDTO } from './dtos/message.dto';
 import { MessageService } from './message.service';
 import {
     ContactRequestMessageState,
+    EditMessageState,
     FileMessageState,
     FileShareMessageState,
     MessageState,
@@ -79,18 +80,16 @@ export class MessageController {
         // rename file share message handler
         this._messageStateHandlers.set(
             MessageType.FILE_SHARE_UPDATE,
-            new RenameFileShareMessageState(
-                this._chatGateway,
-                this._messageService,
-                this._quantumService
-            )
+            new RenameFileShareMessageState(this._chatGateway, this._messageService, this._quantumService)
         );
+        // edit messgae handler
+        this._messageStateHandlers.set(MessageType.EDIT, new EditMessageState(this._chatGateway, this._messageService));
     }
 
     @Put()
     @UseGuards(AuthGuard)
-    async handleIncomingMessage(@Body() message: CreateMessageDTO<unknown>) {
-        console.log(`msg type: ${message.type}`);
+    async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
+        console.log(`INCOMING MESSAGE: ${message.type}`);
         const blockedContacts = await this._blockedContactService.getBlockedContactList();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
