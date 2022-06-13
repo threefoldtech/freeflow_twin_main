@@ -14,12 +14,12 @@ import { ShareRedisRepository } from './repositories/share-redis.repository';
 
 @Module({
     imports: [
-        MessageModule,
         KeyModule,
         ApiModule,
-        ChatModule,
         DbModule,
         forwardRef(() => FileModule),
+        forwardRef(() => ChatModule),
+        forwardRef(() => MessageModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => LocationModule),
     ],

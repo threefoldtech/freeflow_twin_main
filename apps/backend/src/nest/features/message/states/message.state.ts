@@ -5,6 +5,7 @@ import {
     ContactRequest,
     FileMessage,
     GroupUpdate,
+    IFileShareMessage,
     SystemMessage,
     SystemMessageType,
 } from '../../../types/message-types';
@@ -14,6 +15,7 @@ import { ChatService } from '../../chat/chat.service';
 import { Chat } from '../../chat/models/chat.model';
 import { ContactService } from '../../contact/contact.service';
 import { CreateContactDTO } from '../../contact/dtos/contact.dto';
+import { QuantumService } from '../../quantum/quantum.service';
 import { CreateMessageDTO, MessageDTO } from '../dtos/message.dto';
 import { MessageService } from '../message.service';
 import { Message } from '../models/message.model';
@@ -77,21 +79,36 @@ export class FileMessageState implements MessageState<FileMessage> {
     }
 }
 
-export class FileShareMessageState implements MessageState<FileMessage> {
-    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+export class FileShareMessageState implements MessageState<IFileShareMessage> {
+    constructor(
+        private readonly _chatGateway: ChatGateway,
+        private readonly _messageService: MessageService,
+        private readonly _configService: ConfigService,
+        private readonly _quantumService: QuantumService
+    ) {}
 
-    async handle({ message }: { message: MessageDTO<FileMessage>; chat?: Chat }): Promise<Message> {
+    async handle({ message }: { message: MessageDTO<IFileShareMessage>; chat?: Chat }): Promise<Message> {
+        if (message.from === this._configService.get<string>('userId')) return;
         this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._quantumService.createFileShare({ ...message.body, isSharedWithMe: true });
         return await this._messageService.createMessage(message);
     }
 }
 
-export class RenameFileShareMessageState implements MessageState<FileMessage> {
-    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+export class RenameFileShareMessageState implements MessageState<IFileShareMessage> {
+    constructor(
+        private readonly _chatGateway: ChatGateway,
+        private readonly _messageService: MessageService,
+        private readonly _quantumService: QuantumService
+    ) {}
 
-    async handle({ message }: { message: MessageDTO<FileMessage>; chat?: Chat }) {
-        this._chatGateway.emitMessageToConnectedClients('message', message);
-        return await this._messageService.renameSharedMessage();
+    async handle({ message, chat }: { message: MessageDTO<IFileShareMessage>; chat?: Chat }) {
+        const owner = chat.isGroup ? chat.chatId : message.body.owner.id;
+        await this._messageService.renameSharedMessage({ message, chatId: owner });
+        const share = await this._quantumService.getShareById({ id: message.body.id });
+        if (!share) return;
+        if (!chat.isGroup) this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._quantumService.updateShare(share, { ...message.body, isSharedWithMe: true }, true);
     }
 }
 

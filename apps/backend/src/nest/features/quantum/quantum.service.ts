@@ -62,7 +62,7 @@ export class QuantumService {
                 })
             );
         } catch (error) {
-            throw new BadRequestException(`unable to get directory content: ${error}`);
+            return [];
         }
     }
 
@@ -181,9 +181,7 @@ export class QuantumService {
 
         const chat = await this._chatService.getChat(shareWith);
 
-        const sharePermissionTypes = [SharePermissionType.READ];
-        if (isWritable) sharePermissionTypes.push(SharePermissionType.WRITE);
-        const sharePermissions: ISharePermission[] = [{ userId: shareWith, sharePermissionTypes }];
+        if (!chat) return;
 
         const pathStats = await this._fileService.getStats({ path });
 
@@ -192,6 +190,10 @@ export class QuantumService {
             id: this.userId,
             location: myLocation as string,
         };
+
+        const sharePermissionTypes = [SharePermissionType.READ];
+        if (isWritable) sharePermissionTypes.push(SharePermissionType.WRITE);
+        const sharePermissions: ISharePermission[] = [{ userId: shareWith, sharePermissionTypes }];
 
         const creationData = {
             path,
@@ -204,17 +206,34 @@ export class QuantumService {
             lastModified: pathStats.mtime.getTime(),
         };
 
-        let share;
+        let updatedShare = null;
         const existingShare = await this._shareRepository.getShareByPath({ path });
-        if (existingShare?.id) share = await this.updateShare(existingShare, { ...creationData });
-        else share = await this.createFileShare(creationData);
+        if (existingShare?.id) {
+            const updatedPermissions = existingShare.parsePermissions().map(permission => {
+                if (permission.userId === shareWith)
+                    return {
+                        userId: shareWith,
+                        sharePermissionTypes,
+                    };
+
+                return permission;
+            });
+            const permissionExists = updatedPermissions.some(permission => permission.userId === shareWith);
+            const permissions = permissionExists
+                ? updatedPermissions
+                : [...updatedPermissions, { userId: shareWith, sharePermissionTypes }];
+            updatedShare = await this.updateShare(existingShare, {
+                ...creationData,
+                permissions,
+            });
+        }
 
         const msg: MessageDTO<IFileShareMessage> = {
             id: uuidv4(),
             chatId: chat.chatId,
             from: this.userId,
             to: shareWith,
-            body: share,
+            body: updatedShare ?? (await this.createFileShare(creationData)),
             timeStamp: new Date(),
             type: MessageType.FILE_SHARE,
             subject: null,
@@ -250,11 +269,46 @@ export class QuantumService {
         }
     }
 
-    async getShareById({ id }: { id: string }): Promise<IFileShare> {
+    async getShareById({ id }: { id: string }): Promise<Share> {
         try {
-            return (await this._shareRepository.getSharedWithMeById({ id })).toJSON();
+            return await this._shareRepository.getSharedWithMeById({ id });
         } catch (error) {
             throw new BadRequestException('share does not exist');
+        }
+    }
+
+    async deleteShare({ id }: { id: string }) {
+        try {
+            return await this._shareRepository.deleteShare({ entityId: id });
+        } catch (error) {
+            throw new BadRequestException(`unable to delete share: ${error}`);
+        }
+    }
+
+    /**
+     * Deletes a user's permissions from a shared file.
+     * @param {Object} obj - Object.
+     * @param {string} obj.userId - User Id.
+     */
+    async deleteUserPermissions({ userId }: { userId: string }) {
+        const myShares = await this._shareRepository.getMyShares();
+        const sharedWithMe = await this._shareRepository.getSharedWithMe();
+
+        sharedWithMe.forEach(async share => {
+            const owner = share.parseOwner();
+            if (owner.id === userId) await this.deleteShare({ id: share.entityId });
+        });
+
+        for (const share of myShares) {
+            const permissions = share.parsePermissions();
+            const newPermissions = permissions.filter(p => p.userId !== userId);
+            if (newPermissions.length === permissions.length) continue;
+            if (newPermissions.length > 0)
+                return await this.updateShare(share, {
+                    ...share.toJSON(),
+                    permissions: newPermissions,
+                });
+            return await this.deleteShare({ id: share.entityId });
         }
     }
 
@@ -294,7 +348,7 @@ export class QuantumService {
      * @param {CreateFileShareDTO} dto - Creation object.
      * @return {IFileShare} - File share.
      */
-    private async createFileShare({
+    async createFileShare({
         id,
         path,
         owner,
@@ -332,9 +386,10 @@ export class QuantumService {
      * @param {CreateFileShareDTO} dto - Creation object.
      * @return {IFileShare} - Updated file share.
      */
-    private async updateShare(
+    async updateShare(
         existingShare: Share,
-        { path, owner, name, isFolder, isSharedWithMe, permissions, size, lastModified }: CreateFileShareDTO
+        { path, owner, name, isFolder, isSharedWithMe, permissions, size }: CreateFileShareDTO,
+        isGroup?: boolean
     ): Promise<IFileShare> {
         existingShare.path = path;
         existingShare.owner = stringifyOwner(owner);
@@ -343,7 +398,7 @@ export class QuantumService {
         existingShare.isSharedWithMe = isSharedWithMe;
         existingShare.permissions = stringifyPermissions(permissions);
         existingShare.size = size;
-        existingShare.lastModified = lastModified;
+        existingShare.lastModified = new Date().getTime();
 
         permissions.map(async p => {
             const msg: MessageDTO<IFileShareMessage> = {
@@ -361,17 +416,21 @@ export class QuantumService {
             const signedMsg = await this._keyService.appendSignatureToMessage({ message: msg });
 
             const chat = await this._chatService.getChat(p.userId);
+            if (!chat) return;
+            this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
 
-            // TODO: rename share in chat
-            await this._messageService.renameSharedMessage();
-
-            chat.parseContacts()
-                .filter(c => c.id !== this.userId)
-                .forEach(c => {
-                    this._apiService.sendMessageToApi({ location: c.location, message: signedMsg });
-                });
+            if (!isGroup)
+                chat.parseContacts()
+                    .filter(c => c.id !== this.userId)
+                    .forEach(c => {
+                        this._apiService.sendMessageToApi({ location: c.location, message: signedMsg });
+                    });
         });
 
-        return (await this._shareRepository.updateShare({ share: existingShare })).toJSON();
+        try {
+            return (await this._shareRepository.updateShare({ share: existingShare })).toJSON();
+        } catch (error) {
+            throw new BadRequestException(`unable to update file share in database: ${error}`);
+        }
     }
 }

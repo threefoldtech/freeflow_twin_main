@@ -74,6 +74,10 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         return await this.findAllWhereEqPaginated({ offset, count, where: 'chatId', eq: chatId });
     }
 
+    async getAllMessagesFromChat({ chatId }: { chatId: string }): Promise<Message[]> {
+        return await this.findAllWhereEq({ where: 'chatId', eq: chatId });
+    }
+
     async deleteMessagesFromChat(chatId: string) {
         const messages = await this.findAllWhereEq({ where: 'chatId', eq: chatId });
         messages.forEach(m => this.delete(m.entityId));
@@ -83,5 +87,10 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         const message = await this.findOne({ where: 'id', eq: id });
         await this.delete(message.entityId);
         return true;
+    }
+
+    async updateMessage({ message }: { message: Message }): Promise<Message> {
+        await this.update(message);
+        return message;
     }
 }

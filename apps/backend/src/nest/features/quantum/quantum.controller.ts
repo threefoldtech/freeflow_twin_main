@@ -56,7 +56,7 @@ export class QuantumController {
     @Get('share')
     @UseGuards(AuthGuard)
     async getShareById(@Query('id') id: string): Promise<IFileShare> {
-        return await this._quantumService.getShareById({ id });
+        return (await this._quantumService.getShareById({ id })).toJSON();
     }
 
     @Post('dir')
@@ -93,6 +93,7 @@ export class QuantumController {
     @Put('rename')
     @UseGuards(AuthGuard)
     async renameFileOrDirectory(@Body() { from, to }: RenameFileDTO): Promise<void> {
-        return await this._quantumService.renameFileOrDirectory({ from, to: join(this.storageDir, to) });
+        const actualPath = to.includes('appdata') ? to : join(this.storageDir, to);
+        return await this._quantumService.renameFileOrDirectory({ from, to: actualPath });
     }
 }

@@ -1,12 +1,14 @@
-import { Body, Controller, ForbiddenException, Put } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Put, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { AuthGuard } from '../../guards/auth.guard';
 import { MessageType } from '../../types/message-types';
 import { ApiService } from '../api/api.service';
 import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
 import { ContactService } from '../contact/contact.service';
+import { QuantumService } from '../quantum/quantum.service';
 import { CreateMessageDTO } from './dtos/message.dto';
 import { MessageService } from './message.service';
 import {
@@ -31,7 +33,8 @@ export class MessageController {
         private readonly _contactService: ContactService,
         private readonly _blockedContactService: BlockedContactService,
         private readonly _apiService: ApiService,
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _quantumService: QuantumService
     ) {
         // contact request handler
         this._messageStateHandlers.set(
@@ -66,17 +69,28 @@ export class MessageController {
         // file share message handler
         this._messageStateHandlers.set(
             MessageType.FILE_SHARE,
-            new FileShareMessageState(this._chatGateway, this._messageService)
+            new FileShareMessageState(
+                this._chatGateway,
+                this._messageService,
+                this._configService,
+                this._quantumService
+            )
         );
         // rename file share message handler
         this._messageStateHandlers.set(
             MessageType.FILE_SHARE_UPDATE,
-            new RenameFileShareMessageState(this._chatGateway, this._messageService)
+            new RenameFileShareMessageState(
+                this._chatGateway,
+                this._messageService,
+                this._quantumService
+            )
         );
     }
 
     @Put()
+    @UseGuards(AuthGuard)
     async handleIncomingMessage(@Body() message: CreateMessageDTO<unknown>) {
+        console.log(`msg type: ${message.type}`);
         const blockedContacts = await this._blockedContactService.getBlockedContactList();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
@@ -90,6 +104,8 @@ export class MessageController {
         const chat = await this._chatService.getChat(chatId);
 
         if (!chat) return;
+
+        message.chatId = chatId;
 
         // TODO: fix encryption
         // const validSignature = await this._messageService.verifySignedMessageByChat({

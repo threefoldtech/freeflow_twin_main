@@ -86,4 +86,8 @@ export class ShareRedisRepository extends EntityRepository<Share> {
         await this.update(share);
         return share;
     }
+
+    async deleteShare({ entityId }: { entityId: string }) {
+        return await this.delete(entityId);
+    }
 }

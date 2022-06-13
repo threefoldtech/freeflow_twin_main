@@ -147,15 +147,18 @@ export class ContactService {
         };
 
         const existingContact = await this.getContact({ id });
-        if (existingContact) return;
+        const existingMessages = await this._messageService.getAllMessagesFromChat({ chatId: existingContact?.id });
+        if (existingContact && existingMessages.length > 0) return;
 
         let newContact;
         try {
-            newContact = await this._contactRepo.addNewContact({
-                id,
-                location,
-                contactRequest,
-            });
+            newContact =
+                existingContact ??
+                (await this._contactRepo.addNewContact({
+                    id,
+                    location,
+                    contactRequest,
+                }));
         } catch (error) {
             throw new BadRequestException(`unable to create contact: ${error}`);
         }

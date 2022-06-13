@@ -8,6 +8,7 @@ import { ApiService } from '../api/api.service';
 import { ChatService } from '../chat/chat.service';
 import { ContactService } from '../contact/contact.service';
 import { Contact } from '../contact/models/contact.model';
+import { QuantumService } from '../quantum/quantum.service';
 
 @WebSocketGateway({ cors: '*' })
 export class UserGateway implements OnGatewayInit {
@@ -22,13 +23,15 @@ export class UserGateway implements OnGatewayInit {
         private readonly _contactService: ContactService,
         private readonly _apiService: ApiService,
         private readonly _configService: ConfigService,
-        private readonly _chatService: ChatService
+        private readonly _chatService: ChatService,
+        private readonly _quantumService: QuantumService
     ) {}
 
     @SubscribeMessage('remove_user')
     async handleRemoveUserFromConnections(@MessageBody() chatId: string) {
         await this._contactService.deleteContact({ id: chatId });
         await this._chatService.deleteChat(chatId);
+        await this._quantumService.deleteUserPermissions({ userId: chatId });
         this.emitMessageToConnectedClients('chat_removed', chatId);
     }
 

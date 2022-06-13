@@ -1,6 +1,7 @@
-import { BadRequestException, Injectable, NotImplementedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { IFileShareMessage, MessageType } from '../../types/message-types';
 import { Chat } from '../chat/models/chat.model';
 import { ContactDTO } from '../contact/dtos/contact.dto';
 import { KeyService } from '../key/key.service';
@@ -10,11 +11,15 @@ import { MessageRedisRepository } from './repositories/message-redis.repository'
 
 @Injectable()
 export class MessageService {
+    private userId: string;
+
     constructor(
         private readonly _messageRepo: MessageRedisRepository,
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService
-    ) {}
+    ) {
+        this.userId = this._configService.get<string>('userId');
+    }
 
     /**
      * Creates a new message.
@@ -137,8 +142,26 @@ export class MessageService {
         return this.verifySignedMessage({ isGroup: chat.isGroup, adminContact, fromContact, signedMessage });
     }
 
-    async renameSharedMessage() {
-        throw new NotImplementedException();
+    async getAllMessagesFromChat({ chatId }: { chatId: string }): Promise<Message[]> {
+        try {
+            return await this._messageRepo.getAllMessagesFromChat({ chatId });
+        } catch (error) {
+            return [];
+        }
+    }
+
+    async renameSharedMessage({ message, chatId }: { message: MessageDTO<IFileShareMessage>; chatId: string }) {
+        const msgReferences = (await this.getAllMessagesFromChat({ chatId }))
+            .filter(msg => msg.type === MessageType.FILE_SHARE)
+            .filter(msg => (JSON.parse(msg.body) as IFileShareMessage).id === message.body.id);
+        Promise.all(
+            msgReferences.map(async msg => {
+                msg.body = JSON.stringify(message.body);
+                await this._messageRepo.updateMessage({
+                    message: msg,
+                });
+            })
+        );
     }
 
     /**

@@ -21,7 +21,6 @@ export class ApiService {
      */
     async registerDigitalTwin({ doubleName, signedAddress }: { doubleName: string; signedAddress: string }) {
         try {
-            console.log(`Register Digital Twin called with doubleName: ${doubleName}, signedAddress: ${signedAddress}`);
             return await axios.put(
                 `${this._configService.get<string>('appBackend')}/api/users/digitaltwin/${doubleName}`,
                 {
@@ -55,13 +54,34 @@ export class ApiService {
                 responseType: responseType || 'json',
                 timeout: 5000,
             });
-        } catch {}
+        } catch {
+            return;
+        }
     }
 
-    async sendStatusUpdate({ location, status }: { location: string; status: IStatusUpdate }) {
+    /**
+     * Sends your updated status to the given location.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to send status to.
+     * @param {IStatusUpdate} obj.status - Status to send.
+     */
+    async sendStatusUpdate({
+        location,
+        status,
+        responseType,
+    }: {
+        location: string;
+        status: IStatusUpdate;
+        responseType?: ResponseType;
+    }) {
         try {
-            return await axios.put(`http://[${location}]/api/v2/user/update-status`, status, { timeout: 5000 });
-        } catch {}
+            return await axios.put(`http://[${location}]/api/v2/user/update-status`, status, {
+                responseType: responseType || 'json',
+                timeout: 5000,
+            });
+        } catch {
+            return;
+        }
     }
 
     /**
@@ -128,8 +148,7 @@ export class ApiService {
      */
     async getAdminChat({ location, chatId }: { location: string; chatId: string }): Promise<ChatDTO> {
         try {
-            // TODO: change to /nest/messages/:chatId when implemented
-            const res = await axios.get<ChatDTO>(`http://[${location}]/api/v1/messages/${chatId}`);
+            const res = await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/${chatId}`);
             return res.data;
         } catch (error) {
             throw new BadRequestException(`unable to get admins chat: ${error}`);
@@ -255,6 +274,8 @@ export class ApiService {
      * Used to talk to other twins.
      * @param {string} resource - Twin to contact with resource.
      */
+    // TODO: remove this, last thing that is using this is get status.
+    // change this to a function `getContactsStatusList`
     async getExternalResource({ resource }: { resource: string }) {
         try {
             return await axios.get(resource);
