@@ -1,6 +1,21 @@
-import { Body, Controller, Get, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get,
+    NotFoundException,
+    Post,
+    Put,
+    Query,
+    Res,
+    StreamableFile,
+    UnauthorizedException,
+    UseGuards,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Response } from 'express';
+import { createReadStream } from 'fs';
 import { join } from 'path';
+import syncRequest from 'sync-request';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
@@ -9,7 +24,9 @@ import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { MoveFileDTO } from './dtos/move-file.dto';
 import { RenameFileDTO } from './dtos/rename-file.dto';
 import { ShareFileRequesDTO } from './dtos/share-file.dto';
+import { SharePermissionType } from './enums/share-permission-type.enum';
 import { IFileShare } from './interfaces/file-share.interface';
+import { IOnlyOfficeResponse } from './interfaces/only-office-reponse.interface';
 import { QuantumService } from './quantum.service';
 
 @Controller('quantum')
@@ -36,8 +53,82 @@ export class QuantumController {
 
     @Get('file/info')
     @UseGuards(AuthGuard)
-    async getFileInfo() {
-        // TODO: continue here
+    async getFileInfo(@Query() params: { path: string; attachments: boolean }) {
+        const { path } = params;
+        // TODO: handle shares
+        // const parsedParams = Buffer.from(JSON.stringify(params), 'base64').toString('utf8');
+        // const paramsObj = JSON.parse(parsedParams);
+
+        // console.log(paramsObj);
+
+        // let actualPath = path;
+        // if (params) {
+        //     const { shareId, token } = paramsObj as { shareId: string; token: string };
+        //     const payload = await this._quantumService.verifyQuantumJWT({ token });
+        //     if (payload.permissions.indexOf(SharePermissionType.READ) < 0)
+        //         throw new UnauthorizedException(`you do not have the premission to read this file`);
+        //     actualPath = await this._quantumService.getSharePath({ shareId });
+        // }
+
+        // actualPath = attachments ? join(actualPath, '/appdata/attachments') : actualPath;
+
+        return {
+            ...(await this._quantumService.getFileInfo({ path })),
+            key: this._quantumService.getQuantumFileToken({ writable: true, path }),
+            readToken: await this._quantumService.generateQuantumJWT({
+                payload: { file: path, permissions: [SharePermissionType.READ] },
+                exp: 5 * 60,
+            }),
+            writeToken: await this._quantumService.generateQuantumJWT({
+                payload: { file: path, permissions: [SharePermissionType.WRITE] },
+                exp: 24 * 60 * 60,
+            }),
+        };
+    }
+
+    @Get('file/internal')
+    @UseGuards(AuthGuard)
+    async getQuantumFile(@Query() { path, token }: { path: string; token: string }) {
+        if (!token) throw new UnauthorizedException('no token provided');
+
+        // TODO: handle blocked tokens
+
+        const payload = await this._quantumService.verifyQuantumJWT({ token });
+        if (payload.permissions.indexOf(SharePermissionType.READ) < 0 || payload.file !== path)
+            throw new UnauthorizedException(`you do not have the premission to read this file`);
+
+        // TODO: handle attachments
+
+        return new StreamableFile(createReadStream(path));
+    }
+
+    @Post('file/internal')
+    @UseGuards(AuthGuard)
+    async editQuantumFile(@Body() onlyOfficeResponse: IOnlyOfficeResponse, @Query('token') token: string) {
+        if (!token) throw new UnauthorizedException('no token provided');
+
+        if (onlyOfficeResponse.status !== 2 && onlyOfficeResponse.status !== 6)
+            return {
+                error: 0,
+            };
+
+        // TODO: handle blocked tokens
+
+        const payload = await this._quantumService.verifyQuantumJWT({ token });
+        if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
+            throw new UnauthorizedException(`you do not have the premission to edit this file`);
+
+        if (!payload.file || !onlyOfficeResponse.url) throw new NotFoundException('no file or url provided');
+
+        const url = new URL(onlyOfficeResponse.url);
+        url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
+        url.protocol = 'https:';
+        const fileResponse = syncRequest('GET', url);
+        const fileBuffer = <Buffer>fileResponse.body;
+        await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });
+        return {
+            error: 0,
+        };
     }
 
     @Get('search')

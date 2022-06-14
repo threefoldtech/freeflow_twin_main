@@ -30,8 +30,9 @@ export class FileService {
      * @param {string} obj.path - File path.
      * @param {string} obj.content - File contents.
      */
-    writeFile({ path, content, flag }: { path: string; content: string; flag?: WriteFileOptions }) {
-        if (!this.exists({ path })) writeFileSync(path, content, flag);
+    writeFile({ path, content, flag }: { path: string; content: string | Buffer; flag?: WriteFileOptions }) {
+        if (this.exists({ path })) this.deleteFile({ path });
+        writeFileSync(path, content, flag);
     }
 
     /**
@@ -72,6 +73,11 @@ export class FileService {
      */
     exists({ path }: { path: string }): boolean {
         return existsSync(path);
+    }
+
+    readFile({ path }: { path: string }): Buffer {
+        if (!this.exists({ path })) throw new BadRequestException('file does not exist');
+        return readFileSync(path);
     }
 
     /**

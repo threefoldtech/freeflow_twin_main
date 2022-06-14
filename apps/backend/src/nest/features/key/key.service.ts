@@ -75,7 +75,7 @@ export class KeyService {
         try {
             return this._keyRepo.getKey({ keyType, userId });
         } catch (error) {
-            throw new NotFoundException(error);
+            throw new NotFoundException(`${keyType} key not found for userId: ${userId}, error: ${error}`);
         }
     }
 

@@ -29,23 +29,15 @@
 </template>
 
 <script setup lang="ts">
-    const generateUrl = (
-        protocol: 'http' | 'https',
-        owner: string,
-        path: string,
-        token: string,
-        attachment: boolean = false
-    ) => {
-        path = encodeURIComponent(path);
-        token = encodeURIComponent(token);
-        return `${protocol}://${owner}/api/v1/browse/internal/files?path=${path}&token=${token}&attachment=${attachment}`;
-    };
-    import { computed, defineComponent, onMounted, ref, watch } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
+    import { computed, onMounted, ref } from 'vue';
+    import { myYggdrasilAddress } from '@/store/authStore';
+    import { startFetchStatusLoop, showUserOfflineMessage } from '@/store/statusStore';
+    import { calcExternalResourceLink } from '@/services/urlService';
+    import { EditPathInfo, getFileInfo } from '@/services/fileBrowserService';
+    import Spinner from '@/components/Spinner.vue';
+    import { isUndefined } from 'lodash';
+    import { useRoute } from 'vue-router';
     import {
-        createModel,
-        FullPathInfoModel,
-        getFile,
         fetchShareDetails,
         fetchFileAccessDetails,
         getExtension,
@@ -54,20 +46,8 @@
         accessDenied,
     } from '@/store/fileBrowserStore';
     import { get } from 'scriptjs';
-    import config from '@/config';
-    ('../../../public/config/config');
-    import { Contact, DtId } from '@/types';
-    import axios, { ResponseType } from 'axios';
-    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
-    import { fetchStatus, startFetchStatusLoop, watchingUsers, showUserOfflineMessage } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '@/services/urlService';
-    import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
-    import { showShareDialog } from '@/services/dialogService';
-    import Spinner from '@/components/Spinner.vue';
-    import { isUndefined } from 'lodash';
 
     const route = useRoute();
-    const router = useRouter();
     const fileType = ref<FileType>();
     const readUrl = ref<string>();
     const isLoading = ref<boolean>(true);
@@ -77,6 +57,18 @@
             x => x === fileType.value
         );
     });
+
+    const generateUrl = (
+        protocol: 'http' | 'https',
+        owner: string,
+        path: string,
+        token: string,
+        attachment: boolean = false
+    ) => {
+        path = encodeURIComponent(path);
+        token = encodeURIComponent(token);
+        return `${protocol}://${owner}/api/v2/quantum/file/internal?path=${path}&token=${token}&attachment=${attachment}`;
+    };
 
     onMounted(async () => {
         const path = atob(<string>route.params.path);
@@ -132,7 +124,7 @@
                 fileAccesDetails.readToken,
                 fileAccesDetails.writeToken,
                 getExtension(fileAccesDetails.fullName),
-                fileAccesDetails.extension,
+                fileAccesDetails.fullName,
                 attachments
             );
 
@@ -186,6 +178,8 @@
         isAttachement: boolean = false
     ) => {
         const readUrl = generateUrl('http', `[${location}]`, path, readToken, isAttachement);
+
+        console.log(readUrl);
 
         const writeUrl = generateUrl('http', `[${location}]`, path, writeToken);
 

@@ -1,5 +1,7 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHash } from 'crypto';
+import { sign, verify } from 'jsonwebtoken';
 import { join } from 'path';
 
 import { IFileShareMessage, MessageType } from '../../types/message-types';
@@ -10,6 +12,7 @@ import { ChatService } from '../chat/chat.service';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { FileService } from '../file/file.service';
 import { KeyService } from '../key/key.service';
+import { KeyType } from '../key/models/key.model';
 import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
@@ -17,6 +20,7 @@ import { RenameFileDTO } from './dtos/rename-file.dto';
 import { CreateFileShareDTO, ShareFileRequesDTO } from './dtos/share-file.dto';
 import { SharePermissionType } from './enums/share-permission-type.enum';
 import { IFileShare } from './interfaces/file-share.interface';
+import { IFileTokenPayload } from './interfaces/file-token-payload.interface';
 import { ISharePermission } from './interfaces/share-permission.interface';
 import { Share, stringifyOwner, stringifyPermissions } from './models/share.model';
 import { ShareRedisRepository } from './repositories/share-redis.repository';
@@ -83,6 +87,26 @@ export class QuantumService {
         }
     }
 
+    async getFileInfo({ path }: { path: string }) {
+        try {
+            const stats = await this._fileService.getStats({ path });
+            if (!stats.isFile()) throw new BadRequestException('path is not a file');
+
+            return await this.formatFileDetails({ path });
+        } catch (error) {
+            throw new BadRequestException(`unable to get file info: ${error}`);
+        }
+    }
+
+    async getSharePath({ shareId }: { shareId: string }): Promise<string> {
+        try {
+            const share = await this._shareRepository.getShareById({ id: shareId });
+            return share.path;
+        } catch (error) {
+            throw new NotFoundException(`share with id: ${shareId} not found`);
+        }
+    }
+
     /**
      * Creates a directory.
      * @param {Object} obj - Object.
@@ -122,6 +146,11 @@ export class QuantumService {
             return this.createFileWithRetry({ fromPath, toPath, name, count: count + 1 });
 
         this._fileService.moveFile({ from: fromPath, to: pathWithCount });
+    }
+
+    async writeFile({ path, file }: { path: string; file: Buffer }) {
+        this._fileService.writeFile({ path, content: file });
+        return await this.formatFileDetails({ path });
     }
 
     /**
@@ -313,37 +342,6 @@ export class QuantumService {
     }
 
     /**
-     * Formats the file details to be returned to the client.
-     * @param {Object} obj - Object.
-     * @param {string} obj.path - Path to the file.
-     * @return {PathInfoDTO} - PathInfoDTO.
-     */
-    private async formatFileDetails({ path }: { path: string }): Promise<PathInfoDTO> {
-        try {
-            const stats = await this._fileService.getStats({ path });
-            const details = this._fileService.getPathDetails({ path });
-            const extension = details.ext.replace(/\./g, '');
-            const directory = details.dir;
-
-            return {
-                isFile: stats.isFile(),
-                isDirectory: stats.isDirectory(),
-                directory,
-                path,
-                fullName: details.base,
-                name: details.name,
-                extension,
-                size: stats.size,
-                createdOn: stats.ctime,
-                lastModified: stats.mtime,
-                lastAccessed: stats.atime,
-            };
-        } catch (error) {
-            throw new BadRequestException(`unable to get file details: ${error}`);
-        }
-    }
-
-    /**
      * Creates a new file share.
      * @param {CreateFileShareDTO} dto - Creation object.
      * @return {IFileShare} - File share.
@@ -431,6 +429,64 @@ export class QuantumService {
             return (await this._shareRepository.updateShare({ share: existingShare })).toJSON();
         } catch (error) {
             throw new BadRequestException(`unable to update file share in database: ${error}`);
+        }
+    }
+
+    async generateQuantumJWT({ payload, exp }: { payload: IFileTokenPayload; exp?: number | string }): Promise<string> {
+        const privateKey = await this._keyService.getKey({ userId: this.userId, keyType: KeyType.Private });
+
+        return sign(payload, Buffer.from(privateKey.key), {
+            expiresIn: exp ?? '9999 years',
+            issuer: this.userId,
+            audience: 'quantum',
+        });
+    }
+
+    async verifyQuantumJWT({ token }: { token: string }): Promise<IFileTokenPayload> {
+        const privateKey = await this._keyService.getKey({ userId: this.userId, keyType: KeyType.Private });
+        try {
+            return verify(token, Buffer.from(privateKey.key)) as IFileTokenPayload;
+        } catch (error) {
+            throw new UnauthorizedException(`unable to verify quantum token: ${error}`);
+        }
+    }
+
+    getQuantumFileToken({ writable, path }: { writable: boolean; path: string }): string {
+        const fileBuffer = this._fileService.readFile({ path });
+        const hex = createHash('sha256').update(fileBuffer).digest('hex');
+        return createHash('sha1')
+            .update(`${writable ? 'write' : 'read'}${path}${hex}`)
+            .digest('hex');
+    }
+
+    /**
+     * Formats the file details to be returned to the client.
+     * @param {Object} obj - Object.
+     * @param {string} obj.path - Path to the file.
+     * @return {PathInfoDTO} - PathInfoDTO.
+     */
+    private async formatFileDetails({ path }: { path: string }): Promise<PathInfoDTO> {
+        try {
+            const stats = await this._fileService.getStats({ path });
+            const details = this._fileService.getPathDetails({ path });
+            const extension = details.ext.replace(/\./g, '');
+            const directory = details.dir;
+
+            return {
+                isFile: stats.isFile(),
+                isDirectory: stats.isDirectory(),
+                directory,
+                path,
+                fullName: details.base,
+                name: details.name,
+                extension,
+                size: stats.size,
+                createdOn: stats.ctime,
+                lastModified: stats.mtime,
+                lastAccessed: stats.atime,
+            };
+        } catch (error) {
+            throw new BadRequestException(`unable to get file details: ${error}`);
         }
     }
 }
