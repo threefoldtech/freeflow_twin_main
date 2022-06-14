@@ -3,7 +3,7 @@
         <div class="flex justify-between items-center mb-6 mt-4 mx-4">
             <h2 class="text-gray-800 font-medium text-left text-base">Members</h2>
             <UserAddIcon
-                v-if="isAdmin"
+                v-if="isAdmin || isModerator"
                 class="text-gray-600 w-5 h-5 cursor-pointer hover:text-gray-800 transition duration-75"
                 @click="openAddUserToGroup = true"
             />
@@ -23,13 +23,29 @@
                         <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
                     </div>
                 </div>
-                <button
-                    v-if="isAdmin && chat.adminId !== contact.id"
-                    @click="removeFromGroup(contact)"
-                    class="inline-flex items-center border border-red-500 px-3 py-2 shadow-sm text-sm font-medium cursor-pointer rounded-md w-min justify-self-end"
-                >
-                    <TrashIcon class="h-4 w-4 text-red-500" />
-                </button>
+                <div class="inline-flex items-center shadow-sm text-sm font-medium justify-self-end">
+                    <button
+                        v-if="isAdmin && chat.adminId !== contact.id && !contact.roles?.includes(Roles.MODERATOR)"
+                        @click="changeUserRole(contact)"
+                        class="border border-blue-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
+                    >
+                        <ChevronDoubleUpIcon class="h-4 w-4 text-blue-500" />
+                    </button>
+                    <button
+                        v-if="isAdmin && chat.adminId !== contact.id && contact.roles?.includes(Roles.MODERATOR)"
+                        @click="changeUserRole(contact)"
+                        class="border border-yellow-500 px-3 py-2 mr-2 shadow-sm cursor-pointer rounded-md w-min"
+                    >
+                        <ChevronDoubleDownIcon class="h-4 w-4 text-yellow-500" />
+                    </button>
+                    <button
+                        v-if="(isAdmin || isModerator) && user.id !== contact.id && contact.id !== chat.adminId"
+                        @click="removeFromGroup(contact)"
+                        class="border border-red-500 px-3 py-2 mr-2 cursor-pointer rounded-md w-min"
+                    >
+                        <TrashIcon class="h-4 w-4 text-red-500" />
+                    </button>
+                </div>
             </li>
         </ul>
         <div id="spacer" class="bg-gray-100 h-2 w-full mt-2"></div>
@@ -100,7 +116,7 @@
     </div>
     <!-- ADD USER TO GROUP MODAL -->
     <div
-        v-if="isAdmin && openAddUserToGroup"
+        v-if="(isAdmin || isModerator) && openAddUserToGroup"
         @click="openAddUserToGroup = false"
         class="w-full h-full inset-0 absolute bg-black bg-opacity-25 z-50 flex justify-center items-center"
     >
@@ -166,12 +182,12 @@
         :showAlert="showRemoveUserDialog"
         @close="
             showRemoveUserDialog = false;
-            toBeRemovedUser = null;
+            selectedUser = null;
         "
     >
         <template #title> Remove user</template>
         <template #content>
-            Do you really want to remove <b>{{ toBeRemovedUser.id }}</b> from the group?
+            Do you really want to remove <b>{{ selectedUser.id }}</b> from the group?
         </template>
         <template #actions>
             <button
@@ -184,7 +200,36 @@
                 class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
                 @click="
                     showRemoveUserDialog = false;
-                    toBeRemovedUser = null;
+                    selectedUser = null;
+                "
+            >
+                Cancel
+            </button>
+        </template>
+    </Alert>
+
+    <Alert
+        v-if="showChangeUserRoleDialog"
+        :showAlert="showChangeUserRoleDialog"
+        @close="
+            showChangeUserRoleDialog = false;
+            selectedUser = null;
+        "
+    >
+        <template #title v-if="selectedUser?.roles?.includes(Roles.MODERATOR)"> Demote user</template>
+        <template #title v-else>Promote user</template>
+        <template #actions>
+            <button
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                @click="doChangeUserRole"
+            >
+                {{ selectedUser?.roles?.includes(Roles.MODERATOR) ? 'Demote ' : 'Promote ' }}user
+            </button>
+            <button
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                @click="
+                    showChangeUserRoleDialog = false;
+                    selectedUser = null;
                 "
             >
                 Cancel
@@ -200,12 +245,14 @@
     import { useAuthState } from '../store/authStore';
     import { isBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
-    import { TrashIcon } from '@heroicons/vue/solid';
+    import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import { Chat, MessageTypes, SystemMessageTypes } from '@/types';
+    import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
+
+    const { updateContactsInGroup } = usechatsActions();
 
     interface IProps {
         chat: Chat;
@@ -227,16 +274,17 @@
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);
 
-    const { contacts } = useContactsState();
+    const { contacts, groupContacts } = useContactsState();
 
     const filteredMembers = computed(() => {
-        return contacts
+        return groupContacts
             .filter(con => !props.chat.contacts.some(c => c.id === con.id))
             .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()));
     });
 
     const showRemoveUserDialog = ref(false);
-    const toBeRemovedUser = ref();
+    const showChangeUserRoleDialog = ref(false);
+    const selectedUser = ref<GroupContact>();
 
     const truncate = ({ body, extension }) => {
         return body.filename?.length < 30
@@ -255,18 +303,34 @@
         });
     });
 
+    const changeUserRole = (contact: GroupContact | Contact) => {
+        if ('roles' in contact) {
+            showChangeUserRoleDialog.value = true;
+            selectedUser.value = contact;
+        }
+    };
+
+    const doChangeUserRole = () => {
+        const isModerator = selectedUser.value.roles.includes(Roles.MODERATOR);
+
+        if (isModerator) selectedUser.value.roles.pop();
+        if (!isModerator) selectedUser.value.roles.push(Roles.MODERATOR);
+
+        updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.CHANGE_USER_ROLE);
+        showChangeUserRoleDialog.value = false;
+        selectedUser.value = null;
+    };
+
     const removeFromGroup = contact => {
         showRemoveUserDialog.value = true;
-        toBeRemovedUser.value = contact;
+        selectedUser.value = contact;
     };
     const doRemoveFromGroup = () => {
-        const { updateContactsInGroup } = usechatsActions();
-        updateContactsInGroup(props.chat.chatId, toBeRemovedUser.value, SystemMessageTypes.REMOVE_USER);
+        updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
-        toBeRemovedUser.value = null;
+        selectedUser.value = null;
     };
     const addToGroup = contact => {
-        const { updateContactsInGroup } = usechatsActions();
         //@ts-ignore
         updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
@@ -277,10 +341,17 @@
         );
     });
 
+    const { user } = useAuthState();
+
     const isAdmin = computed(() => {
-        const { user } = useAuthState();
         //@ts-ignore
         return props.chat.adminId == user.id;
+    });
+
+    const isModerator = computed(() => {
+        const contact = props.chat.contacts.find(c => c.id === user.id);
+        if ('roles' in contact) return contact.roles.includes(Roles.MODERATOR);
+        return false;
     });
 
     const blocked = computed(() => {

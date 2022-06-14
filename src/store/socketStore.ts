@@ -1,6 +1,6 @@
 import { Chat, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { toRefs, inject } from 'vue';
+import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';

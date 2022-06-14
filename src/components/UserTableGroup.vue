@@ -82,15 +82,15 @@
     </div>
 </template>
 <script setup lang="ts">
-    import { Contact } from '@/types';
-    import { defineComponent, ref, computed, onMounted, PropType, defineProps } from 'vue';
+    import { Contact, GroupContact } from '@/types';
+    import { defineProps, ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
 
     interface IProps {
         modelValue?: string;
         placeholder: string;
-        data: any[];
+        data: GroupContact[];
         usersInGroup: Contact[];
         error: string;
         focus: boolean;
@@ -126,8 +126,8 @@
     };
 
     const searchResults = () => {
-        return props.data.filter((item: Contact) => {
-            return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
+        return props.data.filter((c: Contact) => {
+            return c.id.toLowerCase().includes(searchTerm.value.toLowerCase());
         });
     };
 
