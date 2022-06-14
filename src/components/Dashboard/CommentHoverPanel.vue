@@ -79,6 +79,7 @@
     const { contacts } = useContactsState();
     const { addContact } = useContactsActions();
     const { getChat } = usechatsActions();
+    const { retrieveChats } = usechatsActions();
 
     const props = defineProps<{
         comment: SOCIAL_POST;

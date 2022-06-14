@@ -31,7 +31,9 @@
             </div> -->
         </template>
         <template #data-delete="data">
-            <span class="my-1 p-2 rounded-md bg-red-500 text-white cursor-pointer" @click="remove(data.row)"> Remove </span>
+            <span class="my-1 p-2 rounded-md bg-red-500 text-white cursor-pointer" @click="remove(data.row)">
+                Remove
+            </span>
         </template>
     </Table>
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>

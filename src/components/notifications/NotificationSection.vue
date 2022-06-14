@@ -1,5 +1,5 @@
 <template>
-    <div style="z-index:70" class="absolute w-80 right-0 bottom-0 flex flex-col items-end justify-end">
+    <div style="z-index: 70" class="absolute w-80 right-0 bottom-0 flex flex-col items-end justify-end">
         <NotificationCard
             v-for="notification in notifications"
             :key="getKey(notification)"

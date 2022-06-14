@@ -43,6 +43,29 @@
                 <unicode-emoji-picker v-pre></unicode-emoji-picker>
             </span>
 
+            <div
+                v-if="showTagPerson"
+                class="absolute bottom-16 left-2 right-2 bg-white p-3 rounded-md shadow-md divide-y"
+            >
+                <h4 class="mb-1">Members</h4>
+                <ul>
+                    <li
+                        v-for="(contact, idx) in contacts"
+                        :key="idx"
+                        class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
+                        :class="{ 'bg-gray-100': activeTag === idx }"
+                    >
+                        <AvatarImg :id="String(contact.id)" small />
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-900">
+                                {{ contact.id }}
+                                <span class="text-gray-400 font-normal text-xs ml-1">{{ contact.location }}</span>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
             <button
                 class="hover:text-icon mx-2 my-0 p-0 self-center flex-1"
                 @click.stop="toggleEmoji"
@@ -86,6 +109,14 @@
                                 @input="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
+                                @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
+                                @keyup.arrow-down="activeTag < contacts.length - 1 ? activeTag++ : (activeTag = 0)"
+                                @keyup.esc="
+                                    () => {
+                                        showTagPerson = false;
+                                        message.focus();
+                                    }
+                                "
                             />
                         </div>
                     </form>
@@ -123,10 +154,20 @@
     } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
     import { useAuthState } from '@/store/authStore';
-    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, QuoteBodyType } from '@/types';
+    import {
+        Chat,
+        FileTypes,
+        Message,
+        MessageBodyType,
+        MessageTypes,
+        QuoteBodyType,
+        Contact,
+        AnonymousContact,
+    } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
+    import AvatarImg from '@/components/AvatarImg.vue';
 
     const emit = defineEmits(['messageSend', 'failed']);
 
@@ -150,6 +191,18 @@
     const showEmoji = ref(false);
 
     const { addScrollEvent } = useScrollActions();
+
+    const showTagPerson = ref(false);
+    const activeTag = ref(0);
+    const contactsRef = ref([...props.chat.contacts]);
+    const contacts = computed<(Contact | AnonymousContact)[]>({
+        get() {
+            return contactsRef.value.sort((a, b) => a.id.localeCompare(String(b.id)));
+        },
+        set(newVal) {
+            contactsRef.value = newVal;
+        },
+    });
 
     const resizeTextarea = () => {
         let area = message.value;
@@ -202,6 +255,16 @@
     });
 
     watch(messageInput, () => {
+        showTagPerson.value = false;
+        const messageInputs = messageInput.value.split(' ');
+        const latestMessage = messageInputs[messageInputs.length - 1];
+        if (props.chat.isGroup && latestMessage.startsWith('@')) {
+            showTagPerson.value = true;
+            contacts.value = [...props.chat.contacts].filter(c =>
+                String(c.id).toLowerCase().includes(latestMessage.toLowerCase().substring(1))
+            );
+        }
+
         draftMessage(selectedId, createMessage());
     });
 
@@ -293,6 +356,16 @@
     };
 
     const chatsend = async () => {
+        const atIdx = messageInput.value.lastIndexOf('@');
+        if (showTagPerson.value && atIdx > -1) {
+            const contact = contacts.value[activeTag.value].id;
+            messageInput.value = messageInput.value.substring(0, atIdx + 1);
+            messageInput.value += `${contact} `;
+            showTagPerson.value = false;
+            contacts.value = [...props.chat.contacts];
+            return;
+        }
+
         messageInput.value = '';
         const { sendMessageObject } = usechatsActions();
 
