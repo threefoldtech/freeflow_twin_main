@@ -59,12 +59,35 @@
             <div class="md:flex-grow flex-grow-0"></div>
             <div
                 class="w-20 h-20 mb-5 grid cursor-pointer content-end items-center justify-center justify-items-center"
-                @click="toggleShowUserConfigDialog"
             >
-                <AvatarImg :id="String(user.id)" />
-                <!--<h3 class="truncate w-full text-sm">{{ user.id }}</h3>-->
+                <AvatarImg @click="toggleShowUserConfigDialog" :id="String(user.id)" />
+                <button
+                    class="mt-2 py-2 px-4 text-white rounded-md max-w-max hover:bg-primarylight"
+                    @click="showLogoutDialog = true"
+                >
+                    Logout
+                </button>
             </div>
         </div>
+
+        <Alert v-if="showLogoutDialog" :showAlert="showLogoutDialog" @close="showLogoutDialog = false">
+            <template #title> Logout</template>
+            <template #content> Do you really want to logout?</template>
+            <template #actions>
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="logout"
+                >
+                    Logout
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                    @click="showLogoutDialog = false"
+                >
+                    Cancel
+                </button>
+            </template>
+        </Alert>
     </nav>
 </template>
 
@@ -74,6 +97,10 @@
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
     import { AppItemType, AppType } from '@/types/apps';
+    import Button from '@/components/Button.vue';
+    import Alert from '@/components/Alert.vue';
+    import { ref } from 'vue';
+    import { doLogout } from '@/services/authService';
 
     const apps: Array<AppItemType> = [
         {
@@ -114,6 +141,13 @@
     const router = useRouter();
 
     const emit = defineEmits(['clicked']);
+
+    const showLogoutDialog = ref(false);
+
+    const logout = async () => {
+        showLogoutDialog.value = false;
+        await doLogout();
+    };
 
     const changePage = (name: string) => {
         emit('clicked');

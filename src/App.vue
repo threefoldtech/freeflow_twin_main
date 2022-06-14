@@ -5,14 +5,6 @@
         }"
         class="h-screen"
     >
-        <!-- <template v-if="false"> -->
-        <!--     <div -->
-        <!--         class="fixed left-0 top-0 bg-red-700 text-white uppercase text-xl z-[9999] px-16 transform -rotate-45 -translate-x-16 translate-y-2 opacity-50 pointer-events-none" -->
-        <!--     > -->
-        <!--         Beta -->
-        <!--     </div> -->
-        <!-- </template> -->
-        <!-- <router-view /> -->
         <router-view v-show="path !== '/glass'" />
 
         <app-layout>
@@ -38,10 +30,18 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { myYggdrasilAddress } from '@/store/authStore';
+    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import { ref, computed } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
+    import { useSocketActions } from '@/store/socketStore';
+
+    const { user } = useAuthState();
+    const { initializeSocket } = useSocketActions();
+
+    if (user) {
+        initializeSocket(user.id.toString());
+    }
 
     console.log('Version: ' + version);
 
