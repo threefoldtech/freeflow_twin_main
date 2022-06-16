@@ -9,19 +9,29 @@
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"
     >
-        <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" :unreadMessagesAmount="unreadMessagesAmount" />
-        <div v-if="!collapsed" class="ml-3 w-full">
+        <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
+        <div v-if="!collapsed" class="ml-3 w-full relative">
             <p class="flex items-center">
                 <span class="text-sm text-gray-900 font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
                 </span>
                 <span v-if="chat.isGroup" class="ml-2 text-sm"> (group)</span>
                 <span v-if="blocked" class="ml-2 text-red-500"> BLOCKED</span>
-                <span v-if="lastMessage" class="text-gray-400 ml-auto self-end text-sm">
+                <span
+                    v-if="lastMessage"
+                    class="ml-auto self-end text-sm"
+                    :class="unreadMessages > 0 ? 'font-bold text-gray-600' : 'text-gray-400'"
+                >
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <p class="text-sm text-gray-500 max-h-6 max-w-xs truncate">{{ lastMessageBody }}</p>
+            <p
+                class="text-sm max-h-6 max-w-xs truncate"
+                :class="unreadMessages > 0 ? 'font-bold' : 'text-gray-500'"
+            >
+                {{ lastMessageBody }}
+            </p>
+            <p v-if="unreadMessages > 0" class="absolute right-0 -bottom-2 bg-accent-300 h-4 w-4 rounded-full"></p>
         </div>
     </li>
 </template>
@@ -36,6 +46,9 @@
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useRouter } from 'vue-router';
     import { isBlocked } from '@/store/blockStore';
+    import { usechatsActions } from '@/store/chatStore';
+
+    const { newUnreadChats, removeUnreadChats } = usechatsActions();
 
     interface IProps {
         chat: Chat;
@@ -100,18 +113,22 @@
         }
     });
 
-    const unreadMessagesAmount = computed(() => {
-        if (!props.chat || !user) {
-            return 0;
-        }
+    const unreadMessages = computed(() => {
+        if (!props.chat || !user) return 0;
 
         const lastReadMessageId = props.chat.read[<string>user.id];
         const index = props.chat.messages?.findIndex(m => m.id === lastReadMessageId);
-        if (!index || index < 1) {
-            return 0;
+
+        //more than 50 unread messages in chat
+        if (lastReadMessageId && index === -1) {
+            newUnreadChats(props.chat.chatId);
+            return 50;
         }
 
-        return props.chat.messages.length - (index + 1);
+        let missedMessages = props.chat.messages.length - (index + 1);
+        const chatId = props.chat.chatId;
+        missedMessages === 0 ? removeUnreadChats(chatId) : newUnreadChats(chatId);
+        return missedMessages;
     });
 
     const blocked = computed(() => {

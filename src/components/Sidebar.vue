@@ -49,14 +49,16 @@
                 class="mb-4 grid"
             >
                 <div
-                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center mb-3 pt-6"
+                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center"
+                    :class="app.name === AppType.Whisper ? 'mb-3 pt-6' : 'mb-1'"
                     style="position: relative"
                     @click="changePage(app.name)"
                 >
                     <p
+                        v-if="app.name === AppType.Whisper"
                         class="absolute text-xs right-0 top-0 inline-block bg-gradient text-white rounded-full text-center w-7 h-7 pt-2"
                     >
-                        10
+                        {{ totalUnreadChats() }}
                     </p>
                     <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
@@ -79,6 +81,12 @@
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
     import { AppItemType, AppType } from '@/types/apps';
+
+    interface IProps {
+        unreadChats?: string[];
+    }
+
+    const props = defineProps<IProps>();
 
     const apps: Array<AppItemType> = [
         {
@@ -129,6 +137,14 @@
 
     const toggleShowUserConfigDialog = () => {
         showUserConfigDialog.value = !showUserConfigDialog.value;
+    };
+
+    const totalUnreadChats = () => {
+        let total = 0;
+        for (const msg of props.unreadChats) {
+            total++;
+        }
+        return total > 99 ? '99+' : total;
     };
 </script>
 
