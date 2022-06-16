@@ -43,7 +43,7 @@
     import { useSocketState } from '../store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
-    import {usechatsActions} from '@/store/chatStore';
+    import { usechatsActions } from '@/store/chatStore';
 
     const totalUnreadChats = ref<string[]>([]);
 
