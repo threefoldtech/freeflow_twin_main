@@ -1,6 +1,6 @@
 import { Chat, Contact, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { toRefs, inject } from 'vue';
+import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { setLocation, useAuthState } from '@/store/authStore';
 import { addUserToBlockList, blocklist } from '@/store/blockStore';
@@ -11,6 +11,7 @@ import { allSocialPosts } from '@/store/socialStore';
 import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
+import config from '@/config';
 
 const state = reactive<State>({
     socket: '',
@@ -87,6 +88,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
         if (statusList[id]) statusList[id].isOnline = isOnline;
+    });
+    state.socket.on('appID', (url: string) => {
+        config.setAppId(url);
     });
     state.socket.on('yggdrasil', (location: string) => {
         setLocation(location);

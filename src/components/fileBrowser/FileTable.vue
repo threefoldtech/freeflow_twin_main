@@ -323,22 +323,14 @@
         uploadFiles,
         equals,
         moveFiles,
-        sharedDir,
-        sharedContent,
-        getSharedContent,
-        searchResults,
-        searchDirValue,
-        currentShare,
         isDraggingFiles,
         goToShared,
         fileBrowserTypeView,
-        goToFilesInChat,
         savedAttachments,
         savedAttachmentsIsLoading,
     } from '@/store/fileBrowserStore';
     import { useRouter, useRoute } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import {
         currentRightClickedItem,
@@ -358,11 +350,6 @@
     const router = useRouter();
 
     const { user } = useAuthState();
-
-    onBeforeMount(() => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
-    });
 
     const setCurrentRightClickedItem = item => {
         currentRightClickedItem.value = {

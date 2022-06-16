@@ -117,7 +117,7 @@
             <div>
                 <UserTableGroup
                     v-model="usernameInGroupAdd"
-                    :data="contacts"
+                    :data="groupContacts"
                     :error="usernameAddError"
                     :usersInGroup="usersInGroup"
                     placeholder="Search for user..."
@@ -145,8 +145,10 @@
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState } from '../store/authStore';
-    import { Contact } from '../types/index';
+    import { myYggdrasilAddress, useAuthState } from '../store/authStore';
+    import { Contact, GroupContact, Roles } from '../types/index';
+    import axios from 'axios';
+    import config from '@/config';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
@@ -155,14 +157,15 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
-    const { contacts } = useContactsState();
-    //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
+    const { groupContacts } = useContactsState();
+
     const userAddLocation = ref('');
     const usernameAddError = ref('');
     const groupnameAdd = ref('');
     const groupnameAddError = ref('');
     const usernameInGroupAdd = ref('');
-    const usersInGroup = ref<Contact[]>([]);
+    const usersInGroup = ref<GroupContact[]>([]);
+    const possibleUsers = ref<Contact[]>([]);
     const contactAddError = ref('');
 
     const manualContactAddUsername = ref<string>('');
@@ -238,6 +241,7 @@
         usersInGroup.value.push({
             id: user.id,
             location: user.location,
+            roles: [Roles.USER, Roles.MODERATOR, Roles.ADMIN],
         });
 
         addGroupchat(groupnameAdd.value, usersInGroup.value);
@@ -249,6 +253,14 @@
         usersInGroup.value = [];
         emit('closeDialog');
     };
+
+    // @todo: config
+    axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
+        const { user } = useAuthState();
+        const posContacts = <Contact[]>r.data;
+        const alreadyExistingChatIds = [...groupContacts.map(c => c.id), user.id];
+        possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
+    });
 </script>
 
 <style scoped></style>
