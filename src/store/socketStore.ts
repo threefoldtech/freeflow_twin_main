@@ -11,7 +11,6 @@ import { allSocialPosts } from '@/store/socialStore';
 import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
-import config from '@/config';
 
 const state = reactive<State>({
     socket: '',
