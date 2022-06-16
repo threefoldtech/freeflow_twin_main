@@ -2,11 +2,11 @@
     <div class="h-full overflow-y-auto px-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <div class="shadow overflow-hidden sm:rounded-lg">
                     <table
                         v-if="fileBrowserTypeView === 'LIST'"
                         :key="currentDirectory"
-                        class="min-w-full divide-y divide-gray-200"
+                        class="hidden lg:block min-w-full divide-y divide-gray-200"
                     >
                         <thead class="bg-gray-50">
                             <tr>
@@ -120,7 +120,53 @@
                     <!-- Local filebrowser -->
                     <ul
                         v-else
-                        class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+                        class="hidden lg:grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+                        role="list"
+                    >
+                        <p
+                            v-if="searchResults === 'None'"
+                            class="px-6 py-4 whitespace-nowrap col-span-12 text-base font-medium text-center text-gray-800 flex justify-center flex-col"
+                        >
+                            No items in this folder
+                            <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
+                        </p>
+                        <li
+                            v-for="item in searchResults"
+                            v-if="searchResults !== 'None'"
+                            :key="item.fullName"
+                            :title="item.fullName"
+                            class="relative"
+                            draggable="true"
+                            @click="handleSelect(item)"
+                            @dblclick="handleItemClick(item)"
+                            @dragover="event => onDragOver(event, item)"
+                            @dragstart="event => onDragStart(event, item)"
+                            @drop="() => onDrop(item)"
+                        >
+                            <div
+                                :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
+                                class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
+                            >
+                                <div class="flex justify-start items-center cursor-pointer px-4">
+                                    <i
+                                        :key="item.name"
+                                        :class="getIcon(item) + ' ' + getIconColor(item)"
+                                        class="fa-lg"
+                                    ></i>
+                                    <p class="ml-4 text-sm font-medium text-gray-900 truncate pointer-events-none">
+                                        {{ item.name
+                                        }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <p class="hidden text-sm font-medium text-gray-500 pointer-events-none">
+                                {{ getFileLastModified(item) }}
+                            </p>
+                        </li>
+                    </ul>
+                    <ul
+                        class="grid lg:hidden grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
                         role="list"
                     >
                         <p

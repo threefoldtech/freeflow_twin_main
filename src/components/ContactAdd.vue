@@ -1,15 +1,17 @@
 <template>
     <div class="place-items-start">
-        <div class="grid grid-cols-2">
+        <div class="grid grid-cols-2 px-4">
             <a
-                v-for="item in navigation"
+                v-for="(item, index) in navigation"
                 :key="item.name"
                 :class="[
                     activeItem === item.name
                         ? 'bg-primary text-white'
                         : 'bg-gray-100 text-black hover:bg-gray-200 transition duration-300',
+                    index === 0 ? 'rounded-l-md' : '',
+                    index === navigation.length - 1 ? 'rounded-r-md' : '',
                 ]"
-                class="nav-link grid-cols-6 text-center py-2 rounded-xl font-normal"
+                class="nav-link grid-cols-6 text-center py-2 font-normal"
                 href="#"
                 @click.prevent="setActive(item.name)"
             >
@@ -90,7 +92,7 @@
             </Disclosure>
         </div>
         <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent="groupAdd">
-            <div class="flex place-items-center mx-1 mb-4">
+            <div class="flex place-items-center px-4 mb-4">
                 <div class="w-full">
                     <br />
                     <span v-if="groupnameAddError !== ''" class="text-red-600">
@@ -129,7 +131,7 @@
                 ></UserTableGroup>
             </div>
 
-            <div class="flex mt-4 justify-end w-full">
+            <div class="flex mt-4 px-4 justify-end w-full">
                 <button
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end transition hover:bg-gray-50"
                     @click="$emit('closeDialog')"

@@ -152,7 +152,7 @@
             @update-model-value="sendUpdate"
         >
             <template v-slot:title>
-                <h1>Invite someone to chat</h1>
+                <h1 class="font-medium">Invite someone to chat</h1>
             </template>
             <template v-slot:default>
                 <AddContact @closeDialog="sendUpdate(false)"></AddContact>

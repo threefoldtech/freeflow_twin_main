@@ -149,6 +149,10 @@ unicode-emoji-picker {
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
+
+    ::-webkit-scrollbar{
+        border-left: 1px solid #E5E7EB;
+    }
 }
 
 .material-symbols-rounded {

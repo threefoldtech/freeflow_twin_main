@@ -1,25 +1,54 @@
 <template>
-    <div :class="{ hidden: sharedDir || savedAttachments }" class="mx-2">
+    <div :class="{ hidden: sharedDir || savedAttachments }" class="mx-2 hidden md:flex justify-between">
         <button
-            class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
+            class="text-white py-2 px-4 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
             @click="showCreateFolderDialog = true"
         >
             <i class="fas fa-plus"></i> New Folder
         </button>
         <button
-            class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
+            class="text-white py-2 px-4 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
             @click="showCreateFileDialog = true"
         >
             <i class="fas fa-plus"></i> Upload File(s)
         </button>
     </div>
+    <button
+        type="button"
+        class="absolute right-5 bottom-5 inline-flex md:hidden items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none"
+        @click="showMainActionsOverlay = true"
+    >
+        <PlusSmIconOutline class="h-6 w-6" aria-hidden="true" />
+    </button>
+    <MainActionsOverlay
+        :model-value="showMainActionsOverlay"
+        class='md:hidden'
+        @update-model-value="showMainActionsOverlay = false"
+    >
+        <template v-slot:content>
+            <div class="flex justify-around mt-5">
+                <div class="flex flex-col items-center" @click="() => {showCreateFolderDialog = true; showMainActionsOverlay = false;}">
+                    <div class='inline-flex items-center p-2.5 border border-gray-400 rounded-full'>
+                        <FolderAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+                    </div>
+                    <p class="mt-1">Folder</p>
+                </div>
+                <div class="flex flex-col items-center" @click="() => {showCreateFileDialog = true; showMainActionsOverlay = false;}">
+                    <div class='inline-flex items-center p-2.5 border border-gray-400 rounded-full'>
+                        <DocumentAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+                    </div>
+                    <p class="mt-1">File</p>
+                </div>
+            </div>
+        </template>
+    </MainActionsOverlay>
     <Dialog
         :model-value="showCreateFolderDialog"
         :noActions="false"
         @update-model-value="val => updateCreateFolderDialog(val)"
     >
         <template v-slot:title>
-            <h1>Create folder</h1>
+            <h1 class="font-medium">Create folder</h1>
         </template>
         <div>
             <p v-for="(error, idx) in createFolderErrors" :key="idx" class="text-sm font-medium text-red-500">
@@ -49,7 +78,7 @@
         @update-model-value="val => updateCreateFileDialog(val)"
     >
         <template v-slot:title>
-            <h1>Add files</h1>
+            <h1 class="font-medium">Add files</h1>
         </template>
         <div class="flex flex-col">
             <p class="text-sm font-medium text-red-500">
@@ -93,9 +122,12 @@
     import { DocumentTextIcon, XIcon } from '@heroicons/vue/solid';
     import { createErrorNotification } from '@/store/notificiationStore';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
+    import { PlusSmIcon as PlusSmIconOutline, FolderAddIcon, DocumentAddIcon } from '@heroicons/vue/outline';
+    import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
 
     const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);
+    const showMainActionsOverlay = ref(false);
     const newFolderInput = ref<HTMLInputElement>();
     const newFileInput = ref<any>(undefined);
     const selectedFiles = ref<File[]>([]);

@@ -76,7 +76,7 @@
         </Alert>
         <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" :noActions="true">
             <template v-slot:title class="center">
-                <h1 class="text-center">Renaming {{ selectedPaths[0].name }}</h1>
+                <h1 class="font-medium">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
             <div class="relative">
                 <label for="rename" class="sr-only">Rename</label>
@@ -120,7 +120,7 @@
         </Dialog>
         <Dialog :modelValue="showShareDialog" @update-model-value="resetShareDialog" :noActions="true">
             <template v-slot:title>
-                <h1 class="text-center">Share files</h1>
+                <h1 class="font-medium">Share files</h1>
             </template>
             <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2" :key="selectedTab">
                 <div class="flex-grow" v-for="(tab, index) in tabs" :key="`${tab}-${index}`">
