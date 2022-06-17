@@ -21,7 +21,8 @@
                             @click="showAddUserDialog = true"
                         >
                             <PlusIcon class="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-                            Start a new chat
+                            {{ chats.length > 0 ? 'Or start' : 'Start' }}
+                            a new chat
                         </button>
                     </div>
                 </div>
