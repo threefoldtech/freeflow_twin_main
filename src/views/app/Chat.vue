@@ -1,6 +1,9 @@
 <template>
     <app-layout>
-        <div class="relative h-full w-full md:customgrid" :class="chats.length === 0 ? '' : 'grid'">
+        <div
+            class="relative h-full w-full md:customgrid"
+            :class="chats.length === 0 && chatRequests.length === 0 ? '' : 'grid'"
+        >
             <ChatList v-model="showAddUserDialog" />
             <div class="hidden w-full h-full md:grid place-items-center border-2">
                 <div class="text-center">
@@ -37,7 +40,7 @@
     import { ChatAlt2Icon } from '@heroicons/vue/outline';
     import { useChatsState } from '@/store/chatStore';
 
-    const { chats } = useChatsState();
+    const { chats, chatRequests } = useChatsState();
 
     const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');
     const router = useRouter();
