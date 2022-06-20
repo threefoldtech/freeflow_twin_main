@@ -8,10 +8,12 @@ import {
     FileTypes,
     GetMessagesResponse,
     GroupChat,
+    GroupContact,
     GroupManagementBody,
     Message,
     MessageBodyType,
     MessageTypes,
+    Roles,
     SystemBody,
     SystemMessageTypes,
 } from '../types';
@@ -145,7 +147,7 @@ export const removeChat = (chatId: string) => {
     selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const addGroupchat = (name: string, contacts: Contact[]) => {
+const addGroupchat = (name: string, contacts: GroupContact[]) => {
     const { user } = useAuthState();
 
     const contactInGroup = contacts
@@ -552,7 +554,7 @@ const readMessage = (chatId: string, messageId: string) => {
 
 const updateContactsInGroup = async (
     groupId: string,
-    contact: Contact,
+    contact: GroupContact,
     type: SystemMessageTypes,
     nextAdmin?: string
 ) => {
@@ -562,9 +564,7 @@ const updateContactsInGroup = async (
     if (!('location' in admin)) return;
     const adminLocation = admin.location;
 
-    let msg = `${contact.id} has been removed from the group`;
-    if (type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
-    if (type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
+    let msg = setMessage(type, contact);
 
     const message: Message<GroupManagementBody> = {
         id: uuidv4(),
@@ -584,6 +584,24 @@ const updateContactsInGroup = async (
     };
 
     sendMessageObject(groupId, message);
+};
+
+const setMessage = (type: SystemMessageTypes, contact: GroupContact) => {
+    let msg = `${contact.id} has been removed from the group`;
+
+    switch (type) {
+        case SystemMessageTypes.ADD_USER:
+            msg = `${contact.id} has been added to the group`;
+            break;
+        case SystemMessageTypes.USER_LEFT_GROUP:
+            msg = `${contact.id} has left the group`;
+            break;
+        case SystemMessageTypes.CHANGE_USER_ROLE:
+            const roleChange = contact.roles.includes(Roles.MODERATOR) ? 'promoted' : 'demoted';
+            msg = `${contact.id} has been ${roleChange}`;
+            break;
+    }
+    return msg;
 };
 
 export const useChatsState = () => {

@@ -1,6 +1,6 @@
 import { Chat, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { toRefs, inject } from 'vue';
+import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
@@ -9,6 +9,7 @@ import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
 import { statusList } from './statusStore';
+import config from '@/config';
 
 const state = reactive<State>({
     socket: '',
@@ -90,6 +91,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
         if (statusList[id]) statusList[id].isOnline = isOnline;
+    });
+    state.socket.on('appID', (url: string) => {
+        config.setAppId(url);
     });
 };
 

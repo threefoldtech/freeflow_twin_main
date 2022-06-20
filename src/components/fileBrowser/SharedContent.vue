@@ -152,18 +152,11 @@
         fileBrowserTypeView,
         isQuantumChatFiles,
     } from '@/store/fileBrowserStore';
-    import { onBeforeMount, watch, computed } from 'vue';
+    import { watch, computed } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import Spinner from '@/components/Spinner.vue';
-    import { useSocketActions } from '@/store/socketStore';
-    import { useAuthState } from '@/store/authStore';
 
-    onBeforeMount(async () => {
-        sharedBreadcrumbs.value = [];
-        const { initializeSocket } = useSocketActions();
-        const { user } = useAuthState();
-        initializeSocket(user.id.toString());
-    });
+    sharedBreadcrumbs.value = [];
 
     watch(sharedFolderIsloading, () => {});
 

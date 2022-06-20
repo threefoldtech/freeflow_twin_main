@@ -1,6 +1,6 @@
 <template>
     <section
-        v-if="chats.length > 0"
+        v-if="chats.length > 0 || chatRequests.length > 0"
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,
@@ -163,8 +163,7 @@
 
 <script setup lang="ts">
     import moment from 'moment';
-    import { useSocketActions } from '@/store/socketStore';
-    import { ref, computed, onBeforeMount, watch } from 'vue';
+    import { ref, computed, watch } from 'vue';
 
     import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { useAuthState } from '@/store/authStore';
@@ -198,6 +197,8 @@
     const { retrieveChats } = usechatsActions();
     const collapsed = ref(false);
     let selectedId = ref('');
+
+    retrieveChats();
 
     const status = computed(() => {
         return statusList[selectedId.value];
@@ -260,11 +261,6 @@
             return chats.value;
         }
         return chats.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
-    });
-    onBeforeMount(() => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
-        retrieveChats();
     });
 
     const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));
