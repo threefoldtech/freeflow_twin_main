@@ -49,10 +49,17 @@
                 class="mb-4 grid"
             >
                 <div
-                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center mb-1"
+                    class="sm:h-20 h-16 sm:w-20 w-16 rounded-full grid place-items-center"
+                    :class="app.name === AppType.Whisper ? 'mb-3 pt-6' : 'mb-1'"
                     style="position: relative"
                     @click="changePage(app.name)"
                 >
+                    <p
+                        v-if="app.name === AppType.Whisper"
+                        class="absolute text-xs right-0 top-0 inline-block bg-gradient text-white rounded-full text-center w-7 h-7 pt-2"
+                    >
+                        {{ totalUnreadChats }}
+                    </p>
                     <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
             </div>
@@ -101,6 +108,14 @@
     import Alert from '@/components/Alert.vue';
     import { ref } from 'vue';
     import { doLogout } from '@/services/authService';
+    import { computed } from 'vue';
+
+    interface IProps {
+        unreadChats?: string[];
+    }
+
+    const props = defineProps<IProps>();
+
 
     const apps: Array<AppItemType> = [
         {
@@ -159,6 +174,14 @@
     const toggleShowUserConfigDialog = () => {
         showUserConfigDialog.value = !showUserConfigDialog.value;
     };
+
+    const totalUnreadChats = computed(() => {
+        let total = 0;
+        for (const msg of props.unreadChats) {
+            total++;
+        }
+        return total > 99 ? '99+' : total;
+    });
 </script>
 
 <style scoped>

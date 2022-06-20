@@ -38,6 +38,8 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('chat_removed', (chatId: string) => {
         removeChat(chatId);
+        const { removeUnreadChats } = usechatsActions();
+        removeUnreadChats(chatId);
     });
     state.socket.on('chat_blocked', (chatId: string) => {
         addUserToBlockList(chatId);
@@ -53,14 +55,17 @@ const initializeSocket = (username: string) => {
         }
         if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
             notify({ id: message.id });
+            const { newUnreadChats } = usechatsActions();
+            newUnreadChats(message.to === user.id ? message.from.toString() : message.to.toString());
         }
         const { addMessage } = usechatsActions();
 
-        addMessage(message.to === user.id ? message.from : message.to, message);
+        addMessage(message.to === user.id ? message.from.toString() : message.to.toString(), message);
     });
     state.socket.on('connectionRequest', (newContactRequest: Chat) => {
-        const { addChat } = usechatsActions();
+        const { addChat, newUnreadChats } = usechatsActions();
         addChat(newContactRequest);
+        newUnreadChats(newContactRequest.chatId);
     });
     state.socket.on('chat_updated', (chat: Chat) => {
         const { updateChat } = usechatsActions();
