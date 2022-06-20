@@ -47,10 +47,11 @@
 
     const totalUnreadChats = ref<string[]>([]);
 
-    (async () => {
+    const init = async () => {
         const { getUnreadChats } = usechatsActions();
         totalUnreadChats.value = await getUnreadChats();
-    })();
+    }
+    init();
 
     const { notification } = useSocketState();
     const showNav = ref(false);
