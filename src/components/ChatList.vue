@@ -1,6 +1,6 @@
 <template>
     <section
-        v-if="chats.length > 0"
+        v-if="chats.length > 0 || chatRequests.length > 0"
         :class="{
             'collapsed-bar': collapsed,
             'md:w-16': collapsed,

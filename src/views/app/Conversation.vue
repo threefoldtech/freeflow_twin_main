@@ -526,14 +526,12 @@
     const nextAdmin = ref('');
     const setNextAdmin = e => (nextAdmin.value = e.target.innerText);
 
-    const loadedOnce = ref(false);
     const chat = computed(() => {
         const currentChat = chats.value.find(c => c.chatId == selectedId.value);
-        if (!currentChat && loadedOnce.value) {
+        if (!currentChat && !isLoading.value) {
             localStorage.setItem('lastOpenedChat', '');
             router.push({ name: 'whisper' });
         }
-        loadedOnce.value = true;
         return currentChat;
     });
 
