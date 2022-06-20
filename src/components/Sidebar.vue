@@ -58,7 +58,7 @@
                         v-if="app.name === AppType.Whisper"
                         class="absolute text-xs right-0 top-0 inline-block bg-gradient text-white rounded-full text-center w-7 h-7 pt-2"
                     >
-                        {{ totalUnreadChats() }}
+                        {{ totalUnreadChats }}
                     </p>
                     <img alt="icon of navigation item" :src="app.icon" width="66" />
                 </div>
@@ -81,6 +81,7 @@
     import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
     import { AppItemType, AppType } from '@/types/apps';
+    import { computed } from 'vue';
 
     interface IProps {
         unreadChats?: string[];
@@ -139,13 +140,13 @@
         showUserConfigDialog.value = !showUserConfigDialog.value;
     };
 
-    const totalUnreadChats = () => {
+    const totalUnreadChats = computed(() => {
         let total = 0;
         for (const msg of props.unreadChats) {
             total++;
         }
         return total > 99 ? '99+' : total;
-    };
+    });
 </script>
 
 <style scoped>
