@@ -15,25 +15,28 @@
 
 <script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
+    import { onBeforeMount } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
-    import { searchResults, sharedDir, getFile, selectItem, currentDirectory } from '@/store/fileBrowserStore';
+    import { currentDirectory, getFile, searchResults, selectItem, sharedDir } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
-    import { useRoute, useRouter } from 'vue-router';
+    import { useRoute } from 'vue-router';
     import { showShareDialog } from '@/services/dialogService';
+    import { decodeString } from '@/utils/files';
 
     const route = useRoute();
     onBeforeMount(async () => {
-        const path = atob(<string>route.params.path);
+        const path = decodeString(<string>route.params.path);
         const item = await getFile(path);
         selectItem(item);
         currentDirectory.value = '/';
         showShareDialog.value = true;
     });
-</script>
 
-function emit(arg0: string) { throw new Error('Function not implemented.'); }
+    function emit(arg0: string) {
+        throw new Error('Function not implemented.');
+    }
+</script>
 
 <style scoped type="text/css"></style>

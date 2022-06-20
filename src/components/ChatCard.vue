@@ -42,7 +42,7 @@
     import { statusList } from '@/store/statusStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useRouter } from 'vue-router';
-    import { isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
     import { usechatsActions } from '@/store/chatStore';
 
     const { newUnreadChats, removeUnreadChats } = usechatsActions();
@@ -130,7 +130,7 @@
 
     const blocked = computed(() => {
         if (!props.chat || props.chat.isGroup) return false;
-        return isBlocked(props.chat.chatId);
+        return userIsBlocked(props.chat.chatId);
     });
 </script>
 

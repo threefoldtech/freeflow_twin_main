@@ -29,6 +29,35 @@
 </template>
 
 <script setup lang="ts">
+    import { computed, onMounted, ref } from 'vue';
+    import { useRoute } from 'vue-router';
+    import {
+        accessDenied,
+        fetchFileAccessDetails,
+        fetchShareDetails,
+        FileType,
+        getExtension,
+        getFileType,
+    } from '@/store/fileBrowserStore';
+    import { get } from 'scriptjs';
+    import { showUserOfflineMessage, startFetchStatusLoop } from '@/store/statusStore';
+    import { calcExternalResourceLink } from '@/services/urlService';
+    import { EditPathInfo, getFileInfo } from '@/services/fileBrowserService';
+    import Spinner from '@/components/Spinner.vue';
+    import { isUndefined } from 'lodash';
+    import { decodeString } from '@/utils/files';
+
+    const route = useRoute();
+    const fileType = ref<FileType>();
+    const readUrl = ref<string>();
+    const isLoading = ref<boolean>(true);
+
+    const isSupportedInDocumentServer = computed(() => {
+        return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
+            x => x === fileType.value
+        );
+    });
+
     const generateUrl = (
         protocol: 'http' | 'https',
         owner: string,
@@ -40,52 +69,14 @@
         token = encodeURIComponent(token);
         return `${protocol}://${owner}/api/v1/browse/internal/files?path=${path}&token=${token}&attachment=${attachment}`;
     };
-    import { computed, defineComponent, onMounted, ref, watch } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
-    import {
-        createModel,
-        FullPathInfoModel,
-        getFile,
-        fetchShareDetails,
-        fetchFileAccessDetails,
-        getExtension,
-        FileType,
-        getFileType,
-        accessDenied,
-    } from '@/store/fileBrowserStore';
-    import { get } from 'scriptjs';
-    import config from '@/config';
-    ('../../../public/config/config');
-    import { Contact, DtId } from '@/types';
-    import axios, { ResponseType } from 'axios';
-    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
-    import { fetchStatus, startFetchStatusLoop, watchingUsers, showUserOfflineMessage } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '@/services/urlService';
-    import { EditPathInfo, getFileInfo, PathInfo } from '@/services/fileBrowserService';
-    import { showShareDialog } from '@/services/dialogService';
-    import Spinner from '@/components/Spinner.vue';
-    import { isUndefined } from 'lodash';
-
-    const route = useRoute();
-    const router = useRouter();
-    const fileType = ref<FileType>();
-    const readUrl = ref<string>();
-    const isLoading = ref<boolean>(true);
-
-    const isSupportedInDocumentServer = computed(() => {
-        return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
-            x => x === fileType.value
-        );
-    });
 
     onMounted(async () => {
-        const path = atob(<string>route.params.path);
+        const path = decodeString(<string>route.params.path);
         const shareId = <string>route.params.shareId;
         const attachments = route.params.attachments === 'true';
         let location;
         let documentServerconfig;
         let fileAccesDetails: EditPathInfo;
-        const myAddress = await myYggdrasilAddress();
 
         if (shareId) {
             const shareDetails = await fetchShareDetails(shareId);
@@ -113,7 +104,6 @@
             fileAccesDetails = (await getFileInfo(path, attachments)).data;
             //@todo find better way to get name
 
-            location = await myYggdrasilAddress();
             readUrl.value = generateUrl(
                 'https',
                 window.location.hostname,
