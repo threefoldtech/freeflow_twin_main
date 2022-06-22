@@ -116,7 +116,6 @@
 
     const props = defineProps<IProps>();
 
-
     const apps: Array<AppItemType> = [
         {
             name: AppType.Dashboard,
