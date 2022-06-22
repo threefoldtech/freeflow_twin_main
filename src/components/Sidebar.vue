@@ -55,7 +55,7 @@
                     @click="changePage(app.name)"
                 >
                     <p
-                        v-if="app.name === AppType.Whisper"
+                        v-if="app.name === AppType.Whisper && totalUnreadChats > 0"
                         class="absolute text-xs right-0 top-0 inline-block bg-gradient text-white rounded-full text-center w-7 h-7 pt-2"
                     >
                         {{ totalUnreadChats }}
