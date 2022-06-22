@@ -21,7 +21,6 @@ const authState = reactive<AuthState>({
 // @TODO get name from backend not URL
 export const loginName = window.location.host.split('.')[0];
 
-
 export const useAuthState = () => {
     return {
         ...authState,

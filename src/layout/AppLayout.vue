@@ -50,7 +50,7 @@
     const init = async () => {
         const { getUnreadChats } = usechatsActions();
         totalUnreadChats.value = await getUnreadChats();
-    }
+    };
     init();
 
     const { notification } = useSocketState();
