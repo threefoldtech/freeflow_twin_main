@@ -1,7 +1,7 @@
 <template>
-    <div :class="{ hidden: sharedDir || savedAttachments }" class="mx-2 hidden md:flex justify-between">
+    <div :class="{ hidden: sharedDir || savedAttachments }" class="mx-2 hidden lg:flex justify-between">
         <button
-            class="text-white py-2 px-4 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
+            class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
             @click="showCreateFolderDialog = true"
         >
             <i class="fas fa-plus"></i> New Folder
@@ -15,7 +15,7 @@
     </div>
     <button
         type="button"
-        class="absolute right-5 bottom-5 inline-flex md:hidden items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none"
+        class="fixed right-5 bottom-5 inline-flex lg:hidden items-center p-2 border border-transparent rounded-full shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none z-50"
         @click="showMainActionsOverlay = true"
     >
         <PlusSmIconOutline class="h-6 w-6" aria-hidden="true" />
@@ -25,8 +25,11 @@
         class='md:hidden'
         @update-model-value="showMainActionsOverlay = false"
     >
+        <template v-slot:header>
+            <h2 class="py-2">Create new</h2>
+        </template>
         <template v-slot:content>
-            <div class="flex justify-around mt-5">
+            <div class="flex justify-around py-4">
                 <div class="flex flex-col items-center" @click="() => {showCreateFolderDialog = true; showMainActionsOverlay = false;}">
                     <div class='inline-flex items-center p-2.5 border border-gray-400 rounded-full'>
                         <FolderAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />

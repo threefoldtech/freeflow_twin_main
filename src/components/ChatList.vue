@@ -13,11 +13,12 @@
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
-                        class="absolute lg:static bottom-5 right-5 bg-primary hover:bg-accent-800 transition duration:300 rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                        class="fixed lg:static bottom-5 right-5 bg-accent-600 hover:bg-accent-700 transition duration:300 rounded-full text-white mx-2 p-2 collapsed-bar:w-10 collapsed-bar:h-10"
                         @click="showAddUserDialog = true"
                     >
-                        <i class="fas fa-plus"></i>
+                        <PlusSmIconOutline class="h-6 w-6" aria-hidden="true" />
                     </button>
+                    
                     <h1 class="collapsed-bar:hidden hidden lg:block pt-1 text-lg">Messages</h1>
                 </div>
                 <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden lg:block relative">
@@ -178,7 +179,7 @@
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
     import { SearchIcon, PlusIcon } from '@heroicons/vue/solid';
-    import { ChatIcon } from '@heroicons/vue/outline';
+    import { ChatIcon, PlusSmIcon as PlusSmIconOutline } from '@heroicons/vue/outline';
     import {
         triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_CHAT_CARD,

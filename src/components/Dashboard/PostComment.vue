@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div
+        <!--<div
             class="self-stretch flex justify-center items-center transform transition-opacity duration-200 opacity-0 translate -translate-y-2 hover:opacity-100"
         >
             <a class="" href="#">
@@ -66,7 +66,7 @@
                     </svg>
                 </div>
             </a>
-        </div>
+        </div>-->
     </div>
     <ReplyComment
         v-for="(reply, idx) in commentsSorted"

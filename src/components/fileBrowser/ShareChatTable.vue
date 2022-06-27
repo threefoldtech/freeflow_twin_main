@@ -1,5 +1,5 @@
 <template>
-    <div class="my-2 relative rounded-md shadow-sm">
+    <div class="my-2 mx-4 relative rounded-md shadow-sm">
         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
         </div>
@@ -19,12 +19,12 @@
             <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
         </div>
     </div>
-    <div class="flex flex-col">
-        <div class="-my-2">
-            <div class="py-2 align-middle inline-block min-w-full">
-                <div class="shadow border-b overflow-auto border-gray-200 sm:rounded-lg" style="max-height: 500px">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-100">
+    <div class="flex flex-col mt-4 relative pt-10">
+        <div class="overflow-y-auto overflow-x-hidden border-b">
+            <div class="align-middle inline-block min-w-full max-h-[60vh] sm:max-h-[40vh]">
+                <div class="overflow-hidden border-b border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200 block">
+                        <thead class="w-full block absolute top-0 z-10 bg-gray-100">
                             <tr>
                                 <th
                                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0 z-50"
@@ -42,34 +42,34 @@
                                 ></th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="item in searchResults" :key="item.id">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="flex">
-                                        <div class="flex-shrink-0 h-10 w-10">
+                        <tbody class="bg-white divide-y divide-gray-200 min-w-full flex flex-col">
+                            <tr v-for="item in searchResults" :key="item.id" class="flex">
+                                <td class="px-6 py-4 whitespace-nowrap flex-1 min-w-0 flex items-center">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 hidden md:block">
                                             <AvatarImg :id="item.chatId" alt="chat image" />
                                         </div>
-                                        <div class="ml-4">
-                                            <div class="text-sm font-medium text-gray-900">
+                                        <div class="md:ml-4">
+                                            <div class="text-sm font-medium text-gray-900 text-ellipsis overflow-hidden">
                                                 {{ item.name }}
                                             </div>
                                         </div>
                                     </div>
                                 </td>
-                                <td>
+                                <td class="whitespace-nowrap px-3 py-4 flex flex-1 justify-center">
                                     <div
-                                        class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center"
+                                        class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-min justify-between flex content-center items-center"
                                     >
                                         <span
                                             :class="{ 'bg-primary text-white': !item.canWrite }"
-                                            class="p-2 rounded-xl"
+                                            class="p-2 rounded-l-xl"
                                             @click="item.canWrite = false"
                                         >
                                             Read</span
                                         >
                                         <span
                                             :class="{ 'bg-primary text-white': item.canWrite }"
-                                            class="p-2 rounded-xl"
+                                            class="p-2 rounded-r-xl"
                                             @click="item.canWrite = true"
                                         >
                                             Write</span
@@ -77,7 +77,7 @@
                                     </div>
                                 </td>
 
-                                <td class="text-center">
+                                <td class="text-center whitespace-nowrap px-3 py-4 flex-1 text-left md:text-right">
                                     <button
                                         v-if="!item.isAlreadySent && !item.loading"
                                         class="text-white py-2 px-4 rounded-md justify-self-end bg-primary"

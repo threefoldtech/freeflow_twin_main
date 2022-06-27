@@ -6,7 +6,7 @@
         <input
             type="text"
             v-model="searchTerm"
-            class="focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
+            class="focus:border-primary focus:ring-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
             :placeholder="placeholder"
             v-focus
         />
@@ -18,16 +18,16 @@
             <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
         </div>
     </div>
-    <div class="flex flex-col mt-4 relative pt-10 md:px-4">
-        <div class="overflow-auto">
+    <div class="flex flex-col mt-4 relative pt-10">
+        <div class="overflow-y-auto overflow-x-hidden border-b">
             <div class="align-middle inline-block min-w-full max-h-[50vh] sm:max-h-[40vh]">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <div class="overflow-hidden border-b border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200 block">
-                        <thead class="bg-gray-100 block absolute top-0 w-full z-10">
-                            <tr class="block">
+                        <thead class="w-full block absolute top-0 z-10 bg-gray-100">
+                            <tr class="block w-full pr-10">
                                 <th
                                     scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider block"
+                                    class="px-6 py-3 bg-gray-100 text-left text-xs font-medium text-gray-500 uppercase tracking-wider block"
                                 >
                                     Users
                                 </th>
@@ -50,14 +50,16 @@
                                                         class="w-5 text-gray-400 fas fa-map-marker-alt mr-2"
                                                         aria-hidden="true"
                                                     />
-                                                    {{ trimStringMidway(item.location) }}
+                                                    <p class="md:hidden">{{ trimStringMidway(item.location) }}</p>
+                                                    <p class="hidden md:block">{{ item.location }}</p>
                                                 </div>
                                                 <div class="flex align-center text-sm text-gray-500">
                                                     <em
                                                         class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center"
                                                         aria-hidden="true"
                                                     />
-                                                    {{ trimStringMidway(item.app_id) }}
+                                                    <p class="md:hidden">{{ trimStringMidway(item.app_id) }}</p>
+                                                    <p class="hidden md:block">{{ item.app_id }}</p>
                                                 </div>
                                             </div>
                                         </div>

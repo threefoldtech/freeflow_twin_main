@@ -4,13 +4,12 @@
         :class="{
             'hover:bg-gray-100': !router.currentRoute?.value.path.includes(chat.chatId),
             'bg-gray-200 hover:bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
-            'opacity-50': blocked,
         }"
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"
     >
         <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" :unreadMessagesAmount="unreadMessagesAmount" />
-        <div v-if="!collapsed" class="ml-3 w-full">
+         <div v-if="!collapsed" class="ml-3 w-full">
             <p class="flex items-center">
                 <span class="text-sm text-gray-900 font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
@@ -21,7 +20,7 @@
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <p class="text-sm text-gray-500 max-h-6 max-w-xs truncate">{{ lastMessageBody }}</p>
+            <p class="text-sm text-gray-500 max-h-6 max-w-[60vw] md:max-w-xs truncate">{{ lastMessageBody }}</p>
         </div>
     </li>
 </template>

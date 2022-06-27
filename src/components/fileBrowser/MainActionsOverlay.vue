@@ -10,10 +10,10 @@
             @keydown.esc="$emit('update-model-value', false)"
         >
             <div
-                class="form-container z-50 bg-white p-4 h-1/3 w-full overflow-auto fixed "
+                class="form-container z-50 bg-white h-auto w-full overflow-auto fixed "
                 @mousedown.stop
             >
-                <h2>Create new</h2>
+                <slot name='header'/>
                 <slot name='content'/>
             </div>
         </div>

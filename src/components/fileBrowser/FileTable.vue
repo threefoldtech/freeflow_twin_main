@@ -38,7 +38,7 @@
         >
     </v-contextmenu>
     <div class="flex flex-col mx-2">
-        <div class="lg:overflow-x-auto">
+        <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
                 <div class="overflow-hidden sm:rounded-lg">
                     <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
@@ -53,7 +53,7 @@
                         <table
                             v-if="fileBrowserTypeView === 'LIST' && !savedAttachmentsIsLoading"
                             :key="currentDirectory"
-                            class="hidden lg:block min-w-full divide-y divide-gray-300 shadow border border-gray-300 sm:rounded-lg"
+                            class="min-w-full divide-y divide-gray-300 shadow border border-gray-300 sm:rounded-lg"
                             @dragenter="onDragEnterParent"
                             @dragleave="onDragLeaveParent"
                         >
@@ -213,88 +213,7 @@
                         <!-- Local filebrowser -->
                         <ul
                             v-if="fileBrowserTypeView === 'GRID' && !savedAttachmentsIsLoading"
-                            class="hidden lg:grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
-                            role="list"
-                        >
-                            <p
-                                v-if="sortContent().length === 0"
-                                class="px-6 py-4 whitespace-nowrap col-span-12 text-base font-medium text-center text-gray-800 flex justify-center flex-col"
-                            >
-                                No items in this folder
-                                <span class="mt-4 underline cursor-pointer" @click="goBack">Go back</span>
-                            </p>
-                            <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
-                                <div
-                                    class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
-                                    @click="goToShared()"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-2">
-                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
-                                        <p
-                                            class="block text-sm font-medium text-gray-900 truncate pointer-events-none ml-4"
-                                        >
-                                            Shared with me
-                                        </p>
-                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
-                                <div
-                                    class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
-                                    @click="router.push({ name: 'savedAttachments' })"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-2">
-                                        <i class="fas fa-share-alt-square fa-lg text-blue-400"></i>
-                                        <p
-                                            class="block text-sm font-medium text-gray-900 truncate pointer-events-none ml-4"
-                                        >
-                                            Saved attachments
-                                        </p>
-                                        <button class="absolute inset-0 focus:outline-none" type="button"></button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li
-                                v-for="item in sortContent()"
-                                :key="item.fullName"
-                                :title="item.fullName"
-                                class="relative"
-                                draggable="true"
-                                @click="handleSelect(item)"
-                                @dblclick="handleItemClick(item)"
-                                @dragover="event => onDragOver(event, item)"
-                                @dragstart="event => onDragStart(event, item)"
-                                @drop="() => onDrop(item)"
-                                @mousedown.right="setCurrentRightClickedItem(item)"
-                                v-contextmenu:contextmenu-filebrowser-item-local
-                            >
-                                <div
-                                    :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
-                                    class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
-                                >
-                                    <div class="flex justify-start items-center cursor-pointer px-4">
-                                        <i
-                                            :key="item.name"
-                                            :class="getIcon(item) + ' ' + getIconColor(item)"
-                                            class="fa-lg"
-                                        ></i>
-                                        <p
-                                            class="block text-sm font-medium text-gray-900 truncate pointer-events-none ml-4"
-                                        >
-                                            {{ item.name
-                                            }}{{ getFileExtension(item) === '-' ? '' : `.${getFileExtension(item)}` }}
-                                        </p>
-                                    </div>
-                                </div>
-                                <p class="hidden block text-sm font-medium text-gray-500 pointer-events-none">
-                                    {{ getFileLastModified(item) }}
-                                </p>
-                            </li>
-                        </ul>
-                        <ul
-                            v-if="!savedAttachmentsIsLoading"
-                            class="grid lg:hidden grid-cols-1 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+                            class="grid grid-cols-1 gap-x-2 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 xl:gap-x-6 mt-4"
                             role="list"
                         >
                             <p
@@ -348,7 +267,6 @@
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
                                 @mousedown.right="setCurrentRightClickedItem(item)"
-                                v-contextmenu:contextmenu-filebrowser-item-local
                             >
                                 <div
                                     :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
@@ -443,6 +361,7 @@
     onBeforeMount(() => {
         const { initializeSocket } = useSocketActions();
         initializeSocket(user.id.toString());
+        console.log(window.innerWidth);
     });
 
     const setCurrentRightClickedItem = item => {

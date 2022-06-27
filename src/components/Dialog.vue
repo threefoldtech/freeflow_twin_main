@@ -4,7 +4,7 @@
             v-if="props.modelValue"
             ref="dialogRef"
             tabindex="-1"
-            class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
+            class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-full grid place-items-center"
             style="z-index: 60"
             @mousedown="$emit('update-model-value', false)"
             @keydown.esc="$emit('update-model-value', false)"

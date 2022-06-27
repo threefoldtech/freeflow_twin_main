@@ -204,16 +204,17 @@
             </template>
         </Alert>
         <Dialog
+            v-if='showLeaveDialog && chat?.isGroup'
             v-model="showLeaveDialog"
             class="max-w-10"
             :noActions="true"
             @update-model-value="showLeaveDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
+                <h1 class="text-center">Leaving group</h1>
             </template>
-            <div v-if="chat?.isGroup">
-                <p v-if="chat?.contacts.length > 1" class="mb-5">
+            <div>
+                <p v-if="chat?.contacts.length > 1" class="mb-5 px-4">
                     Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
                 </p>
                 <div
@@ -233,12 +234,7 @@
                     </p>
                 </div>
             </div>
-            <div v-else>
-                Do you really want to delete
-                <b> {{ chat?.name }} </b>
-                from your connections?
-            </div>
-            <div class="flex justify-end mt-2">
+            <div class="flex justify-end mt-2 px-4">
                 <button
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                     @click="showLeaveDialog = false"
@@ -250,6 +246,29 @@
                 </button>
             </div>
         </Dialog>
+
+        <Alert v-if="showLeaveDialog && !chat?.isGroup" :showAlert="showLeaveDialog" @close="showLeaveDialog = false">
+            <template #title> Deleting user </template>
+            <template #content>
+                Do you really want to delete this user
+                <b>{{ chat?.name }}</b
+                >?
+            </template>
+            <template #actions>
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="doLeaveChat"
+                >
+                    Delete
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                    @click="showLeaveDialog = false"
+                >
+                    Cancel
+                </button>
+            </template>
+        </Alert>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
             <template #title> Deleting group </template>
