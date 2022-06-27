@@ -9,8 +9,9 @@
         @click="selectedMessageId = message.id"
     >
         <AvatarImg
+            @click="$emit('clickedProfile', message.from)"
             small
-            class="mx-2"
+            class="mx-2 cursor-pointer"
             :class="{
                 'opacity-0': !isLastMessage,
             }"
@@ -166,7 +167,7 @@
     import { downloadAttachment } from '@/services/fileBrowserService';
 
     interface IProps {
-        message: object;
+        message: Message<MessageBodyType>;
         chatId: string;
         isMine: boolean;
         isGroup: boolean;
@@ -179,7 +180,7 @@
     const isDownloadingAttachment = ref<boolean>(false);
     const props = defineProps<IProps>();
 
-    const emit = defineEmits(['openEditShare']);
+    const emit = defineEmits(['openEditShare', 'clickedProfile']);
 
     const { user } = useAuthState();
 

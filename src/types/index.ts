@@ -46,6 +46,7 @@ export interface QuoteBodyType extends MessageBodyType {
     message: string;
     quotedMessage: Message<MessageBodyType>;
 }
+
 export interface GroupUpdate extends MessageBodyType {
     type: string;
     contact: Contact;
@@ -59,19 +60,22 @@ export interface Chat {
     read: {
         [key: string]: string;
     };
-    contacts: (AnonymousContact | Contact)[];
+    contacts: (GroupContact | Contact)[];
     acceptedChat: boolean;
     name: string;
     isGroup: boolean;
     adminId: string;
     draft: Message<MessageBodyType>;
 }
-export interface PersonChat extends Chat {}
 
-export interface GroupChat extends Chat {}
+export interface PersonChat extends Chat {}
 
 export interface Contact extends AnonymousContact {
     location: string;
+}
+
+export interface GroupContact extends Contact {
+    roles: Roles[];
 }
 
 export interface AnonymousContact {
@@ -82,8 +86,16 @@ export interface DtId extends Id {}
 
 export interface Id extends String {}
 
+export interface GroupChat extends Chat {}
+
 export interface Workspace extends GroupChat {
     subGroups: GroupChat[];
+}
+
+export enum Roles {
+    USER = 'USER',
+    MODERATOR = 'MODERATOR',
+    ADMIN = 'ADMIN',
 }
 
 export enum SystemMessageTypes {
@@ -92,6 +104,7 @@ export enum SystemMessageTypes {
     JOINED_VIDEOROOM = 'JOINED_VIDEOROOM',
     CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND',
     USER_LEFT_GROUP = 'USER_LEFT_GROUP',
+    CHANGE_USER_ROLE = 'CHANGE_USER_ROLE',
 }
 
 export enum FileTypes {
@@ -104,6 +117,7 @@ export interface GroupManagementBody extends SystemBody {
     contact: Contact;
     nextAdmin?: string;
 }
+
 export interface JoinedVideoRoomBody extends SystemBody {
     id: string;
 }
@@ -150,6 +164,7 @@ export enum SharePermission {
     Read = 'r',
     Write = 'w',
 }
+
 export interface SharePermissionInterface {
     chatId: string | undefined;
     types: SharePermission[];

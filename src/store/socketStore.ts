@@ -1,13 +1,15 @@
-import { Chat, Id, Message } from '@/types';
+import { Chat, Contact, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { toRefs, inject } from 'vue';
+import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
-import { useAuthState } from '@/store/authStore';
-import { addUserToBlockList } from '@/store/blockStore';
+import { setLocation, useAuthState } from '@/store/authStore';
+import { addUserToBlockList, blocklist } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { allSocialPosts } from '@/store/socialStore';
+import { loadAllUsers } from '@/store/userStore';
+import config from '@/config';
 import { statusList } from './statusStore';
 
 const state = reactive<State>({
@@ -36,6 +38,8 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('chat_removed', (chatId: string) => {
         removeChat(chatId);
+        const { removeUnreadChats } = usechatsActions();
+        removeUnreadChats(chatId);
     });
     state.socket.on('chat_blocked', (chatId: string) => {
         addUserToBlockList(chatId);
@@ -51,14 +55,17 @@ const initializeSocket = (username: string) => {
         }
         if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
             notify({ id: message.id });
+            const { newUnreadChats } = usechatsActions();
+            newUnreadChats(message.to === user.id ? message.from.toString() : message.to.toString());
         }
         const { addMessage } = usechatsActions();
 
-        addMessage(message.to === user.id ? message.from : message.to, message);
+        addMessage(message.to === user.id ? message.from.toString() : message.to.toString(), message);
     });
     state.socket.on('connectionRequest', (newContactRequest: Chat) => {
-        const { addChat } = usechatsActions();
+        const { addChat, newUnreadChats } = usechatsActions();
         addChat(newContactRequest);
+        newUnreadChats(newContactRequest.chatId);
     });
     state.socket.on('chat_updated', (chat: Chat) => {
         const { updateChat } = usechatsActions();
@@ -86,6 +93,18 @@ const initializeSocket = (username: string) => {
     state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
         if (statusList[id]) statusList[id].isOnline = isOnline;
     });
+    state.socket.on('appID', (url: string) => {
+        config.setAppId(url);
+    });
+    state.socket.on('yggdrasil', (location: string) => {
+        setLocation(location);
+    });
+    state.socket.on('blocked_contacts', (contacts: { id: string }[]) => {
+        blocklist.value = contacts;
+    });
+    state.socket.on('users_loaded', async (users: Contact[]) => {
+        loadAllUsers(users);
+    });
 };
 
 const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate = false) => {
@@ -104,6 +123,11 @@ export const sendBlockChat = async (id: Id) => {
     state.socket.emit('block_chat', id);
 };
 
+const sendUnBlockedChat = async (id: Id) => {
+    state.socket.emit('unblock_chat', id);
+    blocklist.value = blocklist.value.filter(x => x !== id);
+};
+
 const sendSocketUserStatus = async (status: string) => {
     const data = {
         status,
@@ -116,6 +140,9 @@ export const useSocketActions = () => {
         initializeSocket,
         sendSocketMessage,
         sendSocketUserStatus,
+        sendUnBlockedChat,
+        sendRemoveChat,
+        sendBlockChat,
         notify,
     };
 };

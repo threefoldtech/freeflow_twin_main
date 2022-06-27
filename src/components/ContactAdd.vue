@@ -19,12 +19,7 @@
             </a>
         </div>
         <div v-if="isActive('user')" class="flex flex-col">
-            <UserTable
-                :data="possibleUsers"
-                focus
-                placeholder="Search for user..."
-                @addContact="contactAdd"
-            ></UserTable>
+            <UserTable :data="allUsers" focus placeholder="Search for user..." @addContact="contactAdd"></UserTable>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
                     class="flex justify-between w-full mt-4 ml-0 py-2 text-sm font-medium text-left text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
@@ -124,7 +119,7 @@
             <div>
                 <UserTableGroup
                     v-model="usernameInGroupAdd"
-                    :data="contacts"
+                    :data="groupContacts"
                     :error="usernameAddError"
                     :usersInGroup="usersInGroup"
                     placeholder="Search for user..."
@@ -152,25 +147,26 @@
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState, myYggdrasilAddress } from '../store/authStore';
-    import { Contact } from '../types/index';
+    import { myYggdrasilAddress, useAuthState } from '../store/authStore';
+    import { Contact, GroupContact, Roles } from '../types/index';
     import axios from 'axios';
     import config from '@/config';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
+    import { allUsers } from '@/store/userStore';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
-    const { contacts } = useContactsState();
-    //const contacts = [{"id":"jens", "location":"145.546.487"},{"id":"Simon", "location":"145.586.487"},{"id":"jonas", "location":"145.546.48765654654"},{"id":"Ine", "location":"145.546sdfsdf.487"}];
+    const { groupContacts } = useContactsState();
+
     const userAddLocation = ref('');
     const usernameAddError = ref('');
     const groupnameAdd = ref('');
     const groupnameAddError = ref('');
     const usernameInGroupAdd = ref('');
-    const usersInGroup = ref<Contact[]>([]);
+    const usersInGroup = ref<GroupContact[]>([]);
     const possibleUsers = ref<Contact[]>([]);
     const contactAddError = ref('');
 
@@ -181,6 +177,8 @@
         { name: 'user', text: 'Add a user' },
         { name: 'group', text: 'Create a group' },
     ]);
+
+    const { user } = useAuthState();
 
     const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
@@ -242,10 +240,10 @@
             groupnameAddError.value = "The name can't contain more than 50 characters";
             return;
         }
-        const mylocation = await myYggdrasilAddress();
         usersInGroup.value.push({
             id: user.id,
-            location: mylocation,
+            location: user.location,
+            roles: [Roles.USER, Roles.MODERATOR, Roles.ADMIN],
         });
 
         addGroupchat(groupnameAdd.value, usersInGroup.value);
@@ -262,7 +260,7 @@
     axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
         const { user } = useAuthState();
         const posContacts = <Contact[]>r.data;
-        const alreadyExistingChatIds = [...contacts.map(c => c.id), user.id];
+        const alreadyExistingChatIds = [...groupContacts.map(c => c.id), user.id];
         possibleUsers.value = posContacts.filter(pu => !alreadyExistingChatIds.find(aEx => aEx === pu.id));
     });
 </script>

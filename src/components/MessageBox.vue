@@ -79,6 +79,13 @@
                     @copy="copyMessage($event, message)"
                     @openEditShare="editFileSharePermission"
                     @mousedown.right="setCurrentRightClickedItem(message)"
+                    @clickedProfile="
+                        id =>
+                            $emit(
+                                'clickedProfile',
+                                chat.contacts.find(c => c.id === id)
+                            )
+                    "
                     v-contextmenu:contextmenu-message
                 />
             </div>
@@ -182,6 +189,8 @@
 
     const { chats } = useChatsState();
     const { user } = useAuthState();
+
+    const emit = defineEmits(['clickedProfile']);
 
     const tabs = ['Create shares', 'Edit permissions'];
 

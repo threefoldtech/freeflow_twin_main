@@ -84,12 +84,10 @@
     const { retrieveChats } = usechatsActions();
     const dashboardWindow = ref<HTMLElement>(null);
 
-    onBeforeMount(async () => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
+    (async () => {
         await getAllPosts();
         await retrieveChats();
-    });
+    })();
 
     const showLoader = computed(() => {
         if (allSocialPosts.value.length >= 1) return false;

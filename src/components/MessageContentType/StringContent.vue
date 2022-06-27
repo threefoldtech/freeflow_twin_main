@@ -4,38 +4,32 @@
 
 <script lang="ts" setup>
     import { computed } from 'vue';
-
-    // Disclaimer: This is not yet proven to be SAFE, this might contain XSS. Use with caution!
-    const regularExpression = /((http|https):\/\/([a-zA-Z0-9.\/?=&\[\]:\_\-\;\%]+))/g;
+    import { marked } from 'marked';
+    import DOMPurify from 'dompurify';
+    import emoji from 'node-emoji';
 
     interface IProp {
-        message: Object;
+        message: {
+            body: string;
+        };
     }
 
     const props = defineProps<IProp>();
-    const escapeHtml = (unsafeHtml: string) => {
-        return unsafeHtml
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
-    };
+    let { body } = props.message;
+    const replacer = (match: string) => emoji.emojify(match);
+    const words = body.split(' ');
 
     const computedMessage = computed(() => {
-        let escapedHtml = escapeHtml(`${props.message.body}`);
-        const matches = escapedHtml.match(regularExpression);
-
-        if (matches === null) {
-            return escapedHtml;
-        }
-
-        escapedHtml = escapedHtml.replace(
-            regularExpression,
-            `<a class='hover:underline' href='$1' target='_BLANK'>$1</a>`
+        body = body.replace(/(:.*:)/g, replacer);
+        words.map(word =>
+            word.startsWith('@')
+                ? (body = body.replace(
+                      word,
+                      `<span class="bg-blue-400 text-white p-1 text-sm rounded-sm cursor-pointer hover:bg-blue-500">${word}</span>`
+                  ))
+                : (body = body)
         );
-
-        return escapedHtml;
+        return DOMPurify.sanitize(marked(body));
     });
 </script>
 

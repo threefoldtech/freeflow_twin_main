@@ -101,7 +101,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <MessageBox ref="messageBox" :chat="chat" style="flex: 2">
+                            <MessageBox @clickedProfile="popupProfile" ref="messageBox" :chat="chat" style="flex: 2">
                                 <div></div>
                                 <template v-slot:viewAnchor>
                                     <div
@@ -175,6 +175,7 @@
                                 @app-unblock="unBlockChat"
                                 @app-leave="leaveChat"
                                 @app-delete="deleteChat"
+                                @clickedProfile="popupProfile"
                             >
                             </group-management>
                         </div>
@@ -183,7 +184,7 @@
             </template>
         </appLayout>
         <Alert v-if="showDialog" :showAlert="showDialog" @close="showDialog = false">
-            <template #title> Blocking </template>
+            <template #title> Blocking</template>
             <template #content>
                 Do you really want to block
                 <b> {{ chat.name }} </b>?
@@ -213,8 +214,8 @@
             <template v-slot:title class="center">
                 <h1 class="text-center">Leaving group</h1>
             </template>
-            <div>
-                <p v-if="chat?.contacts.length > 1" class="mb-5 px-4">
+            <div v-if="chat?.isGroup && chat?.adminId === user?.id">
+                <p v-if="chat?.contacts.length > 1" class="mb-5">
                     Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
                 </p>
                 <div
@@ -235,6 +236,7 @@
                 </div>
             </div>
             <div class="flex justify-end mt-2 px-4">
+
                 <button
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                     @click="showLeaveDialog = false"
@@ -271,7 +273,7 @@
         </Alert>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
-            <template #title> Deleting group </template>
+            <template #title> Deleting group</template>
             <template #content>
                 Do you really want to delete this group
                 <b>{{ chat?.name }}</b
@@ -299,6 +301,47 @@
             </template>
             <div>{{ errorMessage }}</div>
         </Dialog>
+
+        <Dialog v-model="showProfileDialog" @updateModelValue="showProfileDialog = false">
+            <template v-slot:title>
+                <h1 class="mb-5">User info</h1>
+            </template>
+
+            <div>
+                <div class="flex space-x-5 mb-5">
+                    <AvatarImg :id="selectedUser?.id" large />
+                    <h2 class="mt-3 text-xl">{{ selectedUser?.id }}</h2>
+                </div>
+
+                <div class="flex space-x-3" v-if="isPersonFriend !== null">
+                    <div class="w-auto">
+                        <a
+                            class="text-xs text-accent-600 hover:bg-opacity-60 font-semibold flex items-center justify-center px-3 py-2 bg-accent-300 bg-opacity-50 rounded-lg"
+                            href="#"
+                            @click="goToChat"
+                        >
+                            <div class="mr-1 h-6 flex items-center flex-shrink-0">
+                                <img src="/whisperbold.svg" alt="whisper" />
+                            </div>
+                            Send private message
+                        </a>
+                    </div>
+
+                    <div class="w-auto">
+                        <a
+                            class="text-xs text-gray-800 hover:bg-gray-300 font-semibold flex items-center justify-center px-3 py-2 bg-gray-200 rounded-lg"
+                            href="#"
+                            @click="goToKutana"
+                        >
+                            <div class="mr-1 h-6 flex items-center flex-shrink-0">
+                                <img src="/kutanabold.svg" alt="kutana" />
+                            </div>
+                            Go to video room
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
     </div>
 </template>
 
@@ -307,11 +350,11 @@
     import AppLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
-    import { useContactsState } from '@/store/contactStore';
+    import { useContactsActions, useContactsState } from '@/store/contactStore';
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
+    import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
     import ChatList from '@/components/ChatList.vue';
@@ -323,10 +366,10 @@
     import { useIntersectionObserver } from '@/lib/intersectionObserver';
     import { useRoute, useRouter } from 'vue-router';
     import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
-    import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
+    import { AnonymousContact, Contact, JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
     import MessageBox from '@/components/MessageBox.vue';
     import Button from '@/components/Button.vue';
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon, VideoCameraIcon, InformationCircleIcon } from '@heroicons/vue/outline';
@@ -356,6 +399,8 @@
     const showDeleteDialog = ref(false);
     const showRemoveUserDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
+    const { addContact } = useContactsActions();
+    const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
 
     watch(
         () => route.params.id,
@@ -367,6 +412,45 @@
     onBeforeMount(async () => {
         await retrieveChats();
     });
+
+    const showProfileDialog = ref(false);
+    const selectedUser = ref<Contact | AnonymousContact>();
+
+    const isPersonFriend = computed(() => {
+        if (user.id === selectedUser.value?.id) return null;
+        return contacts.some(item => item.id === selectedUser.value.id);
+    });
+
+    const goToChat = async e => {
+        e.preventDefault();
+        if (user.id === selectedUser.value?.id) return;
+        if (!('location' in selectedUser.value)) return;
+
+        if (!isPersonFriend.value) {
+            await retrieveChats();
+            addContact(selectedUser.value.id, selectedUser.value.location);
+        }
+        await nextTick(async () => {
+            localStorage.setItem('lastOpenedChat', selectedUser.value.id.toString());
+            await router.push({ name: 'whisper' });
+        });
+    };
+
+    const goToKutana = async e => {
+        e.preventDefault;
+        await nextTick(async () => {
+            await router.push({ name: 'kutana' });
+        });
+    };
+
+    const popupProfile = async (contact: Contact | AnonymousContact) => {
+        console.log('contact', contact);
+        if (!contact) return;
+        if (!('location' in contact)) return;
+
+        showProfileDialog.value = true;
+        selectedUser.value = contact;
+    };
 
     const truncate = (value, limit = 20) => {
         if (value.length > limit) {
@@ -414,14 +498,12 @@
     const nextAdmin = ref('');
     const setNextAdmin = e => (nextAdmin.value = e.target.innerText);
 
-    const loadedOnce = ref(false);
     const chat = computed(() => {
         const currentChat = chats.value.find(c => c.chatId == selectedId.value);
-        if (!currentChat && loadedOnce.value) {
+        if (!currentChat && !isLoading.value) {
             localStorage.setItem('lastOpenedChat', '');
             router.push({ name: 'whisper' });
         }
-        loadedOnce.value = true;
         return currentChat;
     });
 
@@ -482,7 +564,7 @@
     const doLeaveChat = async () => {
         if (chat.value.isGroup && chat.value.contacts.length > 1) {
             const { updateContactsInGroup } = usechatsActions();
-            if (!nextAdmin.value) return;
+            if (!nextAdmin.value && user.id === chat.value.adminId) return;
             await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
             return;
         }
@@ -513,7 +595,7 @@
         router.push({ name: 'whisper' });
     };
 
-    const unBlockChat = async () => await deleteBlockedEntry(chat.value.chatId);
+    const unBlockChat = async () => sendUnBlockedChat(chat.value.chatId);
 
     const reads = computed(() => {
         const preReads = {};
@@ -566,7 +648,7 @@
 
     const blocked = computed(() => {
         if (!chat.value || chat.value.isGroup) return false;
-        return isBlocked(<string>chat.value.chatId);
+        return userIsBlocked(<string>chat.value.chatId);
     });
 
     let activeItem = ref('edit');

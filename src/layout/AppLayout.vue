@@ -4,6 +4,7 @@
     </suspense>
     <div class="bg-gray-100 h-full relative text-sm">
         <NotificationSection />
+
         <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
             <Navigation :class="[smallScreen ? 'top' : 'side']">
                 <template #content>
@@ -30,7 +31,18 @@
     import { useSocketState } from '../store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
+
     import Navigation from '@/components/Navigation.vue';
+
+    import { usechatsActions } from '@/store/chatStore';
+
+    const totalUnreadChats = ref<string[]>([]);
+
+    const init = async () => {
+        const { getUnreadChats } = usechatsActions();
+        totalUnreadChats.value = await getUnreadChats();
+    };
+    init();
 
     const { notification } = useSocketState();
     const showNav = ref(false);

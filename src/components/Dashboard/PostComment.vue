@@ -103,7 +103,7 @@
     import { ThumbUpIcon } from '@heroicons/vue/solid';
     import { COMMENT_MODEL, MESSAGE_TYPE } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import { TransitionRoot } from '@headlessui/vue';
     import { likeComment } from '@/services/socialService';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -114,14 +114,9 @@
     const props = defineProps<{ comment: COMMENT_MODEL }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
-    const myLocation = ref<string>('');
     const { user } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
-
-    onBeforeMount(async () => {
-        myLocation.value = await myYggdrasilAddress();
-    });
 
     //only shows user panel if mouse stays focussed for a moment
     const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
@@ -143,7 +138,7 @@
     });
 
     const myAvatar = computed(() => {
-        return calcExternalResourceLink(`http://[${myLocation.value}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${user.location}]/api/v1/user/avatar/default`);
     });
 
     const handleReplyForm = () => {
