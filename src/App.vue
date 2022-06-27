@@ -16,7 +16,7 @@
         <router-view v-show="path !== '/glass'" />
 
         <app-layout>
-            <div v-show="path === '/glass' && hasBrowserBeenStartedOnce" class="h-full w-full relative">
+            <div v-show="path === '/glass' && hasBrowserBeenStartedOnce" class="h-full ">
                 <iframe
                     class="relative h-full w-full"
                     title="forum"
