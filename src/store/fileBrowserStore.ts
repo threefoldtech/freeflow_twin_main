@@ -14,6 +14,8 @@ import { watchingUsers } from '@/store/statusStore';
 import router from '@/plugins/Router';
 import { AppType } from '@/types/apps';
 import { usechatsActions, useChatsState } from './chatStore';
+import { isArray } from 'lodash';
+import { decodeString } from '@/utils/files';
 
 declare const Buffer;
 
@@ -122,7 +124,6 @@ export const updateAttachments = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path, true);
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-    // attachments.value = result.data.map(createModel);
     currentDirectoryContent.value = result.data.map(createModel);
     savedAttachments.value = true;
     savedAttachmentsIsLoading.value = false;
@@ -254,15 +255,6 @@ export const chatFilesReceived = (chat: Chat, received: boolean) => {
 
 export const getchatsWithFiles = (received: boolean) => {
     return chats.value.filter(chat => chatFilesReceived(chat, received).length > 0);
-};
-
-export const uploadFile = async (file: File, path = currentDirectory.value) => {
-    const result = await Api.uploadFile(path, file);
-    if ((result.status !== 200 && result.status !== 201) || !result.data)
-        throw new Error('Could not create new folder');
-
-    currentDirectoryContent.value.push(createModel(result.data));
-    await updateContent();
 };
 
 export const deleteFiles = async (list: PathInfoModel[]) => {
@@ -803,7 +795,7 @@ export const showSharedFolderErrorModal = ref(false);
 
 export const loadLocalFolder = () => {
     if (router.currentRoute.value.params.attachment) updateAttachments(currentDirectory.value);
-    const folderId = atob(<string>router.currentRoute.value.params.folder);
+    const folderId = decodeString(<string>router.currentRoute.value.params.folder);
     currentDirectory.value = folderId.split('.').shift();
     savedAttachments.value = false;
 };
@@ -956,7 +948,6 @@ export const loadSharedItems = () => {
     }
 
     sharedWithMeCurrentFolder.value = sharedBreadcrumbs.value[sharedBreadcrumbs.value.length - 1];
-    //sharedBreadcrumbs.value[sharedBreadcrumbs.value.length - 1]
 };
 
 export const goIntoSharedFolder = async (share: SharedFileInterface) => {

@@ -16,42 +16,35 @@
 
 <script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
-    import { computed, defineComponent, onBeforeMount } from 'vue';
+    import { onBeforeMount } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
     import {
-        updateContent,
-        searchResults,
-        sharedDir,
-        selectedPaths,
-        searchDirValue,
         currentDirectory,
-        currentShare,
-        getFile,
-        selectItem,
-        selectedTab,
-        goBack,
-        currentDirectoryContent,
-        sharedItem,
-        goIntoSharedFolder,
-        goTo,
-        fetchBasedOnRoute,
         isQuantumChatFiles,
+        searchDirValue,
+        searchResults,
+        selectedPaths,
+        selectedTab,
+        selectItem,
+        sharedDir,
+        sharedItem,
+        updateContent,
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
     import { useRoute, useRouter } from 'vue-router';
     import { isUndefined } from 'lodash';
     import { showShareDialog } from '@/services/dialogService';
-    import Spinner from '@/components/Spinner.vue';
     import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
+    import { decodeString } from '@/utils/files';
 
     const route = useRoute();
     const router = useRouter();
 
     onBeforeMount(async () => {
         if (route.params.name === 'sharedWithMeItemNested') {
-            currentDirectory.value = atob(<string>route.params.path);
+            currentDirectory.value = decodeString(<string>route.params.path);
         }
 
         if (!sharedDir.value) {
@@ -68,7 +61,6 @@
                 return;
             }
             if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
-            //if(route.name !== 'savedAttachments') await updateContent(currentDirectory.value);
             sharedDir.value = false;
             searchResults.value = [];
             searchDirValue.value = '';

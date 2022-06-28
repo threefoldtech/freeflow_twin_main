@@ -1,5 +1,9 @@
 import axios from 'axios';
 import config from '@/config';
+import { Contact } from '@/types';
+import { useContactsState } from '@/store/contactStore';
+import { useAuthState } from '@/store/authStore';
+import { ref } from 'vue';
 
 export const setNewAvatar = async selectedFile => {
     var formData = new FormData();
@@ -25,4 +29,14 @@ export const isUserAuthenticated = async () => {
     } catch (e) {
         console.log(e);
     }
+};
+
+export const allUsers = ref<Contact[]>([]);
+
+export const loadAllUsers = async (users: Contact[]) => {
+    const { contacts } = useContactsState();
+    const { user } = useAuthState();
+
+    const contactsCopy = [...contacts, user];
+    allUsers.value = users.filter(u => !contactsCopy.some(c => c.id === u.id));
 };

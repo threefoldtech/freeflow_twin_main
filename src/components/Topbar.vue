@@ -57,12 +57,9 @@
 </template>
 
 <script setup lang="ts">
-    import { defineComponent, onBeforeMount, ref } from 'vue';
+    import { ref } from 'vue';
     import { useAuthState } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
-    import Dialog from './Dialog.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
@@ -118,14 +115,9 @@
         isEditingStatus.value = false;
     };
 
-    // @todo: config
-
-    onBeforeMount(() => {
-        initBlocklist();
-    });
-
     const unblockUser = async user => {
-        await deleteBlockedEntry(user);
+        const { sendUnBlockedChat } = useSocketActions();
+        sendUnBlockedChat(user);
         showUserConfigDialog.value = false;
     };
 

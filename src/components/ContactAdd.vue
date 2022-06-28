@@ -17,12 +17,7 @@
             </a>
         </div>
         <div v-if="isActive('user')" class="flex flex-col">
-            <UserTable
-                :data="possibleUsers"
-                focus
-                placeholder="Search for user..."
-                @addContact="contactAdd"
-            ></UserTable>
+            <UserTable :data="allUsers" focus placeholder="Search for user..." @addContact="contactAdd"></UserTable>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
                     class="flex justify-between w-full mt-4 ml-0 py-2 text-sm font-medium text-left text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
@@ -158,6 +153,7 @@
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
+    import { allUsers } from '@/store/userStore';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
@@ -179,6 +175,8 @@
         { name: 'user', text: 'Add a user' },
         { name: 'group', text: 'Create a group' },
     ]);
+
+    const { user } = useAuthState();
 
     const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
@@ -240,10 +238,9 @@
             groupnameAddError.value = "The name can't contain more than 50 characters";
             return;
         }
-        const mylocation = await myYggdrasilAddress();
         usersInGroup.value.push({
             id: user.id,
-            location: mylocation,
+            location: user.location,
             roles: [Roles.USER, Roles.MODERATOR, Roles.ADMIN],
         });
 

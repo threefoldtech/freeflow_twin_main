@@ -19,7 +19,7 @@
                             <i class="fas fa-pen text-icon"></i>
                         </div>
                         <AvatarImg
-                            :id="user.id"
+                            :id="String(user.id)"
                             large
                             class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden"
                         />
@@ -127,16 +127,16 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, onBeforeMount, onMounted, ref, watch, watchEffect } from 'vue';
+    import { computed, ref, watch, watchEffect } from 'vue';
     import { useAuthState, getMyStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { blocklist, deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
+    import { blocklist } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
-    import { showAddUserDialog, showUserConfigDialog } from '@/services/dialogService';
+    import { showUserConfigDialog } from '@/services/dialogService';
     import { statusList } from '@/store/statusStore';
     import { calcExternalResourceLink } from '../services/urlService';
     import VueCropper from 'vue-cropperjs';
@@ -144,10 +144,7 @@
 
     const emit = defineEmits(['addUser']);
 
-    initBlocklist();
-
     const { user } = useAuthState();
-    const showEditPic = ref(false);
     const fileInput = ref();
     const file = ref();
     const userStatus = ref('');
@@ -158,10 +155,6 @@
     const cropper = ref(null);
     const isHoveringAvatar = ref(false);
     const showEditAvatar = ref(false);
-
-    onBeforeMount(async () => {
-        await initBlocklist();
-    });
 
     watch(showEditAvatar, () => {
         if (showEditAvatar.value) {
@@ -229,7 +222,7 @@
         file.value = null;
     };
 
-    const closeDialog = newVal => {
+    const closeDialog = (newVal: boolean) => {
         showUserConfigDialog.value = newVal;
     };
 
@@ -249,8 +242,9 @@
         isEditingStatus.value = false;
     };
 
-    const unblockUser = async user => {
-        await deleteBlockedEntry(user);
+    const unblockUser = async (user: string) => {
+        const { sendUnBlockedChat } = useSocketActions();
+        sendUnBlockedChat(user);
         showUserConfigDialog.value = false;
     };
 

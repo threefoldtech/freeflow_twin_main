@@ -17,6 +17,7 @@
             </div>
             <slot name="side">
                 <Sidebar
+                    :unreadChats="totalUnreadChats"
                     @clicked="showNav = false"
                     class="bg-accent-800 md:block"
                     :class="[showNav ? '' : 'hidden', smallScreen ? 'top' : 'side']"
@@ -42,6 +43,15 @@
     import { useSocketState } from '../store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
+    import { usechatsActions } from '@/store/chatStore';
+
+    const totalUnreadChats = ref<string[]>([]);
+
+    const init = async () => {
+        const { getUnreadChats } = usechatsActions();
+        totalUnreadChats.value = await getUnreadChats();
+    };
+    init();
 
     const { notification } = useSocketState();
     const showNav = ref(false);
