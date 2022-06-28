@@ -106,8 +106,7 @@
         }
 
         const fileInfo = (await getFileInfo(path, attachments)).data;
-        //todo: location is hardcoded
-        const location = '204:ad78:b5e7:ec71:6bc8:f90d:dc42:3e8f';
+        const location = useAuthState().user.location;
 
         //@todo find better way to get name
 
