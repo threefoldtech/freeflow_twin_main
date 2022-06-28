@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { uuidv4 } from '../../utils/uuid';
 import { LocationService } from '../location/location.service';
 import { User } from './models/user.model';
 import { UserRedisRepository } from './repositories/user-redis.repository';
@@ -51,9 +52,8 @@ export class UserService {
     }
 
     async getUserAvatar(): Promise<string> {
-        const { avatar } = await this.getUserData();
         if (!this.myAddress) this.myAddress = (await this._locationService.getOwnLocation()) as string;
-        return `http://[${this.myAddress}]/api/v2/user/avatar/${avatar}`;
+        return `http://[${this.myAddress}]/api/v2/user/avatar/${uuidv4()}`;
     }
 
     /**
@@ -85,7 +85,7 @@ export class UserService {
             userToUpdate.lastSeen = new Date().getTime();
             await this._userRepo.updateUserData(userToUpdate);
             if (!this.myAddress) this.myAddress = (await this._locationService.getOwnLocation()) as string;
-            return `http://[${this.myAddress}]/api/v2/user/avatar/${path}`;
+            return `http://[${this.myAddress}]/api/v2/user/avatar/${uuidv4()}`;
         } catch (error) {
             throw new BadRequestException(`failed to update avatar: ${error}`);
         }

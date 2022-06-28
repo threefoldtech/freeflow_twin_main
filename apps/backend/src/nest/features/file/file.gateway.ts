@@ -10,7 +10,7 @@ import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
-import { ChatFileState, FileAction, FileState, PostFileState, QuantumFileState } from './file.state';
+import { AvatarFileState, ChatFileState, FileAction, FileState, PostFileState, QuantumFileState } from './file.state';
 
 @WebSocketGateway({ cors: '*' })
 export class FileGateway implements OnGatewayInit {
@@ -53,6 +53,11 @@ export class FileGateway implements OnGatewayInit {
             FileAction.ADD_TO_QUANTUM,
             new QuantumFileState(this._configService, this._fileService, this._quantumService)
         );
+        // handles files for avatar
+        this._fileStateHandlers.set(
+            FileAction.CHANGE_AVATAR,
+            new AvatarFileState(this._configService, this._fileService)
+        );
     }
 
     afterInit(server: Server) {
@@ -64,6 +69,10 @@ export class FileGateway implements OnGatewayInit {
     async handleUploadedFile(
         @MessageBody() { fileId, payload, action }: { fileId: string; payload: unknown; action: FileAction }
     ) {
-        return await this._fileStateHandlers.get(action).handle({ fileId, payload });
+        const handled = await this._fileStateHandlers.get(action).handle({ fileId, payload });
+        if (handled) {
+            this.server.emit('avatar_test', { fileId, payload, action });
+        }
+        return handled;
     }
 }

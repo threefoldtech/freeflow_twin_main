@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '@/config';
 
-export const setNewAvatar = async selectedFile => {
+export const setNewAvatar = async (selectedFile): Promise<{ id: string; filename: string; url: string }> => {
     var formData = new FormData();
     formData.append('file', selectedFile);
     const url = `${config.baseUrl}api/v2/user/avatar`;

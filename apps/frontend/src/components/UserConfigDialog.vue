@@ -79,15 +79,6 @@
                             </button>
                         </li>
                     </template>
-
-                    <!-- <li v-if="blockedUsers.length === 0 && blockedUsersLoading">
-                        ...
-                    </li>
-                    <li
-                        v-if="blockedUsers.length === 0 && !blockedUsersLoading"
-                    >
-                        No blocked users
-                    </li> -->
                 </ul>
             </div>
         </div>
@@ -127,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, onBeforeMount, onMounted, ref, watch, watchEffect } from 'vue';
+    import { computed, nextTick, onBeforeMount, ref, watch, watchEffect } from 'vue';
     import { useAuthState, getMyStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
@@ -136,11 +127,12 @@
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
-    import { showAddUserDialog, showUserConfigDialog } from '@/services/dialogService';
+    import { showUserConfigDialog } from '@/services/dialogService';
     import { statusList } from '@/store/statusStore';
     import { calcExternalResourceLink } from '../services/urlService';
     import VueCropper from 'vue-cropperjs';
     import 'cropperjs/dist/cropper.css';
+    import { FileAction } from 'custom-types/file-actions.type';
 
     const emit = defineEmits(['addUser']);
 
@@ -234,7 +226,13 @@
     };
 
     const sendNewAvatar = async (data: any) => {
-        await setNewAvatar(data);
+        const { sendHandleUploadedFile } = useSocketActions();
+        const avatar = await setNewAvatar(data);
+        await sendHandleUploadedFile({
+            fileId: avatar.id,
+            action: FileAction.CHANGE_AVATAR,
+            payload: { filename: avatar.filename },
+        });
         await fetchStatus(user.id);
     };
 
@@ -258,6 +256,7 @@
         emit('addUser');
     };
     const status = computed(() => {
+        console.log(statusList, user.id);
         return statusList[<string>user.id];
     });
 
@@ -284,9 +283,11 @@
         background-color: aquamarine;
         border: 2px solid black;
     }
+
     .avatar-container {
         position: relative;
     }
+
     .overlay {
         position: absolute;
         top: 0;

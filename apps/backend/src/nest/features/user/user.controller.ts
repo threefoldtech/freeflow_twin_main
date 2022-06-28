@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IStatus, IStatusUpdate } from 'custom-types/status.type';
+import fs from 'fs';
 import { createReadStream } from 'fs-extra';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -66,9 +67,10 @@ export class UserController {
 
     @Get('avatar/:avatarId')
     async getAvatar(@Param('avatarId') avatarId: string) {
-        let filePath = `${this._configService.get<string>('baseDir')}user/avatar-default`;
-        if (avatarId !== 'default') {
-            filePath = `${this._configService.get<string>('baseDir')}user/${avatarId}`;
+        // represents uuid for saving the new avatar
+        let filePath = `${this._configService.get<string>('baseDir')}user/avatar`;
+        if (!fs.existsSync(filePath)) {
+            filePath = `${this._configService.get<string>('baseDir')}user/avatar-default`;
         }
         const stream = createReadStream(filePath);
         return new StreamableFile(stream);
@@ -79,16 +81,18 @@ export class UserController {
     @UseInterceptors(
         LocalFilesInterceptor({
             fieldName: 'file',
-            path: 'user',
+            path: 'tmp',
             fileFilter: imageFileFilter,
             limits: {
-                fileSize: Math.pow(2048, 2), // 2MB
+                fileSize: Math.pow(2048, 2) * 10, // 20MB
             },
         })
     )
-    uploadAvatar(@UploadedFile() file: Express.Multer.File): Promise<string> {
+    async uploadAvatar(
+        @UploadedFile() file: Express.Multer.File
+    ): Promise<{ id: string; filename: string; url: string }> {
         if (!file) throw new BadRequestException('provide a valid image');
-        const filename = file.filename.split('.')[0];
-        return this._userService.updateAvatar({ path: filename });
+        const url = await this._userService.updateAvatar({ path: file.originalname });
+        return { id: file.filename, filename: file.originalname, url };
     }
 }

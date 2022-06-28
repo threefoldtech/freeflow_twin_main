@@ -5,9 +5,8 @@ import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
-import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
+import { getAllPosts } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
-import { allSocialPosts } from '@/store/socialStore';
 import { FileAction } from 'custom-types/file-actions.type';
 import { statusList } from './statusStore';
 

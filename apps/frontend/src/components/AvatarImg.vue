@@ -8,16 +8,17 @@
         }"
         class="grid relative"
     >
-        <div
+        <img
             :class="{
                 'h-16 w-16': large,
                 'h-12 w-12': !small && !xsmall && !large,
                 'h-10 w-10': small,
                 'h-8 w-8': xsmall,
             }"
-            :style="`background:url(${src}) no-repeat center/cover`"
             class="bg-icon rounded-full"
-        ></div>
+            alt="avatar"
+            :src="src"
+        />
         <div
             v-if="showOnlineStatus"
             :class="{
