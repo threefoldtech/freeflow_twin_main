@@ -55,7 +55,7 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
                 },
             });
             if (!data.id) return false;
-            post.images ? post.images.push(data.id) : (post.images = [data.id]);
+            post.images ? post.images.push(data.filename) : (post.images = [data.filename]);
             const { sendHandleUploadedFile } = useSocketActions();
             sendHandleUploadedFile({
                 fileId: String(data.id),
