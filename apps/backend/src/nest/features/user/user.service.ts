@@ -58,7 +58,7 @@ export class UserService {
 
     /**
      * Updates user data to Redis.
-     * @param {UserData} userData - Data to update user data with.
+     * @param {User} userData - Data to update user data with.
      * @return {string} - Updated user data ID.
      */
     async updateUserData(userData: User): Promise<string> {

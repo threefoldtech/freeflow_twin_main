@@ -103,10 +103,7 @@ export const sendBlockChat = async (id: Id) => {
 };
 
 const sendSocketUserStatus = async (status: string) => {
-    const data = {
-        status,
-    };
-    state.socket.emit('status_update', data);
+    state.socket.emit('status_update', status);
 };
 
 const sendHandleUploadedFile = async ({

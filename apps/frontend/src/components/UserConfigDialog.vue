@@ -242,7 +242,7 @@
     };
     const sendNewStatus = async () => {
         const { sendSocketUserStatus } = useSocketActions();
-        sendSocketUserStatus(userStatus.value);
+        await sendSocketUserStatus(userStatus.value);
         user.status = userStatus.value;
         isEditingStatus.value = false;
     };

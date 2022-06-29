@@ -69,10 +69,6 @@ export class FileGateway implements OnGatewayInit {
     async handleUploadedFile(
         @MessageBody() { fileId, payload, action }: { fileId: string; payload: unknown; action: FileAction }
     ) {
-        const handled = await this._fileStateHandlers.get(action).handle({ fileId, payload });
-        if (handled) {
-            this.server.emit('avatar_test', { fileId, payload, action });
-        }
-        return handled;
+        return await this._fileStateHandlers.get(action).handle({ fileId, payload });
     }
 }
