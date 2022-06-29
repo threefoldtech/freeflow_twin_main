@@ -90,7 +90,7 @@ export class MessageController {
     @UseGuards(AuthGuard)
     async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
         console.log(`INCOMING MESSAGE: ${message.type}`);
-        const blockedContacts = await this._blockedContactService.getBlockedContactList();
+        const blockedContacts = await this._blockedContactService.getBlockedContactIds();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
         if (isBlocked) throw new ForbiddenException('blocked');

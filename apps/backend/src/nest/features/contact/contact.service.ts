@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ContactRequest, MessageBody, MessageType } from '../../types/message-types';
 import { uuidv4 } from '../../utils/uuid';
 import { ApiService } from '../api/api.service';
+import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
@@ -26,6 +27,7 @@ export class ContactService {
         private readonly _apiService: ApiService,
         @Inject(forwardRef(() => ChatService))
         private readonly _chatService: ChatService,
+        private readonly _blockedContactService: BlockedContactService,
         @Inject(forwardRef(() => ChatGateway))
         private readonly _chatGateway: ChatGateway
     ) {}
@@ -53,6 +55,17 @@ export class ContactService {
         } catch (error) {
             throw new NotFoundException('contact not found');
         }
+    }
+
+    /**
+     * Gets all contacts that are not blocked.
+     * @return {Contact[]} - Contacts.
+     */
+    async getUnblockedContacts(): Promise<Contact[]> {
+        const contacts = await this.getContacts();
+        const blockedContacts = await this._blockedContactService.getBlockedContactIds();
+
+        return contacts.filter(contact => !blockedContacts.includes(contact.id));
     }
 
     /**

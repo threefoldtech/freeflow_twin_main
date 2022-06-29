@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 
 import { ApiModule } from '../api/api.module';
+import { BlockedContactModule } from '../blocked-contact/blocked-contact.module';
 import { ChatModule } from '../chat/chat.module';
 import { DbModule } from '../db/db.module';
 import { KeyModule } from '../key/key.module';
@@ -20,6 +21,7 @@ import { ContactRedisRepository } from './repositories/contact-redis.repository'
         forwardRef(() => YggdrasilModule),
         forwardRef(() => ChatModule),
         forwardRef(() => MessageModule),
+        BlockedContactModule,
     ],
     controllers: [ContactController],
     providers: [ContactService, ContactRedisRepository],
