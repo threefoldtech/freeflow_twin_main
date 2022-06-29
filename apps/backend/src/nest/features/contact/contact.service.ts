@@ -228,7 +228,7 @@ export class ContactService {
      */
     async addContact({ id, location }: CreateContactDTO<ContactRequest>): Promise<Contact> {
         const existingContact = await this.getContact({ id });
-        if (existingContact) return;
+        if (existingContact) return await this._contactRepo.updateContact({ id });
         try {
             return await this._contactRepo.addNewContact({
                 id,

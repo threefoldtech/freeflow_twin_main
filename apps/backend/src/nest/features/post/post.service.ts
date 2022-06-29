@@ -99,7 +99,8 @@ export class PostService {
         try {
             // get contacts posts
             if (!external) {
-                const contacts = await this._contactService.getUnblockedContacts();
+                //todo: add 'accepted' property to contact in redis and use that instead of checking contactRequest property
+                const contacts = (await this._contactService.getUnblockedContacts()).filter(c => !c.contactRequest);
 
                 await Promise.all(
                     contacts.map(async contact => {

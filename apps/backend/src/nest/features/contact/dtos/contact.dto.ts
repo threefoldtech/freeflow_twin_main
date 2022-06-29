@@ -27,3 +27,5 @@ export class DeleteContactDTO {
     @IsString()
     id: string;
 }
+
+export class UpdateContactDTO extends DeleteContactDTO {}

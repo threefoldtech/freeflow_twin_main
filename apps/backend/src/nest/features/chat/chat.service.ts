@@ -80,7 +80,9 @@ export class ChatService {
         const chat = await this.getChat(chatId);
         const contacts = chat.parseContacts();
         const contact = contacts.find(c => c.id === chatId);
+        contact.contactRequest = false;
         try {
+            //todo: update the contact.accepted property to true for the other user
             if (contact) await this._contactService.addContact(contact);
             chat.acceptedChat = true;
             await this._chatRepository.updateChat(chat);
