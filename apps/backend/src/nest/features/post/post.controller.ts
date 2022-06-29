@@ -18,9 +18,10 @@ export class PostController {
     async getPosts(
         @Param() { username }: GetPostsQueryDto,
         @Query('offset') offset = 0,
-        @Query('count') count = 50
+        @Query('count') count = 50,
+        @Query('external') external = false
     ): Promise<IPostContainerDTO[]> {
-        return await this._postService.getPosts({ offset, count, username });
+        return await this._postService.getPosts({ offset, count, username, external });
     }
 
     @Get('/:owner/:postId')

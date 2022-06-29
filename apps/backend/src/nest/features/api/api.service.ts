@@ -178,7 +178,7 @@ export class ApiService {
      * @return {IPostContainerDTO[]} - Found posts.
      */
     async getExternalPosts({ location, userId }: { location: string; userId: string }): Promise<IPostContainerDTO[]> {
-        const destinationUrl = `http://[${location}]/api/v2/posts/${userId}`;
+        const destinationUrl = `http://[${location}]/api/v2/posts/${userId}?external=true`;
         try {
             return (await axios.get<IPostContainerDTO[]>(destinationUrl)).data;
         } catch (error) {

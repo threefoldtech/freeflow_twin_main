@@ -13,6 +13,7 @@ import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { stringifyLikes, stringifyReplies } from './models/post.model';
 import { PostRedisRepository } from './repositories/post-redis.repository';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class PostService {
@@ -27,6 +28,7 @@ export class PostService {
         private readonly _apiService: ApiService,
         private readonly _contactService: ContactService,
         private readonly _blockedContactService: BlockedContactService,
+        private readonly _userService: UserService,
         private readonly _userGateway: UserGateway
     ) {}
 
@@ -89,25 +91,29 @@ export class PostService {
         offset,
         count,
         username,
+        external,
     }: {
         offset: number;
         count: number;
         username: string;
+        external: boolean;
     }): Promise<IPostContainerDTO[]> {
         const posts: IPostContainerDTO[] = [];
         try {
             // get contacts posts
-            const contacts = await this.getContacts();
-            await Promise.all(
-                contacts.map(async contact => {
-                    const data = await this._apiService.getExternalPosts({
-                        location: contact.location,
-                        userId: contact.id,
-                    });
-                    posts.push(...data);
-                })
-            );
+            if (!external) {
+                const contacts = await this.getContacts();
 
+                await Promise.all(
+                    contacts.map(async contact => {
+                        const data = await this._apiService.getExternalPosts({
+                            location: contact.location,
+                            userId: contact.id,
+                        });
+                        posts.push(...data);
+                    })
+                );
+            }
             // get own posts
             const data = (await this._postRepo.getPosts({ offset, count, username })).map(post => post.toJSON());
             posts.push(...data);
@@ -268,8 +274,9 @@ export class PostService {
      * @return {Contact[]} - Contacts.
      */
     private async getContacts(): Promise<Contact[]> {
-        if (!this.contacts) this.contacts = await this._contactService.getContacts();
-        if (!this.blockedContacts) this.blockedContacts = await this._blockedContactService.getBlockedContactList();
+        if (this.contacts.length === 0) this.contacts = await this._contactService.getContacts();
+        if (this.blockedContacts.length === 0)
+            this.blockedContacts = await this._blockedContactService.getBlockedContactList();
 
         return this.contacts.filter(contact => !this.blockedContacts.includes(contact.id));
     }
