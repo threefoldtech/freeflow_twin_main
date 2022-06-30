@@ -31,4 +31,13 @@ export class ContactController {
             accepted: true,
         });
     }
+
+    @Put('delete/:userId')
+    async deleteContact(@Param() { userId }: { userId: string }): Promise<Contact> {
+        return await this._contactService.updateContact({
+            id: userId,
+            contactRequest: false,
+            accepted: false,
+        });
+    }
 }

@@ -4,6 +4,7 @@ import axios, { ResponseType } from 'axios';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
+import Contact from '../../../models/contact';
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
@@ -300,6 +301,20 @@ export class ApiService {
             return (await axios.put<boolean>(destinationUrl)).data;
         } catch (error) {
             throw new BadRequestException(`unable to accept contact request: ${error}`);
+        }
+    }
+
+    /**
+     * Lets the other twin know that he was removed as a contact.
+     * @param {string} resource - Twin to contact with resource.
+     */
+    async deleteContact({ contact }: { contact: Contact }): Promise<boolean> {
+        const ownId = await this._configService.get<string>('userId');
+        const destinationUrl = `http://[${contact.location}]/api/v2/contacts/delete/${ownId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to delete contact: ${error}`);
         }
     }
 }

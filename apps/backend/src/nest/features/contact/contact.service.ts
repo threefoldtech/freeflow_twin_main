@@ -246,6 +246,7 @@ export class ContactService {
         const contact = await this.getContact({ id });
         if (contact?.entityId)
             try {
+                await this._apiService.deleteContact({ contact });
                 return await this._contactRepo.deleteContact({ id: contact.entityId });
             } catch (error) {
                 throw new BadRequestException(`unable remove contact: ${error}`);
