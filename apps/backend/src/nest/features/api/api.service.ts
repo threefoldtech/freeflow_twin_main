@@ -287,7 +287,9 @@ export class ApiService {
 
     /**
      * Lets the other twin know that the connection request was accepted.
-     * @param {string} resource - Twin to contact with resource.
+     * @param {Object} obj - Object.
+     * @param {string} obj.ownId - Your own id
+     * @param {string} obj.contactLocation - IPv6 location to send event to.
      */
     async acceptContactRequest({
         ownId,
@@ -306,7 +308,8 @@ export class ApiService {
 
     /**
      * Lets the other twin know that he was removed as a contact.
-     * @param {string} resource - Twin to contact with resource.
+     @param {Object} obj - Object.
+     @param {string} obj.contact - The contact that you deleted.
      */
     async deleteContact({ contact }: { contact: Contact }): Promise<boolean> {
         const ownId = await this._configService.get<string>('userId');
