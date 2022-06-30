@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { ApiModule } from '../api/api.module';
 import { ChatModule } from '../chat/chat.module';
@@ -17,12 +17,12 @@ import { UserService } from './user.service';
     imports: [
         DbModule,
         KeyModule,
-        LocationModule,
-        YggdrasilModule,
-        ContactModule,
         ApiModule,
-        ChatModule,
-        QuantumModule,
+        forwardRef(() => LocationModule),
+        forwardRef(() => YggdrasilModule),
+        forwardRef(() => ChatModule),
+        forwardRef(() => ContactModule),
+        forwardRef(() => QuantumModule),
     ],
     controllers: [UserController],
     providers: [UserService, UserGateway, UserRedisRepository],

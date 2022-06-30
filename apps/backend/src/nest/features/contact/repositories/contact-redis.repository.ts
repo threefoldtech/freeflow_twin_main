@@ -44,10 +44,11 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
      * @param {string} obj.id - Contact ID.
      * @param {string} obj.location - Contact IPv6.
      * @param {boolean} obj.contactRequest - Contact request.
+     * @param {boolean} obj.accepted - Contact accepted.
      * @return {Contact} - Created entity.
      */
-    async addNewContact({ id, location, contactRequest }: CreateContactDTO<MessageBody>): Promise<Contact> {
-        return await this.save({ id, location, contactRequest });
+    async addNewContact({ id, location, contactRequest, accepted }: CreateContactDTO<MessageBody>): Promise<Contact> {
+        return await this.save({ id, location, contactRequest, accepted });
     }
 
     /**
@@ -61,11 +62,19 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
     /**
      * Updates a contact.
      * @param {string} id - Contact ID.
+     * @param contactRequest
+     * @param accepted
      */
-    async updateContact({ id }: UpdateContactDTO) {
+    async updateContact({ id, contactRequest, accepted }: UpdateContactDTO) {
+        console.log('values', id, contactRequest, accepted);
         const contact = await this.getContact({ id });
         if (!contact) return;
-        contact.contactRequest = false;
+        contact.contactRequest = contactRequest;
+        contact.accepted = accepted;
+        console.log('updated values contactrequest', contact.contactRequest);
+        console.log('updated values accepted', contact.accepted);
+        console.log('updated values id', contact.id);
+
         await this.update(contact);
         return contact;
     }

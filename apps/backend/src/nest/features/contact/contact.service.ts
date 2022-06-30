@@ -12,7 +12,7 @@ import { LocationService } from '../location/location.service';
 import { CreateMessageDTO, MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { Message } from '../message/models/message.model';
-import { CreateContactDTO, DeleteContactDTO } from './dtos/contact.dto';
+import { CreateContactDTO, DeleteContactDTO, UpdateContactDTO } from './dtos/contact.dto';
 import { Contact } from './models/contact.model';
 import { ContactRedisRepository } from './repositories/contact-redis.repository';
 
@@ -90,6 +90,7 @@ export class ContactService {
                     id,
                     location,
                     contactRequest: false,
+                    accepted: false,
                 });
             } catch (error) {
                 throw new BadRequestException(`unable to create contact: ${error}`);
@@ -147,12 +148,7 @@ export class ContactService {
      * @param {CreateMessageDTO} obj.message - Contact request message.
      * @return {Contact} - Created entity.
      */
-    async handleIncomingContactRequest({
-        id,
-        location,
-        contactRequest,
-        message,
-    }: CreateContactDTO<ContactRequest>): Promise<Contact> {
+    async handleIncomingContactRequest({ id, location, message }: CreateContactDTO<ContactRequest>): Promise<Contact> {
         const yggdrasilAddress = await this._locationService.getOwnLocation();
         const me = {
             id: this._configService.get<string>('userId'),
@@ -170,7 +166,8 @@ export class ContactService {
                 (await this._contactRepo.addNewContact({
                     id,
                     location,
-                    contactRequest,
+                    contactRequest: true,
+                    accepted: false,
                 }));
         } catch (error) {
             throw new BadRequestException(`unable to create contact: ${error}`);
@@ -228,12 +225,13 @@ export class ContactService {
      */
     async addContact({ id, location }: CreateContactDTO<ContactRequest>): Promise<Contact> {
         const existingContact = await this.getContact({ id });
-        if (existingContact) return await this._contactRepo.updateContact({ id });
+        if (existingContact) return;
         try {
             return await this._contactRepo.addNewContact({
                 id,
                 location,
                 contactRequest: false,
+                accepted: false,
             });
         } catch (error) {
             throw new BadRequestException(`unable to add contact: ${error}`);
@@ -252,5 +250,21 @@ export class ContactService {
             } catch (error) {
                 throw new BadRequestException(`unable remove contact: ${error}`);
             }
+    }
+
+    /**
+     * Updates a contact.
+     * @param {string} id - Contact ID.
+     * @param contactRequest
+     * @param accepted
+     */
+    async updateContact({ id, contactRequest, accepted }: UpdateContactDTO): Promise<Contact> {
+        const contact = this.getContact({ id });
+        if (!contact) throw new NotFoundException(`contact not found`);
+        try {
+            return await this._contactRepo.updateContact({ id, contactRequest, accepted });
+        } catch (error) {
+            throw new BadRequestException(`unable to update contact: ${error}`);
+        }
     }
 }

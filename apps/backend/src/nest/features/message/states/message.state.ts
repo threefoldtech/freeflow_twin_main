@@ -47,7 +47,6 @@ export class ContactRequestMessageState implements MessageState<ContactRequest> 
             id: from.id,
             location: from.location,
             message: (<unknown>message) as CreateMessageDTO<ContactRequest>,
-            contactRequest: true,
         });
     }
 }

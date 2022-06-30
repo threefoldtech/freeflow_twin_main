@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
 import { EntityData } from 'redis-om';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -21,5 +21,14 @@ export class ContactController {
     @UseGuards(AuthGuard)
     async createContact(@Body() body: CreateContactDTO<MessageBody>): Promise<Contact> {
         return await this._contactService.createNewContact(body);
+    }
+
+    @Put('accept/:userId')
+    async acceptRequest(@Param() { userId }: { userId: string }): Promise<Contact> {
+        return await this._contactService.updateContact({
+            id: userId,
+            contactRequest: false,
+            accepted: true,
+        });
     }
 }

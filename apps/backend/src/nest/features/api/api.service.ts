@@ -283,4 +283,23 @@ export class ApiService {
             throw new BadRequestException(`unable to get external resource: ${error}`);
         }
     }
+
+    /**
+     * Lets the other twin know that the connection request was accepted.
+     * @param {string} resource - Twin to contact with resource.
+     */
+    async acceptContactRequest({
+        ownId,
+        contactLocation,
+    }: {
+        ownId: string;
+        contactLocation: string;
+    }): Promise<boolean> {
+        const destinationUrl = `http://[${contactLocation}]/api/v2/contacts/accept/${ownId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to accept contact request: ${error}`);
+        }
+    }
 }
