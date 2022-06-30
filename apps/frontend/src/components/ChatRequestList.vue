@@ -24,7 +24,7 @@
     import { usechatsActions } from '@/store/chatStore';
     import Button from '@/components/Button.vue';
     import { Chat } from '@/types';
-    import { sendRemoveChat } from '@/store/socketStore';
+    import { sendRemoveUser } from '@/store/socketStore';
 
     interface Props {
         chatRequests: Chat[];
@@ -38,6 +38,6 @@
     };
 
     const denyChatRequest = id => {
-        sendRemoveChat(id);
+        sendRemoveUser(id);
     };
 </script>
