@@ -71,14 +71,14 @@
     import { useRouter } from 'vue-router';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
     import { usechatsActions } from '@/store/chatStore';
-    import { computed, nextTick, onBeforeMount, ref } from 'vue';
+    import { computed, nextTick, ref } from 'vue';
     import { myYggdrasilAddress } from '@/store/authStore';
     import { fetchStatus } from '@/store/statusStore';
     import { IPostContainerDTO } from 'custom-types/post.type';
 
     const { contacts } = useContactsState();
-    const { addContact } = useContactsActions();
-    const { getChat } = usechatsActions();
+    const { addContact, retrieveContacts } = useContactsActions();
+    const { getChat, retrieveChats } = usechatsActions();
 
     const props = defineProps<{
         comment: IPostContainerDTO;
@@ -89,7 +89,8 @@
     const online = ref<boolean>();
     const router = useRouter();
 
-    onBeforeMount(async () => {
+    const init = async () => {
+        await retrieveContacts();
         location.value = await myYggdrasilAddress();
         const userId = props.comment.owner.id;
         const { isOnline } = await fetchStatus(userId);
@@ -104,17 +105,18 @@
             const formattedDate = new Date(chat.createdAt).toLocaleDateString('nl-BE', options);
             friendsSince.value = formattedDate;
         }
-    });
+    };
+    init();
 
     const isPersonFriend = computed(() => {
         if (location.value === props.comment.owner.location) return null;
-        return contacts.some(item => item.id === props.comment.owner.id);
+        return contacts.value.some(item => item.id === props.comment.owner.id);
     });
 
     const goToChat = async e => {
         e.preventDefault();
         if (location.value === props.comment.owner.location) return;
-        if (!contacts.some(item => item.id === props.comment.owner.id)) {
+        if (!contacts.value.some(item => item.id === props.comment.owner.id)) {
             await retrieveChats();
             addContact(props.comment.owner.id, props.comment.owner.location);
         }
