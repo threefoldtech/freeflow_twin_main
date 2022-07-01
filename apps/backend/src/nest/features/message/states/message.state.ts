@@ -6,6 +6,7 @@ import {
     FileMessage,
     GroupUpdate,
     IFileShareMessage,
+    IPostShare,
     SystemMessage,
     SystemMessageType,
 } from '../../../types/message-types';
@@ -99,6 +100,15 @@ export class FileShareMessageState implements MessageState<IFileShareMessage> {
         if (message.from === this._configService.get<string>('userId')) return;
         this._chatGateway.emitMessageToConnectedClients('message', message);
         await this._quantumService.createFileShare({ ...message.body, isSharedWithMe: true });
+        return await this._messageService.createMessage(message);
+    }
+}
+
+export class PostShareMessageState implements MessageState<IPostShare> {
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+
+    async handle({ message }: { message: MessageDTO<IPostShare> }): Promise<Message> {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
         return await this._messageService.createMessage(message);
     }
 }

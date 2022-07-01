@@ -1,4 +1,5 @@
 import { FileType } from 'custom-types/file-actions.type';
+import { IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 import { ContactDTO } from '../features/contact/dtos/contact.dto';
 import { IFileShare } from '../features/quantum/interfaces/file-share.interface';
@@ -17,6 +18,13 @@ export interface FileMessage {
     type: FileType;
     filename: string;
     url: string;
+}
+
+export interface IPostShare {
+    message: string;
+    post: IPostDTO;
+    images: string[];
+    owner: IPostOwner;
 }
 
 export interface SystemMessage {
@@ -53,6 +61,7 @@ export enum MessageType {
     QUOTE = 'QUOTE',
     FILE_SHARE_DELETE = 'FILE_SHARE_DELETE',
     DOWNLOAD_ATTACHMENT = 'DOWNLOAD_ATTACHMENT',
+    POST_SHARE = 'POST_SHARE',
 }
 
 export enum SystemMessageType {

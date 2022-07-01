@@ -164,7 +164,7 @@
     import { downloadAttachment } from '@/services/fileBrowserService';
 
     interface IProps {
-        message: object;
+        message: Message<MessageBodyType>;
         chatId: string;
         isMine: boolean;
         isGroup: boolean;
@@ -220,7 +220,7 @@
 
     const read = () => {
         const { readMessage } = usechatsActions();
-        readMessage(props.chatId, props.message.id);
+        readMessage(props.chatId, props.message.id.toString());
     };
 
     if (!props.isreadbyme) {
@@ -230,6 +230,7 @@
     const deleteMessage = message => {
         //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
+            chatId: props.chatId,
             id: message.id,
             from: message.from,
             to: message.to,
@@ -249,6 +250,7 @@
     const deleteReply = (message, reply) => {
         //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
+            chatId: props.chatId,
             id: reply.id,
             from: reply.from,
             to: reply.to,

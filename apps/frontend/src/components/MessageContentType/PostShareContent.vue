@@ -87,12 +87,12 @@
 
     const thumbnailImage = computed(() => {
         return calcExternalResourceLink(
-            `https://[${props.message.body.owner.location}]/api/v2/files/${btoa(props.message.body.images[0])}`
+            `http://[${props.message.body.owner.location}]/api/v2/files/${props.message.body.images[0]}`
         );
     });
 
     const avatarImg = computed(() => {
-        return calcExternalResourceLink(`https://[${props.message.body.owner.location}]/api/v2/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${props.message.body.owner.location}]/api/v2/user/avatar/default`);
     });
 
     const goToSocialPost = async () => {

@@ -389,7 +389,7 @@
     };
 
     const avatarImg = computed(() => {
-        return calcExternalResourceLink(`https://[${props.item.owner.location}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/user/avatar/default`);
     });
 
     const fetchPostImage = (image: string) => {
