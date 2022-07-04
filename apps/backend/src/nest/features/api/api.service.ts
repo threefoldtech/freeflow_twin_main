@@ -52,7 +52,6 @@ export class ApiService {
         try {
             return await axios.put(`http://[${location}]/api/v2/messages`, message, {
                 responseType: responseType || 'json',
-                timeout: 5000,
             });
         } catch {
             return;
@@ -77,7 +76,6 @@ export class ApiService {
         try {
             return await axios.put(`http://[${location}]/api/v2/user/update-status`, status, {
                 responseType: responseType || 'json',
-                timeout: 5000,
             });
         } catch {
             return;
