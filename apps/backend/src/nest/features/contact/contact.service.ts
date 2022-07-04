@@ -120,7 +120,6 @@ export class ContactService {
             adminId: newContact.id,
             read: [],
             isGroup: false,
-            draft: [],
             messages: [signedMessage],
         });
 
@@ -208,7 +207,6 @@ export class ContactService {
             adminId: message.from,
             read: [],
             isGroup: false,
-            draft: [],
             messages: [contactRequestMsg],
         });
 

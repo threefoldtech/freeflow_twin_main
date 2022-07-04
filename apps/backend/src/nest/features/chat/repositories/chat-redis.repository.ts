@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 import { DbService } from '../../db/db.service';
 import { EntityRepository } from '../../db/entity.repository';
+import { stringifyMessage } from '../../message/models/message.model';
 import { CreateChatDTO } from '../dtos/chat.dto';
-import { Chat, chatSchema, stringifyContacts, stringifyMessages } from '../models/chat.model';
+import { Chat, chatSchema, stringifyContacts } from '../models/chat.model';
 
 @Injectable()
 export class ChatRedisRepository extends EntityRepository<Chat> {
@@ -41,7 +42,7 @@ export class ChatRedisRepository extends EntityRepository<Chat> {
             adminId,
             read: read ? read : [],
             isGroup,
-            draft: draft ? stringifyMessages(draft) : [],
+            draft: draft ? stringifyMessage(draft) : null,
         });
     }
 

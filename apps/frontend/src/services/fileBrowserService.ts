@@ -8,7 +8,8 @@ import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
 import { useSocketActions } from '@/store/socketStore';
 import { FileAction } from 'custom-types/file-actions.type';
 
-const endpoint = `${config.baseUrl}api/v1/browse`;
+// TODO: delete when everything is handled by nestjs
+const endpoint = `${config.baseUrl}api/v2/quantum`;
 
 export interface PathInfo {
     isFile: boolean;
@@ -191,7 +192,7 @@ export const removeFilePermissions = async (userId: string, path: string, locati
     });
 };
 
-export const getShared = async (shareStatus: string) => {
+export const getShared = async (_shareStatus: string) => {
     return await axios.get<SharedFileInterface[]>(`${config.baseUrl}api/v2/quantum/shares/shared-with-me`);
 };
 export const getShareWithId = async (id: string) => {
@@ -218,6 +219,7 @@ export const getFileAccessDetails = async (
 
     path = encodeURIComponent(path);
 
+    // TODO: handle in nest
     let apiEndPointToCall = `/api/v1/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
@@ -235,6 +237,7 @@ export const getSharedFolderContent = async (
     let externalUrl = `https://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
+    // TODO: handle in nest
     let apiEndPointToCall = `/api/v1/browse/share/${shareId}/folder?path=${path}`;
 
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
@@ -244,6 +247,7 @@ export const getSharedFolderContent = async (
 };
 
 export const getShareByPath = async (path: string): Promise<SharedFileInterface> => {
+    // TODO: handle in nest
     return (await axios.get(`${endpoint}/share/path/`, { params: { path } })).data;
 };
 
@@ -251,6 +255,7 @@ export const downloadAttachment = async (message: any) => {
     createNotification('Downloading attachment', `from ${message.from}`, Status.Info);
     try {
         const msgUrl = message.body.url;
+        // TODO: handle in nest
         const response = await axios.get(`${endpoint}/attachment/download`, {
             params: { owner: message.from, path: msgUrl, to: message.to, messageId: message.id },
         });

@@ -18,7 +18,7 @@ export interface Chat {
     adminId: string;
     read: string[];
     isGroup: boolean;
-    draft?: string[];
+    draft?: string;
 }
 
 export class Chat extends Entity {
@@ -31,16 +31,16 @@ export class Chat extends Entity {
             acceptedChat: this.acceptedChat,
             adminId: this.adminId,
             isGroup: this.isGroup,
-            draft: this.parseMessages(),
+            draft: this.parseMessage(),
             messages: [],
         };
     }
     /**
      * Parses message or draft strings to valid JSON.
-     * @return {Message[]} - The parsed messages.
+     * @return {Message} - The parsed message.
      */
-    parseMessages(): Message[] {
-        return this.draft.map(m => JSON.parse(m));
+    parseMessage(): Message {
+        return JSON.parse(this.draft);
     }
 
     /**
@@ -76,5 +76,5 @@ export const chatSchema = new Schema(Chat, {
     adminId: { type: 'string' },
     read: { type: 'string[]' },
     isGroup: { type: 'boolean' },
-    draft: { type: 'string[]' },
+    draft: { type: 'string' },
 });

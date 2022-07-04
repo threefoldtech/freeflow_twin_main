@@ -14,6 +14,7 @@ import { ContactService } from '../contact/contact.service';
 import { KeyService } from '../key/key.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
+import { stringifyMessage } from '../message/models/message.model';
 import { ChatGateway } from './chat.gateway';
 import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
 import { Chat, stringifyContacts } from './models/chat.model';
@@ -201,6 +202,24 @@ export class ChatService {
     }
 
     /**
+     * Updates a chats draft message.
+     * @param {Object} obj - Object.
+     * @param {Chat} obj.draftMessage - Draft message to add to chat.
+     * @return {ChatDTO} - Updated chat.
+     *
+     */
+    async updateDraft({ draftMessage }: { draftMessage: MessageDTO<unknown> }): Promise<ChatDTO> {
+        const chat = await this.getChat(draftMessage.chatId);
+        chat.draft = stringifyMessage(draftMessage);
+        try {
+            await this._chatRepository.updateChat(chat);
+            return chat.toJSON();
+        } catch (error) {
+            throw new BadRequestException(error);
+        }
+    }
+
+    /**
      * Handles a message read.
      * @param {MessateDTO} message - Message that is read.
      */
@@ -208,15 +227,16 @@ export class ChatService {
         const chatId = this._messageService.determineChatID(message);
         const chat = await this.getChat(chatId);
 
-        const chatMessages = chat.parseMessages();
-        const newRead = chatMessages.find(m => m.id === message.body);
-        const oldRead = chatMessages.find(m => m.id === chat.read[message.from]);
+        // TODO: update
+        // const chatMessages = chat.parseMessage();
+        // const newRead = chatMessages.find(m => m.id === message.body);
+        // const oldRead = chatMessages.find(m => m.id === chat.read[message.from]);
 
-        if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
+        // if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
 
-        chat.read[0] = message.body;
-        this._chatGateway.emitMessageToConnectedClients('message', message);
-        await this._chatRepository.updateChat(chat);
+        // chat.read[0] = message.body;
+        // this._chatGateway.emitMessageToConnectedClients('message', message);
+        // await this._chatRepository.updateChat(chat);
 
         return chat;
     }

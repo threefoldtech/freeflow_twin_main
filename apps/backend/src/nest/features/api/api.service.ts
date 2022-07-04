@@ -271,18 +271,6 @@ export class ApiService {
     }
 
     /**
-     * Used to talk to other twins.
-     * @param {string} resource - Twin to contact with resource.
-     */
-    async getExternalResource({ resource }: { resource: string }) {
-        try {
-            return await axios.get(resource);
-        } catch (error) {
-            throw new BadRequestException(`unable to get external resource: ${error}`);
-        }
-    }
-
-    /**
      * Lets the other twin know that the connection request was accepted.
      * @param {Object} obj - Object.
      * @param {string} obj.ownId - Your own id
