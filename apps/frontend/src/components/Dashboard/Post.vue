@@ -255,7 +255,6 @@
                         class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
                         placeholder="Type your message here"
                         type="text"
-                        @focus="focusInput"
                         @input="onInput"
                     />
                     <input
@@ -315,7 +314,7 @@
     import { IPostContainerDTO } from 'custom-types/post.type';
 
     const props = defineProps<{ item: IPostContainerDTO }>();
-    const inputRef = ref<HTMLInputElement>(null);
+    const inputRef = ref(null);
     const messageInput = ref<string>('');
     const showComments = ref<boolean>(false);
     const showAllImages = ref<boolean>(false);
@@ -389,7 +388,7 @@
     };
 
     const avatarImg = computed(() => {
-        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/user/avatar/default`);
     });
 
     const fetchPostImage = (image: string) => {

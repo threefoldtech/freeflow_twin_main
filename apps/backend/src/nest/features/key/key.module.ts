@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { ApiModule } from '../api/api.module';
 import { DbModule } from '../db/db.module';
@@ -7,7 +7,7 @@ import { KeyService } from './key.service';
 import { KeyRedisRepository } from './repositories/key-redis.repository';
 
 @Module({
-    imports: [DbModule, EncryptionModule, ApiModule],
+    imports: [DbModule, EncryptionModule, forwardRef(() => ApiModule)],
     providers: [KeyService, KeyRedisRepository],
     exports: [KeyService],
 })

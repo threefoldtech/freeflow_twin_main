@@ -15,8 +15,8 @@ import { ShareRedisRepository } from './repositories/share-redis.repository';
 @Module({
     imports: [
         KeyModule,
-        ApiModule,
         DbModule,
+        forwardRef(() => ApiModule),
         forwardRef(() => FileModule),
         forwardRef(() => ChatModule),
         forwardRef(() => MessageModule),

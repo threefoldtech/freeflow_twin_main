@@ -117,7 +117,7 @@
     });
 
     const avatarImg = computed(() => {
-        return calcExternalResourceLink(`https://[${props.comment.owner.location}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${props.comment.owner.location}]/api/v2/user/avatar/default`);
     });
 
     const handleReplyForm = () => {

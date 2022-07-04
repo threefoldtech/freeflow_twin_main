@@ -14,7 +14,7 @@ import { FileTasks } from './file.tasks';
 @Module({
     imports: [
         forwardRef(() => YggdrasilModule),
-        ApiModule,
+        forwardRef(() => ApiModule),
         forwardRef(() => LocationModule),
         KeyModule,
         ChatModule,

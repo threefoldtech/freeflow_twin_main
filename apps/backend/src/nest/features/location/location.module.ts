@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { ApiModule } from '../api/api.module';
 import { EncryptionModule } from '../encryption/encryption.module';
@@ -7,7 +7,7 @@ import { LocationController } from './location.controller';
 import { LocationService } from './location.service';
 
 @Module({
-    imports: [EncryptionModule, ApiModule, YggdrasilModule],
+    imports: [EncryptionModule, forwardRef(() => ApiModule), forwardRef(() => YggdrasilModule)],
     providers: [LocationService],
     controllers: [LocationController],
     exports: [LocationService],

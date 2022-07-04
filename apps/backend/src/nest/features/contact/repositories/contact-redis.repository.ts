@@ -30,6 +30,15 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
     }
 
     /**
+     * Gets a contact by location.
+     * @param {string} location - Contact location.
+     * @return {Contact} - Found contact.
+     */
+    async getContactByLocation({ location }: { location: string }): Promise<Contact> {
+        return await this.findOne({ where: 'location', eq: location });
+    }
+
+    /**
      * Gets a contact that has accepted the chat request (contactRequest is false).
      * @param {string} id - Contacts Id.
      * @return {Contact} - Found contact.

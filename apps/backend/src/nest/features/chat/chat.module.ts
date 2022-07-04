@@ -17,8 +17,8 @@ import { ChatRedisRepository } from './repositories/chat-redis.repository';
     imports: [
         DbModule,
         KeyModule,
-        ApiModule,
-        BlockedContactModule,
+        forwardRef(() => BlockedContactModule),
+        forwardRef(() => ApiModule),
         forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => MessageModule),

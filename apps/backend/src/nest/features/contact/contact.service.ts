@@ -58,6 +58,19 @@ export class ContactService {
     }
 
     /**
+     * Gets a contact by location.
+     * @param {string} location - Contact location.
+     * @return {Contact} - Found contact.
+     */
+    async getContactByLocation({ location }: { location: string }): Promise<Contact> {
+        try {
+            return await this._contactRepo.getContactByLocation({ location });
+        } catch (error) {
+            return null;
+        }
+    }
+
+    /**
      * Gets all contacts that are not blocked.
      * @return {Contact[]} - Contacts.
      */

@@ -118,7 +118,7 @@
     const dialogRef = ref<HTMLElement>(null);
     let escListener = null;
 
-    const props = defineProps<{ item: IPostContainerDTO; avatar: any }>();
+    const props = defineProps<{ item: IPostContainerDTO; avatarImg: any }>();
 
     onMounted(() => {
         dialogRef.value.focus();
@@ -157,11 +157,11 @@
     };
 
     const getAvatar = (location: string) => {
-        return calcExternalResourceLink(`http://[${location}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${location}]/api/v2/user/avatar/default`);
     };
 
     const avatarImg = computed(() => {
-        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v1/user/avatar/default`);
+        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/user/avatar/default`);
     });
 
     onBeforeMount(async () => {

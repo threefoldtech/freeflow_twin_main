@@ -274,8 +274,6 @@ export class ApiService {
      * Used to talk to other twins.
      * @param {string} resource - Twin to contact with resource.
      */
-    // TODO: remove this, last thing that is using this is get status.
-    // change this to a function `getContactsStatusList`
     async getExternalResource({ resource }: { resource: string }) {
         try {
             return await axios.get(resource);

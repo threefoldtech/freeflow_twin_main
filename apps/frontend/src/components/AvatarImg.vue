@@ -69,9 +69,9 @@
     });
 
     const src = computed(() => {
-        if (!status.value || !status.value.avatar) {
+        if (!status.value || !status.value.avatar)
             return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(<string>props.id)}.svg?m=14&b=%23ffffff`;
-        }
+
         return calcExternalResourceLink(status.value.avatar);
     });
 </script>

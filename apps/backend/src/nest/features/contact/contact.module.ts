@@ -16,7 +16,7 @@ import { ContactRedisRepository } from './repositories/contact-redis.repository'
     imports: [
         DbModule,
         KeyModule,
-        ApiModule,
+        forwardRef(() => ApiModule),
         forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => ChatModule),
