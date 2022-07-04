@@ -615,7 +615,6 @@ export const useChatsState = () => {
 
 export const draftMessage = (chatId: string, message: any) => {
     getChat(chatId).draft = message;
-    // TODO: add debounce
     axios.put(`${config.baseUrl}api/v2/chats/draft`, message);
 };
 

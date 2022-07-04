@@ -254,6 +254,24 @@
         });
     });
 
+    const debounce = (fn: Function, delay: number) => {
+        let timeout: number;
+
+        return (...args: any) => {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+
+            timeout = setTimeout(() => {
+                fn(...args);
+            }, delay);
+        };
+    };
+
+    const debounceDraft = debounce(() => {
+        draftMessage(selectedId, createMessage());
+    }, 1500);
+
     watch(messageInput, () => {
         showTagPerson.value = false;
         const messageInputs = messageInput.value.split(' ');
@@ -265,7 +283,7 @@
             );
         }
 
-        draftMessage(selectedId, createMessage());
+        debounceDraft();
     });
 
     const createEditBody = (action: { message: { body: { message: string }; type: MessageBodyType } }) => {
