@@ -17,6 +17,7 @@ import {
     FileMessageState,
     FileShareMessageState,
     MessageState,
+    PostShareMessageState,
     ReadMessageState,
     RenameFileShareMessageState,
     StringMessageState,
@@ -82,15 +83,20 @@ export class MessageController {
             MessageType.FILE_SHARE_UPDATE,
             new RenameFileShareMessageState(this._chatGateway, this._messageService, this._quantumService)
         );
-        // edit messgae handler
+        // edit message handler
         this._messageStateHandlers.set(MessageType.EDIT, new EditMessageState(this._chatGateway, this._messageService));
+        //post share handler
+        this._messageStateHandlers.set(
+            MessageType.POST_SHARE,
+            new PostShareMessageState(this._chatGateway, this._messageService)
+        );
     }
 
     @Put()
     @UseGuards(AuthGuard)
     async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
         console.log(`INCOMING MESSAGE: ${message.type}`);
-        const blockedContacts = await this._blockedContactService.getBlockedContactList();
+        const blockedContacts = await this._blockedContactService.getBlockedContactIds();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
         if (isBlocked) throw new ForbiddenException('blocked');

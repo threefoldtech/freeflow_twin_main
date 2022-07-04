@@ -5,9 +5,9 @@ import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { ApiService } from '../api/api.service';
 import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 import { ContactService } from '../contact/contact.service';
-import { Contact } from '../contact/models/contact.model';
 import { LocationService } from '../location/location.service';
 import { UserGateway } from '../user/user.gateway';
+import { UserService } from '../user/user.service';
 import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
@@ -17,8 +17,6 @@ import { PostRedisRepository } from './repositories/post-redis.repository';
 @Injectable()
 export class PostService {
     private ownLocation = '';
-    private contacts: Contact[] = [];
-    private blockedContacts: string[] = [];
 
     constructor(
         private readonly _postRepo: PostRedisRepository,
@@ -27,6 +25,7 @@ export class PostService {
         private readonly _apiService: ApiService,
         private readonly _contactService: ContactService,
         private readonly _blockedContactService: BlockedContactService,
+        private readonly _userService: UserService,
         private readonly _userGateway: UserGateway
     ) {}
 
@@ -89,25 +88,29 @@ export class PostService {
         offset,
         count,
         username,
+        external,
     }: {
         offset: number;
         count: number;
         username: string;
+        external: boolean;
     }): Promise<IPostContainerDTO[]> {
         const posts: IPostContainerDTO[] = [];
         try {
             // get contacts posts
-            const contacts = await this.getContacts();
-            await Promise.all(
-                contacts.map(async contact => {
-                    const data = await this._apiService.getExternalPosts({
-                        location: contact.location,
-                        userId: contact.id,
-                    });
-                    posts.push(...data);
-                })
-            );
+            if (!external) {
+                const contacts = (await this._contactService.getUnblockedContacts()).filter(c => c.accepted);
 
+                await Promise.all(
+                    contacts.map(async contact => {
+                        const data = await this._apiService.getExternalPosts({
+                            location: contact.location,
+                            userId: contact.id,
+                        });
+                        posts.push(...data);
+                    })
+                );
+            }
             // get own posts
             const data = (await this._postRepo.getPosts({ offset, count, username })).map(post => post.toJSON());
             posts.push(...data);
@@ -148,7 +151,7 @@ export class PostService {
     async likePost({ postId, likePostDTO }: { postId: string; likePostDTO: LikePostDTO }): Promise<{ status: string }> {
         const { likerId: id, likerLocation: location, owner } = likePostDTO;
 
-        if (await this.isBlocked({ userId: id })) throw new BadRequestException('blocked');
+        if (await this._blockedContactService.isBlocked({ userId: id })) throw new BadRequestException('blocked');
 
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
 
@@ -204,7 +207,7 @@ export class PostService {
 
         if (location !== this.ownLocation) return this._apiService.handleTyping({ location, typingDTO });
 
-        const contacts = await this.getContacts();
+        const contacts = await this._contactService.getUnblockedContacts();
         Promise.all(
             contacts.map(async contact => {
                 await this._apiService.sendSomeoneIsTyping({ location: contact.location, typingDTO });
@@ -261,25 +264,5 @@ export class PostService {
         }
 
         return { status: 'commented' };
-    }
-
-    /**
-     * Gets all contacts that are not blocked.
-     * @return {Contact[]} - Contacts.
-     */
-    private async getContacts(): Promise<Contact[]> {
-        if (!this.contacts) this.contacts = await this._contactService.getContacts();
-        if (!this.blockedContacts) this.blockedContacts = await this._blockedContactService.getBlockedContactList();
-
-        return this.contacts.filter(contact => !this.blockedContacts.includes(contact.id));
-    }
-
-    /**
-     * Checks if a user is blocked or not.
-     * @returb {boolean} - True if the user is blocked, false otherwise.
-     */
-    private async isBlocked({ userId }: { userId: string }): Promise<boolean> {
-        if (!this.blockedContacts) this.blockedContacts = await this._blockedContactService.getBlockedContactList();
-        return this.blockedContacts.includes(userId);
     }
 }

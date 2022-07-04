@@ -178,7 +178,7 @@ export class ApiService {
      * @return {IPostContainerDTO[]} - Found posts.
      */
     async getExternalPosts({ location, userId }: { location: string; userId: string }): Promise<IPostContainerDTO[]> {
-        const destinationUrl = `http://[${location}]/api/v2/posts/${userId}`;
+        const destinationUrl = `http://[${location}]/api/v2/posts/${userId}?external=true`;
         try {
             return (await axios.get<IPostContainerDTO[]>(destinationUrl)).data;
         } catch (error) {
@@ -281,6 +281,44 @@ export class ApiService {
             return await axios.get(resource);
         } catch (error) {
             throw new BadRequestException(`unable to get external resource: ${error}`);
+        }
+    }
+
+    /**
+     * Lets the other twin know that the connection request was accepted.
+     * @param {Object} obj - Object.
+     * @param {string} obj.ownId - Your own id
+     * @param {string} obj.contactLocation - IPv6 location to send event to.
+     * @return {boolean} - True if success.
+     */
+    async acceptContactRequest({
+        ownId,
+        contactLocation,
+    }: {
+        ownId: string;
+        contactLocation: string;
+    }): Promise<boolean> {
+        const destinationUrl = `http://[${contactLocation}]/api/v2/contacts/accept/${ownId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to accept contact request: ${error}`);
+        }
+    }
+
+    /**
+     * Lets the other twin know that he was removed as a contact.
+     * @param {Object} obj - Object.
+     * @param {string} obj.ownId - Your own id
+     * @param {string} obj.contactLocation - IPv6 location to send event to.
+     * @return {boolean} - True if success.
+     */
+    async deleteContact({ ownId, location }: { ownId: string; location: string }): Promise<boolean> {
+        const destinationUrl = `http://[${location}]/api/v2/contacts/delete/${ownId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
+            throw new BadRequestException(`unable to delete contact: ${error}`);
         }
     }
 }

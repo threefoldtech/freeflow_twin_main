@@ -5,9 +5,8 @@ import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
-import { getAllPosts, updateSomeoneIsTyping } from '@/services/socialService';
+import { getAllPosts } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
-import { allSocialPosts } from '@/store/socialStore';
 import { FileAction } from 'custom-types/file-actions.type';
 import { statusList } from './statusStore';
 
@@ -104,10 +103,7 @@ export const sendBlockChat = async (id: Id) => {
 };
 
 const sendSocketUserStatus = async (status: string) => {
-    const data = {
-        status,
-    };
-    state.socket.emit('status_update', data);
+    state.socket.emit('status_update', status);
 };
 
 const sendHandleUploadedFile = async ({

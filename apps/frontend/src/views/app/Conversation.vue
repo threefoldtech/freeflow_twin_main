@@ -230,7 +230,7 @@
             </template>
         </appLayout>
         <Alert v-if="showDialog" :showAlert="showDialog" @close="showDialog = false">
-            <template #title> Blocking </template>
+            <template #title> Blocking</template>
             <template #content>
                 Do you really want to block
                 <b> {{ chat.name }} </b>?
@@ -295,8 +295,8 @@
         </Dialog>
 
         <Alert v-if="showDeleteUserDialog" :showAlert="showDeleteUserDialog" @close="showDeleteUserDialog = false">
-            <template #title> Deleting user </template>
-            <template #content> Do you really want to delete this user from your connections? </template>
+            <template #title> Deleting user</template>
+            <template #content> Do you really want to delete this user from your connections?</template>
             <template #actions>
                 <button
                     class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
@@ -314,7 +314,7 @@
         </Alert>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
-            <template #title> Deleting group </template>
+            <template #title> Deleting group</template>
             <template #content>
                 Do you really want to delete this group
                 <b>{{ chat?.name }}</b
@@ -539,6 +539,7 @@
 
     const doDeleteUser = async () => {
         await sendRemoveUser(chat.value.chatId);
+        showDeleteUserDialog.value = false;
     };
 
     const blockChat = () => (showDialog.value = true);
@@ -577,6 +578,7 @@
         showDeleteChatDialog.value = false;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
+        openDeleteUserDialogFromOtherFile.value = false;
     });
 
     onUpdated(() => {
@@ -587,6 +589,7 @@
         showDeleteChatDialog.value = false;
         openDeleteDialogFromOtherFile.value = false;
         openBlockDialogFromOtherFile.value = false;
+        openDeleteUserDialogFromOtherFile.value = false;
     });
 
     const status = computed(() => {

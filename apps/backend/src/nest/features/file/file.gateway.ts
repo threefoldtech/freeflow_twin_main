@@ -10,7 +10,7 @@ import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
-import { ChatFileState, FileAction, FileState, PostFileState, QuantumFileState } from './file.state';
+import { AvatarFileState, ChatFileState, FileAction, FileState, PostFileState, QuantumFileState } from './file.state';
 
 @WebSocketGateway({ cors: '*' })
 export class FileGateway implements OnGatewayInit {
@@ -52,6 +52,11 @@ export class FileGateway implements OnGatewayInit {
         this._fileStateHandlers.set(
             FileAction.ADD_TO_QUANTUM,
             new QuantumFileState(this._configService, this._fileService, this._quantumService)
+        );
+        // handles files for avatar
+        this._fileStateHandlers.set(
+            FileAction.CHANGE_AVATAR,
+            new AvatarFileState(this._configService, this._fileService)
         );
     }
 

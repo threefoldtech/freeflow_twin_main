@@ -24,6 +24,10 @@ export interface IPostFile {
     filename: string;
 }
 
+export interface IAvatarFile {
+    filename: string;
+}
+
 export interface IQuantumFile {
     filename: string;
     path: string;

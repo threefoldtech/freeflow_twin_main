@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ContactRequest, MessageBody, MessageType } from '../../types/message-types';
 import { uuidv4 } from '../../utils/uuid';
 import { ApiService } from '../api/api.service';
+import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
@@ -11,7 +12,7 @@ import { LocationService } from '../location/location.service';
 import { CreateMessageDTO, MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { Message } from '../message/models/message.model';
-import { CreateContactDTO, DeleteContactDTO } from './dtos/contact.dto';
+import { CreateContactDTO, DeleteContactDTO, UpdateContactDTO } from './dtos/contact.dto';
 import { Contact } from './models/contact.model';
 import { ContactRedisRepository } from './repositories/contact-redis.repository';
 
@@ -26,6 +27,7 @@ export class ContactService {
         private readonly _apiService: ApiService,
         @Inject(forwardRef(() => ChatService))
         private readonly _chatService: ChatService,
+        private readonly _blockedContactService: BlockedContactService,
         @Inject(forwardRef(() => ChatGateway))
         private readonly _chatGateway: ChatGateway
     ) {}
@@ -56,6 +58,17 @@ export class ContactService {
     }
 
     /**
+     * Gets all contacts that are not blocked.
+     * @return {Contact[]} - Contacts.
+     */
+    async getUnblockedContacts(): Promise<Contact[]> {
+        const contacts = await this.getContacts();
+        const blockedContacts = await this._blockedContactService.getBlockedContactIds();
+
+        return contacts.filter(contact => !blockedContacts.includes(contact.id));
+    }
+
+    /**
      * Creates a new contact.
      * @param {Object} obj - Object.
      * @param {string} obj.id - Contact ID.
@@ -77,6 +90,7 @@ export class ContactService {
                     id,
                     location,
                     contactRequest: false,
+                    accepted: false,
                 });
             } catch (error) {
                 throw new BadRequestException(`unable to create contact: ${error}`);
@@ -134,12 +148,7 @@ export class ContactService {
      * @param {CreateMessageDTO} obj.message - Contact request message.
      * @return {Contact} - Created entity.
      */
-    async handleIncomingContactRequest({
-        id,
-        location,
-        contactRequest,
-        message,
-    }: CreateContactDTO<ContactRequest>): Promise<Contact> {
+    async handleIncomingContactRequest({ id, location, message }: CreateContactDTO<ContactRequest>): Promise<Contact> {
         const yggdrasilAddress = await this._locationService.getOwnLocation();
         const me = {
             id: this._configService.get<string>('userId'),
@@ -157,7 +166,8 @@ export class ContactService {
                 (await this._contactRepo.addNewContact({
                     id,
                     location,
-                    contactRequest,
+                    contactRequest: true,
+                    accepted: false,
                 }));
         } catch (error) {
             throw new BadRequestException(`unable to create contact: ${error}`);
@@ -221,6 +231,7 @@ export class ContactService {
                 id,
                 location,
                 contactRequest: false,
+                accepted: false,
             });
         } catch (error) {
             throw new BadRequestException(`unable to add contact: ${error}`);
@@ -235,9 +246,32 @@ export class ContactService {
         const contact = await this.getContact({ id });
         if (contact?.entityId)
             try {
+                await this._apiService.deleteContact({
+                    ownId: this._configService.get<string>('userId'),
+                    location: contact.location,
+                });
                 return await this._contactRepo.deleteContact({ id: contact.entityId });
             } catch (error) {
                 throw new BadRequestException(`unable remove contact: ${error}`);
             }
+    }
+
+    /**
+     * Updates a contact.
+     * @param {Object} obj - Object.
+     * @param {string} obj.id - Contact ID.
+     * @param {boolean} obj.contactRequest - Contact request.
+     * @param {boolean} obj.accepted - Chat accepted.
+     */
+    async updateContact({ id, contactRequest, accepted }: UpdateContactDTO): Promise<Contact> {
+        const contact = await this.getContact({ id });
+        if (!contact) throw new NotFoundException(`contact not found`);
+        contact.contactRequest = contactRequest;
+        contact.accepted = accepted;
+        try {
+            return await this._contactRepo.updateContact({ contact });
+        } catch (error) {
+            throw new BadRequestException(`unable to update contact: ${error}`);
+        }
     }
 }

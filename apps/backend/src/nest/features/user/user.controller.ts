@@ -3,7 +3,6 @@ import {
     Body,
     Controller,
     Get,
-    Param,
     Post,
     Put,
     StreamableFile,
@@ -18,6 +17,7 @@ import { createReadStream } from 'fs-extra';
 import { AuthGuard } from '../../guards/auth.guard';
 import { imageFileFilter } from '../../utils/file-filters';
 import { LocalFilesInterceptor } from '../file/file.interceptor';
+import { FileService } from '../file/file.service';
 import { KeyService } from '../key/key.service';
 import { KeyType } from '../key/models/key.model';
 import { UserGateway } from './user.gateway';
@@ -29,7 +29,8 @@ export class UserController {
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService,
         private readonly _userService: UserService,
-        private readonly _userGateway: UserGateway
+        private readonly _userGateway: UserGateway,
+        private readonly _fileService: FileService
     ) {}
 
     @Get('publickey')
@@ -65,12 +66,13 @@ export class UserController {
     }
 
     @Get('avatar/:avatarId')
-    async getAvatar(@Param('avatarId') avatarId: string) {
-        let filePath = `${this._configService.get<string>('baseDir')}user/avatar-default`;
-        if (avatarId !== 'default') {
-            filePath = `${this._configService.get<string>('baseDir')}user/${avatarId}`;
+    async getAvatar() {
+        // represents uuid for saving the new avatar
+        let path = `${this._configService.get<string>('baseDir')}user/avatar`;
+        if (!this._fileService.exists({ path })) {
+            path = `${this._configService.get<string>('baseDir')}user/avatar-default`;
         }
-        const stream = createReadStream(filePath);
+        const stream = createReadStream(path);
         return new StreamableFile(stream);
     }
 
@@ -79,16 +81,18 @@ export class UserController {
     @UseInterceptors(
         LocalFilesInterceptor({
             fieldName: 'file',
-            path: 'user',
+            path: 'tmp',
             fileFilter: imageFileFilter,
             limits: {
-                fileSize: Math.pow(2048, 2), // 2MB
+                fileSize: Math.pow(2048, 2) * 10, // 20MB
             },
         })
     )
-    uploadAvatar(@UploadedFile() file: Express.Multer.File): Promise<string> {
+    async uploadAvatar(
+        @UploadedFile() file: Express.Multer.File
+    ): Promise<{ id: string; filename: string; url: string }> {
         if (!file) throw new BadRequestException('provide a valid image');
-        const filename = file.filename.split('.')[0];
-        return this._userService.updateAvatar({ path: filename });
+        const url = await this._userService.updateAvatar({ path: file.originalname });
+        return { id: file.filename, filename: file.originalname, url };
     }
 }

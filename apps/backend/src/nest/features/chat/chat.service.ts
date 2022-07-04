@@ -80,8 +80,20 @@ export class ChatService {
         const chat = await this.getChat(chatId);
         const contacts = chat.parseContacts();
         const contact = contacts.find(c => c.id === chatId);
+        const ownId = this._configService.get<string>('userId');
+        contact.contactRequest = false;
         try {
-            if (contact) await this._contactService.addContact(contact);
+            if (contact) {
+                await this._contactService.updateContact({
+                    id: contact.id,
+                    contactRequest: false,
+                    accepted: true,
+                });
+                await this._apiService.acceptContactRequest({
+                    ownId,
+                    contactLocation: contact.location,
+                });
+            }
             chat.acceptedChat = true;
             await this._chatRepository.updateChat(chat);
             this._chatGateway.emitMessageToConnectedClients('new_chat', chat.toJSON());

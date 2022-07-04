@@ -44,10 +44,11 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
      * @param {string} obj.id - Contact ID.
      * @param {string} obj.location - Contact IPv6.
      * @param {boolean} obj.contactRequest - Contact request.
+     * @param {boolean} obj.accepted - Contact accepted.
      * @return {Contact} - Created entity.
      */
-    async addNewContact({ id, location, contactRequest }: CreateContactDTO<MessageBody>): Promise<Contact> {
-        return await this.save({ id, location, contactRequest });
+    async addNewContact({ id, location, contactRequest, accepted }: CreateContactDTO<MessageBody>): Promise<Contact> {
+        return await this.save({ id, location, contactRequest, accepted });
     }
 
     /**
@@ -56,5 +57,14 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
      */
     async deleteContact({ id }: DeleteContactDTO): Promise<void> {
         return await this.delete(id);
+    }
+
+    /**
+     * Updates a contact.
+     * @param {string} id - Contact ID.
+     */
+    async updateContact({ contact }: { contact: Contact }) {
+        await this.update(contact);
+        return contact;
     }
 }

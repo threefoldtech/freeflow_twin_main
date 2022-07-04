@@ -41,10 +41,9 @@ export class BlockedContactService {
      * Gets blocked contact ids using pagination.
      * @return {string[]} - Found blocked contacts ids.
      */
-    async getBlockedContactList(): Promise<string[]> {
+    async getBlockedContactIds(): Promise<string[]> {
         try {
-            const contacts = await this._blockedContactRepo.getBlockedContacts();
-            return contacts.map(c => c.id);
+            return (await this._blockedContactRepo.getBlockedContacts()).map(c => c.id);
         } catch (error) {
             return [];
         }
@@ -60,5 +59,13 @@ export class BlockedContactService {
         } catch (error) {
             return [];
         }
+    }
+
+    /**
+     * Checks if a user is blocked or not.
+     * @return {boolean} - True if the user is blocked, false otherwise.
+     */
+    async isBlocked({ userId }: { userId: string }): Promise<boolean> {
+        return (await this.getBlockedContactIds()).includes(userId);
     }
 }
