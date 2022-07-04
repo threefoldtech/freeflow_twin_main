@@ -4,6 +4,7 @@ import { ApiModule } from '../api/api.module';
 import { ChatModule } from '../chat/chat.module';
 import { ContactModule } from '../contact/contact.module';
 import { DbModule } from '../db/db.module';
+import { FileModule } from '../file/file.module';
 import { KeyModule } from '../key/key.module';
 import { LocationModule } from '../location/location.module';
 import { QuantumModule } from '../quantum/quantum.module';
@@ -18,6 +19,7 @@ import { UserService } from './user.service';
         DbModule,
         KeyModule,
         ApiModule,
+        FileModule,
         forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => ChatModule),

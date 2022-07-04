@@ -246,7 +246,10 @@ export class ContactService {
         const contact = await this.getContact({ id });
         if (contact?.entityId)
             try {
-                await this._apiService.deleteContact({ contact });
+                await this._apiService.deleteContact({
+                    ownId: this._configService.get<string>('userId'),
+                    location: contact.location,
+                });
                 return await this._contactRepo.deleteContact({ id: contact.entityId });
             } catch (error) {
                 throw new BadRequestException(`unable remove contact: ${error}`);
@@ -255,15 +258,18 @@ export class ContactService {
 
     /**
      * Updates a contact.
-     * @param {string} id - Contact ID.
-     * @param contactRequest
-     * @param accepted
+     * @param {Object} obj - Object.
+     * @param {string} obj.id - Contact ID.
+     * @param {boolean} obj.contactRequest - Contact request.
+     * @param {boolean} obj.accepted - Chat accepted.
      */
     async updateContact({ id, contactRequest, accepted }: UpdateContactDTO): Promise<Contact> {
-        const contact = this.getContact({ id });
+        const contact = await this.getContact({ id });
         if (!contact) throw new NotFoundException(`contact not found`);
+        contact.contactRequest = contactRequest;
+        contact.accepted = accepted;
         try {
-            return await this._contactRepo.updateContact({ id, contactRequest, accepted });
+            return await this._contactRepo.updateContact({ contact });
         } catch (error) {
             throw new BadRequestException(`unable to update contact: ${error}`);
         }

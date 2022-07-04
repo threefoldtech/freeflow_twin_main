@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { MessageBody } from '../../../types/message-types';
 import { DbService } from '../../db/db.service';
 import { EntityRepository } from '../../db/entity.repository';
-import { CreateContactDTO, DeleteContactDTO, UpdateContactDTO } from '../dtos/contact.dto';
+import { CreateContactDTO, DeleteContactDTO } from '../dtos/contact.dto';
 import { Contact, contactSchema } from '../models/contact.model';
 
 @Injectable()
@@ -62,19 +62,8 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
     /**
      * Updates a contact.
      * @param {string} id - Contact ID.
-     * @param contactRequest
-     * @param accepted
      */
-    async updateContact({ id, contactRequest, accepted }: UpdateContactDTO) {
-        console.log('values', id, contactRequest, accepted);
-        const contact = await this.getContact({ id });
-        if (!contact) return;
-        contact.contactRequest = contactRequest;
-        contact.accepted = accepted;
-        console.log('updated values contactrequest', contact.contactRequest);
-        console.log('updated values accepted', contact.accepted);
-        console.log('updated values id', contact.id);
-
+    async updateContact({ contact }: { contact: Contact }) {
         await this.update(contact);
         return contact;
     }

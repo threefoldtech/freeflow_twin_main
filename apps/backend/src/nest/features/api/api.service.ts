@@ -4,7 +4,6 @@ import axios, { ResponseType } from 'axios';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
-import Contact from '../../../models/contact';
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
@@ -290,6 +289,7 @@ export class ApiService {
      * @param {Object} obj - Object.
      * @param {string} obj.ownId - Your own id
      * @param {string} obj.contactLocation - IPv6 location to send event to.
+     * @return {boolean} - True if success.
      */
     async acceptContactRequest({
         ownId,
@@ -308,12 +308,13 @@ export class ApiService {
 
     /**
      * Lets the other twin know that he was removed as a contact.
-     @param {Object} obj - Object.
-     @param {string} obj.contact - The contact that you deleted.
+     * @param {Object} obj - Object.
+     * @param {string} obj.ownId - Your own id
+     * @param {string} obj.contactLocation - IPv6 location to send event to.
+     * @return {boolean} - True if success.
      */
-    async deleteContact({ contact }: { contact: Contact }): Promise<boolean> {
-        const ownId = await this._configService.get<string>('userId');
-        const destinationUrl = `http://[${contact.location}]/api/v2/contacts/delete/${ownId}`;
+    async deleteContact({ ownId, location }: { ownId: string; location: string }): Promise<boolean> {
+        const destinationUrl = `http://[${location}]/api/v2/contacts/delete/${ownId}`;
         try {
             return (await axios.put<boolean>(destinationUrl)).data;
         } catch (error) {

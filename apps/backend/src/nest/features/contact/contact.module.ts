@@ -9,7 +9,6 @@ import { LocationModule } from '../location/location.module';
 import { MessageModule } from '../message/message.module';
 import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 import { ContactController } from './contact.controller';
-import { ContactGateway } from './contact.gateway';
 import { ContactService } from './contact.service';
 import { ContactRedisRepository } from './repositories/contact-redis.repository';
 
@@ -25,7 +24,7 @@ import { ContactRedisRepository } from './repositories/contact-redis.repository'
         BlockedContactModule,
     ],
     controllers: [ContactController],
-    providers: [ContactService, ContactRedisRepository, ContactGateway],
+    providers: [ContactService, ContactRedisRepository],
     exports: [ContactService],
 })
 export class ContactModule {}

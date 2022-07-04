@@ -63,7 +63,7 @@ export class BlockedContactService {
 
     /**
      * Checks if a user is blocked or not.
-     * @returb {boolean} - True if the user is blocked, false otherwise.
+     * @return {boolean} - True if the user is blocked, false otherwise.
      */
     async isBlocked({ userId }: { userId: string }): Promise<boolean> {
         return (await this.getBlockedContactIds()).includes(userId);

@@ -3,7 +3,6 @@ import {
     Body,
     Controller,
     Get,
-    Param,
     Post,
     Put,
     StreamableFile,
@@ -13,12 +12,12 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IStatus, IStatusUpdate } from 'custom-types/status.type';
-import fs from 'fs';
 import { createReadStream } from 'fs-extra';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { imageFileFilter } from '../../utils/file-filters';
 import { LocalFilesInterceptor } from '../file/file.interceptor';
+import { FileService } from '../file/file.service';
 import { KeyService } from '../key/key.service';
 import { KeyType } from '../key/models/key.model';
 import { UserGateway } from './user.gateway';
@@ -30,7 +29,8 @@ export class UserController {
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService,
         private readonly _userService: UserService,
-        private readonly _userGateway: UserGateway
+        private readonly _userGateway: UserGateway,
+        private readonly _fileService: FileService
     ) {}
 
     @Get('publickey')
@@ -66,13 +66,13 @@ export class UserController {
     }
 
     @Get('avatar/:avatarId')
-    async getAvatar(@Param('avatarId') avatarId: string) {
+    async getAvatar() {
         // represents uuid for saving the new avatar
-        let filePath = `${this._configService.get<string>('baseDir')}user/avatar`;
-        if (!fs.existsSync(filePath)) {
-            filePath = `${this._configService.get<string>('baseDir')}user/avatar-default`;
+        let path = `${this._configService.get<string>('baseDir')}user/avatar`;
+        if (!this._fileService.exists({ path })) {
+            path = `${this._configService.get<string>('baseDir')}user/avatar-default`;
         }
-        const stream = createReadStream(filePath);
+        const stream = createReadStream(path);
         return new StreamableFile(stream);
     }
 

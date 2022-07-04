@@ -46,7 +46,6 @@ export class ChatFileState implements FileState<IChatFile> {
             this._fileService.makeDirectory({ path: this.storageDir });
             this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, fileId) });
         } catch (error) {
-            console.error(error);
             return false;
         }
         // create new message and emit to connected sockets
@@ -92,7 +91,6 @@ export class PostFileState implements FileState<IPostFile> {
             this._fileService.makeDirectory({ path: this.storageDir });
             this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, filename) });
         } catch (error) {
-            console.error(error);
             return false;
         }
 
@@ -114,7 +112,6 @@ export class AvatarFileState implements FileState<IAvatarFile> {
         try {
             this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, filename) });
         } catch (error) {
-            console.error(error);
             return false;
         }
         return true;
@@ -141,7 +138,6 @@ export class QuantumFileState implements FileState<IQuantumFile> {
             this._fileService.makeDirectory({ path: toPath });
             this._quantumService.createFileWithRetry({ fromPath, toPath, name });
         } catch (error) {
-            console.error(error);
             return false;
         }
 
