@@ -2,7 +2,7 @@
     <div class="h-full overflow-y-auto px-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
-                <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <div class="shadow overflow-hidden sm:rounded-lg">
                     <table
                         v-if="fileBrowserTypeView === 'LIST'"
                         :key="currentDirectory"
@@ -119,8 +119,8 @@
                     <!-- GRID -->
                     <!-- Local filebrowser -->
                     <ul
-                        v-else
-                        class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+                        v-if="fileBrowserTypeView === 'GRID'"
+                        class="grid grid-cols-1 gap-x-2 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 xl:gap-x-6 mt-4"
                         role="list"
                     >
                         <p

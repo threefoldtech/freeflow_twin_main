@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="flex flex-row my-4 items-center justify-between">
+        <div class="flex flex-col lg:flex-row my-4 lg:items-center justify-between">
             <div class="mt-1 mx-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
@@ -27,14 +27,14 @@
                     <i aria-hidden="true" class="fa fa-window-close h-5 w-5 text-gray-400" />
                 </div>
             </div>
-            <div v-if="!savedAttachments" class="flex flex-row items-center">
+            <div v-if="!savedAttachments" class="flex flex-col-reverse lg:flex-row items-center">
                 <SelectedOptions v-if="!sharedDir"></SelectedOptions>
                 <MainActionButtons v-if="!sharedDir"></MainActionButtons>
             </div>
         </div>
         <div class="flex items-center justify-between px-2">
             <Breadcrumbs></Breadcrumbs>
-            <ViewSelect />
+            <ViewSelect class='hidden lg:block' />
         </div>
     </div>
 </template>

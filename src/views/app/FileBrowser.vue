@@ -29,6 +29,7 @@
         selectItem,
         sharedDir,
         sharedItem,
+        fileBrowserTypeView,
         updateContent,
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
@@ -42,10 +43,24 @@
     const route = useRoute();
     const router = useRouter();
 
+    
+    const handleResize = () => {
+        if(window.innerWidth <= 1024 && fileBrowserTypeView.value === "LIST"){
+            fileBrowserTypeView.value = "GRID";
+        }
+    }
+
+
     onBeforeMount(async () => {
         if (route.params.name === 'sharedWithMeItemNested') {
             currentDirectory.value = decodeString(<string>route.params.path);
         }
+
+        if (window.innerWidth < 1024) {
+            fileBrowserTypeView.value = 'GRID';
+        }
+        
+        window.addEventListener('resize', handleResize);
 
         if (!sharedDir.value) {
             if (route.params.editFileShare === 'true') {

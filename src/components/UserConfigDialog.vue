@@ -1,7 +1,7 @@
 <template>
     <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" :noActions="true">
         <template v-slot:title>
-            <h1>Profile settings</h1>
+            <h1 class="font-medium">Profile settings</h1>
         </template>
         <div>
             <div class="avatar-container mb-2">
@@ -93,7 +93,7 @@
         </div>
         <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" :noActions="true">
             <template v-slot:title>
-                <h1>Avatar</h1>
+                <h1 class="font-medium">Avatar</h1>
             </template>
             <div class="flex w-full flex-col">
                 <div class="w-full">

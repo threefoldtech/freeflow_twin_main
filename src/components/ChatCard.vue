@@ -4,7 +4,6 @@
         :class="{
             'hover:bg-gray-100': !router.currentRoute?.value.path.includes(chat.chatId),
             'bg-gray-200 hover:bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
-            'opacity-50': blocked,
         }"
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"
@@ -25,7 +24,7 @@
                     {{ timeAgo(lastMessage.timeStamp) }}
                 </span>
             </p>
-            <p class="text-sm max-h-6 max-w-xs truncate" :class="unreadMessages > 0 ? 'font-bold' : 'text-gray-500'">
+            <p class="text-sm max-h-6 max-w-[60vw] truncate" :class="unreadMessages > 0 ? 'font-bold' : 'text-gray-500'">
                 {{ lastMessageBody }}
             </p>
             <p v-if="unreadMessages > 0" class="absolute right-0 -bottom-2 bg-accent-300 h-4 w-4 rounded-full"></p>

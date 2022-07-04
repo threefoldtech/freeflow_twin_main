@@ -3,7 +3,7 @@
         class="group flex flex-row"
         :class="{
             'mb-2': isLastMessage,
-            'my-message flex-row-reverse md:flex-row lg:flex-row-reverse xl:flex-row ': isMine,
+            'my-message flex-row-reverse lg:flex-row-reverse xl:flex-row ': isMine,
         }"
         v-if="message.type !== MessageTypes.SYSTEM"
         @click="selectedMessageId = message.id"
@@ -24,13 +24,15 @@
             >
                 <div
                     tabindex="0"
-                    class="flex flex-col rounded-md rounded-r-xl mb-1 bg-white shadow relative overflow-hidden my-message:bg-accent-200 focus:outline-none focus:ring-4 ring-accent-500 ring-offset-2"
+                    class="flex flex-col rounded-lg mb-1 bg-white relative overflow-hidden my-message:bg-accent-200 focus:outline-none focus:ring-4 ring-accent-500 ring-offset-2"
                     :class="{
-                        'rounded-tl-xl': isFirstMessage,
-                        'rounded-bl-xl': isLastMessage,
+                        'rounded-tl-none': !isMine && isLastMessage,
+                        'rounded-tr': isMine && !isLastMessage,
+                        'rounded-tl': !isMine && !isLastMessage,
+                        'rounded-tr-none xl:rounded-tr-lg xl:rounded-tl-none': isMine && isLastMessage,
                     }"
                 >
-                    <header class="p-4 pt-2 pb-2 font-bold" v-if="isFirstMessage && isGroup">
+                    <header class="p-4 pt-2 pb-0 font-semibold text-sm capitalize" v-if="isFirstMessage && isGroup">
                         {{ message.from }}
                     </header>
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">

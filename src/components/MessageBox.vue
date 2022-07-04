@@ -2,7 +2,7 @@
     <div ref="messageBoxLocal" class="overflow-y-auto" @scroll="handleScroll">
         <Dialog :modelValue="showShareDialog" @update-model-value="showShareDialog = false" :noActions="true">
             <template v-slot:title>
-                <h1 class="text-center">
+                <h1 class="font-medium">
                     Edit permissions for <span>{{ selectedEditFile.body.isFolder ? 'folder ' : 'file ' }}</span>
                     <span class="text-accent-800 font-semibold">{{ selectedEditFile.body.name }}</span>
                 </h1>

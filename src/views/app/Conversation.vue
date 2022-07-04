@@ -2,92 +2,52 @@
     <p class="hidden">{{ JSON.stringify(openBlockDialogFromOtherFile) }}</p>
     <div :key="conversationComponentRerender" class="h-full w-full">
         <appLayout>
-            <template v-slot:top>
-                <div v-if="chat" :class="{ 'group-chat': chat?.isGroup }" class="w-full flex md:px-4 text-white">
-                    <div class="place-items-center grid mr-4">
-                        <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
-                    </div>
-                    <div class="py-4 pl-2">
-                        <p class="font-bold font overflow-hidden overflow-ellipsis">
-                            {{ chat.name }}
-                        </p>
-                        <p v-if="!blocked" class="font-light group-chat:hidden">
-                            {{ status?.isOnline ? 'Is online' : 'Is offline' }}
-                        </p>
-                        <p v-if="blocked" class="group-chat:hidden text-red-500">BLOCKED</p>
-                        <p class="font-thin hidden group-chat:span">Group chat</p>
-                    </div>
-                </div>
-                <div v-else>Loading</div>
-            </template>
-            <template v-slot:actions>
-                <div :class="{ 'group-chat': chat?.isGroup }">
-                    <div class="relative">
-                        <button class="text-lg text-white md:hidden" @click="showMenu = true">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div v-if="showMenu" class="backdrop" @click="showMenu = false"></div>
+            <template #topbar>
+                <Topbar>
+                    <template #user>
                         <div
-                            v-if="showMenu"
-                            class="right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2 pl-2"
+                            v-if="chat"
+                            :class="{ 'group-chat': chat?.isGroup }"
+                            class="w-full flex lg:px-4 text-black"
                         >
+                            <div class="place-items-center grid mr-4">
+                                <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
+                            </div>
+                            <div class="py-4 pl-2">
+                                <p class="font-bold font overflow-hidden overflow-ellipsis">
+                                    {{ chat.name }}
+                                </p>
+                                <p v-if="!blocked" class="font-light group-chat:hidden">
+                                    {{ status?.isOnline ? 'Is online' : 'Is offline' }}
+                                </p>
+                                <p v-if="blocked" class="group-chat:hidden text-red-500">BLOCKED</p>
+                                <p class="font-thin hidden group-chat:span">Group chat</p>
+                            </div>
+                        </div>
+                        <div v-else>Loading</div>
+                    </template>
+                    <template #actions>
+                        <div class="flex" :class="{ 'group-chat': chat?.isGroup }">
                             <button
-                                class="flex align-center"
-                                @click="
-                                    popupMeeting();
-                                    showMenu = false;
-                                "
-                            >
-                                <div class="w-8 justify-center align-center">
-                                    <i class="fas fa-video"></i>
-                                </div>
-                                <span class="ml-1 text-left">Call</span>
-                            </button>
-
-                            <button
+                                v-if="!showSideBar"
                                 class="flex"
                                 @click="
                                     toggleSideBar();
                                     showMenu = false;
                                 "
                             >
-                                <div class="w-8">
-                                    <i class="fas fa-info-circle"></i>
-                                </div>
-                                <span class="ml-1 text-left">Info</span>
+                                <InformationCircleIcon class="w-6 text-gray-500" />
                             </button>
-
-                            <button
-                                class="flex"
-                                @click="
-                                    blockChat();
-                                    showMenu = false;
-                                "
-                            >
-                                <div class="w-8">
-                                    <i class="fas fa-minus-circle"></i>
-                                </div>
-                                <span class="ml-1 text-left">Block chat</span>
-                            </button>
-                            <button
-                                class="flex"
-                                @click="
-                                    leaveChat();
-                                    showMenu = false;
-                                "
-                            >
-                                <div class="w-8">
-                                    <i class="fas fa-trash"></i>
-                                </div>
-                                <span class="ml-1 text-left">Delete chat</span>
+                            <button v-if="showSideBar" class="flex" @click="disableSidebar">
+                                <XIcon class="w-6 text-gray-500" />
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </Topbar>
             </template>
             <template v-slot:default>
                 <div :class="{ 'group-chat': chat?.isGroup }" class="flex flex-row relative h-full w-full">
-                    <ChatList class="hidden md:inline-block" />
+                    <ChatList class='hidden lg:inline-block' />
                     <div
                         v-if="chat"
                         :key="chat.id + selectedId"
@@ -98,7 +58,7 @@
                             <!--                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"-->
                             <!--                        >-->
                             <div
-                                class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden md:flex"
+                                class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden lg:flex"
                             >
                                 <div class="py-2 pl-4 flex-1">
                                     <p class="font-bold font overflow-hidden overflow-ellipsis w-80">
@@ -178,42 +138,36 @@
                         v-if="chat"
                         :key="'aside' + chat.id + selectedId"
                         :class="{ 'flex ': showSideBar, hidden: !showSideBar }"
-                        class="min-h-screen flex-1 xl:flex-initial flex-col overflow-y-hidden md:w-[400px]"
+                        class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[400px] lg:border-l"
                     >
-                        <div class="bg-white h-14 xl:hidden flex justify-end items-center">
-                            <button
-                                class="rounded-full w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10 bg-gray-100 flex justify-center mr-2"
-                                @click="disableSidebar"
+                        <div class="max-w-full w-full bg-gray-100 xl:bg-white flex flex-col flex-grow">
+                            <div
+                                class="bg-white p-4 w-full mb-4 lg:flex min-h-64 justify-between items-center hidden"
                             >
-                                <div class="h-full flex items-center justify-center"><i class="fa fa-times"></i></div>
-                            </button>
-                        </div>
-
-                        <div class="max-w-full w-full bg-white border flex flex-col flex-grow">
-                            <div class="bg-white pb-4 w-full mb-4 p-6 flex min-h-64 justify-start relative">
+                                <div class='flex items-center'>
+                                    <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
+                                    <div class="ml-6">
+                                        <h2
+                                            class="break-all w-full overflow-y-auto max-h-28 text-lg text-white font-semibold text-gray-800"
+                                        >
+                                            {{ chat.name }}
+                                        </h2>
+                                        <p v-if="chat.isGroup" class="text-gray-500">
+                                            {{ chat.contacts.length }} members
+                                        </p>
+                                        <p
+                                            v-if="!chat.isGroup"
+                                            class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
+                                        >
+                                            {{ status?.status || 'No status found' }}
+                                        </p>
+                                    </div>
+                                </div>
                                 <XIcon
-                                    class="w-5 h-5 absolute right-5 top-5 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-100 hidden xl:inline"
+                                    class="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-100 hidden lg:inline justify-self-end"
                                     @click="disableSidebar"
                                 />
-                                <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
-                                <div class="ml-6">
-                                    <h2
-                                        class="break-all w-full overflow-y-auto max-h-28 text-lg text-white font-semibold text-gray-800"
-                                    >
-                                        {{ chat.name }}
-                                    </h2>
-                                    <p v-if="chat.isGroup" class="text-gray-500">{{ chat.contacts.length }} members</p>
-                                    <p
-                                        v-if="!chat.isGroup"
-                                        class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
-                                    >
-                                        {{ status?.status || 'No status found' }}
-                                    </p>
-                                </div>
                             </div>
-
-                            <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
-
                             <group-management
                                 :chat="chat"
                                 @app-call="popupMeeting"
@@ -251,13 +205,14 @@
             </template>
         </Alert>
         <Dialog
+            v-if='showLeaveDialog && chat?.isGroup'
             v-model="showLeaveDialog"
             class="max-w-10"
             :noActions="true"
             @update-model-value="showLeaveDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting User' }}</h1>
+                <h1 class="text-center">Leaving group</h1>
             </template>
             <div v-if="chat?.isGroup && chat?.adminId === user?.id">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
@@ -280,16 +235,8 @@
                     </p>
                 </div>
             </div>
-            <div v-else-if="chat?.isGroup">
-                Do you really want to leave the group <b>{{ chat?.name }}</b
-                >?
-            </div>
-            <div v-else>
-                Do you really want to delete
-                <b> {{ chat?.name }} </b>
-                from your connections?
-            </div>
-            <div class="flex justify-end mt-2">
+            <div class="flex justify-end mt-2 px-4">
+
                 <button
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                     @click="showLeaveDialog = false"
@@ -301,6 +248,29 @@
                 </button>
             </div>
         </Dialog>
+
+        <Alert v-if="showLeaveDialog && !chat?.isGroup" :showAlert="showLeaveDialog" @close="showLeaveDialog = false">
+            <template #title> Deleting user </template>
+            <template #content>
+                Do you really want to delete this user
+                <b>{{ chat?.name }}</b
+                >?
+            </template>
+            <template #actions>
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="doLeaveChat"
+                >
+                    Delete
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                    @click="showLeaveDialog = false"
+                >
+                    Cancel
+                </button>
+            </template>
+        </Alert>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
             <template #title> Deleting group</template>
@@ -402,7 +372,7 @@
     import { userIsBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
-    import { XIcon } from '@heroicons/vue/outline';
+    import { XIcon, VideoCameraIcon, InformationCircleIcon } from '@heroicons/vue/outline';
     import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
     import {
         conversationComponentRerender,
@@ -412,6 +382,7 @@
     import { useOnline } from '@vueuse/core';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
     import Alert from '@/components/Alert.vue';
+    import Topbar from '@/components/Topbar.vue';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);

@@ -5,7 +5,7 @@
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
-            <TabList class="flex items-stretch h-12 rounded-t-lg relative">
+            <TabList class="hidden md:flex items-stretch h-12 rounded-t-lg relative">
                 <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
                     <div
                         class="px-8 font-medium flex flex-row items-center cursor-pointer"
@@ -44,16 +44,21 @@
                         ></div>
                     </TransitionRoot>
                     <FileDropArea @send-file="selectFiles">
-                        <div class="p-4 flex items-start h-48">
+                        <div 
+                            class="p-4 flex items-start "
+                            :class="{'h-min': !createPostModalStatus, 'h-48': createPostModalStatus}"
+                        >
                             <AvatarImg :id="user.id" class="w-12 h-12"></AvatarImg>
                             <div class="flex flex-col w-full h-full py-2 px-4">
                                 <textarea
-                                    class="resize-none ml-4 text-base text-gray-800 outline-none block w-full border-none h-full focus:outline-none"
+                                    class="resize-none ml-4 text-base text-gray-800 outline-none block w-full border-none focus:outline-none"
+                                    :class="{'h-full': createPostModalStatus, 'h-min': !createPostModalStatus}"
                                     placeholder="Write something about you"
                                     v-model="new_post_text"
                                     maxlength="2000"
                                 />
                                 <p
+                                    v-if="createPostModalStatus"
                                     :class="new_post_text.length >= 2000 ? ['text-red-600'] : ''"
                                     class="text-sm text-gray-500 self-end"
                                 >
@@ -64,7 +69,7 @@
                         <div class="flex flex-col" v-if="error">
                             <small class="px-4 text-gray-500">{{ errorMessage }}</small>
                         </div>
-                        <div class="p-4">
+                        <div v-if="new_post_images.length >= 1 && createPostModalStatus" class="p-4">
                             <ImageGrid
                                 v-if="new_post_images.length >= 1 && createPostModalStatus"
                                 :images="new_post_images"
@@ -82,10 +87,10 @@
                         <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
                             <div
                                 @click="$refs.create_post_file_upload.click()"
-                                class="bg-gray-300 px-4 py-2 rounded-full flex items-center w-28 cursor-pointer hover:bg-gray-200"
+                                class="px-4 py-2 rounded-full flex items-center w-40 cursor-pointer"
                             >
-                                <CameraIcon class="text-gray-600 w-6 h-6" />
-                                <span class="ml-2 font-medium text-gray-600">Media</span>
+                                <PhotographIcon class="text-blue-600 w-6 h-6" />
+                                <span class="ml-2 font-medium text-blue-600">Photo/ Video</span>
                             </div>
                         </div>
                     </FileDropArea>
@@ -131,7 +136,7 @@
 
 <script setup lang="ts">
     import { XIcon, PencilAltIcon } from '@heroicons/vue/solid';
-    import { CameraIcon, HeartIcon, ChatAltIcon } from '@heroicons/vue/outline';
+    import { CameraIcon, HeartIcon, ChatAltIcon, PhotographIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { computed, ref } from 'vue';

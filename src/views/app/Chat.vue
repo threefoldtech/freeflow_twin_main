@@ -1,11 +1,10 @@
 <template>
     <app-layout>
-        <div
-            class="relative h-full w-full md:customgrid"
-            :class="chats.length === 0 && chatRequests.length === 0 ? '' : 'grid'"
-        >
+
+        <div class="relative h-full w-full grid lg:customgrid">
             <ChatList v-model="showAddUserDialog" />
-            <div class="hidden w-full h-full md:grid place-items-center border-2">
+            <div class="hidden w-full h-full lg:grid place-items-center">
+
                 <div class="text-center">
                     <ChatAlt2Icon class="mx-auto h-16 w-16 text-gray-400" aria-hidden="true" />
                     <h3 class="mt-2 text-base font-medium text-gray-900">
