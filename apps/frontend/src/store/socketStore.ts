@@ -1,14 +1,13 @@
 import { Chat, Contact, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { inject, toRefs } from 'vue';
-import { handleRead, removeChat, usechatsActions } from './chatStore';
+import { handleRead, newUnreadChats, removeChat, usechatsActions } from './chatStore';
 import { setLocation, useAuthState } from '@/store/authStore';
 import { addUserToBlockList, blocklist } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
 import { FileAction } from 'custom-types/file-actions.type';
-import { allSocialPosts } from '@/store/socialStore';
 import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
