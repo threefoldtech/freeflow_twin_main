@@ -158,7 +158,7 @@
                 </button>
                 <img alt="logo uhuru" src="/Logo_secundary.png" class="h-6 ml-4 mt-4" />
             </div>
-            <slot name='content'/>
+            <slot name="content" />
         </header>
     </div>
 </template>

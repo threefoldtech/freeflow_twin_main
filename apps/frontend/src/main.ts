@@ -11,11 +11,8 @@ import config from '@/config';
 import MessageContent from '@/components/MessageContent.vue';
 import { clickOutside } from '@/plugins/ClickOutside';
 import axios from 'axios';
-import Vue3TouchEvents from "vue3-touch-events";
 import FloatingVue from 'floating-vue';
 import 'floating-vue/dist/style.css';
-// console.log(Socketio)
-// const a = Socketio.install
 
 FloatingVue.options.themes.menu.delay.hide = 0;
 FloatingVue.options.themes.menu.delay.show = 600;
@@ -24,7 +21,6 @@ const app = createApp(App)
     .directive('click-outside', clickOutside)
     .use(router)
     .use(FloatingVue)
-    .use(Vue3TouchEvents)
     .use(socketIo, {
         connection: config.baseUrl,
         options: {

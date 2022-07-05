@@ -50,7 +50,9 @@
                                             <AvatarImg :id="item.chatId" alt="chat image" />
                                         </div>
                                         <div class="md:ml-4">
-                                            <div class="text-sm font-medium text-gray-900 text-ellipsis overflow-hidden">
+                                            <div
+                                                class="text-sm font-medium text-gray-900 text-ellipsis overflow-hidden"
+                                            >
                                                 {{ item.name }}
                                             </div>
                                         </div>

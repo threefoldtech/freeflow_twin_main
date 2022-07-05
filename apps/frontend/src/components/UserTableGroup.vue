@@ -36,7 +36,11 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 block overflow-auto">
-                            <tr v-for="(item, index) in searchResults()" :key="index" class="w-full block cursor-pointer"   >
+                            <tr
+                                v-for="(item, index) in searchResults()"
+                                :key="index"
+                                class="w-full block cursor-pointer"
+                            >
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <label :for="index" class="flex items-center">
                                         <div class="mr-5">

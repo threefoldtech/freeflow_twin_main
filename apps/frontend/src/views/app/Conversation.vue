@@ -47,7 +47,7 @@
             </template>
             <template v-slot:default>
                 <div :class="{ 'group-chat': chat?.isGroup }" class="flex flex-row relative h-full w-full">
-                    <ChatList class='hidden lg:inline-block' />
+                    <ChatList class="hidden lg:inline-block" />
                     <div
                         v-if="chat"
                         :key="chat.id + selectedId"
@@ -141,10 +141,8 @@
                         class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[400px] lg:border-l"
                     >
                         <div class="max-w-full w-full bg-gray-100 xl:bg-white flex flex-col flex-grow">
-                            <div
-                                class="bg-white p-4 w-full mb-4 lg:flex min-h-64 justify-between items-center hidden"
-                            >
-                                <div class='flex items-center'>
+                            <div class="bg-white p-4 w-full mb-4 lg:flex min-h-64 justify-between items-center hidden">
+                                <div class="flex items-center">
                                     <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
                                     <div class="ml-6">
                                         <h2
@@ -206,7 +204,7 @@
             </template>
         </Alert>
         <Dialog
-            v-if='showLeaveDialog && chat?.isGroup'
+            v-if="showLeaveDialog && chat?.isGroup"
             v-model="showLeaveDialog"
             class="max-w-10"
             :noActions="true"
@@ -351,7 +349,7 @@
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { sendBlockChat, sendRemoveChat, sendRemoveUser } from '@/store/socketStore';
+    import { sendRemoveUser } from '@/store/socketStore';
     import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
@@ -370,7 +368,7 @@
     import { userIsBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
-    import { XIcon, VideoCameraIcon, InformationCircleIcon } from '@heroicons/vue/outline';
+    import { XIcon, InformationCircleIcon } from '@heroicons/vue/outline';
     import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
     import {
         conversationComponentRerender,

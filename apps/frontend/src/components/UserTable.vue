@@ -34,7 +34,12 @@
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 block overflow-auto">
-                            <tr class="w-full block cursor-pointer" v-for="(item, index) in searchResults()" :key="index" @click="handleClick(item)">
+                            <tr
+                                class="w-full block cursor-pointer"
+                                v-for="(item, index) in searchResults()"
+                                :key="index"
+                                @click="handleClick(item)"
+                            >
                                 <td class="px-2 md:px-6 py-4 whitespace-nowrap w-full block">
                                     <div class="flex items-center justify-between">
                                         <div class="flex">
@@ -117,10 +122,10 @@
     };
 
     const trimStringMidway = (text: string) => {
-        const str1 = text.substr(0, text.length/2);
-        const str2 = text.substr(text.length/2 + 1, text.length);
+        const str1 = text.substr(0, text.length / 2);
+        const str2 = text.substr(text.length / 2 + 1, text.length);
 
-        return (str1.substr(0,str1.length/2) + '...' + str2.substr(str2.length/2, str2.length));
+        return str1.substr(0, str1.length / 2) + '...' + str2.substr(str2.length / 2, str2.length);
     };
 </script>
 

@@ -350,6 +350,7 @@
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import Alert from '@/components/Alert.vue';
     import { IPostContainerDTO } from 'custom-types/post.type';
+    import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
 
     const props = defineProps<{ item: IPostContainerDTO }>();
     const inputRef = ref(null);

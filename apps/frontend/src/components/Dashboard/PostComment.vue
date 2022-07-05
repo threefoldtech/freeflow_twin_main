@@ -98,15 +98,13 @@
     import { ThumbUpIcon } from '@heroicons/vue/solid';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
-    import { useAuthState } from '@/store/authStore';
-    import { TransitionRoot } from '@headlessui/vue';
-    import { likeComment } from '@/services/socialService';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { CommentType, IPostComment } from 'custom-types/post.type';
 
     const props = defineProps<{ comment: IPostComment }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
+    const myLocation = ref<string>('');
     const { user } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
@@ -114,9 +112,6 @@
     onBeforeMount(async () => {
         myLocation.value = await myYggdrasilAddress();
     });
-
-    //only shows user panel if mouse stays focussed for a moment
-    const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
 
     const commentsSorted = computed(() => {
         return props.comment?.replies.sort(function (a, b) {

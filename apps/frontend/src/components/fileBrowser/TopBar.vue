@@ -34,7 +34,7 @@
         </div>
         <div class="flex items-center justify-between px-2">
             <Breadcrumbs></Breadcrumbs>
-            <ViewSelect class='hidden lg:block' />
+            <ViewSelect class="hidden lg:block" />
         </div>
     </div>
 </template>

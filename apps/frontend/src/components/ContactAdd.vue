@@ -19,7 +19,12 @@
             </a>
         </div>
         <div v-if="isActive('user')" class="flex flex-col">
-            <UserTable :data="allUsers" focus placeholder="Search for user..." @addContact="contactAdd"></UserTable>
+            <UserTable
+                :data="possibleUsers"
+                focus
+                placeholder="Search for user..."
+                @addContact="contactAdd"
+            ></UserTable>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
                     class="flex justify-between w-full mt-4 ml-0 py-2 text-sm font-medium text-left text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
@@ -119,7 +124,7 @@
             <div>
                 <UserTableGroup
                     v-model="usernameInGroupAdd"
-                    :data="contacts"
+                    :data="groupContacts"
                     :error="usernameAddError"
                     :usersInGroup="usersInGroup"
                     placeholder="Search for user..."
@@ -147,7 +152,7 @@
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref, onMounted } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { myYggdrasilAddress, useAuthState } from '../store/authStore';
+    import { useAuthState } from '../store/authStore';
     import { Contact, GroupContact, Roles } from '../types/index';
     import axios from 'axios';
     import config from '@/config';
@@ -159,7 +164,9 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
-    const { contacts } = useContactsState();
+    const { groupContacts, contacts } = useContactsState();
+    console.log('groupContacts', groupContacts);
+    console.log('contacts', contacts);
 
     const userAddLocation = ref('');
     const usernameAddError = ref('');
@@ -181,6 +188,10 @@
     onMounted(async () => {
         const { retrieveContacts } = useContactsActions();
         await retrieveContacts();
+
+        const { data } = await axios.get(`${config.appBackend}api/users/digitaltwin`);
+        possibleUsers.value = data;
+        console.log('possible ', possibleUsers.value);
     });
 
     const contactAdd = (contact: Contact) => {
@@ -260,11 +271,11 @@
     };
 
     // @todo: config
-    axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
-        const { user } = useAuthState();
-        const posContacts = <Contact[]>r.data;
-        possibleUsers.value = posContacts;
-    });
+    // axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
+    //     const { user } = useAuthState();
+    //     const posContacts = <Contact[]>r.data;
+    //     possibleUsers.value = posContacts;
+    // });
 </script>
 
 <style scoped></style>

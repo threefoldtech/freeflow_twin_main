@@ -1,4 +1,6 @@
 import { ref } from 'vue';
+import axios from 'axios';
+import config from '@/config';
 
 export const blocklist = ref([]);
 
@@ -15,7 +17,7 @@ export const addUserToBlockList = (userId: string) => {
     blocklist.value.push(userId);
 };
 
-export const isBlocked = (userId: string) => blocklist.value.includes(userId);
+export const userIsBlocked = (userId: string) => blocklist.value.includes(userId);
 
 export const deleteBlockedEntry = async (user: string) => {
     await axios.delete(`${config.baseUrl}api/v2/blocked/${user}/`);

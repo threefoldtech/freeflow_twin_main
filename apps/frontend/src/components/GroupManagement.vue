@@ -337,7 +337,15 @@
         return files;
     });
 
-    defineEmits(['app-call', 'app-block', 'app-delete', 'app-unblock', 'app-leave', 'app-delete-user', 'clickedProfile']);
+    defineEmits([
+        'app-call',
+        'app-block',
+        'app-delete',
+        'app-unblock',
+        'app-leave',
+        'app-delete-user',
+        'clickedProfile',
+    ]);
 
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);
@@ -364,7 +372,7 @@
 
     onMounted(() => {
         //Calculating already existent objects
-        const computed = contacts.value.map(contact => {
+        const computed = contacts.map(contact => {
             for (const i of props.chat.contacts) {
                 if (contact.id === i.id && contact.location === i.location) {
                     return contact;
@@ -405,7 +413,7 @@
         updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
     const filteredContacts = computed(() => {
-        return contacts.value.filter(
+        return contacts.filter(
             //@ts-ignore
             c => !props.chat.contacts.map(x => x.id).includes(c.id)
         );

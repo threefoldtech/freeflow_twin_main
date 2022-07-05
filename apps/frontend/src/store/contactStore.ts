@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Contact, MessageTypes, SystemBody, SystemMessageTypes } from '../types';
 import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
@@ -66,6 +65,15 @@ export const useContactsState = () => {
         }),
         // ...toRefs(state),
     };
+};
+
+const calculateContacts = () => {
+    const { chats } = useChatsState();
+    const { user } = useAuthState();
+    const contacts = chats.value
+        .filter(chat => !chat.isGroup && chat.acceptedChat)
+        .map(chat => chat.contacts.find(contact => contact.id !== user.id));
+    return contacts;
 };
 
 export const useContactsActions = () => {

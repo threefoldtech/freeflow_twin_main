@@ -43,13 +43,11 @@
     const route = useRoute();
     const router = useRouter();
 
-    
     const handleResize = () => {
-        if(window.innerWidth <= 1024 && fileBrowserTypeView.value === "LIST"){
-            fileBrowserTypeView.value = "GRID";
+        if (window.innerWidth <= 1024 && fileBrowserTypeView.value === 'LIST') {
+            fileBrowserTypeView.value = 'GRID';
         }
-    }
-
+    };
 
     onBeforeMount(async () => {
         if (route.params.name === 'sharedWithMeItemNested') {
@@ -59,7 +57,7 @@
         if (window.innerWidth < 1024) {
             fileBrowserTypeView.value = 'GRID';
         }
-        
+
         window.addEventListener('resize', handleResize);
 
         if (!sharedDir.value) {

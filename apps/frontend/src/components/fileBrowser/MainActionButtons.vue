@@ -22,7 +22,7 @@
     </button>
     <MainActionsOverlay
         :model-value="showMainActionsOverlay"
-        class='md:hidden'
+        class="md:hidden"
         @update-model-value="showMainActionsOverlay = false"
     >
         <template v-slot:header>
@@ -30,14 +30,30 @@
         </template>
         <template v-slot:content>
             <div class="flex justify-around py-4">
-                <div class="flex flex-col items-center" @click="() => {showCreateFolderDialog = true; showMainActionsOverlay = false;}">
-                    <div class='inline-flex items-center p-2.5 border border-gray-400 rounded-full'>
+                <div
+                    class="flex flex-col items-center"
+                    @click="
+                        () => {
+                            showCreateFolderDialog = true;
+                            showMainActionsOverlay = false;
+                        }
+                    "
+                >
+                    <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
                         <FolderAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
                     </div>
                     <p class="mt-1">Folder</p>
                 </div>
-                <div class="flex flex-col items-center" @click="() => {showCreateFileDialog = true; showMainActionsOverlay = false;}">
-                    <div class='inline-flex items-center p-2.5 border border-gray-400 rounded-full'>
+                <div
+                    class="flex flex-col items-center"
+                    @click="
+                        () => {
+                            showCreateFileDialog = true;
+                            showMainActionsOverlay = false;
+                        }
+                    "
+                >
+                    <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
                         <DocumentAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
                     </div>
                     <p class="mt-1">File</p>

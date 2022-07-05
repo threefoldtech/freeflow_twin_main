@@ -36,14 +36,8 @@
 <script setup lang="ts">
     import { computed, onMounted, ref } from 'vue';
     import { myYggdrasilAddress } from '@/store/authStore';
-    import { startFetchStatusLoop, showUserOfflineMessage } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '@/services/urlService';
-    import { EditPathInfo, getFileInfo } from '@/services/fileBrowserService';
-    import Spinner from '@/components/Spinner.vue';
-    import { isUndefined } from 'lodash';
     import { useRoute } from 'vue-router';
     import {
-        fetchShareDetails,
         accessDenied,
         fetchFileAccessDetails,
         FileType,
@@ -51,7 +45,7 @@
         getFileType,
     } from '@/store/fileBrowserStore';
     import { get } from 'scriptjs';
-    import { showUserOfflineMessage, startFetchStatusLoop, statusList, watchingUsers } from '@/store/statusStore';
+    import { showUserOfflineMessage, startFetchStatusLoop } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import {
         EditPathInfo,
@@ -100,97 +94,101 @@
         let fileAccesDetails: EditPathInfo;
         const myAddress = await myYggdrasilAddress();
 
-    const isSupported = computed(() => {
-        return [
-            FileType.Excel,
-            FileType.Word,
-            FileType.Powerpoint,
-            FileType.Pdf,
-            FileType.Html,
-            FileType.Text,
-        ].includes(fileType.value);
-    });
+        const isSupported = computed(() => {
+            return [
+                FileType.Excel,
+                FileType.Word,
+                FileType.Powerpoint,
+                FileType.Pdf,
+                FileType.Html,
+                FileType.Text,
+            ].includes(fileType.value);
+        });
 
-    const init = async () => {
-        if (accessDenied.value || showUserOfflineMessage.value) {
-            isLoading.value = false;
-            return;
-        }
+        const init = async () => {
+            if (accessDenied.value || showUserOfflineMessage.value) {
+                isLoading.value = false;
+                return;
+            }
 
-        const shareDetails = await getShareWithId(shareId);
+            const shareDetails = await getShareWithId(shareId);
 
-        if (shareDetails) {
-            await startFetchStatusLoop(shareDetails.owner);
-            const location = shareDetails.owner.location;
-            const fileInfo = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
+            if (shareDetails) {
+                await startFetchStatusLoop(shareDetails.owner);
+                const location = shareDetails.owner.location;
+                const fileInfo = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
 
-            const apiEndpoint = generateFileBrowserUrl(
-                'http',
-                `[${shareDetails.owner.location}]`,
+                const apiEndpoint = generateFileBrowserUrl(
+                    'http',
+                    `[${shareDetails.owner.location}]`,
+                    fileInfo.path,
+                    fileInfo.readToken
+                );
+                const encodedEndpoint = encodeURIComponent(apiEndpoint);
+                readUrl.value = calcExternalResourceLink(encodedEndpoint);
+
+                initDocumentServer(fileInfo, location);
+
+                isLoading.value = false;
+                return;
+            }
+
+            const fileInfo = (await getFileInfo(path, attachments)).data;
+            const location = useAuthState().user.location;
+
+            //@todo find better way to get name
+
+            readUrl.value = generateFileBrowserUrl(
+                'https',
+                window.location.hostname,
                 fileInfo.path,
-                fileInfo.readToken
-            );
-            const encodedEndpoint = encodeURIComponent(apiEndpoint);
-            readUrl.value = calcExternalResourceLink(encodedEndpoint);
-
-            initDocumentServer(fileInfo, location);
-
-            isLoading.value = false;
-            return;
-        }
-
-        const fileInfo = (await getFileInfo(path, attachments)).data;
-        const location = useAuthState().user.location;
-
-        //@todo find better way to get name
-
-        readUrl.value = generateFileBrowserUrl(
-            'https',
-            window.location.hostname,
-            fileInfo.path,
-            fileInfo.readToken,
-            attachments
-        );
-        console.log('readUrl', readUrl.value);
-        initDocumentServer(fileInfo, location);
-        isLoading.value = false;
-    };
-    init();
-
-    const initDocumentServer = (fileInfo: EditPathInfo, location: string) => {
-        fileType.value = getFileType(getExtension(fileInfo.fullName));
-        console.log('fileinfo', fileInfo);
-
-        if (isSupported.value) {
-            const documentServerConfig = generateDocumentServerConfig(
-                location,
-                fileInfo.path,
-                fileInfo.key,
                 fileInfo.readToken,
-                fileInfo.writeToken,
-                getExtension(fileInfo.fullName),
-                fileInfo.extension,
-                attachments,
-                isLoading.value
+                attachments
             );
-            console.log('documentServer', documentServerConfig);
-
-            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
-                //@ts-ignore
-                new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
-            });
-            return;
-        }
-
-        //If statement so that we don't override the URl of a file that is shared
-        if (readUrl.value) {
+            console.log('readUrl', readUrl.value);
+            initDocumentServer(fileInfo, location);
             isLoading.value = false;
-            return;
-        }
+        };
+        init();
 
-      readUrl.value = generateFileBrowserUrl('https', window.location.hostname, fileInfo.path, fileInfo.readToken);
+        const initDocumentServer = (fileInfo: EditPathInfo, location: string) => {
+            fileType.value = getFileType(getExtension(fileInfo.fullName));
+            console.log('fileinfo', fileInfo);
 
-      if (fileType.value === FileType.Video) {
+            if (isSupported.value) {
+                const documentServerConfig = generateDocumentServerConfig(
+                    location,
+                    fileInfo.path,
+                    fileInfo.key,
+                    fileInfo.readToken,
+                    fileInfo.writeToken,
+                    getExtension(fileInfo.fullName),
+                    fileInfo.extension,
+                    attachments,
+                    isLoading.value
+                );
+                console.log('documentServer', documentServerConfig);
+
+                get(
+                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
+                    () => {
+                        //@ts-ignore
+                        new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
+                    }
+                );
+                return;
+            }
+
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+        };
+
+        readUrl.value = generateFileBrowserUrl('https', window.location.hostname, fileInfo.path, fileInfo.readToken);
+
+        if (fileType.value === FileType.Video) {
             //If statement so that we don't override the URl of a file that is shared
             if (readUrl.value) {
                 isLoading.value = false;

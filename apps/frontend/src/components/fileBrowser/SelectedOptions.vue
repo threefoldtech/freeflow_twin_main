@@ -226,7 +226,7 @@
             <template v-slot:title>
                 <h1 class="font-medium">Share files</h1>
             </template>
-            
+
             <div class="grid grid-cols-2 px-4">
                 <a
                     v-for="(item, index) in tabs"

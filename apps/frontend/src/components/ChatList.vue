@@ -78,7 +78,7 @@
             </div>
             <div class="flex-grow overflow-auto">
                 <div
-                    v-if="filteredChatRequests.length === 0 && filteredChats.length == 0"
+                    v-if="filteredChatRequests.length === 0 && filteredChats.length === 0"
                     class="text-center collapsed-bar:hidden mt-4"
                 >
                     <div class="text-center">
@@ -196,7 +196,6 @@
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
         openDeleteUserDialogFromOtherFile,
-        conversationComponentRerender,
         RIGHT_CLICK_ACTIONS_CHAT_CARD,
         RIGHT_CLICK_TYPE,
         rightClickItemAction,
@@ -204,6 +203,7 @@
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import { userIsBlocked } from '@/store/blockStore';
+    import { useSocketActions } from '@/store/socketStore';
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
@@ -243,7 +243,7 @@
                         }
                         if (userIsBlocked(chatId)) {
                             const { sendUnBlockedChat } = useSocketActions();
-                            sendUnBlockedChat(chatId);
+                            await sendUnBlockedChat(chatId);
                             break;
                         }
                         openBlockDialogFromOtherFile.value = true;
