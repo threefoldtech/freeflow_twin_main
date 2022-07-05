@@ -1,0 +1,143 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+    h1,
+    h2,
+    h3 {
+        font-family: "Inter", sans-serif;
+    }
+    h1 {
+        font-size: 24px;
+        font-weight: 300;
+    }
+    h2 {
+        @apply text-xl;
+    }
+    h3 {
+        @apply text-lg;
+    }
+    a {
+        @apply font-bold;
+    }
+    label {
+        white-space: nowrap;
+    }
+    th{
+        @apply font-bold;
+    }
+    p{
+        font-size: 14px;
+        font-weight: 400;
+    }
+    /* input,
+    textarea,
+    select {
+        @apply my-1 border-b-2 w-full p-1 transition;
+    }
+    input:focus,
+    textarea:focus,
+    select {
+        @apply outline-none border-accent;
+    } */
+    /* button {
+        @apply py-1 px-2 mx-2;
+    }
+    button:focus {
+        @apply outline-none;
+    } */
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter-to {
+    opacity: 1;
+}
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+.bg-gradient {
+    background: #36a688;
+}
+.backdrop {
+    @apply fixed h-screen w-screen left-0 top-0 bg-black bg-opacity-20 z-20;
+}
+.red {
+    @apply bg-red-600;
+}
+@-webkit-keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spinner {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@layer components {
+    @variants responsive {
+        .bigmaingrid {
+            display: grid;
+            grid-template-areas:
+                'top top'
+                'side content'
+                'side content';
+            grid-template-columns: 100px 1fr;
+            grid-template-rows: auto 1fr;
+        }
+
+        .maingrid {
+            display: grid;
+            grid-template-areas:
+                'top'
+                'content'
+                'content';
+            grid-template-rows: auto 1fr;
+        }
+        .customgrid {
+            grid-template-columns: 400px 1fr;
+        }
+        .topgrid {
+            display: grid !important;
+            grid-template-columns: 500px 2fr 1fr !important;
+        }
+    }
+}
+
+/* custom scrollbar */
+::-webkit-scrollbar {
+    width: 16px;
+    position: absolute;
+    left: 0;
+}
+
+::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #d6dee1;
+    border-radius: 8px;
+    border: 6px solid transparent;
+    background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #a8bbbf;
+}
+
+::selection {
+    @apply bg-accent-300;
+}
