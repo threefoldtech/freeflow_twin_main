@@ -204,7 +204,7 @@
             </template>
         </Alert>
         <Dialog
-            v-if="showLeaveDialog && chat?.isGroup"
+            v-if="showLeaveDialog"
             v-model="showLeaveDialog"
             class="max-w-10"
             :noActions="true"

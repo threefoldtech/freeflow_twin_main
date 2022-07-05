@@ -373,6 +373,7 @@
     onMounted(() => {
         //Calculating already existent objects
         const computed = contacts.map(contact => {
+            if (!contact) return;
             for (const i of props.chat.contacts) {
                 if (contact.id === i.id && contact.location === i.location) {
                     return contact;
