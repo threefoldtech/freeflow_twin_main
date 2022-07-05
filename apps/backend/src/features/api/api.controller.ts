@@ -26,18 +26,16 @@ export class ApiController {
             if (!contact) return;
         }
 
-        try {
-            http.get(loc, response => {
-                const length = response.rawHeaders.length;
-                let index = 0;
-                while (index < length) {
-                    res.setHeader(response.rawHeaders[index], response.rawHeaders[index + 1]);
-                    index += 2;
-                }
-                response.pipe(res);
-            });
-        } catch (error) {
+        http.get(loc, response => {
+            const length = response.rawHeaders.length;
+            let index = 0;
+            while (index < length) {
+                res.setHeader(response.rawHeaders[index], response.rawHeaders[index + 1]);
+                index += 2;
+            }
+            response.pipe(res);
+        }).on('error', () => {
             return;
-        }
+        });
     }
 }
