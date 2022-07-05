@@ -150,21 +150,19 @@
 
 <script lang="ts" setup>
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { ref, onMounted } from 'vue';
+    import { ref, onBeforeMount } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
     import { Contact, GroupContact, Roles } from '../types/index';
-    import axios from 'axios';
-    import config from '@/config';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
-    import { allUsers } from '@/store/userStore';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
     const { groupContacts, contacts } = useContactsState();
+    const { retrieveContacts } = useContactsActions();
     console.log('groupContacts', groupContacts);
     console.log('contacts', contacts);
 
@@ -185,13 +183,10 @@
         { name: 'group', text: 'Create a group' },
     ]);
 
-    onMounted(async () => {
-        const { retrieveContacts } = useContactsActions();
+    onBeforeMount(async () => {
+        const { dtContacts } = useContactsState();
+        possibleUsers.value = dtContacts;
         await retrieveContacts();
-
-        const { data } = await axios.get(`${config.appBackend}api/users/digitaltwin`);
-        possibleUsers.value = data;
-        console.log('possible ', possibleUsers.value);
     });
 
     const contactAdd = (contact: Contact) => {
@@ -269,13 +264,6 @@
         usersInGroup.value = [];
         emit('closeDialog');
     };
-
-    // @todo: config
-    // axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
-    //     const { user } = useAuthState();
-    //     const posContacts = <Contact[]>r.data;
-    //     possibleUsers.value = posContacts;
-    // });
 </script>
 
 <style scoped></style>

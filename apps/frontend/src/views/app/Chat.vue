@@ -37,8 +37,16 @@
     import { PlusIcon } from '@heroicons/vue/solid';
     import { ChatAlt2Icon } from '@heroicons/vue/outline';
     import { useChatsState } from '@/store/chatStore';
+    import { useContactsActions } from '@/store/contactStore';
+    import { onBeforeMount } from 'vue';
 
-    const { chats, chatRequests } = useChatsState();
+    const { retrieveDTContacts } = useContactsActions();
+
+    const { chats } = useChatsState();
+
+    onBeforeMount(async () => {
+        await retrieveDTContacts();
+    });
 
     const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');
     const router = useRouter();

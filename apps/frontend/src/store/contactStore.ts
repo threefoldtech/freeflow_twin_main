@@ -9,6 +9,7 @@ import { reactive, toRefs } from 'vue';
 
 const state = reactive<ContactState>({
     contacts: [],
+    dtContacts: [],
 });
 
 const retrieveContacts = async () => {
@@ -16,6 +17,14 @@ const retrieveContacts = async () => {
         const contacts = response.data;
         state.contacts = contacts;
     });
+};
+
+const retrieveDTContacts = async () => {
+    if (state.dtContacts.length > 0) return state.dtContacts;
+
+    const { data } = await axios.get(`${config.appBackend}api/users/digitaltwin`);
+    state.dtContacts = data;
+    return data;
 };
 
 // const contactIsHealthy = (location) => {
@@ -63,6 +72,7 @@ export const useContactsState = () => {
             };
             return contact;
         }),
+        dtContacts: state.dtContacts,
         // ...toRefs(state),
     };
 };
@@ -81,9 +91,11 @@ export const useContactsActions = () => {
         retrieveContacts,
         // setLastMessage,
         addContact,
+        retrieveDTContacts,
     };
 };
 
 interface ContactState {
     contacts: Contact[];
+    dtContacts: Contact[];
 }
