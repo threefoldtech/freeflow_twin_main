@@ -8,10 +8,12 @@ import {
     FileTypes,
     GetMessagesResponse,
     GroupChat,
+    GroupContact,
     GroupManagementBody,
     Message,
     MessageBodyType,
     MessageTypes,
+    Roles,
     SystemBody,
     SystemMessageTypes,
 } from '../types';
@@ -30,6 +32,7 @@ const state = reactive<ChatState>({
     chats: [],
     chatRequests: [],
     chatInfo: {},
+    unreadChats: [],
 });
 
 export const selectedId = ref('');
@@ -145,7 +148,7 @@ export const removeChat = (chatId: string) => {
     selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const addGroupchat = (name: string, contacts: Contact[]) => {
+const addGroupchat = (name: string, contacts: GroupContact[]) => {
     const { user } = useAuthState();
 
     const contactInGroup = contacts
@@ -572,7 +575,7 @@ const readMessage = (chatId: string, messageId: string) => {
 
 const updateContactsInGroup = async (
     groupId: string,
-    contact: Contact,
+    contact: GroupContact,
     type: SystemMessageTypes,
     nextAdmin?: string
 ) => {
@@ -582,9 +585,7 @@ const updateContactsInGroup = async (
     if (!('location' in admin)) return;
     const adminLocation = admin.location;
 
-    let msg = `${contact.id} has been removed from the group`;
-    if (type === SystemMessageTypes.ADD_USER) msg = `${contact.id} has been added to the group`;
-    if (type === SystemMessageTypes.USER_LEFT_GROUP) msg = `${contact.id} has left the group`;
+    let msg = setMessage(type, contact);
 
     const message: Message<GroupManagementBody> = {
         chatId: groupId,
@@ -605,6 +606,24 @@ const updateContactsInGroup = async (
     };
 
     sendMessageObject(groupId, message);
+};
+
+const setMessage = (type: SystemMessageTypes, contact: GroupContact) => {
+    let msg = `${contact.id} has been removed from the group`;
+
+    switch (type) {
+        case SystemMessageTypes.ADD_USER:
+            msg = `${contact.id} has been added to the group`;
+            break;
+        case SystemMessageTypes.USER_LEFT_GROUP:
+            msg = `${contact.id} has left the group`;
+            break;
+        case SystemMessageTypes.CHANGE_USER_ROLE:
+            const roleChange = contact.roles.includes(Roles.MODERATOR) ? 'promoted' : 'demoted';
+            msg = `${contact.id} has been ${roleChange}`;
+            break;
+    }
+    return msg;
 };
 
 export const useChatsState = () => {
@@ -636,6 +655,9 @@ export const usechatsActions = () => {
         getChatInfo,
         getChat,
         draftMessage,
+        getUnreadChats,
+        newUnreadChats,
+        removeUnreadChats,
     };
 };
 
@@ -650,6 +672,7 @@ interface ChatState {
     chats: Chat[];
     chatRequests: Chat[];
     chatInfo: ChatInfo;
+    unreadChats: string[];
 }
 
 export const handleRead = (message: Message<string>) => {
@@ -668,4 +691,46 @@ export const handleRead = (message: Message<string>) => {
     }
 
     chat.read[<string>message.from] = message.body;
+};
+
+export const getUnreadChats = async () => {
+    if (state.unreadChats.length > 0) return state.unreadChats;
+
+    await retrieveChats();
+    const { chats } = useChatsState();
+    const { user } = useAuthState();
+
+    const arr: string[] = [];
+
+    for (let chat of chats.value) {
+        const lastReadMessageId = chat.read[<string>user.id];
+        const index = chat.messages?.findIndex(m => m.id === lastReadMessageId);
+
+        //more than 50 new messages in chat (because of pagination)
+        if (index === -1) {
+            arr.push(chat.chatId);
+            continue;
+        }
+
+        const totalMissedMessages = chat.messages.length - (index + 1);
+        if (totalMissedMessages > 0) arr.push(chat.chatId);
+    }
+
+    for (let request of state.chatRequests) {
+        if (arr.includes(request.chatId)) continue;
+        arr.push(request.chatId);
+    }
+    state.unreadChats = arr;
+    return state.unreadChats;
+};
+
+export const newUnreadChats = (chatId: string) => {
+    if (state.unreadChats.includes(chatId)) return;
+    state.unreadChats.push(chatId);
+};
+
+export const removeUnreadChats = (chatId: string) => {
+    const index = state.unreadChats.findIndex(id => id === chatId);
+    if (index === -1) return;
+    state.unreadChats.splice(index, 1);
 };

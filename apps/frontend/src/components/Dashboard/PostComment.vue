@@ -11,17 +11,17 @@
         </VMenu>
         <div class="flex items-center justify-center space-x-2 relative">
             <div class="block">
-                <div class="bg-gray-100 w-auto rounded-xl px-2 pb-2">
-                    <div class="font-medium">
-                        <a class="hover:underline text-sm" href="#">
-                            <small>{{ comment.owner.id }}</small>
+                <div class="bg-gray-100 w-auto rounded-lg px-2 py-2">
+                    <div class="font-semibold">
+                        <a class="hover:underline text-sm font-semibold" href="#">
+                            {{ comment.owner.id }}
                         </a>
                     </div>
-                    <div class="text-xs">
+                    <div class="text-sm">
                         {{ comment.body }}
                     </div>
                 </div>
-                <div class="flex justify-start items-center text-xs w-full">
+                <div class="flex justify-start items-center text-sm w-full">
                     <div class="font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1">
                         <a v-if="comment.type === CommentType.COMMENT" class="hover:underline" href="#" @click="reply">
                             <small>Reply</small>
@@ -38,7 +38,7 @@
                 </div>
             </div>
         </div>
-        <div
+        <!--<div
             class="self-stretch flex justify-center items-center transform transition-opacity duration-200 opacity-0 translate -translate-y-2 hover:opacity-100"
         >
             <a class="" href="#">
@@ -61,7 +61,7 @@
                     </svg>
                 </div>
             </a>
-        </div>
+        </div>-->
     </div>
     <ReplyComment
         v-for="reply in commentsSorted"
@@ -79,11 +79,14 @@
         </div>
         <input
             v-model="replyInput"
-            class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 pl-10 w-2/3"
+            class="text-xs font-medium rounded-lg border border-gray-300 outline-none focus:ring-0 ring-0 w-2/3"
             placeholder="Type your message here"
             type="text"
             maxlength="500"
         />
+        <button type="submit" class="bg-transparent ml-2">
+            <span class="material-symbols-rounded text-primary text-4xl"> send </span>
+        </button>
     </form>
 </template>
 
@@ -95,13 +98,15 @@
     import { ThumbUpIcon } from '@heroicons/vue/solid';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
+    import { TransitionRoot } from '@headlessui/vue';
+    import { likeComment } from '@/services/socialService';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { CommentType, IPostComment } from 'custom-types/post.type';
 
     const props = defineProps<{ comment: IPostComment }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
-    const myLocation = ref<string>('');
     const { user } = useAuthState();
 
     const emit = defineEmits(['replyToComment']);
@@ -109,6 +114,9 @@
     onBeforeMount(async () => {
         myLocation.value = await myYggdrasilAddress();
     });
+
+    //only shows user panel if mouse stays focussed for a moment
+    const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
 
     const commentsSorted = computed(() => {
         return props.comment?.replies.sort(function (a, b) {

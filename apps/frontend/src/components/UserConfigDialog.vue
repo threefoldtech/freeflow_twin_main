@@ -1,7 +1,7 @@
 <template>
     <Dialog v-model="showUserConfigDialog" @update-model-value="closeDialog" :noActions="true">
         <template v-slot:title>
-            <h1>Profile settings</h1>
+            <h1 class="font-medium">Profile settings</h1>
         </template>
         <div>
             <div class="avatar-container mb-2">
@@ -19,7 +19,7 @@
                             <i class="fas fa-pen text-icon"></i>
                         </div>
                         <AvatarImg
-                            :id="user.id"
+                            :id="String(user.id)"
                             large
                             class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden"
                         />
@@ -84,7 +84,7 @@
         </div>
         <Dialog v-model="showEditAvatar" @update-model-value="cancelNewAvatar" :noActions="true">
             <template v-slot:title>
-                <h1>Avatar</h1>
+                <h1 class="font-medium">Avatar</h1>
             </template>
             <div class="flex w-full flex-col">
                 <div class="w-full">
@@ -123,7 +123,7 @@
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { blocklist, deleteBlockedEntry, initBlocklist } from '@/store/blockStore';
+    import { blocklist } from '@/store/blockStore';
     import { setNewAvatar } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
@@ -136,10 +136,7 @@
 
     const emit = defineEmits(['addUser']);
 
-    initBlocklist();
-
     const { user } = useAuthState();
-    const showEditPic = ref(false);
     const fileInput = ref();
     const file = ref();
     const userStatus = ref('');
@@ -150,10 +147,6 @@
     const cropper = ref(null);
     const isHoveringAvatar = ref(false);
     const showEditAvatar = ref(false);
-
-    onBeforeMount(async () => {
-        await initBlocklist();
-    });
 
     watch(showEditAvatar, () => {
         if (showEditAvatar.value) {
@@ -221,7 +214,7 @@
         file.value = null;
     };
 
-    const closeDialog = newVal => {
+    const closeDialog = (newVal: boolean) => {
         showUserConfigDialog.value = newVal;
     };
 
@@ -247,8 +240,9 @@
         isEditingStatus.value = false;
     };
 
-    const unblockUser = async user => {
-        await deleteBlockedEntry(user);
+    const unblockUser = async (user: string) => {
+        const { sendUnBlockedChat } = useSocketActions();
+        sendUnBlockedChat(user);
         showUserConfigDialog.value = false;
     };
 

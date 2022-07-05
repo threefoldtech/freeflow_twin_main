@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { Contact, MessageTypes, SystemBody, SystemMessageTypes } from '../types';
+import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
-import { Chat } from '../types';
-import { usechatsActions, useChatsState } from './chatStore';
+import { useChatsState } from './chatStore';
 import { useAuthState } from './authStore';
 import { Message, DtId } from '../types/index';
 import { reactive, toRefs } from 'vue';
@@ -56,6 +56,15 @@ const addContact = (username: DtId, location: string, _dontCheck = false) => {
 export const useContactsState = () => {
     return {
         ...toRefs(state),
+        contacts: calculateContacts(),
+        groupContacts: calculateContacts().map((c: Contact) => {
+            const contact: GroupContact = {
+                ...c,
+                roles: [Roles.USER],
+            };
+            return contact;
+        }),
+        // ...toRefs(state),
     };
 };
 

@@ -6,7 +6,7 @@
         <div v-else class="flex flex-col mx-2">
             <div class="overflow-x-auto">
                 <div class="align-middle inline-block min-w-full">
-                    <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <div class="overflow-hidden sm:rounded-lg">
                         <table
                             v-if="fileBrowserTypeView === 'LIST'"
                             class="min-w-full divide-y divide-gray-200 shadow"
@@ -84,8 +84,8 @@
                         <!-- SHARED -->
                         <ul
                             role="list"
-                            v-else
-                            class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+                            v-if="fileBrowserTypeView === 'GRID'"
+                            class="grid grid-cols-1 gap-x-2 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 xl:gap-x-6 mt-4"
                         >
                             <p
                                 class="px-6 py-4 whitespace-nowrap col-span-12 text-base font-medium text-center text-gray-800"
@@ -152,18 +152,11 @@
         fileBrowserTypeView,
         isQuantumChatFiles,
     } from '@/store/fileBrowserStore';
-    import { onBeforeMount, watch, computed } from 'vue';
+    import { watch, computed } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import Spinner from '@/components/Spinner.vue';
-    import { useSocketActions } from '@/store/socketStore';
-    import { useAuthState } from '@/store/authStore';
 
-    onBeforeMount(async () => {
-        sharedBreadcrumbs.value = [];
-        const { initializeSocket } = useSocketActions();
-        const { user } = useAuthState();
-        initializeSocket(user.id.toString());
-    });
+    sharedBreadcrumbs.value = [];
 
     watch(sharedFolderIsloading, () => {});
 

@@ -2,92 +2,52 @@
     <p class="hidden">{{ JSON.stringify(openBlockDialogFromOtherFile) }}</p>
     <div :key="conversationComponentRerender" class="h-full w-full">
         <appLayout>
-            <template v-slot:top>
-                <div v-if="chat" :class="{ 'group-chat': chat?.isGroup }" class="w-full flex md:px-4 text-white">
-                    <div class="place-items-center grid mr-4">
-                        <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
-                    </div>
-                    <div class="py-4 pl-2">
-                        <p class="font-bold font overflow-hidden overflow-ellipsis">
-                            {{ chat.name }}
-                        </p>
-                        <p v-if="!blocked" class="font-light group-chat:hidden">
-                            {{ status?.isOnline ? 'Is online' : 'Is offline' }}
-                        </p>
-                        <p v-if="blocked" class="group-chat:hidden text-red-500">BLOCKED</p>
-                        <p class="font-thin hidden group-chat:span">Group chat</p>
-                    </div>
-                </div>
-                <div v-else>Loading</div>
-            </template>
-            <template v-slot:actions>
-                <div :class="{ 'group-chat': chat?.isGroup }">
-                    <div class="relative">
-                        <button class="text-lg text-white md:hidden" @click="showMenu = true">
-                            <i class="fas fa-ellipsis-v"></i>
-                        </button>
-                        <div v-if="showMenu" class="backdrop" @click="showMenu = false"></div>
+            <template #topbar>
+                <Topbar>
+                    <template #user>
                         <div
-                            v-if="showMenu"
-                            class="right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2 pl-2"
+                            v-if="chat"
+                            :class="{ 'group-chat': chat?.isGroup }"
+                            class="w-full flex lg:px-4 text-black"
                         >
+                            <div class="place-items-center grid mr-4">
+                                <AvatarImg :id="chat.chatId" :showOnlineStatus="false"></AvatarImg>
+                            </div>
+                            <div class="py-4 pl-2">
+                                <p class="font-bold font overflow-hidden overflow-ellipsis">
+                                    {{ chat.name }}
+                                </p>
+                                <p v-if="!blocked" class="font-light group-chat:hidden">
+                                    {{ status?.isOnline ? 'Is online' : 'Is offline' }}
+                                </p>
+                                <p v-if="blocked" class="group-chat:hidden text-red-500">BLOCKED</p>
+                                <p class="font-thin hidden group-chat:span">Group chat</p>
+                            </div>
+                        </div>
+                        <div v-else>Loading</div>
+                    </template>
+                    <template #actions>
+                        <div class="flex" :class="{ 'group-chat': chat?.isGroup }">
                             <button
-                                class="flex align-center"
-                                @click="
-                                    popupMeeting();
-                                    showMenu = false;
-                                "
-                            >
-                                <div class="w-8 justify-center align-center">
-                                    <i class="fas fa-video"></i>
-                                </div>
-                                <span class="ml-1 text-left">Call</span>
-                            </button>
-
-                            <button
+                                v-if="!showSideBar"
                                 class="flex"
                                 @click="
                                     toggleSideBar();
                                     showMenu = false;
                                 "
                             >
-                                <div class="w-8">
-                                    <i class="fas fa-info-circle"></i>
-                                </div>
-                                <span class="ml-1 text-left">Info</span>
+                                <InformationCircleIcon class="w-6 text-gray-500" />
                             </button>
-
-                            <button
-                                class="flex"
-                                @click="
-                                    blockChat();
-                                    showMenu = false;
-                                "
-                            >
-                                <div class="w-8">
-                                    <i class="fas fa-minus-circle"></i>
-                                </div>
-                                <span class="ml-1 text-left">Block chat</span>
-                            </button>
-                            <button
-                                class="flex"
-                                @click="
-                                    leaveChat();
-                                    showMenu = false;
-                                "
-                            >
-                                <div class="w-8">
-                                    <i class="fas fa-trash"></i>
-                                </div>
-                                <span class="ml-1 text-left">Delete chat</span>
+                            <button v-if="showSideBar" class="flex" @click="disableSidebar">
+                                <XIcon class="w-6 text-gray-500" />
                             </button>
                         </div>
-                    </div>
-                </div>
+                    </template>
+                </Topbar>
             </template>
             <template v-slot:default>
                 <div :class="{ 'group-chat': chat?.isGroup }" class="flex flex-row relative h-full w-full">
-                    <ChatList class="hidden md:inline-block" />
+                    <ChatList class='hidden lg:inline-block' />
                     <div
                         v-if="chat"
                         :key="chat.id + selectedId"
@@ -98,7 +58,7 @@
                             <!--                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"-->
                             <!--                        >-->
                             <div
-                                class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden md:flex"
+                                class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden lg:flex"
                             >
                                 <div class="py-2 pl-4 flex-1">
                                     <p class="font-bold font overflow-hidden overflow-ellipsis w-80">
@@ -141,7 +101,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <MessageBox ref="messageBox" :chat="chat" style="flex: 2">
+                            <MessageBox @clickedProfile="popupProfile" ref="messageBox" :chat="chat" style="flex: 2">
                                 <div></div>
                                 <template v-slot:viewAnchor>
                                     <div
@@ -178,42 +138,36 @@
                         v-if="chat"
                         :key="'aside' + chat.id + selectedId"
                         :class="{ 'flex ': showSideBar, hidden: !showSideBar }"
-                        class="min-h-screen flex-1 xl:flex-initial flex-col overflow-y-hidden md:w-[400px]"
+                        class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[400px] lg:border-l"
                     >
-                        <div class="bg-white h-14 xl:hidden flex justify-end items-center">
-                            <button
-                                class="rounded-full w-8 h-8 collapsed-bar:w-10 collapsed-bar:h-10 bg-gray-100 flex justify-center mr-2"
-                                @click="disableSidebar"
+                        <div class="max-w-full w-full bg-gray-100 xl:bg-white flex flex-col flex-grow">
+                            <div
+                                class="bg-white p-4 w-full mb-4 lg:flex min-h-64 justify-between items-center hidden"
                             >
-                                <div class="h-full flex items-center justify-center"><i class="fa fa-times"></i></div>
-                            </button>
-                        </div>
-
-                        <div class="max-w-full w-full bg-white border flex flex-col flex-grow">
-                            <div class="bg-white pb-4 w-full mb-4 p-6 flex min-h-64 justify-start relative">
+                                <div class='flex items-center'>
+                                    <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
+                                    <div class="ml-6">
+                                        <h2
+                                            class="break-all w-full overflow-y-auto max-h-28 text-lg text-white font-semibold text-gray-800"
+                                        >
+                                            {{ chat.name }}
+                                        </h2>
+                                        <p v-if="chat.isGroup" class="text-gray-500">
+                                            {{ chat.contacts.length }} members
+                                        </p>
+                                        <p
+                                            v-if="!chat.isGroup"
+                                            class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
+                                        >
+                                            {{ status?.status || 'No status found' }}
+                                        </p>
+                                    </div>
+                                </div>
                                 <XIcon
-                                    class="w-5 h-5 absolute right-5 top-5 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-100 hidden xl:inline"
+                                    class="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-100 hidden lg:inline justify-self-end"
                                     @click="disableSidebar"
                                 />
-                                <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
-                                <div class="ml-6">
-                                    <h2
-                                        class="break-all w-full overflow-y-auto max-h-28 text-lg text-white font-semibold text-gray-800"
-                                    >
-                                        {{ chat.name }}
-                                    </h2>
-                                    <p v-if="chat.isGroup" class="text-gray-500">{{ chat.contacts.length }} members</p>
-                                    <p
-                                        v-if="!chat.isGroup"
-                                        class="break-all w-full overflow-y-auto font-medium text-center text-gray-400 text-sm"
-                                    >
-                                        {{ status?.status || 'No status found' }}
-                                    </p>
-                                </div>
                             </div>
-
-                            <div id="spacer" class="bg-gray-100 h-2 w-full"></div>
-
                             <group-management
                                 :chat="chat"
                                 @app-call="popupMeeting"
@@ -222,6 +176,7 @@
                                 @app-leave="leaveChat"
                                 @app-delete="deleteChat"
                                 @app-delete-user="deleteUser"
+                                @clickedProfile="popupProfile"
                             >
                             </group-management>
                         </div>
@@ -251,15 +206,16 @@
             </template>
         </Alert>
         <Dialog
+            v-if='showLeaveDialog && chat?.isGroup'
             v-model="showLeaveDialog"
             class="max-w-10"
             :noActions="true"
             @update-model-value="showLeaveDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">{{ chat?.isGroup ? 'Leaving group' : 'Deleting Chat' }}</h1>
+                <h1 class="text-center">Leaving group</h1>
             </template>
-            <div v-if="chat?.isGroup">
+            <div v-if="chat?.isGroup && chat?.adminId === user?.id">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
                     Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
                 </p>
@@ -342,6 +298,47 @@
             </template>
             <div>{{ errorMessage }}</div>
         </Dialog>
+
+        <Dialog v-model="showProfileDialog" @updateModelValue="showProfileDialog = false">
+            <template v-slot:title>
+                <h1 class="mb-5">User info</h1>
+            </template>
+
+            <div>
+                <div class="flex space-x-5 mb-5">
+                    <AvatarImg :id="selectedUser?.id" large />
+                    <h2 class="mt-3 text-xl">{{ selectedUser?.id }}</h2>
+                </div>
+
+                <div class="flex space-x-3" v-if="isPersonFriend !== null">
+                    <div class="w-auto">
+                        <a
+                            class="text-xs text-accent-600 hover:bg-opacity-60 font-semibold flex items-center justify-center px-3 py-2 bg-accent-300 bg-opacity-50 rounded-lg"
+                            href="#"
+                            @click="goToChat"
+                        >
+                            <div class="mr-1 h-6 flex items-center flex-shrink-0">
+                                <img src="/whisperbold.svg" alt="whisper" />
+                            </div>
+                            Send private message
+                        </a>
+                    </div>
+
+                    <div class="w-auto">
+                        <a
+                            class="text-xs text-gray-800 hover:bg-gray-300 font-semibold flex items-center justify-center px-3 py-2 bg-gray-200 rounded-lg"
+                            href="#"
+                            @click="goToKutana"
+                        >
+                            <div class="mr-1 h-6 flex items-center flex-shrink-0">
+                                <img src="/kutanabold.svg" alt="kutana" />
+                            </div>
+                            Go to video room
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </Dialog>
     </div>
 </template>
 
@@ -350,11 +347,12 @@
     import AppLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
-    import { useContactsState } from '@/store/contactStore';
+    import { useContactsActions, useContactsState } from '@/store/contactStore';
     import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendBlockChat, sendRemoveChat, sendRemoveUser } from '@/store/socketStore';
+    import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
     import ChatList from '@/components/ChatList.vue';
@@ -366,13 +364,13 @@
     import { useIntersectionObserver } from '@/lib/intersectionObserver';
     import { useRoute, useRouter } from 'vue-router';
     import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
-    import { JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
+    import { AnonymousContact, Contact, JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
     import MessageBox from '@/components/MessageBox.vue';
     import Button from '@/components/Button.vue';
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
-    import { XIcon } from '@heroicons/vue/outline';
+    import { XIcon, VideoCameraIcon, InformationCircleIcon } from '@heroicons/vue/outline';
     import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
     import {
         conversationComponentRerender,
@@ -383,6 +381,7 @@
     import { useOnline } from '@vueuse/core';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
     import Alert from '@/components/Alert.vue';
+    import Topbar from '@/components/Topbar.vue';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);
@@ -400,6 +399,8 @@
     const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
+    const { addContact } = useContactsActions();
+    const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
 
     watch(
         () => route.params.id,
@@ -411,6 +412,45 @@
     onBeforeMount(async () => {
         await retrieveChats();
     });
+
+    const showProfileDialog = ref(false);
+    const selectedUser = ref<Contact | AnonymousContact>();
+
+    const isPersonFriend = computed(() => {
+        if (user.id === selectedUser.value?.id) return null;
+        return contacts.some(item => item.id === selectedUser.value.id);
+    });
+
+    const goToChat = async e => {
+        e.preventDefault();
+        if (user.id === selectedUser.value?.id) return;
+        if (!('location' in selectedUser.value)) return;
+
+        if (!isPersonFriend.value) {
+            await retrieveChats();
+            addContact(selectedUser.value.id, selectedUser.value.location);
+        }
+        await nextTick(async () => {
+            localStorage.setItem('lastOpenedChat', selectedUser.value.id.toString());
+            await router.push({ name: 'whisper' });
+        });
+    };
+
+    const goToKutana = async e => {
+        e.preventDefault;
+        await nextTick(async () => {
+            await router.push({ name: 'kutana' });
+        });
+    };
+
+    const popupProfile = async (contact: Contact | AnonymousContact) => {
+        console.log('contact', contact);
+        if (!contact) return;
+        if (!('location' in contact)) return;
+
+        showProfileDialog.value = true;
+        selectedUser.value = contact;
+    };
 
     const truncate = (value, limit = 20) => {
         if (value.length > limit) {
@@ -458,14 +498,12 @@
     const nextAdmin = ref('');
     const setNextAdmin = e => (nextAdmin.value = e.target.innerText);
 
-    const loadedOnce = ref(false);
     const chat = computed(() => {
         const currentChat = chats.value.find(c => c.chatId == selectedId.value);
-        if (!currentChat && loadedOnce.value) {
+        if (!currentChat && !isLoading.value) {
             localStorage.setItem('lastOpenedChat', '');
             router.push({ name: 'whisper' });
         }
-        loadedOnce.value = true;
         return currentChat;
     });
 
@@ -526,7 +564,7 @@
     const doLeaveChat = async () => {
         if (chat.value.isGroup && chat.value.contacts.length > 1) {
             const { updateContactsInGroup } = usechatsActions();
-            if (!nextAdmin.value) return;
+            if (!nextAdmin.value && user.id === chat.value.adminId) return;
             await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
             return;
         }
@@ -550,7 +588,7 @@
         router.push({ name: 'whisper' });
     };
 
-    const unBlockChat = async () => await deleteBlockedEntry(chat.value.chatId);
+    const unBlockChat = async () => sendUnBlockedChat(chat.value.chatId);
 
     const reads = computed(() => {
         const preReads = {};
@@ -609,7 +647,7 @@
 
     const blocked = computed(() => {
         if (!chat.value || chat.value.isGroup) return false;
-        return isBlocked(<string>chat.value.chatId);
+        return userIsBlocked(<string>chat.value.chatId);
     });
 
     let activeItem = ref('edit');

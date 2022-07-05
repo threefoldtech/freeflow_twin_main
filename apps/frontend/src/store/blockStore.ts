@@ -1,5 +1,3 @@
-import axios from 'axios';
-import config from '@/config';
 import { ref } from 'vue';
 
 export const blocklist = ref([]);

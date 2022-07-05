@@ -1,15 +1,17 @@
 <template>
     <div class="place-items-start">
-        <div class="grid grid-cols-2">
+        <div class="grid grid-cols-2 px-4">
             <a
-                v-for="item in navigation"
+                v-for="(item, index) in navigation"
                 :key="item.name"
                 :class="[
                     activeItem === item.name
                         ? 'bg-primary text-white'
                         : 'bg-gray-100 text-black hover:bg-gray-200 transition duration-300',
+                    index === 0 ? 'rounded-l-md' : '',
+                    index === navigation.length - 1 ? 'rounded-r-md' : '',
                 ]"
-                class="nav-link grid-cols-6 text-center py-2 rounded-xl font-normal"
+                class="nav-link grid-cols-6 text-center py-2 font-normal"
                 href="#"
                 @click.prevent="setActive(item.name)"
             >
@@ -17,12 +19,7 @@
             </a>
         </div>
         <div v-if="isActive('user')" class="flex flex-col">
-            <UserTable
-                :data="possibleUsers"
-                focus
-                placeholder="Search for user..."
-                @addContact="contactAdd"
-            ></UserTable>
+            <UserTable :data="allUsers" focus placeholder="Search for user..." @addContact="contactAdd"></UserTable>
             <Disclosure v-slot="{ open }">
                 <DisclosureButton
                     class="flex justify-between w-full mt-4 ml-0 py-2 text-sm font-medium text-left text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
@@ -90,7 +87,7 @@
             </Disclosure>
         </div>
         <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent="groupAdd">
-            <div class="flex place-items-center mx-1 mb-4">
+            <div class="flex place-items-center px-4 mb-4">
                 <div class="w-full">
                     <br />
                     <span v-if="groupnameAddError !== ''" class="text-red-600">
@@ -129,7 +126,7 @@
                 ></UserTableGroup>
             </div>
 
-            <div class="flex mt-4 justify-end w-full">
+            <div class="flex mt-4 px-4 justify-end w-full">
                 <button
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end transition hover:bg-gray-50"
                     @click="$emit('closeDialog')"
@@ -150,24 +147,26 @@
     import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref, onMounted } from 'vue';
     import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState, myYggdrasilAddress } from '../store/authStore';
-    import { Contact } from '../types/index';
+    import { myYggdrasilAddress, useAuthState } from '../store/authStore';
+    import { Contact, GroupContact, Roles } from '../types/index';
     import axios from 'axios';
     import config from '@/config';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
+    import { allUsers } from '@/store/userStore';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const emit = defineEmits(['closeDialog']);
     const { contacts } = useContactsState();
+
     const userAddLocation = ref('');
     const usernameAddError = ref('');
     const groupnameAdd = ref('');
     const groupnameAddError = ref('');
     const usernameInGroupAdd = ref('');
-    const usersInGroup = ref<Contact[]>([]);
+    const usersInGroup = ref<GroupContact[]>([]);
     const possibleUsers = ref<Contact[]>([]);
     const contactAddError = ref('');
 
@@ -244,10 +243,10 @@
             groupnameAddError.value = "The name can't contain more than 50 characters";
             return;
         }
-        const mylocation = await myYggdrasilAddress();
         usersInGroup.value.push({
             id: user.id,
-            location: mylocation,
+            location: user.location,
+            roles: [Roles.USER, Roles.MODERATOR, Roles.ADMIN],
         });
 
         addGroupchat(groupnameAdd.value, usersInGroup.value);
@@ -264,7 +263,6 @@
     axios.get(`${config.appBackend}api/users/digitaltwin`, {}).then(r => {
         const { user } = useAuthState();
         const posContacts = <Contact[]>r.data;
-        // const alreadyExistingChatIds = [...chats.value.map(c => c.id), user.id];
         possibleUsers.value = posContacts;
     });
 </script>

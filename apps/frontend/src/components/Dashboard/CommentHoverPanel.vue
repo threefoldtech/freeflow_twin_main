@@ -73,6 +73,9 @@
     import { usechatsActions } from '@/store/chatStore';
     import { computed, nextTick, ref } from 'vue';
     import { myYggdrasilAddress } from '@/store/authStore';
+    import { computed, nextTick, onBeforeMount, ref } from 'vue';
+    import { useAuthState } from '@/store/authStore';
+    import { SOCIAL_POST } from '@/store/socialStore';
     import { fetchStatus } from '@/store/statusStore';
     import { IPostComment } from 'custom-types/post.type';
 
@@ -84,10 +87,10 @@
         comment: IPostComment;
         avatar: string;
     }>();
-    const location = ref<string>();
     const friendsSince = ref<string>();
     const online = ref<boolean>();
     const router = useRouter();
+    const { user } = useAuthState();
 
     const init = async () => {
         await retrieveContacts();

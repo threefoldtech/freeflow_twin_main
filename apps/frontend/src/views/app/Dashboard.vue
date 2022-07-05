@@ -35,7 +35,7 @@
                         </a>
                     </nav>
                 </div>
-                <div class="my-0 mx-auto p-4 px-2 w-full sm:w-[800px]">
+                <div class="my-0 mx-auto md:p-4 md:px-2 w-full lg:w-[800px]">
                     <div v-if="isLoadingSocialPosts" class="fixed right-5 bottom-5 flex items-center">
                         <p class="mr-4">Loading</p>
                         <Spinner />
@@ -84,12 +84,10 @@
     const { retrieveChats } = usechatsActions();
     const dashboardWindow = ref<HTMLElement>(null);
 
-    onBeforeMount(async () => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
+    (async () => {
         await getAllPosts();
         await retrieveChats();
-    });
+    })();
 
     const showLoader = computed(() => {
         if (allSocialPosts.value.length >= 1) return false;

@@ -40,7 +40,7 @@
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
-                <div class="overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                <div class="overflow-hidden sm:rounded-lg">
                     <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
                         <div ref="hiddenItems" class="absolute hiddenItems">
                             <div ref="ghostImage" class="bg-white p-2">
@@ -213,7 +213,7 @@
                         <!-- Local filebrowser -->
                         <ul
                             v-if="fileBrowserTypeView === 'GRID' && !savedAttachmentsIsLoading"
-                            class="grid grid-cols-2 gap-x-2 gap-y-4 sm:grid-cols-4 sm:gap-x-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 xl:gap-x-6 mt-4"
+                            class="grid grid-cols-1 gap-x-2 gap-y-4 sm:grid-cols-2 sm:gap-x-4 lg:grid-cols-4 xl:grid-cols-6 2xl:grid-cols-8 xl:gap-x-6 mt-4"
                             role="list"
                         >
                             <p
@@ -225,7 +225,7 @@
                             </p>
                             <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
-                                    class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
+                                    class="group w-full aspect-w-12 h-16 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
                                     @click="goToShared()"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
@@ -241,7 +241,7 @@
                             </li>
                             <li v-if="currentDirectory === '/' && route.name === 'quantum'" title="Shared folder">
                                 <div
-                                    class="group w-full aspect-w-12 aspect-h-4 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
+                                    class="group w-full aspect-w-12 h-16 border-2 bg-white rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
                                     @click="router.push({ name: 'savedAttachments' })"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-2">
@@ -267,11 +267,10 @@
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
                                 @mousedown.right="setCurrentRightClickedItem(item)"
-                                v-contextmenu:contextmenu-filebrowser-item-local
                             >
                                 <div
                                     :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
-                                    class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
+                                    class="group w-full aspect-w-12 h-16 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
@@ -323,22 +322,14 @@
         uploadFiles,
         equals,
         moveFiles,
-        sharedDir,
-        sharedContent,
-        getSharedContent,
-        searchResults,
-        searchDirValue,
-        currentShare,
         isDraggingFiles,
         goToShared,
         fileBrowserTypeView,
-        goToFilesInChat,
         savedAttachments,
         savedAttachmentsIsLoading,
     } from '@/store/fileBrowserStore';
     import { useRouter, useRoute } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
-    import { useSocketActions } from '@/store/socketStore';
     import { useAuthState } from '@/store/authStore';
     import {
         currentRightClickedItem,
@@ -358,11 +349,6 @@
     const router = useRouter();
 
     const { user } = useAuthState();
-
-    onBeforeMount(() => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
-    });
 
     const setCurrentRightClickedItem = item => {
         currentRightClickedItem.value = {

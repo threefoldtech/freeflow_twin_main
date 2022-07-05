@@ -1,12 +1,14 @@
 <template>
     <app-layout>
-        <iframe
-            class="relative h-full w-full"
-            title="kutana"
-            id="kutana-iframe"
-            :src="iframeUrl"
-            allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;"
-        />
+        <div class="h-full">
+            <iframe
+                class="relative h-full w-full"
+                title="kutana"
+                id="kutana-iframe"
+                :src="iframeUrl"
+                allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;"
+            />
+        </div>
     </app-layout>
 </template>
 

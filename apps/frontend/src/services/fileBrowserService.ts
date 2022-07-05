@@ -7,6 +7,8 @@ import { calcExternalResourceLink } from './urlService';
 import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
 import { useSocketActions } from '@/store/socketStore';
 import { FileAction } from 'custom-types/file-actions.type';
+import { showUserOfflineMessage } from '@/store/statusStore';
+import Spinner from '@/components/Spinner.vue';
 
 // TODO: delete when everything is handled by nestjs
 const endpoint = `${config.baseUrl}api/v2/quantum`;
@@ -270,4 +272,62 @@ export const downloadAttachment = async (message: any) => {
 export const hasSpecialCharacters = (name: string) => {
     const format = /[`!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
     return format.test(name);
+};
+
+export const generateFileBrowserUrl = (
+    protocol: 'http' | 'https',
+    owner: string,
+    path: string,
+    token: string,
+    attachment: boolean = false
+) => {
+    path = encodeURIComponent(path);
+    token = encodeURIComponent(token);
+    return `${protocol}://${owner}/api/v1/browse/internal/files?path=${path}&token=${token}&attachment=${attachment}`;
+};
+
+export const generateDocumentServerConfig = (
+    location: string,
+    path: string,
+    key: string,
+    readToken: string,
+    writeToken: string | undefined,
+    extension: string,
+    fileName: string,
+    isAttachement: boolean = false,
+    isLoading: boolean = false
+) => {
+    const readUrl = generateFileBrowserUrl('http', `[${location}]`, path, readToken, isAttachement);
+
+    const writeUrl = generateFileBrowserUrl('http', `[${location}]`, path, writeToken);
+
+    //@todo find better way to get name
+    const myName = window.location.host.split('.')[0];
+
+    return {
+        document: {
+            fileType: extension,
+            key: key,
+            title: fileName,
+            url: readUrl,
+        },
+        height: '100%',
+        width: '100%',
+        editorConfig: {
+            callbackUrl: writeUrl,
+            customization: {
+                chat: false,
+                forcesave: true,
+            },
+            user: {
+                id: myName,
+                name: myName,
+            },
+            mode: writeToken ? 'edit' : 'view',
+        },
+        showUserOfflineMessage,
+        isLoading,
+        Spinner,
+        accessDenied,
+    };
 };

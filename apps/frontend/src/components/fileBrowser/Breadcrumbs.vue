@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-row items-center mb-4">
-        <div class="mx-2 cursor-pointer" @click="goToHome">
+    <div class="flex flex-row items-center">
+        <div class="cursor-pointer" @click="goToHome">
             <HomeIcon class="h-5 w-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
         </div>
         <!--<div

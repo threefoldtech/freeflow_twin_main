@@ -1,26 +1,28 @@
 <template>
     <section
+        v-if="chats.length > 0 || chatRequests.length > 0"
         :class="{
             'collapsed-bar': collapsed,
-            'md:w-16': collapsed,
-            'md:w-[400px]': !collapsed,
+            'lg:w-16': collapsed,
+            'lg:w-[400px]': !collapsed,
         }"
         class="bg-white w-full flex flex-col overflow-hidden border-r"
     >
-        <div class="relative h-full w-full pt-4 flex-grow-0 flex flex-col">
+        <div class="relative h-full w-full lg:pt-4 flex-grow-0 flex flex-col">
             <div
-                class="flex items-center collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 mb-2 flex-grow-0"
+                class="flex items-center collapsed-bar:flex-col-reverse justify-center collapsed-bar:mb-0 lg:mb-2 flex-grow-0"
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
-                        class="bg-primary hover:bg-accent-800 transition duration:300 rounded-full text-white w-8 h-8 mx-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                        class="fixed lg:static bottom-5 right-5 bg-accent-600 hover:bg-accent-700 transition duration:300 rounded-full text-white mx-2 p-2 collapsed-bar:w-10 collapsed-bar:h-10"
                         @click="showAddUserDialog = true"
                     >
-                        <i class="fas fa-plus"></i>
+                        <PlusSmIconOutline class="h-6 w-6" aria-hidden="true" />
                     </button>
-                    <h1 class="collapsed-bar:hidden pt-1 text-lg">Messages</h1>
+
+                    <h1 class="collapsed-bar:hidden hidden lg:block pt-1 text-lg">Messages</h1>
                 </div>
-                <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden md:block relative">
+                <div class="ml-auto collapsed-bar:m-0 collapsed-bar:mb-2 hidden lg:block relative">
                     <button
                         :class="{
                             'mr-2': !collapsed,
@@ -46,7 +48,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!collapsed" class="mt-1 mx-2 relative rounded-md shadow-sm">
+            <div v-if="!collapsed" class="m-2 relative rounded-md shadow-sm">
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <SearchIcon aria-hidden="true" class="h-5 w-5 text-gray-400" />
                 </div>
@@ -81,7 +83,7 @@
                 >
                     <div class="text-center">
                         <ChatIcon class="mx-auto h-12 w-12 text-gray-400" aria-hidden="true" />
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No messages yet</h3>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts yet</h3>
                         <p class="mt-1 text-sm text-gray-500">Start chatting by adding a contact</p>
                         <div class="mt-6">
                             <button
@@ -97,7 +99,7 @@
                 </div>
                 <div
                     v-if="filteredChats && filteredChats.length"
-                    class="flex flex-col justify-center items-center pt-2 collapsed-bar:px-0"
+                    class="flex flex-col justify-center items-center collapsed-bar:px-0"
                 >
                     <v-contextmenu ref="contextmenu-chat-card">
                         <v-contextmenu-item
@@ -118,7 +120,7 @@
                                 }
                             "
                         >
-                            {{ isBlocked(currentRightClickedItem?.data?.chatId) ? 'Unblock' : 'Block' }} User
+                            {{ userIsBlocked(currentRightClickedItem?.data?.chatId) ? 'Unblock' : 'Block' }} User
                         </v-contextmenu-item>
                         <v-contextmenu-item
                             @click="
@@ -155,27 +157,25 @@
                 </div>
             </div>
         </div>
-
-        <Dialog
-            :modelValue="showAddUserDialog"
-            :noActions="true"
-            @closeDialog="sendUpdate(false)"
-            @update-model-value="sendUpdate"
-        >
-            <template v-slot:title>
-                <h1>Invite someone to chat</h1>
-            </template>
-            <template v-slot:default>
-                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
-            </template>
-        </Dialog>
     </section>
+    <Dialog
+        :modelValue="showAddUserDialog"
+        :noActions="true"
+        @closeDialog="sendUpdate(false)"
+        @update-model-value="sendUpdate"
+    >
+        <template v-slot:title>
+            <h1>Invite someone to chat</h1>
+        </template>
+        <template v-slot:default>
+            <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+        </template>
+    </Dialog>
 </template>
 
 <script setup lang="ts">
     import moment from 'moment';
-    import { useSocketActions } from '@/store/socketStore';
-    import { ref, computed, onBeforeMount, watch } from 'vue';
+    import { ref, computed, watch } from 'vue';
 
     import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { useAuthState } from '@/store/authStore';
@@ -189,20 +189,21 @@
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
     import { SearchIcon, PlusIcon } from '@heroicons/vue/solid';
-    import { ChatIcon } from '@heroicons/vue/outline';
+    import { ChatIcon, PlusSmIcon as PlusSmIconOutline } from '@heroicons/vue/outline';
     import {
-        triggerWatchOnRightClickItem,
-        RIGHT_CLICK_ACTIONS_CHAT_CARD,
-        rightClickItemAction,
+        conversationComponentRerender,
         currentRightClickedItem,
-        RIGHT_CLICK_TYPE,
-        setCurrentRightClickedItem,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
         openDeleteUserDialogFromOtherFile,
         conversationComponentRerender,
+        RIGHT_CLICK_ACTIONS_CHAT_CARD,
+        RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        setCurrentRightClickedItem,
+        triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
-    import { deleteBlockedEntry, isBlocked } from '@/store/blockStore';
+    import { userIsBlocked } from '@/store/blockStore';
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
@@ -210,6 +211,8 @@
     const { retrieveChats } = usechatsActions();
     const collapsed = ref(false);
     let selectedId = ref('');
+
+    retrieveChats();
 
     const status = computed(() => {
         return statusList[selectedId.value];
@@ -238,8 +241,9 @@
                         if (router.currentRoute.value.name === 'single') {
                             conversationComponentRerender.value = conversationComponentRerender.value++;
                         }
-                        if (isBlocked(chatId)) {
-                            await deleteBlockedEntry(chatId);
+                        if (userIsBlocked(chatId)) {
+                            const { sendUnBlockedChat } = useSocketActions();
+                            sendUnBlockedChat(chatId);
                             break;
                         }
                         openBlockDialogFromOtherFile.value = true;
@@ -279,11 +283,6 @@
             return chats.value;
         }
         return chats.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
-    });
-    onBeforeMount(() => {
-        const { initializeSocket } = useSocketActions();
-        initializeSocket(user.id.toString());
-        retrieveChats();
     });
 
     const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));

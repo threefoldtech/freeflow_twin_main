@@ -104,10 +104,59 @@
                             <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                         </div>
                     </div>
+                    <div class="group absolute right-0 top-0 z-40">
+                        <Popover v-slot="{ open }" class="relative z-40">
+                            <PopoverButton
+                                :class="open ? '' : 'text-opacity-90'"
+                                class="items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none"
+                            >
+                                <DotsVerticalIcon
+                                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
+                                />
+                                <ChevronDownIcon
+                                    :class="open ? '' : 'text-opacity-70'"
+                                    aria-hidden="true"
+                                    class="w-5 h-5 ml-2 text-orange-300 transition duration-150 ease-in-out group-hover:text-opacity-80"
+                                />
+                            </PopoverButton>
+                            <transition
+                                enter-active-class="transition duration-200 ease-out"
+                                enter-from-class="translate-y-1 opacity-0"
+                                enter-to-class="translate-y-0 opacity-100"
+                                leave-active-class="transition duration-150 ease-in"
+                                leave-from-class="translate-y-0 opacity-100"
+                                leave-to-class="translate-y-1 opacity-0"
+                            >
+                                <PopoverPanel class="absolute z-50 top-0 right-9">
+                                    <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                        <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
+                                            <div
+                                                v-if="props.item.owner.id === user.id.toString()"
+                                                class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
+                                                @click="showDeletePostDialog = true"
+                                            >
+                                                <TrashIcon class="w-6 mr-4" />
+                                                <p>Delete</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </PopoverPanel>
+                            </transition>
+                        </Popover>
+                    </div>
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <p class="my-2 break-words">{{ item.post.body }}</p>
+                <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
+                <div class="my-2 break-words">
+                    <p v-if="!readMore && item.post.body.length > 200">
+                        {{ item.post.body.slice(0, 200) }}
+                    </p>
+                    <p v-else>{{ item.post.body }}</p>
+                    <a class="text-gray-800" v-if="item.post.body.length > 200" @click="readMore = !readMore" href="#">
+                        {{ readMore ? 'Show less' : 'Read more' }}
+                    </a>
+                </div>
                 <div :class="{ 'grid-cols-1': item.images.length === 1 }" class="grid grid-cols-2 my-4 gap-1">
                     <div
                         v-for="(image, idx) in item.images.slice(0, showAllImages ? item.images.length : 4)"
@@ -220,14 +269,6 @@
                 <ShareIcon class="w-6 mr-4" />
                 <p>Share</p>
             </div>
-            <div
-                v-if="props.item.owner.id === user.id.toString()"
-                class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
-                @click="showDeletePostDialog = true"
-            >
-                <TrashIcon class="w-6 mr-4" />
-                <p>Delete</p>
-            </div>
         </div>
         <div>
             <TransitionRoot
@@ -239,6 +280,14 @@
                 leave-from="opacity-100"
                 leave-to="opacity-0"
             >
+                <CommentsContainer
+                    v-if="showComments && item.replies.length > 0"
+                    :comments="item.replies"
+                    :postingCommentInProgress="postingCommentInProgress"
+                    class="border-t-2 rounded-b-lg"
+                    :class="{ 'max-h-[35rem]': $route.name === 'single' }"
+                    @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"
+                />
                 <form
                     v-if="showComments"
                     :class="{ 'opacity-50': postingCommentInProgress }"
@@ -252,26 +301,15 @@
                         :ref="inputRef"
                         v-model="messageInput"
                         :disabled="postingCommentInProgress"
-                        class="text-xs font-medium rounded-full bg-gray-200 border-none outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
+                        class="text-xs font-medium rounded-lg border border-gray-300 outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
                         placeholder="Type your message here"
                         type="text"
                         @input="onInput"
                     />
-                    <input
-                        class="cursor-pointer text-xs font-medium rounded-full bg-accent-800 hover:bg-accent-600 text-white border-none outline-none flex-grow-0 w-24 h-10"
-                        type="submit"
-                        value="Send"
-                    />
+                    <button type="submit" class="bg-transparent">
+                        <span class="material-symbols-rounded text-primary text-4xl"> send </span>
+                    </button>
                 </form>
-
-                <CommentsContainer
-                    v-if="showComments && item.replies.length > 0"
-                    :comments="item.replies"
-                    :postingCommentInProgress="postingCommentInProgress"
-                    class="border-t-2 rounded-b-lg"
-                    :class="{ 'max-h-[35rem]': $route.name === 'single' }"
-                    @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"
-                />
             </TransitionRoot>
             <TransitionRoot
                 :show="showIsUserTyping"
@@ -299,7 +337,7 @@
     import { HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
     import { HeartIcon, ChatAltIcon, ShareIcon, TrashIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { useAuthState, myYggdrasilAddress } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import { ref, computed, onBeforeMount, watch } from 'vue';
     import moment from 'moment';
     import { TransitionRoot } from '@headlessui/vue';
@@ -319,7 +357,6 @@
     const showComments = ref<boolean>(false);
     const showAllImages = ref<boolean>(false);
     const amount_likes = ref<number>(props.item.likes.length);
-    const myLocation = ref<string | null>(null);
     const showImagePreview = ref<boolean>(false);
     const imagePreviewSrc = ref<string | null>(null);
     const showShareDialog = ref<boolean>(false);
@@ -327,6 +364,7 @@
     const openPanel = ref<boolean>(false);
     const mouseFocussed = ref(false);
     const postingCommentInProgress = ref<boolean>(false);
+    const readMore = ref<boolean>(false);
     const { user } = useAuthState();
     const emit = defineEmits(['refreshPost']);
 
@@ -375,7 +413,6 @@
     const localLike = ref(false);
 
     onBeforeMount(async () => {
-        myLocation.value = await myYggdrasilAddress();
         const { user } = useAuthState();
         if (props.item.likes.some(item => item.id === user.id)) {
             localLike.value = true;

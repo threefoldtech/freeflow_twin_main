@@ -1,8 +1,15 @@
 import axios from 'axios';
 import config from '@/config';
 import { uuidv4 } from '@/common';
-import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@/store/socialStore';
-import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
+import {
+    allSocialPosts,
+    COMMENT_MODEL,
+    isLoadingSocialPosts,
+    MESSAGE_POST_SHARE_BODY,
+    MESSAGE_TYPE,
+    SOCIAL_POST,
+} from '@/store/socialStore';
+import { useAuthState } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
 import { sendMessageObject } from '@/store/chatStore';
 import { CommentType, IPostComment, IPostContainerDTO, IPostDTO, PostType } from 'custom-types/post.type';
@@ -151,7 +158,7 @@ export const commentOnPost = async (
         body: message,
         owner: {
             id: String(user.id),
-            location: myAddress,
+            location: user.location,
         },
         post: {
             id: item.post.id,

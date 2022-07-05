@@ -4,30 +4,28 @@
             v-if="props.modelValue"
             ref="dialogRef"
             tabindex="-1"
-            class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
+            class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-full grid place-items-center"
             style="z-index: 60"
             @mousedown="$emit('update-model-value', false)"
             @keydown.esc="$emit('update-model-value', false)"
         >
             <div
-                class="form-container z-50 bg-white p-4 h-screen sm:h-auto w-11/12 md:max-w-2xl md:w-3/4 sm:rounded overflow-auto"
+                class="bg-white w-full h-full md:h-auto md:max-w-2xl md:w-3/4 md:rounded-lg overflow-y-auto hide-scrollbar md:overflow-hidden"
                 @mousedown.stop
             >
-                <div class="flex justify-between">
-                    <slot name="title" />
-                    <div
-                        class="w-6 h-6 bg-transparent rounded-full hover:bg-gray-100 flex justify-center items-center transition duration-300"
-                        @click="$emit('update-model-value', false)"
-                    >
-                        <button @click="$emit('update-model-value', false)">
-                            <i class="fas fa-times"></i>
-                        </button>
+                <div class="bg-accent-700 text-white md:rounded-t-lg">
+                    <div class="px-4 pt-8 pb-4 flex items-center justify-between">
+                        <slot name="title" />
+                        <XIcon
+                            class="w-6 h-6 text-accent-300 cursor-pointer"
+                            @click="$emit('update-model-value', false)"
+                        />
                     </div>
                 </div>
                 <div class="py-2 flex-col">
                     <slot />
                 </div>
-                <div v-if="!noActions" class="flex justify-end mt-2">
+                <div v-if="!noActions" class="flex justify-end px-4 mt-2">
                     <button
                         class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                         @click="$emit('update-model-value', false)"
@@ -47,6 +45,7 @@
 </template>
 <script lang="ts" setup>
     import { nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
+    import { XIcon } from '@heroicons/vue/solid';
 
     defineEmits(['update-model-value']);
 
