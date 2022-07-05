@@ -1,10 +1,11 @@
 import fs from 'fs';
-import { config } from '../src/config/config';
 import PATH from 'path';
+
+import config from '../src/config/config';
 
 const migrationsFolder = PATH.join(__dirname, '..', 'migrations');
 const migrationName = /^\d{8}_*.+\.js$/gm;
-const migrationsConfigPath = PATH.join(config.baseDir, 'migrations.json');
+const migrationsConfigPath = PATH.join(config().baseDir, 'migrations.json');
 
 interface IMigration {
     name: string;

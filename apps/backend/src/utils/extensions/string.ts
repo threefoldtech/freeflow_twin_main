@@ -17,7 +17,7 @@ String.prototype.removeAfterLastOccurrence = function (separator: string, includ
 
 String.prototype.insert = function (index: number, value: string) {
     if (index > 0) {
-        return this.substring(0, index) + value + this.substr(index);
+        return this.substring(0, index) + value + this.substring(index);
     }
 
     return value + this;
