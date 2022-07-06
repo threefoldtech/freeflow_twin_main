@@ -64,9 +64,10 @@ export class RemoveUserSystemState implements SubSystemMessageState {
 }
 
 export class PersistSystemMessage implements SubSystemMessageState {
-    constructor(private readonly _messageService: MessageService) {}
+    constructor(private readonly _messageService: MessageService, private readonly _chatGateway: ChatGateway) {}
 
     async handle({ message }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<Message> {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
         return await this._messageService.createMessage(message);
     }
 }

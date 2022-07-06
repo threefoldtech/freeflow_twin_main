@@ -161,16 +161,6 @@ export class SystemMessageState implements MessageState<SystemMessage> {
                 this._messageService
             )
         );
-        // system joined video room message handler
-        this._subSystemMessageStateHandlers.set(
-            SystemMessageType.JOINED_VIDEOROOM,
-            new PersistSystemMessage(this._messageService)
-        );
-        // system contact request send message handler
-        this._subSystemMessageStateHandlers.set(
-            SystemMessageType.CONTACT_REQUEST_SEND,
-            new PersistSystemMessage(this._messageService)
-        );
         // user leaves group message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.USER_LEFT_GROUP,
@@ -184,7 +174,7 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         // system default message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.DEFAULT,
-            new PersistSystemMessage(this._messageService)
+            new PersistSystemMessage(this._messageService, this._chatGateway)
         );
     }
 
@@ -194,8 +184,11 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const { type } = message.body as GroupUpdate;
-        if (type) return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat });
 
-        return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({ message, chat });
+        if (!type || [SystemMessageType.JOINED_VIDEOROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type)) {
+            return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({ message, chat });
+        }
+
+        return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat });
     }
 }
