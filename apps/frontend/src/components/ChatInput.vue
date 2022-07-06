@@ -270,7 +270,7 @@
 
     const debounceDraft = debounce(() => {
         draftMessage(selectedId, createMessage());
-    }, 1500);
+    }, 800);
 
     watch(messageInput, () => {
         showTagPerson.value = false;
