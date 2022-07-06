@@ -142,16 +142,13 @@
 
     const searchResults = () => {
         return props.data.filter((c: Contact) => {
-            return c.id.toLowerCase().includes(searchTerm.value.toLowerCase());
+            return c.id?.toLowerCase().includes(searchTerm.value.toLowerCase());
         });
     };
 
     const userIsInGroup = (contact: Contact) => {
         const user = props.usersInGroup.find(c => c.id == contact.id);
-        if (user) {
-            return true;
-        }
-        return false;
+        return !!user;
     };
 
     const removeUserFromGroup = (contact: Contact) => {

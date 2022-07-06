@@ -1,6 +1,9 @@
 <template>
     <app-layout>
-        <div class="relative h-full w-full lg:customgrid" :class="chats.length === 0 ? '' : 'grid'">
+        <div
+            class="relative h-full w-full lg:customgrid"
+            :class="chats.length === 0 && chatRequests.length === 0 ? '' : 'grid'"
+        >
             <ChatList v-model="showAddUserDialog" />
             <div class="hidden w-full h-full lg:grid place-items-center border-2">
                 <div class="text-center">
@@ -42,7 +45,7 @@
 
     const { retrieveDTContacts } = useContactsActions();
 
-    const { chats } = useChatsState();
+    const { chats, chatRequests } = useChatsState();
 
     onBeforeMount(async () => {
         await retrieveDTContacts();
