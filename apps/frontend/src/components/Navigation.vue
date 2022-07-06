@@ -44,7 +44,7 @@
                                 app?.enabled && router.currentRoute?.value.meta.app === app.name,
                             'text-gray-500': !app?.enabled,
                         }"
-                        class="mb-4 grid"
+                        class="grid"
                     >
                         <div
                             class="group w-full p-3 flex flex-col items-center text-xs font-medium"

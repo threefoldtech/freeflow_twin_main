@@ -1,19 +1,19 @@
 version: "3"
 
 services:
-  edwardker-digitaltwin:
-    container_name: edwardker-chat
+  baertietest-digitaltwin:
+    container_name: baertietest-chat
     build:
       context: ../..
       dockerfile: ./docker/dev/Dockerfile
     restart: always
     environment:
-      - USER_ID=edwardker
+      - USER_ID=baertietest
       - ENVIRONMENT=development
       - DIGITALTWIN_APPID=digitaltwin.jimbertesting.be
     volumes:
       - ../..:/app
-      - ./appdata_edwardker:/appdata
+      - ./appdata:/appdata
       # - ./dev/logs:/var/log/
       # - ./dev/logs:/var/log
     networks:
@@ -25,29 +25,29 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
         
-  debug-digitaltwin:
-    container_name: debug-chat
-    build:
-      context: ../..
-      dockerfile: ./docker/dev/Dockerfile
-    restart: always
-    environment:
-      - USER_ID=debug
-      - ENVIRONMENT=development
-      - DIGITALTWIN_APPID=digitaltwin.jimbertesting.be
-    volumes:
-      - ../..:/app
-      - ./appdata_debug:/appdata
-      # - ./dev/logs:/var/log/
-      # - ./dev/logs:/var/log
-    networks:
-      - chatnet
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
-    cap_add:
-      - NET_ADMIN
-    devices:
-      - /dev/net/tun:/dev/net/tun
+  # debug-digitaltwin:
+  #   container_name: debug-chat
+  #   build:
+  #     context: ../..
+  #     dockerfile: ./docker/dev/Dockerfile
+  #   restart: always
+  #   environment:
+  #     - USER_ID=debug
+  #     - ENVIRONMENT=development
+  #     - DIGITALTWIN_APPID=digitaltwin.jimbertesting.be
+  #   volumes:
+  #     - ../..:/app
+  #     - ./appdata_debug:/appdata
+  #     # - ./dev/logs:/var/log/
+  #     # - ./dev/logs:/var/log
+  #   networks:
+  #     - chatnet
+  #   sysctls:
+  #     - net.ipv6.conf.all.disable_ipv6=0
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun:/dev/net/tun
         
   redis-commander:
     container_name: redis-commander
@@ -57,11 +57,11 @@ services:
       - chatnet
     restart: always
     environment:
-      - REDIS_HOSTS=local:edwardker-digitaltwin:6379,local:debug-digitaltwin:6379
+      - REDIS_HOSTS=local:baertietest-digitaltwin:6379
     ports:
       - "8081:8081"
     depends_on:
-      - edwardker-digitaltwin
+      - baertietest-digitaltwin
 
 networks:
   chatnet:
