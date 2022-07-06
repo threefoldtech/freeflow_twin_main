@@ -91,7 +91,7 @@
                 </DisclosurePanel>
             </Disclosure>
         </div>
-        <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent="groupAdd">
+        <form v-if="isActive('group')" class="w-full h-3/5 overflow-x-hidden" @submit.prevent>
             <div class="flex place-items-center px-4 mb-4">
                 <div class="w-full">
                     <br />
@@ -140,6 +140,7 @@
                 </button>
                 <button
                     class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary hover:bg-accent-700 transition duration-300"
+                    @click="groupAdd"
                 >
                     Add Group
                 </button>
