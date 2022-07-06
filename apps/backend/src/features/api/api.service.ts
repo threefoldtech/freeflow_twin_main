@@ -242,7 +242,7 @@ export class ApiService {
         try {
             return (await axios.post<boolean>(destinationUrl, typingDTO)).data;
         } catch (error) {
-            throw new BadRequestException(`unable to handle typing: ${error}`);
+            throw new BadRequestException(`unable to send typing event: ${error}`);
         }
     }
 
@@ -264,7 +264,7 @@ export class ApiService {
         try {
             return (await axios.put<{ status: string }>(destinationUrl, commentDTO)).data;
         } catch (error) {
-            throw new BadRequestException(`unable to handle typing: ${error}`);
+            throw new BadRequestException(`unable to comment on external post: ${error}`);
         }
     }
 
