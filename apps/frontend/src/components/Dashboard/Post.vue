@@ -67,29 +67,10 @@
                             />
                         </keep-alive>
                     </TransitionRoot>
-                    <div class="flex items-center">
-                        <div
-                            class="relative mr-4 cursor-pointer"
-                            @mouseover="
-                                mouseFocussed = true;
-                                panelTimer();
-                            "
-                            @mouseleave="
-                                mouseFocussed = false;
-                                panelTimer();
-                            "
-                        >
-                            <AvatarImg
-                                :id="item.owner.id"
-                                :showOnlineStatus="false"
-                                class="w-12 h-12 rounded-full"
-                                alt="avatar"
-                            />
-                        </div>
-                        <div>
-                            <p
-                                class="text-base font-medium cursor-pointer hover:underline"
-                                @click="showComingSoonToUhuru = true"
+                    <div class="flex items-center justify-between">
+                        <div class="flex">
+                            <div
+                                class="relative mr-4 cursor-pointer"
                                 @mouseover="
                                     mouseFocussed = true;
                                     panelTimer();
@@ -99,50 +80,73 @@
                                     panelTimer();
                                 "
                             >
-                                {{ item.owner.id }}
-                            </p>
-                            <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
+                                <AvatarImg
+                                    :id="item.owner.id"
+                                    :showOnlineStatus="false"
+                                    class="w-12 h-12 rounded-full"
+                                    alt="avatar"
+                                />
+                            </div>
+                            <div>
+                                <p
+                                    class="text-base font-medium cursor-pointer hover:underline"
+                                    @click="showComingSoonToUhuru = true"
+                                    @mouseover="
+                                        mouseFocussed = true;
+                                        panelTimer();
+                                    "
+                                    @mouseleave="
+                                        mouseFocussed = false;
+                                        panelTimer();
+                                    "
+                                >
+                                    {{ item.owner.id }}
+                                </p>
+                                <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="group absolute right-0 top-0 z-40">
-                        <Popover v-slot="{ open }" class="relative z-40">
-                            <PopoverButton
-                                :class="open ? '' : 'text-opacity-90'"
-                                class="items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none"
-                            >
-                                <DotsVerticalIcon
-                                    class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
-                                />
-                                <ChevronDownIcon
-                                    :class="open ? '' : 'text-opacity-70'"
-                                    aria-hidden="true"
-                                    class="w-5 h-5 ml-2 text-orange-300 transition duration-150 ease-in-out group-hover:text-opacity-80"
-                                />
-                            </PopoverButton>
-                            <transition
-                                enter-active-class="transition duration-200 ease-out"
-                                enter-from-class="translate-y-1 opacity-0"
-                                enter-to-class="translate-y-0 opacity-100"
-                                leave-active-class="transition duration-150 ease-in"
-                                leave-from-class="translate-y-0 opacity-100"
-                                leave-to-class="translate-y-1 opacity-0"
-                            >
-                                <PopoverPanel class="absolute z-50 top-0 right-9">
-                                    <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                                        <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
-                                            <div
-                                                v-if="props.item.owner.id === user.id.toString()"
-                                                class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
-                                                @click="showDeletePostDialog = true"
-                                            >
-                                                <TrashIcon class="w-6 mr-4" />
-                                                <p>Delete</p>
+                        <div class="group">
+                            <Popover v-slot="{ open }" class="relative z-40">
+                                <PopoverButton
+                                    :class="open ? '' : 'text-opacity-90'"
+                                    class="items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none"
+                                >
+                                    <DotsVerticalIcon
+                                        class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"
+                                    />
+                                </PopoverButton>
+                                <transition
+                                    enter-active-class="transition duration-200 ease-out"
+                                    enter-from-class="translate-y-1 opacity-0"
+                                    enter-to-class="translate-y-0 opacity-100"
+                                    leave-active-class="transition duration-150 ease-in"
+                                    leave-from-class="translate-y-0 opacity-100"
+                                    leave-to-class="translate-y-1 opacity-0"
+                                >
+                                    <PopoverPanel class="absolute z-50 top-0 right-5">
+                                        <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                            <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
+                                                <div
+                                                    v-if="props.item.owner.id === user.id.toString()"
+                                                    class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
+                                                    @click="showDeletePostDialog = true"
+                                                >
+                                                    <TrashIcon class="w-6 mr-4" />
+                                                    <p>Delete</p>
+                                                </div>
+                                                <div
+                                                    class="sm:hidden flex items-center cursor-pointer text-gray-500 hover:text-green-500"
+                                                    @click="showShareDialog = true"
+                                                >
+                                                    <ShareIcon class="w-6 mr-4" />
+                                                    <p>Share</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </PopoverPanel>
-                            </transition>
-                        </Popover>
+                                    </PopoverPanel>
+                                </transition>
+                            </Popover>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -263,7 +267,7 @@
                 <p>Comment</p>
             </div>
             <div
-                class="flex items-center cursor-pointer text-gray-500 hover:text-green-500"
+                class="hidden sm:flex items-center cursor-pointer text-gray-500 hover:text-green-500"
                 @click="showShareDialog = true"
             >
                 <ShareIcon class="w-6 mr-4" />
@@ -335,7 +339,14 @@
 
 <script lang="ts" setup>
     import { HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
-    import { HeartIcon, ChatAltIcon, ShareIcon, TrashIcon } from '@heroicons/vue/outline';
+    import {
+        HeartIcon,
+        ChatAltIcon,
+        ShareIcon,
+        TrashIcon,
+        DotsVerticalIcon,
+        ChevronDownIcon,
+    } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { ref, computed, onBeforeMount, watch } from 'vue';
