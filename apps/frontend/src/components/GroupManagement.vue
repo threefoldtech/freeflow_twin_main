@@ -1,7 +1,7 @@
 <template>
     <div class="px-2 py-2 w-full flex flex-col justify-start">
         <!--<h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>-->
-        <div class="flex items-center justify-evenly lg:justify-between">
+        <div class="flex items-center justify-evenly space-x-2 lg:justify-between">
             <!--<div v-if="!chat.isGroup" class="flex flex-col px-2 py-4 w-full cursor-pointer">
                 <i class="fas fa-minus-circle m-3"></i>
                 <p class="text-xs text-gray-300">Bio</p>
@@ -15,7 +15,7 @@
                 <span class="material-symbols-rounded"> videocam </span>
                 <p class="text-xs mt-1">Video</p>
             </div>
-            <!--<div
+            <!--<div 
                 v-if="!blocked"
                 class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
                 @click="$emit('app-mute')"
@@ -45,11 +45,20 @@
                 @click="$emit('app-leave')"
             >
                 <span class="material-symbols-rounded"> {{ chat.isGroup ? 'logout' : 'delete' }} </span>
-                <p class="text-xs mt-1">{{ chat.isGroup ? 'Leave' : 'Delete' }}</p>
+                <p class="text-xs mt-1">{{ chat.isGroup ? 'Leave' : 'Delete chat' }}</p>
             </div>
 
             <div
-                v-if="isAdmin"
+                v-if="!chat.isGroup"
+                class="delete flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('app-delete-user')"
+            >
+                <span class="material-symbols-rounded"> delete </span>
+                <p class="text-xs mt-1">Delete user</p>
+            </div>
+
+            <div
+                v-if="chat.isGroup && isAdmin"
                 class="delete flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
                 @click="$emit('app-delete')"
             >
@@ -125,62 +134,6 @@
         </ul>
     </div>
     <div v-if="sidebarFileList?.length !== 0" id="spacer" class="bg-gray-100 h-2 w-full"></div>
-    <div class="bg-white p-2 w-full h-full flex flex-col justify-start">
-        <h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>
-        <div class="flex items-center flex-col w-full">
-            <div
-                class="call bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-call')"
-            >
-                <i class="fas fa-video m-3"></i>
-                <p class="m-3 text-xs">Join video room</p>
-            </div>
-            <div
-                v-if="!chat.isGroup && !blocked"
-                class="block bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-block')"
-            >
-                <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3 text-xs">Block user</p>
-            </div>
-
-            <div
-                v-if="!chat.isGroup && blocked"
-                class="block bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-unblock')"
-            >
-                <i class="fas fa-plus-circle m-3"></i>
-                <p class="m-3 text-xs">Unblock user</p>
-            </div>
-
-            <div
-                class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-leave')"
-            >
-                <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">{{ chat.isGroup ? 'Leave group' : 'Delete chat' }}</p>
-            </div>
-
-            <div
-                v-if="!chat.isGroup"
-                class="delete bg-gray-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-delete-user')"
-            >
-                <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete User</p>
-            </div>
-
-            <div
-                v-if="chat.isGroup && isAdmin"
-                class="delete bg-red-100 flex items-center rounded w-full m-2 cursor-pointer"
-                @click="$emit('app-delete')"
-            >
-                <i class="fas fa-trash m-3"></i>
-                <p class="m-3 text-xs">Delete group</p>
-            </div>
-        </div>
-        <div class="flex-grow-0 w-full h-full"></div>
-    </div>
     <!-- ADD USER TO GROUP MODAL -->
     <div
         v-if="(isAdmin || isModerator) && openAddUserToGroup"
