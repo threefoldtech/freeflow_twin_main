@@ -73,23 +73,21 @@
     import { usechatsActions } from '@/store/chatStore';
     import { myYggdrasilAddress } from '@/store/authStore';
     import { computed, nextTick, ref } from 'vue';
-    import { useAuthState } from '@/store/authStore';
     import { fetchStatus } from '@/store/statusStore';
-    import { IPostComment } from 'custom-types/post.type';
+    import { IPostContainerDTO } from 'custom-types/post.type';
 
     const { contacts } = useContactsState();
     const { addContact, retrieveContacts } = useContactsActions();
     const { getChat, retrieveChats } = usechatsActions();
 
     const props = defineProps<{
-        comment: IPostComment;
+        comment: IPostContainerDTO;
         avatar: string;
     }>();
     const friendsSince = ref<string>();
     const online = ref<boolean>();
     const router = useRouter();
     const userLocation = ref('');
-    const { user } = useAuthState();
 
     const init = async () => {
         await retrieveContacts();
