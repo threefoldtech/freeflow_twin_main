@@ -92,8 +92,6 @@ const initializeSocket = (username: string) => {
         config.setAppId(url);
     });
     state.socket.on('yggdrasil', (location: string) => {
-        console.log(`LOCATION: ${JSON.stringify(location)}`);
-        setLocation(location);
     });
     state.socket.on('blocked_contacts', (contacts: { id: string }[]) => {
         blocklist.value = contacts;
