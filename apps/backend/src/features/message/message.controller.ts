@@ -13,6 +13,7 @@ import { MessageDTO } from './dtos/message.dto';
 import { MessageService } from './message.service';
 import {
     ContactRequestMessageState,
+    DeleteMessageState,
     EditMessageState,
     FileMessageState,
     FileShareMessageState,
@@ -85,6 +86,11 @@ export class MessageController {
         );
         // edit message handler
         this._messageStateHandlers.set(MessageType.EDIT, new EditMessageState(this._chatGateway, this._messageService));
+        // Delete message handler
+        this._messageStateHandlers.set(
+            MessageType.DELETE,
+            new DeleteMessageState(this._chatGateway, this._messageService)
+        );
         //post share handler
         this._messageStateHandlers.set(
             MessageType.POST_SHARE,

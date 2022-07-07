@@ -87,10 +87,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             messageId: message.id,
             text: message.body,
         });
+        editedMessage.type = message.type;
 
         this.emitMessageToConnectedClients('message', editedMessage);
         const signedMessage = await this._keyService.appendSignatureToMessage({ message: editedMessage });
-        signedMessage.type = MessageType.EDIT;
 
         chat.parseContacts()
             .filter(c => c.id !== this.userId)

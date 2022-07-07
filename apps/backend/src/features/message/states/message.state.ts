@@ -78,6 +78,14 @@ export class EditMessageState implements MessageState<string> {
         await this._messageService.editMessage({ messageId: message.id, text: message.body });
     }
 }
+export class DeleteMessageState implements MessageState<string> {
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+
+    async handle({ message }: { message: MessageDTO<string> }) {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._messageService.deleteMessage({ messageId: message.id });
+    }
+}
 
 export class FileMessageState implements MessageState<FileMessage> {
     constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
