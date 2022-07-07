@@ -5,6 +5,7 @@ import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
+import { Contact } from '../contact/models/contact.model';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
@@ -56,6 +57,21 @@ export class ApiService {
         } catch {
             return;
         }
+    }
+
+    /**
+     * Sends a message to contacts of a group chat.
+     * @param {Object} obj - Object.
+     * @param {Contact[]} obj.contacts - Contacts to send message to.
+     * @param {MessageDTO} obj.message - Message to send.
+     * @param {ResponseType} obj.responseType - Axios optional response type.
+     */
+    async sendFileToGroup({ contacts, message }: { contacts: Contact[]; message: MessageDTO<unknown> }) {
+        Promise.all(
+            contacts.map(async contact => {
+                this.sendMessageToApi({ location: contact.location, message });
+            })
+        );
     }
 
     /**
