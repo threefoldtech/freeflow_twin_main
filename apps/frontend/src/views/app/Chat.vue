@@ -1,8 +1,11 @@
 <template>
     <app-layout>
         <div class="relative h-full w-full lg:customgrid" :class="chats.length === 0 ? '' : 'grid'">
-            <ChatList v-model="showAddUserDialog" />
-            <div class="w-full h-full grid place-items-center border-2">
+            <ChatList />
+            <div
+                class="w-full h-full place-items-center border-2"
+                :class="chats.length > 0 ? 'hidden lg:grid' : 'grid'"
+            >
                 <div class="text-center">
                     <ChatAlt2Icon class="mx-auto h-16 w-16 text-gray-400" aria-hidden="true" />
                     <h3 class="mt-2 text-base font-medium text-gray-900">
@@ -25,6 +28,19 @@
                 </div>
             </div>
         </div>
+        <Dialog
+            :modelValue="showAddUserDialog"
+            :noActions="true"
+            @closeDialog="sendUpdate(false)"
+            @update-model-value="sendUpdate"
+        >
+            <template v-slot:title>
+                <h1>Invite someone to chat</h1>
+            </template>
+            <template v-slot:default>
+                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+            </template>
+        </Dialog>
     </app-layout>
 </template>
 
@@ -39,6 +55,8 @@
     import { useChatsState } from '@/store/chatStore';
     import { useContactsActions } from '@/store/contactStore';
     import { onBeforeMount } from 'vue';
+    import AddContact from '@/components/ContactAdd.vue';
+    import Dialog from '@/components/Dialog.vue';
 
     const { retrieveDTContacts } = useContactsActions();
 
@@ -54,6 +72,10 @@
     if (lastOpenedChatId.value !== '') {
         router.push({ name: 'single', params: { id: lastOpenedChatId.value } });
     }
+
+    const sendUpdate = newVal => {
+        showAddUserDialog.value = newVal;
+    };
 </script>
 
 <style scoped type="text/css"></style>

@@ -5,7 +5,7 @@
         :class="{ 'drop-shadow-lg': createPostModalStatus }"
     >
         <TabGroup>
-            <TabList class="hidden md:flex items-stretch h-12 rounded-t-lg relative">
+            <TabList class="hidden lg:flex items-stretch h-12 rounded-t-lg relative">
                 <Tab v-slot="{ selected }" v-for="tab in navigation" :key="tab.name" as="template">
                     <div
                         class="px-8 font-medium flex flex-row items-center cursor-pointer"

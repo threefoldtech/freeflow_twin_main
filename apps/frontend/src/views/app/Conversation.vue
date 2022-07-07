@@ -47,7 +47,7 @@
             </template>
             <template v-slot:default>
                 <div :class="{ 'group-chat': chat?.isGroup }" class="flex flex-row relative h-full w-full">
-                    <ChatList class="hidden lg:inline-block" />
+                    <ChatList :class="{'hidden lg:inline-block': chat}" />
                     <div
                         v-if="chat"
                         :key="chat.id + selectedId"
