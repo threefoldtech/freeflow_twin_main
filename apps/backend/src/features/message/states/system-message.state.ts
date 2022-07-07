@@ -29,14 +29,12 @@ export class AddUserSystemState implements SubSystemMessageState {
             return await this._chatService.syncNewChatWithAdmin({ adminLocation, chatId: message.to });
 
         const chatToUpdate = await this._chatService.getChat(chat.chatId);
-        if (chat.isGroup) {
-            await this._chatService.addContactToChat({ chat: chatToUpdate, contact });
-            await this._apiService.sendGroupInvitation({ location: contact.location, chat });
-        }
+        const updatedChat = await this._chatService.addContactToChat({ chat: chatToUpdate, contact });
+        if (updatedChat.isGroup) await this._apiService.sendGroupInvitation({ location: contact.location, chat });
         await this._messageService.createMessage(message);
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
-            ...chatToUpdate.toJSON(),
+            ...updatedChat.toJSON(),
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         });
 
@@ -64,11 +62,14 @@ export class RemoveUserSystemState implements SubSystemMessageState {
         }
 
         const chatToUpdate = await this._chatService.getChat(chat.chatId);
-        await this._chatService.removeContactFromChat({ chat: chatToUpdate, contactId: contact.id });
+        const updatedChat = await this._chatService.removeContactFromChat({
+            chat: chatToUpdate,
+            contactId: contact.id,
+        });
         await this._messageService.createMessage(message);
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
-            ...chatToUpdate.toJSON(),
+            ...updatedChat.toJSON(),
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         });
 
@@ -107,13 +108,17 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
             this._chatGateway.emitMessageToConnectedClients('chat_removed', chat.chatId);
             return;
         }
+        console.log(`here`);
         const chatToUpdate = await this._chatService.getChat(chat.chatId);
-        await this._chatService.removeContactFromChat({ chat: chatToUpdate, contactId: contact.id });
+        const updatedChat = await this._chatService.removeContactFromChat({
+            chat: chatToUpdate,
+            contactId: contact.id,
+        });
         await this._messageService.createMessage(message);
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
-            ...chatToUpdate.toJSON(),
+            ...updatedChat.toJSON(),
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         });
-        await this._apiService.sendMessageToGroup({ contacts: chatToUpdate.parseContacts(), message });
+        await this._apiService.sendMessageToGroup({ contacts: updatedChat.parseContacts(), message });
     }
 }
