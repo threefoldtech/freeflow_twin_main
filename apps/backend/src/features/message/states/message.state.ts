@@ -174,6 +174,7 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.USER_LEFT_GROUP,
             new UserLeftGroupMessageState(
+                this._apiService,
                 this._chatService,
                 this._configService,
                 this._chatGateway,

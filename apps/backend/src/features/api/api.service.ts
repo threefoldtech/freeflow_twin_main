@@ -69,7 +69,8 @@ export class ApiService {
     async sendMessageToGroup({ contacts, message }: { contacts: ContactDTO[]; message: MessageDTO<unknown> }) {
         Promise.all(
             contacts.map(async contact => {
-                await this.sendMessageToApi({ location: contact.location, message });
+                if (contact.id !== this._configService.get<string>('userId'))
+                    await this.sendMessageToApi({ location: contact.location, message });
             })
         );
     }
