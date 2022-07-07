@@ -76,7 +76,7 @@ export class ChatFileState implements FileState<IChatFile> {
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
 
         if (chat.isGroup) {
-            await this._apiService.sendFileToGroup({ contacts: chat.parseContacts(), message: signedMessage });
+            await this._apiService.sendMessageToGroup({ contacts: chat.parseContacts(), message: signedMessage });
             return true;
         }
 

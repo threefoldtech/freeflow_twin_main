@@ -4,7 +4,6 @@ import {
     forwardRef,
     Inject,
     Injectable,
-    InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -181,7 +180,7 @@ export class ChatService {
                 await this._messageService.deleteMessagesFromChat({ chatId });
                 await this._chatRepository.deleteChat(chatToDelete.entityId);
             } catch (error) {
-                throw new InternalServerErrorException(`unable to delete chat: ${error}`);
+                return;
             }
     }
 
@@ -191,13 +190,14 @@ export class ChatService {
      * @param {Chat} obj.chat - Chat to remove contact from.
      * @param {string} obj.contactId - Contact to remove.
      */
-    async removeContactFromChat({ chat, contactId }: { chat: Chat; contactId: string }) {
+    async removeContactFromChat({ chat, contactId }: { chat: ChatDTO; contactId: string }) {
         try {
-            const contacts = chat.parseContacts().filter(c => c.id !== contactId);
-            chat.contacts = stringifyContacts(contacts);
-            return await this._chatRepository.updateChat(chat);
+            const chatToUpdate = await this.getChat(chat.chatId);
+            const contacts = chatToUpdate.parseContacts().filter(c => c.id !== contactId);
+            chatToUpdate.contacts = stringifyContacts(contacts);
+            return await this._chatRepository.updateChat(chatToUpdate);
         } catch (error) {
-            throw new BadRequestException(error);
+            throw new BadRequestException(`unable to remove contact from chat: ${error}`);
         }
     }
 

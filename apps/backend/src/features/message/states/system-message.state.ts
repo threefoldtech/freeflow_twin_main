@@ -4,13 +4,13 @@ import { GroupUpdate, SystemMessage, UserLeftGroupMessage } from '../../../types
 import { ApiService } from '../../api/api.service';
 import { ChatGateway } from '../../chat/chat.gateway';
 import { ChatService } from '../../chat/chat.service';
-import { Chat } from '../../chat/models/chat.model';
+import { ChatDTO } from '../../chat/dtos/chat.dto';
 import { MessageDTO } from '../dtos/message.dto';
 import { MessageService } from '../message.service';
 import { Message } from '../models/message.model';
 
 export abstract class SubSystemMessageState {
-    abstract handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<unknown>;
+    abstract handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<unknown>;
 }
 
 export class AddUserSystemState implements SubSystemMessageState {
@@ -22,7 +22,7 @@ export class AddUserSystemState implements SubSystemMessageState {
         private readonly _messageService: MessageService
     ) {}
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<unknown> {
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<unknown> {
         const { contact, adminLocation } = message.body as GroupUpdate;
         const userId = this._configService.get<string>('userId');
         if (userId === contact.id)
@@ -30,8 +30,7 @@ export class AddUserSystemState implements SubSystemMessageState {
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
 
-        if (chat.isGroup)
-            await this._apiService.sendGroupInvitation({ location: contact.location, chat: chat.toJSON() });
+        if (chat.isGroup) await this._apiService.sendGroupInvitation({ location: contact.location, chat });
         await this._messageService.createMessage(message);
         return await this._apiService.sendMessageToApi({ location: contact.location, message });
     }
@@ -46,9 +45,10 @@ export class RemoveUserSystemState implements SubSystemMessageState {
         private readonly _messageService: MessageService
     ) {}
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }) {
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }) {
         const userId = this._configService.get<string>('userId');
         const { contact } = message.body as GroupUpdate;
+        console.log(`CONTACT: ${contact.id}`);
         if (contact.id === userId) {
             const { chatId } = chat;
             await this._chatService.deleteChat(chatId);
@@ -59,15 +59,19 @@ export class RemoveUserSystemState implements SubSystemMessageState {
         await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
         await this._messageService.createMessage(message);
 
-        this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
-        return await this._apiService.sendMessageToApi({ location: contact.location, message });
+        const chatMessages = (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
+            m.toJSON()
+        );
+
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', { ...chat, messages: chatMessages });
+        return true;
     }
 }
 
 export class PersistSystemMessage implements SubSystemMessageState {
     constructor(private readonly _messageService: MessageService, private readonly _chatGateway: ChatGateway) {}
 
-    async handle({ message }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<Message> {
+    async handle({ message }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<Message> {
         this._chatGateway.emitMessageToConnectedClients('message', message);
         return await this._messageService.createMessage(message);
     }
@@ -81,7 +85,7 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
         private readonly _messageService: MessageService
     ) {}
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }): Promise<void> {
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<void> {
         const userId = this._configService.get<string>('userId');
         const { contact, nextAdmin } = message.body as UserLeftGroupMessage;
         if (contact.id === userId) {
@@ -90,8 +94,8 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
             return;
         }
         if (contact.id === chat.adminId && chat.contacts.length > 1) {
-            let newAdmin = chat.parseContacts().find(c => c.id === nextAdmin);
-            if (!newAdmin) newAdmin = chat.parseContacts().find(c => c.id !== contact.id)[0];
+            let newAdmin = chat.contacts.find(c => c.id === nextAdmin);
+            if (!newAdmin) newAdmin = chat.contacts.find(c => c.id !== contact.id)[0];
             chat.adminId = newAdmin.id;
         }
         await this._chatService.removeContactFromChat({ chat, contactId: contact.id });

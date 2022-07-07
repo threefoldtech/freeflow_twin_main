@@ -13,6 +13,7 @@ import {
 import { ApiService } from '../../api/api.service';
 import { ChatGateway } from '../../chat/chat.gateway';
 import { ChatService } from '../../chat/chat.service';
+import { ChatDTO } from '../../chat/dtos/chat.dto';
 import { Chat } from '../../chat/models/chat.model';
 import { ContactService } from '../../contact/contact.service';
 import { CreateContactDTO } from '../../contact/dtos/contact.dto';
@@ -29,7 +30,7 @@ import {
 } from './system-message.state';
 
 export abstract class MessageState<T> {
-    abstract handle({ message }: { message: MessageDTO<T>; chat?: Chat }): Promise<unknown>;
+    abstract handle({ message }: { message: MessageDTO<T>; chat?: Chat | ChatDTO }): Promise<unknown>;
 }
 
 export class ContactRequestMessageState implements MessageState<ContactRequest> {
@@ -186,16 +187,16 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         );
     }
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }) {
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }) {
+        console.log(`SYSTEM MSG HANDLER: ${JSON.stringify(message.body)}`);
         // // TODO: fix
         // const validSignature = await this._messageService.verifySignedMessageByChat({ chat, signedMessage: message });
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const { type } = message.body as GroupUpdate;
 
-        if (!type || [SystemMessageType.JOINED_VIDEOROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type)) {
+        if (!type || [SystemMessageType.JOINED_VIDEOROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type))
             return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({ message, chat });
-        }
 
         return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat });
     }

@@ -109,7 +109,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage('remove_chat')
-    async handleRemoveCHat(@MessageBody() id: string) {
+    async handleRemoveChat(@MessageBody() id: string) {
         const chat = await this._chatService.getChat(id);
         // only adming can delete group chat for everyone
         if (chat.isGroup && chat.adminId === this.userId) {

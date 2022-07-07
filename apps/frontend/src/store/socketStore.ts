@@ -69,6 +69,7 @@ const initializeSocket = (username: string) => {
         newUnreadChats(newContactRequest.chatId);
     });
     state.socket.on('chat_updated', (chat: Chat) => {
+        console.log(`chat_updated: ${JSON.stringify(chat)}`);
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });
