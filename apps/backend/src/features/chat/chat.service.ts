@@ -194,12 +194,11 @@ export class ChatService {
      * @param {Chat} obj.chat - Chat to remove contact from.
      * @param {string} obj.contactId - Contact to remove.
      */
-    async removeContactFromChat({ chat, contactId }: { chat: ChatDTO; contactId: string }) {
+    async removeContactFromChat({ chat, contactId }: { chat: Chat; contactId: string }) {
         try {
-            const chatToUpdate = await this.getChat(chat.chatId);
-            const contacts = chatToUpdate.parseContacts().filter(c => c.id !== contactId);
-            chatToUpdate.contacts = stringifyContacts(contacts);
-            return await this._chatRepository.updateChat(chatToUpdate);
+            const contacts = chat.parseContacts().filter(c => c.id !== contactId);
+            chat.contacts = stringifyContacts(contacts);
+            return await this._chatRepository.updateChat(chat);
         } catch (error) {
             throw new BadRequestException(`unable to remove contact from chat: ${error}`);
         }
@@ -211,12 +210,11 @@ export class ChatService {
      * @param {Chat} obj.chat - Chat to add contact to.
      * @param {Contact} obj.contact - Contact to add.
      */
-    async addContactToChat({ chat, contact }: { chat: ChatDTO; contact: ContactDTO }) {
+    async addContactToChat({ chat, contact }: { chat: Chat; contact: ContactDTO }) {
         try {
-            const chatToUpdate = await this.getChat(chat.chatId);
-            const contacts = [...chatToUpdate.parseContacts(), contact];
-            chatToUpdate.contacts = stringifyContacts(contacts);
-            return await this._chatRepository.updateChat(chatToUpdate);
+            const contacts = [...chat.parseContacts(), contact];
+            chat.contacts = stringifyContacts(contacts);
+            return await this._chatRepository.updateChat(chat);
         } catch (error) {
             throw new BadRequestException(`unable to add contact to chat: ${error}`);
         }

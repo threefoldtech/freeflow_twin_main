@@ -28,15 +28,18 @@ export class AddUserSystemState implements SubSystemMessageState {
         if (userId === contact.id)
             return await this._chatService.syncNewChatWithAdmin({ adminLocation, chatId: message.to });
 
-        this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
-
-        console.log('user added to group', contact.id);
-
+        const chatToUpdate = await this._chatService.getChat(chat.chatId);
         if (chat.isGroup) {
-            await this._chatService.addContactToChat({ chat, contact });
+            await this._chatService.addContactToChat({ chat: chatToUpdate, contact });
             await this._apiService.sendGroupInvitation({ location: contact.location, chat });
         }
         await this._messageService.createMessage(message);
+
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+            ...chatToUpdate.toJSON(),
+            messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
+        });
+
         await this._apiService.sendMessageToApi({ location: contact.location, message });
     }
 }
@@ -53,7 +56,6 @@ export class RemoveUserSystemState implements SubSystemMessageState {
     async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }) {
         const userId = this._configService.get<string>('userId');
         const { contact } = message.body as GroupUpdate;
-        console.log(`CONTACT: ${contact.id}`);
         if (contact.id === userId) {
             const { chatId } = chat;
             await this._chatService.deleteChat(chatId);
@@ -61,14 +63,15 @@ export class RemoveUserSystemState implements SubSystemMessageState {
             return;
         }
 
-        await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
+        const chatToUpdate = await this._chatService.getChat(chat.chatId);
+        await this._chatService.removeContactFromChat({ chat: chatToUpdate, contactId: contact.id });
         await this._messageService.createMessage(message);
 
-        const chatMessages = (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
-            m.toJSON()
-        );
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+            ...chatToUpdate.toJSON(),
+            messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
+        });
 
-        this._chatGateway.emitMessageToConnectedClients('chat_updated', { ...chat, messages: chatMessages });
         return true;
     }
 }
@@ -103,7 +106,8 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
             if (!newAdmin) newAdmin = chat.contacts.find(c => c.id !== contact.id)[0];
             chat.adminId = newAdmin.id;
         }
-        await this._chatService.removeContactFromChat({ chat, contactId: contact.id });
+        const chatToUpdate = await this._chatService.getChat(chat.chatId);
+        await this._chatService.removeContactFromChat({ chat: chatToUpdate, contactId: contact.id });
         await this._messageService.createMessage(message);
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
     }
