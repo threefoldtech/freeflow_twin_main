@@ -77,5 +77,6 @@ RUN mkdir /appdata
 RUN mkdir /appdata/user 
 RUN mkdir /appdata/chats
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
+COPY ./docker/redis.conf /etc/redis/redis.conf
 
 CMD /startup.sh

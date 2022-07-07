@@ -6,7 +6,7 @@ if test -f "$FILE"; then
     exec yggdrasil -useconffile $FILE -logto /var/log/yggdrasil/yggdrasil.log >> /var/log/yggdrasil/yggdrasil.log &
 fi
 
-redis-server --bind 0.0.0.0 --port 6379 --protected-mode no --loadmodule /redis-json/target/release/librejson.so --loadmodule /redis-search/bin/linux-x64-release/search/redisearch.so &
+redis-server /etc/redis/redis.conf &
 cd /app
 ls
 yarn
