@@ -433,7 +433,7 @@
         stopRecording.value = () => {
             mediaRecorder.addEventListener('stop', async () => {
                 const audioBlob = new Blob(audioChunks);
-                sendFile(selectedId, audioBlob, true, true);
+                await sendFile(selectedId, audioBlob, true, true);
                 stopRecording.value = null;
             });
 

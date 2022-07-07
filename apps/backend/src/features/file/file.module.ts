@@ -10,6 +10,7 @@ import { FileController } from './file.controller';
 import { FileGateway } from './file.gateway';
 import { FileService } from './file.service';
 import { FileTasks } from './file.tasks';
+import { MessageModule } from '../message/message.module';
 
 @Module({
     imports: [
@@ -18,6 +19,7 @@ import { FileTasks } from './file.tasks';
         forwardRef(() => LocationModule),
         KeyModule,
         ChatModule,
+        MessageModule,
         forwardRef(() => QuantumModule),
     ],
     controllers: [FileController],
