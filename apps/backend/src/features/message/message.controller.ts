@@ -62,6 +62,11 @@ export class MessageController {
             MessageType.STRING,
             new StringMessageState(this._chatGateway, this._messageService)
         );
+        // Reply message handler
+        this._messageStateHandlers.set(
+            MessageType.QUOTE,
+            new StringMessageState(this._chatGateway, this._messageService)
+        );
         // GIF message handler
         this._messageStateHandlers.set(
             MessageType.GIF,
