@@ -10,7 +10,7 @@ import { MessageService } from '../message.service';
 import { Message } from '../models/message.model';
 
 export abstract class SubSystemMessageState {
-    abstract handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<unknown>;
+    abstract handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat?: ChatDTO }): Promise<unknown>;
 }
 
 export class AddUserSystemState implements SubSystemMessageState {
@@ -30,9 +30,14 @@ export class AddUserSystemState implements SubSystemMessageState {
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
 
-        if (chat.isGroup) await this._apiService.sendGroupInvitation({ location: contact.location, chat });
+        console.log('user added to group', contact.id);
+
+        if (chat.isGroup) {
+            await this._chatService.addContactToChat({ chat, contact });
+            await this._apiService.sendGroupInvitation({ location: contact.location, chat });
+        }
         await this._messageService.createMessage(message);
-        return await this._apiService.sendMessageToApi({ location: contact.location, message });
+        await this._apiService.sendMessageToApi({ location: contact.location, message });
     }
 }
 

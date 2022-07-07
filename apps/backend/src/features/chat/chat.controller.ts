@@ -44,10 +44,10 @@ export class ChatController {
         return await this._chatService.getChats({ offset, count });
     }
 
-    @Get('chatId')
+    @Get(':chatId')
     @UseGuards(AuthGuard)
-    async getChat(@Param('id') id: string): Promise<ChatDTO> {
-        return (await this._chatService.getChat(id)).toJSON();
+    async getChat(@Param('chatId') chatId: string): Promise<ChatDTO> {
+        return (await this._chatService.getChat(chatId)).toJSON();
     }
 
     @Get('accepted')

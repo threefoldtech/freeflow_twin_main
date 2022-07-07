@@ -10,7 +10,9 @@ import { ConfigService } from '@nestjs/config';
 
 import { ApiService } from '../api/api.service';
 import { ContactService } from '../contact/contact.service';
+import { ContactDTO } from '../contact/dtos/contact.dto';
 import { KeyService } from '../key/key.service';
+import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { stringifyMessage } from '../message/models/message.model';
@@ -29,7 +31,8 @@ export class ChatService {
         private readonly _apiService: ApiService,
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _locationService: LocationService
     ) {}
 
     /**
@@ -110,7 +113,8 @@ export class ChatService {
      * @return {ChatDTO} - Accepted chat.
      */
     async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
-        await this.createChat(chat);
+        const existingChat = await this.getChat(chat.chatId);
+        if (!existingChat) await this.createChat(chat);
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
         return chat;
     }
@@ -202,6 +206,23 @@ export class ChatService {
     }
 
     /**
+     * Adds a contact to a chat.
+     * @param {Object} obj - Object.
+     * @param {Chat} obj.chat - Chat to add contact to.
+     * @param {Contact} obj.contact - Contact to add.
+     */
+    async addContactToChat({ chat, contact }: { chat: ChatDTO; contact: ContactDTO }) {
+        try {
+            const chatToUpdate = await this.getChat(chat.chatId);
+            const contacts = [...chatToUpdate.parseContacts(), contact];
+            chatToUpdate.contacts = stringifyContacts(contacts);
+            return await this._chatRepository.updateChat(chatToUpdate);
+        } catch (error) {
+            throw new BadRequestException(`unable to add contact to chat: ${error}`);
+        }
+    }
+
+    /**
      * Updates a chats draft message.
      * @param {Object} obj - Object.
      * @param {Chat} obj.draftMessage - Draft message to add to chat.
@@ -247,10 +268,18 @@ export class ChatService {
      * @param {string} obj.adminLocation - External admin location to get chat from.
      * @param {string} obj.chatId - Chat ID to fetch from location.
      */
-    async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }): Promise<Chat> {
+    async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }) {
+        console.log(`SYNCINGGGGGGGGGGGGGGGGGGG`);
         const chat = await this._apiService.getAdminChat({ location: adminLocation, chatId });
         this._chatGateway.emitMessageToConnectedClients('new_chat', chat);
-        return await this._chatRepository.createChat(chat as CreateChatDTO);
+
+        const existingChat = await this.getChat(chat.chatId);
+        if (existingChat) {
+            existingChat.contacts = stringifyContacts(chat.contacts);
+            return await this._chatRepository.updateChat(existingChat);
+        }
+
+        return await this.createChat(chat as CreateChatDTO);
     }
 
     /**

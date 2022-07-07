@@ -162,8 +162,7 @@ export class ApiService {
      */
     async getAdminChat({ location, chatId }: { location: string; chatId: string }): Promise<ChatDTO> {
         try {
-            const res = await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/${chatId}`);
-            return res.data;
+            return (await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/${chatId}`)).data;
         } catch (error) {
             throw new BadRequestException(`unable to get admins chat: ${error}`);
         }
