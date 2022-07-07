@@ -163,7 +163,7 @@ const addGroupchat = (name: string, contacts: GroupContact[]) => {
     const newGroupchat: GroupChat = {
         isGroup: true,
         chatId,
-        contacts: contacts,
+        contacts,
         messages: [
             {
                 chatId,

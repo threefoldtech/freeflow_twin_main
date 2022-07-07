@@ -46,19 +46,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
      */
     @SubscribeMessage('message')
     async handleIncomingMessage(@MessageBody() { message }: { chatId: string; message: Message }) {
+        console.log(`MSG TYPE SENT: ${message.type}`);
         // get chat data
         const chat = await this._chatService.getChat(message.to);
         if (!chat) return;
         // correct from to message
-        message.from = this._configService.get<string>('userId');
+        message.from = this.userId;
 
         // sign message
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
 
         // set correct chatId to message
         signedMessage.id = message.id;
+        signedMessage.chatId = message.chatId;
 
         const location = chat.parseContacts().find(c => c.id === chat.adminId).location;
+        console.log(`ADMIN: ${JSON.stringify(chat.parseContacts())}`);
         if (signedMessage.type === MessageType.READ) {
             await this._chatService.handleMessageRead(<MessageDTO<string>>signedMessage);
             return await this._apiService.sendMessageToApi({

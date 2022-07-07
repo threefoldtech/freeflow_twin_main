@@ -53,6 +53,7 @@ export class ChatService {
      */
     async createGroupChat(createGroupChatDTO: CreateGroupChatDTO): Promise<Chat> {
         const userId = this._configService.get<string>('userId');
+        console.log(JSON.stringify(createGroupChatDTO.contacts));
         try {
             const chat = await this.createChat(createGroupChatDTO);
             const msg = await this._messageService.createMessage(createGroupChatDTO.messages[0]);
@@ -112,7 +113,6 @@ export class ChatService {
     async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
         await this.createChat(chat);
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
-        chat.messages = [];
         return chat;
     }
 

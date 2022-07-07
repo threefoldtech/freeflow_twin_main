@@ -30,7 +30,8 @@ export class AddUserSystemState implements SubSystemMessageState {
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', chat);
 
-        await this._apiService.sendGroupInvitation({ location: contact.location, chat: chat.toJSON() });
+        if (chat.isGroup)
+            await this._apiService.sendGroupInvitation({ location: contact.location, chat: chat.toJSON() });
         await this._messageService.createMessage(message);
         return await this._apiService.sendMessageToApi({ location: contact.location, message });
     }
