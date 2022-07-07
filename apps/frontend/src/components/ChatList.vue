@@ -282,8 +282,6 @@
             .filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
         return uniqBy(filteredChats, c => c.chatId);
     });
-
-    
 </script>
 
 <style scoped type="text/css"></style>
