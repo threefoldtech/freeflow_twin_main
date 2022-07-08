@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row">
-        <div class="hidden lg:block">
+        <div class="hidden lg:flex flex-row">
             <div v-if="selectedPaths.length > 0" class="mx-2">
                 <p>{{ selectedPaths.length }} File(s) selected</p>
             </div>
