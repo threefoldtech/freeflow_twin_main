@@ -52,7 +52,7 @@ export class QuantumController {
     @Get('file/info')
     @UseGuards(AuthGuard)
     async getFileInfo(@Query() params: { path: string; attachments: boolean }) {
-        const { path  } = params;
+        const { path } = params;
         // const parsedParams = Buffer.from(JSON.stringify(params), 'base64').toString('utf8');
         // const paramsObj = JSON.parse(parsedParams);
 

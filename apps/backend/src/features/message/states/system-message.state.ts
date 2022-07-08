@@ -39,7 +39,7 @@ export class AddUserSystemState implements SubSystemMessageState {
 
         const chatToUpdate = await this._chatService.getChat(chat.chatId);
         const updatedChat = await this._chatService.addContactToChat({ chat: chatToUpdate, contact });
-        if (updatedChat.isGroup) await this._apiService.sendGroupInvitation({ location: contact.location, chat });
+        if (updatedChat.isGroup) this._apiService.sendGroupInvitation({ location: contact.location, chat });
         await this._messageService.createMessage(message);
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
@@ -47,7 +47,8 @@ export class AddUserSystemState implements SubSystemMessageState {
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         });
 
-        await this._apiService.sendMessageToApi({ location: contact.location, message });
+        // await this._apiService.sendMessageToApi({ location: contact.location, message });
+        return true;
     }
 }
 

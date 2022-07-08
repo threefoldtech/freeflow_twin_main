@@ -310,7 +310,7 @@ export class ChatService {
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
-        await Promise.all(
+        Promise.all(
             chat.parseContacts().map(async c => {
                 if (c.id !== this._configService.get('userId'))
                     await this._apiService.sendMessageToApi({ location: c.location, message: signedMessage });
