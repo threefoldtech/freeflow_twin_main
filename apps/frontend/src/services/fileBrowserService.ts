@@ -198,6 +198,7 @@ export const getShared = async (_shareStatus: string) => {
     return await axios.get<SharedFileInterface[]>(`${config.baseUrl}api/v2/quantum/shares/shared-with-me`);
 };
 export const getShareWithId = async (id: string) => {
+    if (!id) return null;
     const params = new URLSearchParams();
     params.append('id', id);
     params.append('attachments', 'false');
@@ -283,7 +284,7 @@ export const generateFileBrowserUrl = (
 ) => {
     path = encodeURIComponent(path);
     token = encodeURIComponent(token);
-    return `${protocol}://${owner}/api/v1/browse/internal/files?path=${path}&token=${token}&attachment=${attachment}`;
+    return `${protocol}://${owner}/api/v2/quantum/file/internal?path=${path}&token=${token}&attachment=${attachment}`;
 };
 
 export const generateDocumentServerConfig = (

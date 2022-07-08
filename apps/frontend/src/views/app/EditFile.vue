@@ -55,23 +55,12 @@
         getShareWithId,
     } from '@/services/fileBrowserService';
     import Spinner from '@/components/Spinner.vue';
-    import { decodeString } from '@/utils/files';
     import { useAuthState } from '@/store/authStore';
 
     const route = useRoute();
     const fileType = ref<FileType>();
     const readUrl = ref<string>();
     const isLoading = ref<boolean>(true);
-    const path = decodeString(<string>route.params.path);
-    const shareId = <string>route.params.shareId;
-    const attachments = route.params.attachments === 'true';
-    const { user } = useAuthState();
-
-    const isSupportedInDocumentServer = computed(() => {
-        return [FileType.Excel, FileType.Word, FileType.Powerpoint, FileType.Pdf, FileType.Html, FileType.Text].some(
-            x => x === fileType.value
-        );
-    });
 
     const generateUrl = (
         protocol: 'http' | 'https',
@@ -89,10 +78,7 @@
         const path = atob(<string>route.params.path);
         const shareId = <string>route.params.shareId;
         const attachments = route.params.attachments === 'true';
-        let location;
-        let documentServerconfig;
         let fileAccesDetails: EditPathInfo;
-        const myAddress = await myYggdrasilAddress();
 
         const isSupported = computed(() => {
             return [
@@ -104,6 +90,40 @@
                 FileType.Text,
             ].includes(fileType.value);
         });
+
+        const initDocumentServer = (fileInfo: EditPathInfo, location: string) => {
+            fileType.value = getFileType(getExtension(fileInfo.fullName));
+            console.log('fileinfo', fileInfo);
+
+            if (isSupported.value) {
+                const documentServerConfig = generateDocumentServerConfig(
+                    location,
+                    fileInfo.path,
+                    fileInfo.key,
+                    fileInfo.readToken,
+                    fileInfo.writeToken,
+                    getExtension(fileInfo.fullName),
+                    fileInfo.extension,
+                    attachments,
+                    isLoading.value
+                );
+
+                get(
+                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
+                    () => {
+                        //@ts-ignore
+                        new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
+                    }
+                );
+                return;
+            }
+
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+        };
 
         const init = async () => {
             if (accessDenied.value || showUserOfflineMessage.value) {
@@ -136,7 +156,8 @@
             const fileInfo = (await getFileInfo(path, attachments)).data;
             const location = useAuthState().user.location;
 
-            //@todo find better way to get name
+            console.log('fileinfo', fileInfo);
+            console.log('location', location);
 
             readUrl.value = generateFileBrowserUrl(
                 'https',
@@ -147,62 +168,30 @@
             );
             console.log('readUrl', readUrl.value);
             initDocumentServer(fileInfo, location);
-            isLoading.value = false;
-        };
-        init();
-
-        const initDocumentServer = (fileInfo: EditPathInfo, location: string) => {
-            fileType.value = getFileType(getExtension(fileInfo.fullName));
-            console.log('fileinfo', fileInfo);
-
-            if (isSupported.value) {
-                const documentServerConfig = generateDocumentServerConfig(
-                    location,
-                    fileInfo.path,
-                    fileInfo.key,
-                    fileInfo.readToken,
-                    fileInfo.writeToken,
-                    getExtension(fileInfo.fullName),
-                    fileInfo.extension,
-                    attachments,
-                    isLoading.value
-                );
-                console.log('documentServer', documentServerConfig);
-
-                get(
-                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
-                    () => {
-                        //@ts-ignore
-                        new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
-                    }
-                );
-                return;
-            }
-
-            //If statement so that we don't override the URl of a file that is shared
-            if (readUrl.value) {
-                isLoading.value = false;
-                return;
-            }
-        };
-
-        readUrl.value = generateFileBrowserUrl('https', window.location.hostname, fileInfo.path, fileInfo.readToken);
-
-        if (fileType.value === FileType.Video) {
-            //If statement so that we don't override the URl of a file that is shared
-            if (readUrl.value) {
-                isLoading.value = false;
-                return;
-            }
-            readUrl.value = generateUrl(
+            readUrl.value = generateFileBrowserUrl(
                 'https',
                 window.location.hostname,
-                fileAccesDetails.path,
-                fileAccesDetails.readToken
+                fileInfo.path,
+                fileInfo.readToken
             );
             isLoading.value = false;
-            return;
-        }
+            if (fileType.value === FileType.Video) {
+                //If statement so that we don't override the URl of a file that is shared
+                if (readUrl.value) {
+                    isLoading.value = false;
+                    return;
+                }
+                readUrl.value = generateUrl(
+                    'https',
+                    window.location.hostname,
+                    fileAccesDetails.path,
+                    fileAccesDetails.readToken
+                );
+                isLoading.value = false;
+                return;
+            }
+        };
+        init();
     });
 </script>
 

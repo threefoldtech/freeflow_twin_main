@@ -6,13 +6,11 @@ import {
     Post,
     Put,
     Query,
-    Res,
     StreamableFile,
     UnauthorizedException,
     UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import syncRequest from 'sync-request';
