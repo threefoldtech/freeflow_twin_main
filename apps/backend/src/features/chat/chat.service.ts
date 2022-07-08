@@ -4,14 +4,15 @@ import {
     forwardRef,
     Inject,
     Injectable,
-    InternalServerErrorException,
     NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { ApiService } from '../api/api.service';
 import { ContactService } from '../contact/contact.service';
+import { ContactDTO } from '../contact/dtos/contact.dto';
 import { KeyService } from '../key/key.service';
+import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { stringifyMessage } from '../message/models/message.model';
@@ -30,7 +31,8 @@ export class ChatService {
         private readonly _apiService: ApiService,
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _locationService: LocationService
     ) {}
 
     /**
@@ -53,19 +55,22 @@ export class ChatService {
      */
     async createGroupChat(createGroupChatDTO: CreateGroupChatDTO): Promise<Chat> {
         const userId = this._configService.get<string>('userId');
+        console.log(JSON.stringify(createGroupChatDTO.contacts));
         try {
             const chat = await this.createChat(createGroupChatDTO);
             const msg = await this._messageService.createMessage(createGroupChatDTO.messages[0]);
-            chat.parseContacts().map(async c => {
-                if (c.id === userId) {
-                    this._chatGateway.emitMessageToConnectedClients('connection_request', {
-                        ...chat.toJSON(),
-                        messages: [msg.toJSON()],
-                    });
-                    return chat;
-                }
-                await this._apiService.sendGroupInvitation({ location: c.location, chat: { ...chat.toJSON() } });
-            });
+            Promise.all(
+                chat.parseContacts().map(async c => {
+                    if (c.id === userId) {
+                        this._chatGateway.emitMessageToConnectedClients('connection_request', {
+                            ...chat.toJSON(),
+                            messages: [msg.toJSON()],
+                        });
+                        return chat;
+                    }
+                    await this._apiService.sendGroupInvitation({ location: c.location, chat: { ...chat.toJSON() } });
+                })
+            );
             return chat;
         } catch (error) {
             throw new BadRequestException(`unable to create group chat: ${error}`);
@@ -110,9 +115,9 @@ export class ChatService {
      * @return {ChatDTO} - Accepted chat.
      */
     async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
-        await this.createChat(chat);
+        const existingChat = await this.getChat(chat.chatId);
+        if (!existingChat) await this.createChat(chat);
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
-        chat.messages = [];
         return chat;
     }
 
@@ -181,7 +186,7 @@ export class ChatService {
                 await this._messageService.deleteMessagesFromChat({ chatId });
                 await this._chatRepository.deleteChat(chatToDelete.entityId);
             } catch (error) {
-                throw new InternalServerErrorException(`unable to delete chat: ${error}`);
+                return;
             }
     }
 
@@ -195,9 +200,27 @@ export class ChatService {
         try {
             const contacts = chat.parseContacts().filter(c => c.id !== contactId);
             chat.contacts = stringifyContacts(contacts);
-            return await this._chatRepository.updateChat(chat);
+            await this._chatRepository.updateChat(chat);
+            return chat;
         } catch (error) {
-            throw new BadRequestException(error);
+            throw new BadRequestException(`unable to remove contact from chat: ${error}`);
+        }
+    }
+
+    /**
+     * Adds a contact to a chat.
+     * @param {Object} obj - Object.
+     * @param {Chat} obj.chat - Chat to add contact to.
+     * @param {Contact} obj.contact - Contact to add.
+     */
+    async addContactToChat({ chat, contact }: { chat: Chat; contact: ContactDTO }) {
+        try {
+            const contacts = [...chat.parseContacts(), contact];
+            chat.contacts = stringifyContacts(contacts);
+            await this._chatRepository.updateChat(chat);
+            return chat;
+        } catch (error) {
+            throw new BadRequestException(`unable to add contact to chat: ${error}`);
         }
     }
 
@@ -247,10 +270,18 @@ export class ChatService {
      * @param {string} obj.adminLocation - External admin location to get chat from.
      * @param {string} obj.chatId - Chat ID to fetch from location.
      */
-    async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }): Promise<Chat> {
+    async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }) {
+        console.log(`SYNCINGGGGGGGGGGGGGGGGGGG`);
         const chat = await this._apiService.getAdminChat({ location: adminLocation, chatId });
         this._chatGateway.emitMessageToConnectedClients('new_chat', chat);
-        return await this._chatRepository.createChat(chat as CreateChatDTO);
+
+        const existingChat = await this.getChat(chat.chatId);
+        if (existingChat) {
+            existingChat.contacts = stringifyContacts(chat.contacts);
+            return await this._chatRepository.updateChat(existingChat);
+        }
+
+        return await this.createChat(chat as CreateChatDTO);
     }
 
     /**
@@ -271,11 +302,10 @@ export class ChatService {
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
-        const userId = this._configService.get<string>('userId');
-        const receivingContacts = chat.parseContacts().filter(c => c.id !== userId);
         await Promise.all(
-            receivingContacts.map(async c => {
-                await this._apiService.sendMessageToApi({ location: c.location, message: signedMessage });
+            chat.parseContacts().map(async c => {
+                if (c.id !== this._configService.get('userId'))
+                    await this._apiService.sendMessageToApi({ location: c.location, message: signedMessage });
             })
         );
     }

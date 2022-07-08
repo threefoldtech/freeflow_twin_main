@@ -46,17 +46,19 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
      */
     @SubscribeMessage('message')
     async handleIncomingMessage(@MessageBody() { message }: { chatId: string; message: Message }) {
+        console.log(`MSG TYPE SENT: ${message.type}`);
         // get chat data
         const chat = await this._chatService.getChat(message.to);
         if (!chat) return;
         // correct from to message
-        message.from = this._configService.get<string>('userId');
+        message.from = this.userId;
 
         // sign message
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
 
         // set correct chatId to message
         signedMessage.id = message.id;
+        signedMessage.chatId = message.chatId;
 
         const location = chat.parseContacts().find(c => c.id === chat.adminId).location;
         if (signedMessage.type === MessageType.READ) {
@@ -85,10 +87,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
             messageId: message.id,
             text: message.body,
         });
+        editedMessage.type = message.type;
 
         this.emitMessageToConnectedClients('message', editedMessage);
         const signedMessage = await this._keyService.appendSignatureToMessage({ message: editedMessage });
-        signedMessage.type = MessageType.EDIT;
 
         chat.parseContacts()
             .filter(c => c.id !== this.userId)
@@ -107,7 +109,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
     }
 
     @SubscribeMessage('remove_chat')
-    async handleRemoveCHat(@MessageBody() id: string) {
+    async handleRemoveChat(@MessageBody() id: string) {
         const chat = await this._chatService.getChat(id);
         // only adming can delete group chat for everyone
         if (chat.isGroup && chat.adminId === this.userId) {

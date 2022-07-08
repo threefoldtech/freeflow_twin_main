@@ -7,7 +7,7 @@ on:
 
 jobs:
     build:
-        runs-on: ubuntu-latest
+        runs-on: staging
         steps:
             - uses: actions/checkout@v2
               with:
@@ -15,16 +15,16 @@ jobs:
             - uses: satackey/action-docker-layer-caching@v0.0.11
               continue-on-error: true
             - name: Build the Docker image
-              run: docker build . --file ./docker/prod/Dockerfile --tag threefoldjimber/digitaltwin:${{ github.sha }}
+              run: docker build . --file ./docker/prod/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
             - name: Log into GitHub Container Registry
-              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            - name: Push to dockerhub
-              run: docker push threefoldjimber/digitaltwin:${{ github.sha }}
-            - name: Push latest to dockerhub
+              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry.gitlab.com -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            - name: Push to gitlab registry
+              run: docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+            - name: Push latest to gitlab registry
               run: |
-                  docker tag threefoldjimber/digitaltwin:${{ github.sha }} threefoldjimber/digitaltwin:latest
-                  docker push threefoldjimber/digitaltwin:latest
-                  docker push threefoldjimber/digitaltwin:${{ github.sha }}
+                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
     deploy:
         needs: [build]
         runs-on: staging
@@ -34,8 +34,8 @@ jobs:
         steps:
             - name: Deploying on staging server
               run: |
-                  docker pull threefoldjimber/digitaltwin:${{ github.sha }}
-                  echo "threefoldjimber/digitaltwin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
+                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+                  echo "registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)     
                   echo Completed.

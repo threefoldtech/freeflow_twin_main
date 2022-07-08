@@ -13,6 +13,7 @@ import {
 import { ApiService } from '../../api/api.service';
 import { ChatGateway } from '../../chat/chat.gateway';
 import { ChatService } from '../../chat/chat.service';
+import { ChatDTO } from '../../chat/dtos/chat.dto';
 import { Chat } from '../../chat/models/chat.model';
 import { ContactService } from '../../contact/contact.service';
 import { CreateContactDTO } from '../../contact/dtos/contact.dto';
@@ -29,7 +30,7 @@ import {
 } from './system-message.state';
 
 export abstract class MessageState<T> {
-    abstract handle({ message }: { message: MessageDTO<T>; chat?: Chat }): Promise<unknown>;
+    abstract handle({ message }: { message: MessageDTO<T>; chat?: Chat | ChatDTO }): Promise<unknown>;
 }
 
 export class ContactRequestMessageState implements MessageState<ContactRequest> {
@@ -76,6 +77,14 @@ export class EditMessageState implements MessageState<string> {
     async handle({ message }: { message: MessageDTO<string> }) {
         this._chatGateway.emitMessageToConnectedClients('message', message);
         await this._messageService.editMessage({ messageId: message.id, text: message.body });
+    }
+}
+export class DeleteMessageState implements MessageState<string> {
+    constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
+
+    async handle({ message }: { message: MessageDTO<string> }) {
+        this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._messageService.deleteMessage({ messageId: message.id });
     }
 }
 
@@ -161,20 +170,11 @@ export class SystemMessageState implements MessageState<SystemMessage> {
                 this._messageService
             )
         );
-        // system joined video room message handler
-        this._subSystemMessageStateHandlers.set(
-            SystemMessageType.JOINED_VIDEOROOM,
-            new PersistSystemMessage(this._messageService)
-        );
-        // system contact request send message handler
-        this._subSystemMessageStateHandlers.set(
-            SystemMessageType.CONTACT_REQUEST_SEND,
-            new PersistSystemMessage(this._messageService)
-        );
         // user leaves group message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.USER_LEFT_GROUP,
             new UserLeftGroupMessageState(
+                this._apiService,
                 this._chatService,
                 this._configService,
                 this._chatGateway,
@@ -184,18 +184,21 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         // system default message handler
         this._subSystemMessageStateHandlers.set(
             SystemMessageType.DEFAULT,
-            new PersistSystemMessage(this._messageService)
+            new PersistSystemMessage(this._messageService, this._chatGateway)
         );
     }
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }) {
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }) {
+        console.log(`SYSTEM MSG HANDLER: ${JSON.stringify(message.body)}`);
         // // TODO: fix
         // const validSignature = await this._messageService.verifySignedMessageByChat({ chat, signedMessage: message });
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const { type } = message.body as GroupUpdate;
-        if (type) return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat });
 
-        return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({ message, chat });
+        if (!type || [SystemMessageType.JOINED_VIDEOROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type))
+            return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({ message, chat });
+
+        return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat });
     }
 }

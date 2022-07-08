@@ -270,7 +270,7 @@
 
     const debounceDraft = debounce(() => {
         draftMessage(selectedId, createMessage());
-    }, 1500);
+    }, 500);
 
     watch(messageInput, () => {
         showTagPerson.value = false;
@@ -433,7 +433,7 @@
         stopRecording.value = () => {
             mediaRecorder.addEventListener('stop', async () => {
                 const audioBlob = new Blob(audioChunks);
-                sendFile(selectedId, audioBlob, true, true);
+                await sendFile(selectedId, audioBlob, true, true);
                 stopRecording.value = null;
             });
 

@@ -285,7 +285,7 @@
     });
 
     watch(
-        () => props.chat.messages,
+        () => props.chat.messages[props.chat.messages.length - 1],
         () => {
             nextTick(() => {
                 const myName = window.location.host.split('.')[0];

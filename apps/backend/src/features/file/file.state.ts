@@ -11,6 +11,7 @@ import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
+import { MessageService } from '../message/message.service';
 
 export enum FileAction {
     ADD_TO_CHAT = 'ADD_TO_CHAT',
@@ -33,7 +34,8 @@ export class ChatFileState implements FileState<IChatFile> {
         private readonly _locationService: LocationService,
         private readonly _keyService: KeyService,
         private readonly _chatService: ChatService,
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _messageService: MessageService
     ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
@@ -44,13 +46,13 @@ export class ChatFileState implements FileState<IChatFile> {
 
         try {
             this._fileService.makeDirectory({ path: this.storageDir });
-            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, fileId) });
+            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, filename) });
         } catch (error) {
             return false;
         }
         // create new message and emit to connected sockets
         const yggdrasilAddress = await this._locationService.getOwnLocation();
-        const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${fileId}`;
+        const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${filename}`;
         const message: MessageDTO<FileMessage> = {
             id: messageId,
             chatId,
@@ -68,8 +70,16 @@ export class ChatFileState implements FileState<IChatFile> {
             replies: [],
         };
         this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._messageService.createMessage(message);
+
         const chat = await this._chatService.getChat(chatId);
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
+
+        if (chat.isGroup) {
+            await this._apiService.sendMessageToGroup({ contacts: chat.parseContacts(), message: signedMessage });
+            return true;
+        }
+
         const location = chat.parseContacts().find(c => c.id === message.to).location;
         await this._apiService.sendMessageToApi({ location, message: <MessageDTO<string>>signedMessage });
         return true;

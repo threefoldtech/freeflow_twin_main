@@ -8,6 +8,7 @@ import { ApiService } from '../api/api.service';
 import { ChatService } from '../chat/chat.service';
 import { ContactService } from '../contact/contact.service';
 import { Contact } from '../contact/models/contact.model';
+import { LocationService } from '../location/location.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { UserService } from './user.service';
 
@@ -26,7 +27,8 @@ export class UserGateway implements OnGatewayInit {
         private readonly _configService: ConfigService,
         private readonly _chatService: ChatService,
         private readonly _quantumService: QuantumService,
-        private readonly _userService: UserService
+        private readonly _userService: UserService,
+        private readonly _locationService: LocationService
     ) {}
 
     /**
@@ -50,6 +52,8 @@ export class UserGateway implements OnGatewayInit {
      * Handles a new socket.io client connection.
      */
     async handleConnection() {
+        const location = await this._locationService.getOwnLocation();
+        this.emitMessageToConnectedClients('yggdrasil', location);
         this.contacts = await this._contactService.getContacts();
         const status: IStatusUpdate = {
             id: this._configService.get<string>('userId'),

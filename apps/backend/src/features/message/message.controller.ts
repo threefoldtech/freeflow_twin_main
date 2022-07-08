@@ -13,6 +13,7 @@ import { MessageDTO } from './dtos/message.dto';
 import { MessageService } from './message.service';
 import {
     ContactRequestMessageState,
+    DeleteMessageState,
     EditMessageState,
     FileMessageState,
     FileShareMessageState,
@@ -61,6 +62,11 @@ export class MessageController {
             MessageType.STRING,
             new StringMessageState(this._chatGateway, this._messageService)
         );
+        // Reply message handler
+        this._messageStateHandlers.set(
+            MessageType.QUOTE,
+            new StringMessageState(this._chatGateway, this._messageService)
+        );
         // GIF message handler
         this._messageStateHandlers.set(
             MessageType.GIF,
@@ -85,6 +91,11 @@ export class MessageController {
         );
         // edit message handler
         this._messageStateHandlers.set(MessageType.EDIT, new EditMessageState(this._chatGateway, this._messageService));
+        // Delete message handler
+        this._messageStateHandlers.set(
+            MessageType.DELETE,
+            new DeleteMessageState(this._chatGateway, this._messageService)
+        );
         //post share handler
         this._messageStateHandlers.set(
             MessageType.POST_SHARE,
@@ -119,8 +130,8 @@ export class MessageController {
         // });
         // if (!validSignature) throw new ForbiddenException('not allowed');
 
-        if (message.type === MessageType.SYSTEM && chat.adminId !== message.from)
-            throw new ForbiddenException(`not allowed`);
+        // if (message.type === MessageType.SYSTEM && chat.adminId !== message.from)
+        //     throw new ForbiddenException(`not allowed`);
 
         const userId = this._configService.get<string>('userId');
         if (chat.isGroup && chat.adminId === userId) await this._chatService.handleGroupAdmin({ chat, message });

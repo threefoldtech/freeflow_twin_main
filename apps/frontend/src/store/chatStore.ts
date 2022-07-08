@@ -163,7 +163,7 @@ const addGroupchat = (name: string, contacts: GroupContact[]) => {
     const newGroupchat: GroupChat = {
         isGroup: true,
         chatId,
-        contacts: contacts,
+        contacts,
         messages: [
             {
                 chatId,
@@ -331,10 +331,10 @@ const addMessage = (chatId: string, message: any) => {
     }
 
     if (message.type === 'EDIT') {
-        const index = chat.messages.findIndex(mes => mes.id == message.body.id);
+        const index = chat.messages.findIndex(mes => mes.id.toString() === message.id.toString());
 
         if (index === -1) return;
-        chat.messages[index] = message.body;
+        chat.messages[index] = message;
         return;
     }
 

@@ -5,6 +5,7 @@ import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
 import { ChatDTO } from '../chat/dtos/chat.dto';
+import { ContactDTO } from '../contact/dtos/contact.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
@@ -59,6 +60,22 @@ export class ApiService {
     }
 
     /**
+     * Sends a message to contacts of a group chat.
+     * @param {Object} obj - Object.
+     * @param {Contact[]} obj.contacts - Contacts to send message to.
+     * @param {MessageDTO} obj.message - Message to send.
+     * @param {ResponseType} obj.responseType - Axios optional response type.
+     */
+    async sendMessageToGroup({ contacts, message }: { contacts: ContactDTO[]; message: MessageDTO<unknown> }) {
+        Promise.all(
+            contacts.map(async contact => {
+                if (contact.id !== this._configService.get<string>('userId'))
+                    await this.sendMessageToApi({ location: contact.location, message });
+            })
+        );
+    }
+
+    /**
      * Sends your updated status to the given location.
      * @param {Object} obj - Object.
      * @param {string} obj.location - IPv6 location to send status to.
@@ -94,7 +111,7 @@ export class ApiService {
         try {
             return await axios.delete(destinationUrl);
         } catch (error) {
-            throw new BadRequestException(`unable to delete chat: ${error}`);
+            return;
         }
     }
 
@@ -146,8 +163,7 @@ export class ApiService {
      */
     async getAdminChat({ location, chatId }: { location: string; chatId: string }): Promise<ChatDTO> {
         try {
-            const res = await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/${chatId}`);
-            return res.data;
+            return (await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/${chatId}`)).data;
         } catch (error) {
             throw new BadRequestException(`unable to get admins chat: ${error}`);
         }
