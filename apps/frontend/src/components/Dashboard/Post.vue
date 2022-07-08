@@ -36,7 +36,6 @@
             </button>
         </template>
     </Alert>
-    
 
     <div class="bg-white my-5 rounded">
         <div class="p-6">
@@ -130,16 +129,20 @@
                                                 <div
                                                     v-if="props.item.owner.id === user.id.toString()"
                                                     class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
-                                                    @click="showDeletePostDialog = true;
-                                                    close();"
+                                                    @click="
+                                                        showDeletePostDialog = true;
+                                                        close();
+                                                    "
                                                 >
                                                     <TrashIcon class="w-6 mr-4" />
                                                     <p>Delete</p>
                                                 </div>
                                                 <div
                                                     class="sm:hidden flex items-center cursor-pointer text-gray-500 hover:text-green-500"
-                                                    @click="showShareDialog = true;
-                                                    close();"
+                                                    @click="
+                                                        showShareDialog = true;
+                                                        close();
+                                                    "
                                                 >
                                                     <ShareIcon class="w-6 mr-4" />
                                                     <p>Share</p>
