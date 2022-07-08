@@ -1,7 +1,7 @@
 <template>
     <nav>
         <div class="flex flex-col h-screen overflow-y-auto items-center">
-            <div class="md:mb-4 mb-2 grid text-center text-white cursor-pointer">
+            <div class="md:mb-4 mb-2 grid h-full text-center text-white cursor-pointer">
                 <div
                     class="rounded-full grid place-items-center"
                     style="position: relative"

@@ -2,7 +2,7 @@
     <div class="h-full flex">
         <!-- Narrow sidebar -->
         <div class="hidden w-28 bg-accent-700 overflow-y-auto lg:block">
-            <div class="w-full py-6 flex flex-col items-center">
+            <div class="w-full h-full py-6 flex flex-col items-center">
                 <div class="flex-shrink-0 flex items-center" @click="changePage('dashboard')">
                     <svg class="sm:w-10 w-8" fill="none" viewBox="0 0 39 48" xmlns="http://www.w3.org/2000/svg">
                         <defs>
@@ -33,7 +33,7 @@
                         />
                     </svg>
                 </div>
-                <div class="flex-1 mt-6 w-full px-2 space-y-1">
+                <div class="flex-1 mt-6 w-full px-2 space-y-3">
                     <div
                         v-for="app in apps"
                         :key="app.name"
@@ -44,7 +44,7 @@
                                 app?.enabled && router.currentRoute?.value.meta.app === app.name,
                             'text-gray-500': !app?.enabled,
                         }"
-                        class="mb-4 grid"
+                        class="grid"
                     >
                         <div
                             class="group w-full p-3 flex flex-col items-center text-xs font-medium"
@@ -53,8 +53,25 @@
                         >
                             <img alt="icon of navigation item" :src="app.icon" class="w-8 first:h-8" />
                             <span class="mt-2 capitalize">{{ app.name }}</span>
+                            <p
+                                v-if="app.name === AppType.Whisper && totalUnreadChats > 0"
+                                class="absolute text-xs right-0 top-0 inline-block bg-gradient text-white rounded-full text-center w-7 h-7 pt-2"
+                            >
+                                {{ totalUnreadChats }}
+                            </p>
                         </div>
                     </div>
+                </div>
+                <div
+                    class="w-20 h-20 mb-5 grid cursor-pointer content-end items-center justify-center justify-items-center"
+                >
+                    <AvatarImg @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="String(user.id)" />
+                    <button
+                        class="mt-2 py-2 px-4 text-white rounded-md max-w-max hover:bg-primarylight"
+                        @click="showLogoutDialog = true"
+                    >
+                        Logout
+                    </button>
                 </div>
             </div>
         </div>
@@ -133,10 +150,41 @@
                                                     class="w-8 first:h-8 mr-3"
                                                 />
                                                 <span class="capitalize">{{ app.name }}</span>
+                                                <span
+                                                    v-if="app.name === AppType.Whisper && totalUnreadChats > 0"
+                                                    :class="[
+                                                        router.currentRoute?.value.meta.app === app.name
+                                                            ? 'bg-accent-600'
+                                                            : 'bg-accent-800',
+                                                        'ml-auto py-0.5 px-3 text-xs font-medium rounded-full',
+                                                    ]"
+                                                >
+                                                    {{totalUnreadChats}}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
                                 </nav>
+                            </div>
+                            <div class="flex-shrink-0 flex border-t border-accent-800 p-4">
+                                <div class="flex items-center">
+                                    <div>
+                                        <AvatarImg
+                                            @click="toggleShowUserConfigDialog"
+                                            class="cursor-pointer"
+                                            :id="String(user.id)"
+                                        />
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-base font-medium text-white">{{ user.id }}</p>
+                                        <p
+                                            class="text-sm font-medium text-accent-200 group-hover:text-white cursor-pointer"
+                                            @click="showLogoutDialog = true"
+                                        >
+                                            Logout
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </DialogPanel>
                     </TransitionChild>
@@ -160,16 +208,36 @@
             </div>
             <slot name="content" />
         </header>
+        <Alert v-if="showLogoutDialog" :showAlert="showLogoutDialog" @close="showLogoutDialog = false">
+            <template #title> Logout</template>
+            <template #content> Do you really want to logout?</template>
+            <template #actions>
+                <button
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="logout"
+                >
+                    Logout
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
+                    @click="showLogoutDialog = false"
+                >
+                    Cancel
+                </button>
+            </template>
+        </Alert>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { useAuthState } from '@/store/authStore';
     import { showUserConfigDialog } from '@/services/dialogService';
+    import { useAuthState } from '@/store/authStore';
     import { AppItemType, AppType } from '@/types/apps';
+    import { doLogout } from '@/services/authService';
+    import Alert from '@/components/Alert.vue';
 
     import {
         Dialog,
@@ -183,6 +251,12 @@
     } from '@headlessui/vue';
 
     import { MenuIcon, XIcon } from '@heroicons/vue/solid';
+
+    interface IProps {
+        unreadChats?: string[];
+    }
+
+    const props = defineProps<IProps>();
 
     const apps: Array<AppItemType> = [
         {
@@ -224,10 +298,31 @@
 
     const emit = defineEmits(['clicked']);
 
+    const { user } = useAuthState();
+
+    const showLogoutDialog = ref(false);
+
+    const logout = async () => {
+        showLogoutDialog.value = false;
+        await doLogout();
+    };
+
     const changePage = (name: string) => {
         emit('clicked');
         router.push({ name });
     };
+
+    const toggleShowUserConfigDialog = () => {
+        showUserConfigDialog.value = !showUserConfigDialog.value;
+    };
+
+    const totalUnreadChats = computed(() => {
+        let total = 0;
+        for (const msg of props.unreadChats) {
+            total++;
+        }
+        return total > 99 ? '99+' : total;
+    });
 
     const mobileMenuOpen = ref(false);
 </script>
