@@ -3,5 +3,5 @@ appdata*/
 backend/
 frontend/
 appdata1/
-docker-compose.local.yml
+docker-compose.yml
 
