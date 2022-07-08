@@ -138,6 +138,4 @@ export class MessageController {
 
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
     }
-
-    
 }

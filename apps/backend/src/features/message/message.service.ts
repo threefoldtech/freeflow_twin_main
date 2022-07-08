@@ -185,6 +185,4 @@ export class MessageService {
         if (to === this._configService.get<string>('userId')) return from;
         return to;
     }
-
-    
 }

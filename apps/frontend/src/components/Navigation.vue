@@ -159,7 +159,7 @@
                                                         'ml-auto py-0.5 px-3 text-xs font-medium rounded-full',
                                                     ]"
                                                 >
-                                                    {{totalUnreadChats}}
+                                                    {{ totalUnreadChats }}
                                                 </span>
                                             </div>
                                         </div>
