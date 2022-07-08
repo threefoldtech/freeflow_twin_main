@@ -278,8 +278,12 @@ export class ChatService {
      * @param {string} obj.chatId - Chat ID to fetch from location.
      */
     async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }) {
-        console.log(`SYNCINGGGGGGGGGGGGGGGGGGG`);
         const chat = await this._apiService.getAdminChat({ location: adminLocation, chatId });
+        Promise.all(
+            chat.messages.map(async message => {
+                await this._messageService.createMessage(message);
+            })
+        );
         this._chatGateway.emitMessageToConnectedClients('new_chat', chat);
 
         const existingChat = await this.getChat(chat.chatId);

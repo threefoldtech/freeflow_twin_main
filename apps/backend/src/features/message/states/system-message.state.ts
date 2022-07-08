@@ -34,6 +34,7 @@ export class AddUserSystemState implements SubSystemMessageState {
                     m.toJSON()
                 ),
             });
+            console.log('admin chat', adminChat.toJSON());
             return adminChat;
         }
 
@@ -47,7 +48,7 @@ export class AddUserSystemState implements SubSystemMessageState {
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         });
 
-        // await this._apiService.sendMessageToApi({ location: contact.location, message });
+        this._apiService.sendMessageToApi({ location: contact.location, message });
         return true;
     }
 }

@@ -135,8 +135,8 @@ export class ApiService {
             return await axios.post(`http://[${location}]/api/v2/chats/group/invite`, chat, {
                 responseType: responseType || 'json',
             });
-        } catch (error) {
-            throw new BadRequestException(`unable to send group invitation: ${error}`);
+        } catch {
+            return;
         }
     }
 
@@ -163,7 +163,7 @@ export class ApiService {
      */
     async getAdminChat({ location, chatId }: { location: string; chatId: string }): Promise<ChatDTO> {
         try {
-            return (await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/${chatId}`)).data;
+            return (await axios.get<ChatDTO>(`http://[${location}]/api/v2/chats/admin/${chatId}`)).data;
         } catch (error) {
             throw new BadRequestException(`unable to get admins chat: ${error}`);
         }
