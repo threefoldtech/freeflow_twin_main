@@ -1,5 +1,6 @@
-import { IsBooleanString, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBooleanString, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
+import { ROLES } from '../../../types/message-types';
 import { CreateMessageDTO } from '../../message/dtos/message.dto';
 
 export class ContactDTO {
@@ -8,6 +9,10 @@ export class ContactDTO {
 
     @IsString()
     location: string;
+
+    @IsOptional()
+    @IsArray()
+    roles?: ROLES[];
 }
 
 export class DeleteContactDTO {

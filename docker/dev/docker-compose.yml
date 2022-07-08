@@ -1,19 +1,19 @@
 version: "3"
 
 services:
-  baertietest-digitaltwin:
-    container_name: baertietest-chat
+  jorisb-digitaltwin:
+    container_name: jorisb-chat
     build:
       context: ../..
       dockerfile: ./docker/dev/Dockerfile
     restart: always
     environment:
-      - USER_ID=baertietest
+      - USER_ID=jorisb
       - ENVIRONMENT=development
       - DIGITALTWIN_APPID=digitaltwin.jimbertesting.be
     volumes:
       - ../..:/app
-      - ./appdata:/appdata
+      - ./appdata_jorisb:/appdata
       # - ./dev/logs:/var/log/
       # - ./dev/logs:/var/log
     networks:
@@ -25,29 +25,29 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
         
-  # debug-digitaltwin:
-  #   container_name: debug-chat
-  #   build:
-  #     context: ../..
-  #     dockerfile: ./docker/dev/Dockerfile
-  #   restart: always
-  #   environment:
-  #     - USER_ID=debug
-  #     - ENVIRONMENT=development
-  #     - DIGITALTWIN_APPID=digitaltwin.jimbertesting.be
-  #   volumes:
-  #     - ../..:/app
-  #     - ./appdata_debug:/appdata
-  #     # - ./dev/logs:/var/log/
-  #     # - ./dev/logs:/var/log
-  #   networks:
-  #     - chatnet
-  #   sysctls:
-  #     - net.ipv6.conf.all.disable_ipv6=0
-  #   cap_add:
-  #     - NET_ADMIN
-  #   devices:
-  #     - /dev/net/tun:/dev/net/tun
+  jefke7-digitaltwin:
+    container_name: jefke7-chat
+    build:
+      context: ../..
+      dockerfile: ./docker/dev/Dockerfile
+    restart: always
+    environment:
+      - USER_ID=jefke7
+      - ENVIRONMENT=development
+      - DIGITALTWIN_APPID=digitaltwin.jimbertesting.be
+    volumes:
+      - ../..:/app
+      - ./appdata_jefke7:/appdata
+      # - ./dev/logs:/var/log/
+      # - ./dev/logs:/var/log
+    networks:
+      - chatnet
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
         
   redis-commander:
     container_name: redis-commander
@@ -57,11 +57,11 @@ services:
       - chatnet
     restart: always
     environment:
-      - REDIS_HOSTS=local:baertietest-digitaltwin:6379
+      - REDIS_HOSTS=local:jorisb-digitaltwin:6379,local:jefke7-digitaltwin:6379
     ports:
       - "8081:8081"
     depends_on:
-      - baertietest-digitaltwin
+      - jorisb-digitaltwin
 
 networks:
   chatnet:

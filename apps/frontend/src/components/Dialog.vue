@@ -10,7 +10,7 @@
             @keydown.esc="$emit('update-model-value', false)"
         >
             <div
-                class="bg-white w-full h-full md:h-auto md:max-w-2xl md:w-3/4 md:rounded-lg overflow-y-auto hide-scrollbar md:overflow-hidden"
+                class="bg-white w-full h-full lg:h-auto lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto hide-scrollbar lg:overflow-hidden"
                 @mousedown.stop
             >
                 <div class="bg-accent-700 text-white md:rounded-t-lg">

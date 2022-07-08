@@ -25,8 +25,17 @@ export class AddUserSystemState implements SubSystemMessageState {
     async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<unknown> {
         const { contact, adminLocation } = message.body as GroupUpdate;
         const userId = this._configService.get<string>('userId');
-        if (userId === contact.id)
-            return await this._chatService.syncNewChatWithAdmin({ adminLocation, chatId: message.to });
+        if (userId === contact.id) {
+            const adminChat = await this._chatService.syncNewChatWithAdmin({ adminLocation, chatId: message.to });
+            await this._messageService.createMessage(message);
+            this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+                ...adminChat.toJSON(),
+                messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
+                    m.toJSON()
+                ),
+            });
+            return adminChat;
+        }
 
         const chatToUpdate = await this._chatService.getChat(chat.chatId);
         const updatedChat = await this._chatService.addContactToChat({ chat: chatToUpdate, contact });

@@ -12,7 +12,7 @@
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.2",
         "@giphy/js-fetch-api": "^2.1.0",
-        "@headlessui/vue": "^1.4.0",
+        "@headlessui/vue": "^0.0.0-insiders.6253aa5",
         "@heroicons/vue": "^1.0.3",
         "@jimber/shared-components": "^1.0.4",
         "@tailwindcss/aspect-ratio": "^0.2.1",
@@ -68,10 +68,10 @@
         "@types/scriptjs": "^0.0.2",
         "@vitejs/plugin-vue": "^1.4.0",
         "@vue/compiler-sfc": "^3.2.2",
+        "custom-types": "*",
         "husky": "^7.0.0",
         "prettier": "^2.6.2",
         "pretty-quick": "^3.1.1",
-        "custom-types": "*",
         "vite": "^2.5.0"
     }
 }
