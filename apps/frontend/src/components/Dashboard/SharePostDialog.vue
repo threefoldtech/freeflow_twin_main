@@ -7,10 +7,10 @@
         @click="$emit('close')"
     >
         <div
-            class="bg-white w-full h-full md:h-auto md:max-w-2xl md:w-3/4 md:rounded-lg overflow-y-auto hide-scrollbar md:overflow-hidden"
+            class="bg-white w-full h-full lg:h-auto lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto hide-scrollbar lg:overflow-hidden"
             @click.stop
         >
-            <div class="bg-accent-700 text-white md:rounded-t-lg">
+            <div class="bg-accent-700 text-white lg:rounded-t-lg">
                 <div class="px-4 pt-8 flex items-center justify-between">
                     <h1 class="font-medium">Share post</h1>
                     <XIcon class="w-6 h-6 text-accent-300 cursor-pointer" @click="$emit('close')" />
@@ -49,7 +49,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col md:max-h-80 md:overflow-y-auto md:overflow-x-hidden">
+            <div class="flex flex-col lg:max-h-80 lg:min-h-[200px] lg:overflow-y-auto lg:overflow-x-hidden">
                 <div class="-my-2 sm:-mx-6 lg:-mx-8">
                     <div class="pt-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                         <div class="overflow-hidden border-b md:border-r border-gray-200">
