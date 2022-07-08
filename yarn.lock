@@ -1175,10 +1175,10 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
-"@headlessui/vue@^1.4.0":
-  version "1.6.4"
-  resolved "https://registry.yarnpkg.com/@headlessui/vue/-/vue-1.6.4.tgz#8492bbb044a9b19ee92bef9cd4d0c3d8feed8588"
-  integrity sha512-axZMcfRLNuwHESPMgDb0Vj7xxlNPmsPl77pvoRZGzJh7lRdRic9kC/qbVM8G36OpIJRZzqrlADLQ2JIObhQjBg==
+"@headlessui/vue@^0.0.0-insiders.6253aa5":
+  version "0.0.0-insiders.6253aa5"
+  resolved "https://registry.yarnpkg.com/@headlessui/vue/-/vue-0.0.0-insiders.6253aa5.tgz#b628cd5a9ae9964e31fc8eef469ce0b08f7ca0c4"
+  integrity sha512-IwkM5dD709rdxcy5vlM2h5/VXFCUJv8cHkCtJPtz3x3jY9vOAx+fh3YMcfp9pl6u2bB7ywjljYQTEDAB6/hTXA==
 
 "@heroicons/vue@^1.0.3", "@heroicons/vue@^1.0.5":
   version "1.0.6"

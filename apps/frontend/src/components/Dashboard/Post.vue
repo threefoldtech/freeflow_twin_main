@@ -36,6 +36,7 @@
             </button>
         </template>
     </Alert>
+    
 
     <div class="bg-white my-5 rounded">
         <div class="p-6">
@@ -123,20 +124,22 @@
                                     leave-from-class="translate-y-0 opacity-100"
                                     leave-to-class="translate-y-1 opacity-0"
                                 >
-                                    <PopoverPanel class="absolute z-50 top-0 right-5">
+                                    <PopoverPanel v-slot="{ close }" class="absolute z-50 top-0 right-5">
                                         <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                             <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
                                                 <div
                                                     v-if="props.item.owner.id === user.id.toString()"
                                                     class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
-                                                    @click="showDeletePostDialog = true"
+                                                    @click="showDeletePostDialog = true;
+                                                    close();"
                                                 >
                                                     <TrashIcon class="w-6 mr-4" />
                                                     <p>Delete</p>
                                                 </div>
                                                 <div
                                                     class="sm:hidden flex items-center cursor-pointer text-gray-500 hover:text-green-500"
-                                                    @click="showShareDialog = true"
+                                                    @click="showShareDialog = true;
+                                                    close();"
                                                 >
                                                     <ShareIcon class="w-6 mr-4" />
                                                     <p>Share</p>

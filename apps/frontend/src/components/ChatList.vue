@@ -157,7 +157,20 @@
                 </div>
             </div>
         </div>
-    </section>
+        <Dialog
+        :modelValue="showAddUserDialog"
+        :noActions="true"
+        @closeDialog="sendUpdate(false)"
+        @update-model-value="sendUpdate"
+    >
+        <template v-slot:title>
+            <h1>Invite someone to chat</h1>
+        </template>
+        <template v-slot:default>
+            <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+        </template>
+    </Dialog>
+    </section>  
 </template>
 
 <script setup lang="ts">
@@ -282,6 +295,10 @@
             .filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
         return uniqBy(filteredChats, c => c.chatId);
     });
+
+    const sendUpdate = newVal => {
+        showAddUserDialog.value = newVal;
+    };
 </script>
 
 <style scoped type="text/css"></style>

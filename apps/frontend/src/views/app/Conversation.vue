@@ -213,7 +213,7 @@
             <template v-slot:title class="center">
                 <h1 class="text-center">Leaving group</h1>
             </template>
-            <div v-if="chat?.isGroup && chat?.adminId === user?.id">
+            <div v-if="chat?.isGroup && chat?.adminId === user?.id" class="px-4">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
                     Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
                 </p>
@@ -234,8 +234,8 @@
                     </p>
                 </div>
             </div>
-            <div v-else>Do you really want to delete all chat history?</div>
-            <div class="flex justify-end mt-2">
+            <div class="px-4" v-else>Do you really want to delete all chat history?</div>
+            <div class="flex justify-end mt-2 px-4">
                 <button
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                     @click="showLeaveDialog = false"
