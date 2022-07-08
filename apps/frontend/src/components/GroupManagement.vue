@@ -429,6 +429,7 @@
 
     const isModerator = computed(() => {
         const contact = props.chat.contacts.find(c => c.id === user.id);
+        if (!contact) return false;
         if ('roles' in contact) return contact.roles.includes(Roles.MODERATOR);
         return false;
     });

@@ -9,6 +9,12 @@ export interface MessageBody {
     type: MessageType;
 }
 
+export enum ROLES {
+    USER = 'USER',
+    MODERATOR = 'MODERATOR',
+    ADMIN = 'ADMIN',
+}
+
 export interface ContactRequest {
     id: string;
     location: string;

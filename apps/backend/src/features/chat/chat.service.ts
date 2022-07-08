@@ -215,7 +215,14 @@ export class ChatService {
      */
     async addContactToChat({ chat, contact }: { chat: Chat; contact: ContactDTO }) {
         try {
-            const contacts = [...chat.parseContacts(), contact];
+            const contacts = [
+                ...chat.parseContacts(),
+                {
+                    id: contact.id,
+                    location: contact.location,
+                    roles: contact.roles,
+                },
+            ];
             chat.contacts = stringifyContacts(contacts);
             await this._chatRepository.updateChat(chat);
             return chat;
@@ -278,7 +285,8 @@ export class ChatService {
         const existingChat = await this.getChat(chat.chatId);
         if (existingChat) {
             existingChat.contacts = stringifyContacts(chat.contacts);
-            return await this._chatRepository.updateChat(existingChat);
+            await this._chatRepository.updateChat(existingChat);
+            return existingChat;
         }
 
         return await this.createChat(chat as CreateChatDTO);
