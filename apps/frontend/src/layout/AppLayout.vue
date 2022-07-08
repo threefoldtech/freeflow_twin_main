@@ -6,7 +6,7 @@
         <NotificationSection />
 
         <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
-            <Navigation :class="[smallScreen ? 'top' : 'side']">
+            <Navigation :unreadChats="totalUnreadChats" :class="[smallScreen ? 'top' : 'side']">
                 <template #content>
                     <slot name="topbar" />
                 </template>

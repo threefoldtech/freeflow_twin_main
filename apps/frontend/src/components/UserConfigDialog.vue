@@ -4,7 +4,7 @@
             <h1 class="font-medium">Profile settings</h1>
         </template>
         <div>
-            <div class="avatar-container mb-2">
+            <div class="avatar-container mb-2 px-4">
                 <div class="flex gap-2 items-center">
                     <div
                         class="avatar-container mr-2 flex justify-center items-center cursor-pointer"
@@ -28,10 +28,10 @@
                 </div>
             </div>
 
-            <div class="relative w-full h-full">
+            <div class="relative w-full h-full px-4">
                 <button
                     v-if="!isEditingStatus"
-                    class="absolute top-0 mt-2 mr-2 right-0 px-2 py-1 flex flex-row text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer items-center"
+                    class="absolute top-0 mt-2 mr-6 right-0 px-2 py-1 flex flex-row text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer items-center"
                     @click="setEditStatus(true)"
                 >
                     <i class="fas fa-pen fa-xs mr-1 align-middle"></i>
@@ -40,7 +40,7 @@
 
                 <button
                     v-if="isEditingStatus"
-                    class="absolute top-1 mt-2 mr-2 right-0 px-2 py-1 flex flex-row ml-1 text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer items-center"
+                    class="absolute top-1 mt-2 mr-6 right-0 px-2 py-1 flex flex-row ml-1 text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer items-center"
                     @click="sendNewStatus"
                 >
                     <i class="fas fa-check fa-xs mr-1 align-middle"></i>
@@ -65,7 +65,7 @@
             </div>
             <input class="hidden" type="file" id="fileInput" ref="fileInput" accept="image/*" @change="changeFile" />
 
-            <div>
+            <div class="px-4">
                 <h2>{{ blocklist?.length > 0 ? 'Blocked' : 'No blocked users' }}</h2>
                 <ul v-if="blocklist?.length > 0" class="max-h-28 overflow-y-auto">
                     <template v-for="blockedUser in blocklist" :key="blockedUser">
@@ -101,7 +101,7 @@
                         :background="false"
                     />
                 </div>
-                <div class="flex flex-row justify-end mt-2">
+                <div class="flex flex-row justify-end mt-2 px-4">
                     <button
                         @click="cancelNewAvatar"
                         class="rounded-md border border-gray-400 mr-2 px-4 py-2 justify-self-end"
