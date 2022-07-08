@@ -300,7 +300,7 @@ export class QuantumService {
 
     async getShareById({ id }: { id: string }): Promise<Share> {
         try {
-            return await this._shareRepository.getSharedWithMeById({ id });
+            return await this._shareRepository.getShareById({ id });
         } catch (error) {
             throw new BadRequestException('share does not exist');
         }
@@ -430,6 +430,26 @@ export class QuantumService {
         } catch (error) {
             throw new BadRequestException(`unable to update file share in database: ${error}`);
         }
+    }
+
+    async getSharePermissionsByUser({ shareId, userId }: { shareId: string; userId: string }) {
+        const share = await this.getShareById({ id: shareId });
+        console.log(share);
+        console.log(shareId);
+        if (!share) return [];
+        const permissions: SharePermissionType[] = [];
+        await Promise.all(
+            share.parsePermissions().map(async p => {
+                const chat = await this._chatService.getChat(p.userId);
+                if (chat.parseContacts().find(c => c.id === userId)) {
+                    p.sharePermissionTypes.forEach(t => {
+                        if (!permissions.some(c => c == t)) permissions.push(t);
+                    });
+                    return;
+                }
+            })
+        );
+        return permissions;
     }
 
     async generateQuantumJWT({ payload, exp }: { payload: IFileTokenPayload; exp?: number | string }): Promise<string> {

@@ -217,13 +217,13 @@ export const getFileAccessDetails = async (
     path: string,
     attachments: boolean
 ) => {
-    let externalUrl = `https://[${owner.location}]`;
+    let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
     path = encodeURIComponent(path);
 
     // TODO: handle in nest
-    let apiEndPointToCall = `/api/v1/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
+    let apiEndPointToCall = `/api/v2/quantum/share/info?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
     externalUrl = externalUrl + apiEndPointToCall;
@@ -302,13 +302,12 @@ export const generateDocumentServerConfig = (
 
     const writeUrl = generateFileBrowserUrl('http', `[${location}]`, path, writeToken);
 
-    //@todo find better way to get name
     const myName = window.location.host.split('.')[0];
 
     return {
         document: {
             fileType: extension,
-            key: key,
+            key,
             title: fileName,
             url: readUrl,
         },

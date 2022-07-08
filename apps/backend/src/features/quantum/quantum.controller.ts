@@ -52,8 +52,7 @@ export class QuantumController {
     @Get('file/info')
     @UseGuards(AuthGuard)
     async getFileInfo(@Query() params: { path: string; attachments: boolean }) {
-        const { path } = params;
-        // TODO: handle shares
+        const { path  } = params;
         // const parsedParams = Buffer.from(JSON.stringify(params), 'base64').toString('utf8');
         // const paramsObj = JSON.parse(parsedParams);
 
@@ -79,6 +78,34 @@ export class QuantumController {
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
                 payload: { file: path, permissions: [SharePermissionType.WRITE] },
+                exp: 24 * 60 * 60,
+            }),
+        };
+    }
+
+    @Get('share/info')
+    @UseGuards(AuthGuard)
+    async getShareFileAccessDetaisl(@Query() params: { shareId: string; userId: string; path: string }) {
+        const { shareId, userId, path } = params;
+        const share = await this._quantumService.getShareById({ id: shareId });
+        const userPermissions = await this._quantumService.getSharePermissionsByUser({ shareId, userId });
+        if (userPermissions.length < 1)
+            throw new UnauthorizedException('you do not have the premission to read this file');
+
+        let actualPath = share.path;
+        if (path !== actualPath) actualPath = join(path, actualPath);
+
+        const userCanWrite = !!userPermissions.find(x => x === SharePermissionType.WRITE);
+
+        return {
+            ...(await this._quantumService.getFileInfo({ path: actualPath })),
+            key: this._quantumService.getQuantumFileToken({ writable: userCanWrite, path: actualPath }),
+            readToken: await this._quantumService.generateQuantumJWT({
+                payload: { file: actualPath, permissions: [SharePermissionType.READ] },
+                exp: 5 * 60,
+            }),
+            writeToken: await this._quantumService.generateQuantumJWT({
+                payload: { file: actualPath, permissions: [SharePermissionType.WRITE] },
                 exp: 24 * 60 * 60,
             }),
         };
@@ -114,7 +141,6 @@ export class QuantumController {
 
         const payload = await this._quantumService.verifyQuantumJWT({ token });
 
-        console.log('got here 5.0', payload);
         if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
             throw new UnauthorizedException(`you do not have the premission to edit this file`);
 
@@ -128,6 +154,7 @@ export class QuantumController {
         console.log('url', url);
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
+        console.log('file', payload.file);
         await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });
         return {
             error: 0,
