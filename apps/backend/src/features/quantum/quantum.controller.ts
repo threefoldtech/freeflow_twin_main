@@ -113,14 +113,19 @@ export class QuantumController {
         // TODO: handle blocked tokens
 
         const payload = await this._quantumService.verifyQuantumJWT({ token });
+
+        console.log('got here 5.0', payload);
         if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
             throw new UnauthorizedException(`you do not have the premission to edit this file`);
 
-        if (!payload.file || !onlyOfficeResponse.url) throw new NotFoundException('no file or url provided');
+        console.log('payload', payload.file);
+        console.log('onlyoffice', onlyOfficeResponse);
+        if (!payload.file || !onlyOfficeResponse?.url) throw new NotFoundException('no file or url provided');
 
         const url = new URL(onlyOfficeResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
+        console.log('url', url);
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
         await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });

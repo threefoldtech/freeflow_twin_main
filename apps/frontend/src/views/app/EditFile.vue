@@ -74,22 +74,22 @@
         return `${protocol}://${owner}/api/v2/quantum/file/internal?path=${path}&token=${token}&attachment=${attachment}`;
     };
 
+    const isSupported = computed(() => {
+        return [
+            FileType.Excel,
+            FileType.Word,
+            FileType.Powerpoint,
+            FileType.Pdf,
+            FileType.Html,
+            FileType.Text,
+        ].includes(fileType.value);
+    });
+
     onMounted(async () => {
         const path = atob(<string>route.params.path);
         const shareId = <string>route.params.shareId;
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
-
-        const isSupported = computed(() => {
-            return [
-                FileType.Excel,
-                FileType.Word,
-                FileType.Powerpoint,
-                FileType.Pdf,
-                FileType.Html,
-                FileType.Text,
-            ].includes(fileType.value);
-        });
 
         const initDocumentServer = (fileInfo: EditPathInfo, location: string) => {
             fileType.value = getFileType(getExtension(fileInfo.fullName));
@@ -107,6 +107,8 @@
                     attachments,
                     isLoading.value
                 );
+
+                console.log('documentServerConfig', documentServerConfig);
 
                 get(
                     `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
