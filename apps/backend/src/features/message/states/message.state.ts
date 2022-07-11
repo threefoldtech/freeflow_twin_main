@@ -137,6 +137,10 @@ export class RenameFileShareMessageState implements MessageState<IFileShareMessa
         const share = await this._quantumService.getShareById({ id: message.body.id });
         if (!share) return;
         await this._quantumService.updateShare(share, { ...message.body, isSharedWithMe: true }, true);
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+            ...chat.toJSON(),
+            messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
+        });
     }
 }
 

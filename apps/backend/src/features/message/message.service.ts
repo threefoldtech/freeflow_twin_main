@@ -167,10 +167,10 @@ export class MessageService {
             .filter(msg => msg.type === MessageType.FILE_SHARE)
             .filter(msg => (JSON.parse(msg.body) as IFileShareMessage).id === message.body.id);
         Promise.all(
-            msgReferences.map(async message => {
-                message.body = JSON.stringify(message.body);
+            msgReferences.map(async msg => {
+                msg.body = JSON.stringify(message.body);
                 await this._messageRepo.updateMessage({
-                    message,
+                    message: msg,
                 });
             })
         );

@@ -381,6 +381,7 @@ export class QuantumService {
     /**
      * Updates an existing file share.
      * @param {Share} existingShare - Share to update.
+     * @param isGroup
      * @param {CreateFileShareDTO} dto - Creation object.
      * @return {IFileShare} - Updated file share.
      */
@@ -415,7 +416,13 @@ export class QuantumService {
 
             const chat = await this._chatService.getChat(p.userId);
             if (!chat) return;
-            this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
+            await this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
+            this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+                ...chat.toJSON(),
+                messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
+                    m.toJSON()
+                ),
+            });
 
             if (!isGroup)
                 chat.parseContacts()
