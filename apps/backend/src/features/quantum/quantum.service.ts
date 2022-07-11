@@ -129,7 +129,7 @@ export class QuantumService {
      * @param {string} obj.toPath - To path.
      * @param {string} obj.name - Name.
      */
-    createFileWithRetry({
+    async createFileWithRetry({
         fromPath,
         toPath,
         name,
@@ -139,11 +139,20 @@ export class QuantumService {
         toPath: string;
         name: string;
         count?: number;
-    }): void {
+    }): Promise<void> {
         const path = join(toPath, name);
         const pathWithCount = count === 0 ? path : `${path.insert(path.lastIndexOf('.'), ` (${count})`)}`;
         if (this._fileService.exists({ path: pathWithCount }))
             return this.createFileWithRetry({ fromPath, toPath, name, count: count + 1 });
+
+        const share = await this._shareRepository.getShareByPath({ path: fromPath });
+        if (share) {
+            await this.updateShare(share, {
+                ...share.toJSON(),
+                path: pathWithCount,
+                name: name,
+            });
+        }
 
         this._fileService.moveFile({ from: fromPath, to: pathWithCount });
     }
