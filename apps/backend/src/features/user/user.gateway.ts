@@ -54,6 +54,7 @@ export class UserGateway implements OnGatewayInit {
     async handleConnection() {
         const location = await this._locationService.getOwnLocation();
         this.emitMessageToConnectedClients('yggdrasil', location);
+        this.emitMessageToConnectedClients('appID', process.env.DIGITALTWIN_APPID);
         this.contacts = await this._contactService.getContacts();
         const status: IStatusUpdate = {
             id: this._configService.get<string>('userId'),

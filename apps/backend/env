@@ -1,0 +1,14 @@
+# APP
+PORT=3000
+NODE_ENV='development'
+BASE_DIR='/appdata/'
+UPLOAD_DESTINATION='./uploads'
+SESSION_SECRET='I4yU9V6O0Sxc1R1EsYDg'
+
+# REDIS
+REDIS_URL='redis://default:PASSWORD@localhost:6379'
+
+# THREEFOLD LOGIN
+DIGITALTWIN_APPID='digitaltwin.jimbertesting.be'
+USER_ID='edwardk'
+SEED_PHRASE='calm science teach foil burst until next mango hole sponsor fold bottom cousin push focus track truly tornado turtle over tornado teach large fiscal'

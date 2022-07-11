@@ -33,6 +33,26 @@ export class AuthController {
         return { url: loginUrl };
     }
 
+    @Get('signout')
+    async signOut(@Req() req: Request, @Res() res: Response) {
+        const promise = new Promise<void>((resolve, reject) => {
+            req.session.destroy(err => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+
+        try {
+            await promise;
+            res.json({ success: true });
+        } catch (err) {
+            res.json({ success: false });
+        }
+    }
+
     @Get('callback')
     async authCallback(@Req() req: Request, @Res() res: Response) {
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);

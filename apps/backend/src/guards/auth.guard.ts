@@ -11,6 +11,7 @@ export class AuthGuard implements CanActivate {
     ) {}
 
     async canActivate(context: ExecutionContext) {
+        // todo: check if user is logged in
         // const req = context.switchToHttp().getRequest();
 
         // const userId = req.session?.userId;
