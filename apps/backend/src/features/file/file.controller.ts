@@ -29,13 +29,14 @@ export class FileController {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
-    @Get(':fileId')
-    downloadFile(@Param('fileId') fileId: string): StreamableFile {
-        const path = join(this.storageDir, fileId);
-        if (!fileId || !this._fileService.exists({ path }))
+    @Get(':path')
+    downloadFile(@Param('path') path: string): StreamableFile {
+        path = atob(path);
+        const filePath = join(`${this.storageDir}`, path);
+        if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
 
-        return new StreamableFile(createReadStream(path));
+        return new StreamableFile(createReadStream(filePath));
     }
 
     @Get('download/compressed')

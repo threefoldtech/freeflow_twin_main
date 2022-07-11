@@ -19,7 +19,7 @@
     />
 
     <Alert v-if="showDeletePostDialog" :showAlert="showDeletePostDialog" @close="showDeletePostDialog = false">
-        <template #title> Deleting post </template>
+        <template #title> Deleting post</template>
         <template #content>Do you really want to delete your post?</template>
         <template #actions>
             <button
@@ -447,7 +447,9 @@
     });
 
     const fetchPostImage = (image: string) => {
-        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/files/${image}`);
+        const owner = props.item.owner;
+        const path = `${owner.id}/posts/${image}`;
+        return calcExternalResourceLink(`http://[${owner.location}]/api/v2/files/${btoa(path)}`);
     };
 
     const timeAgo = time => {
@@ -534,15 +536,15 @@
     }
 
     /*
-    .some-holder-styles{
-      display: none;
-      position: absolute;
-      z-index: 9;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%,-50%);
-    }
-    */
+.some-holder-styles{
+  display: none;
+  position: absolute;
+  z-index: 9;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+*/
 
     .ds-preloader-block__loading-bubble {
         display: inline-block;

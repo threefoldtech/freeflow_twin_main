@@ -86,9 +86,9 @@
     };
 
     const thumbnailImage = computed(() => {
-        return calcExternalResourceLink(
-            `http://[${props.message.body.owner.location}]/api/v2/files/${props.message.body.images[0]}`
-        );
+        const body = props.message.body;
+        const path = `${body.owner.id}/posts/${body.images[0]}`;
+        return calcExternalResourceLink(`http://[${body.owner.location}]/api/v2/files/${btoa(path)}`);
     });
 
     const avatarImg = computed(() => {
