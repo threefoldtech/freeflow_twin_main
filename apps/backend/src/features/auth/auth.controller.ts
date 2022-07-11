@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -33,9 +33,11 @@ export class AuthController {
         return { url: loginUrl };
     }
 
-    @Get('signout')
-    async signOut(@Req() req: Request, @Res() res: Response) {
+    @Post('signout')
+    @UseGuards(AuthGuard)
+    async signOut(@Req() req: Request) {
         const promise = new Promise<void>((resolve, reject) => {
+            req.session.cookie.maxAge = 0;
             req.session.destroy(err => {
                 if (err) {
                     reject(err);
@@ -47,9 +49,13 @@ export class AuthController {
 
         try {
             await promise;
-            res.json({ success: true });
+            return {
+                status: true,
+            };
         } catch (err) {
-            res.json({ success: false });
+            return {
+                success: false,
+            };
         }
     }
 

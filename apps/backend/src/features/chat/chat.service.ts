@@ -11,9 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiService } from '../api/api.service';
 import { ContactService } from '../contact/contact.service';
 import { ContactDTO } from '../contact/dtos/contact.dto';
-import { Contact } from '../contact/models/contact.model';
 import { KeyService } from '../key/key.service';
-import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { stringifyMessage } from '../message/models/message.model';
@@ -32,8 +30,7 @@ export class ChatService {
         private readonly _apiService: ApiService,
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
-        private readonly _chatGateway: ChatGateway,
-        private readonly _locationService: LocationService
+        private readonly _chatGateway: ChatGateway
     ) {}
 
     /**
@@ -88,7 +85,6 @@ export class ChatService {
         const contacts = chat.parseContacts();
         const contact = contacts.find(c => c.id === chatId);
         const ownId = this._configService.get<string>('userId');
-        contact.contactRequest = false;
         try {
             if (contact) {
                 await this._contactService.updateContact({
@@ -277,7 +273,7 @@ export class ChatService {
 
     /**
      * Handles a message read.
-     * @param {MessateDTO} message - Message that is read.
+     * @param {MessageDTO} message - Message that is read.
      */
     async handleMessageRead(message: MessageDTO<string>) {
         const chatId = this._messageService.determineChatID(message);
