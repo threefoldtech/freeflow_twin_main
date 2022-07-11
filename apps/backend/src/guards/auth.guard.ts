@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
         if (!userId && (!isDevMode || !yggdrasilInitialised)) return false;
 
         const key = await this._keyService.getKey({ keyType: KeyType.Public, userId });
-        if (!key) return false
+        if (!key) return false;
 
         return userId === this._configService.get<string>('userId');
     }
