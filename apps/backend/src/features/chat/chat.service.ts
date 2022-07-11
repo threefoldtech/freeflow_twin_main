@@ -11,6 +11,7 @@ import { ConfigService } from '@nestjs/config';
 import { ApiService } from '../api/api.service';
 import { ContactService } from '../contact/contact.service';
 import { ContactDTO } from '../contact/dtos/contact.dto';
+import { Contact } from '../contact/models/contact.model';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
@@ -228,6 +229,31 @@ export class ChatService {
             return chat;
         } catch (error) {
             throw new BadRequestException(`unable to add contact to chat: ${error}`);
+        }
+    }
+
+    /**
+     * Updates a contact.
+     */
+    async updateContact({ chat, contact }: { chat: Chat; contact: ContactDTO }) {
+        try {
+            const contacts = chat.parseContacts();
+
+            const index = contacts.findIndex(c => c.id === contact.id);
+            if (index !== -1) contacts.splice(index, 1);
+
+            const updatedContacts = [
+                ...contacts,
+                {
+                    id: contact.id,
+                    location: contact.location,
+                    roles: contact.roles,
+                },
+            ];
+            chat.contacts = stringifyContacts(updatedContacts);
+            await this._chatRepository.updateChat(chat);
+        } catch (error) {
+            throw new BadRequestException(`unable to update contact: ${error}`);
         }
     }
 

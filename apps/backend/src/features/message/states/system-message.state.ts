@@ -88,6 +88,28 @@ export class RemoveUserSystemState implements SubSystemMessageState {
     }
 }
 
+export class ChangeUserRoleMessageState implements SubSystemMessageState {
+    constructor(
+        private readonly _apiService: ApiService,
+        private readonly _chatService: ChatService,
+        private readonly _configService: ConfigService,
+        private readonly _messageService: MessageService,
+        private readonly _chatGateway: ChatGateway
+    ) {}
+
+    async handle({ message, chat }: { message: MessageDTO<GroupUpdate>; chat: ChatDTO }) {
+        const contact = message.body.contact;
+        const chatToUpdate = await this._chatService.getChat(chat.chatId);
+        await this._chatService.updateContact({ chat: chatToUpdate, contact });
+        await this._messageService.createMessage(message);
+        await this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+            ...chatToUpdate.toJSON(),
+            messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
+        });
+        return true;
+    }
+}
+
 export class PersistSystemMessage implements SubSystemMessageState {
     constructor(private readonly _messageService: MessageService, private readonly _chatGateway: ChatGateway) {}
 
