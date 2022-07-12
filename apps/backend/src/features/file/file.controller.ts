@@ -31,7 +31,7 @@ export class FileController {
 
     @Get(':path')
     downloadFile(@Param('path') path: string): StreamableFile {
-        path = atob(path);
+        path = Buffer.from(path, 'base64').toString('binary');
         const filePath = join(`${this.storageDir}`, path);
         if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
@@ -42,6 +42,7 @@ export class FileController {
     @Get('download/compressed')
     @UseGuards(AuthGuard)
     async downloadFilesCompressed(@Req() req: Request, @Query('path') path: string): Promise<StreamableFile> {
+        path = Buffer.from(path, 'base64').toString('binary');
         try {
             const stats = await this._fileService.getStats({ path });
             if (!stats.isDirectory()) return new StreamableFile(createReadStream(path));

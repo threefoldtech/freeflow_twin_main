@@ -143,7 +143,7 @@ export const deleteFile = async (path: string) => {
 
 export const downloadFileEndpoint = `${config.baseUrl}api/v2/files/download/compressed`;
 export const getDownloadFileEndpoint = (path: string) => {
-    return `${downloadFileEndpoint}?path=${path}`;
+    return `${downloadFileEndpoint}?path=${btoa(path)}`;
 };
 
 export const downloadFile = async (path: string, responseType: ResponseType = 'blob') => {
