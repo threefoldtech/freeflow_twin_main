@@ -249,12 +249,14 @@
 
     const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
+        if (props.chat.read.constructor.name !== 'Array') return;
         const idx = props.chat.read.findIndex(r => r.userId === props.chat.chatId);
         if (idx === -1) return 0;
         return findLastIndex(props.chat.messages, message => props.chat.read[idx].messageId === message.id);
     });
 
     const lastReadByMe = computed(() => {
+        if (props.chat.read.constructor.name !== 'Array') return;
         const idx = props.chat.read.findIndex(r => r.userId === props.chat.chatId);
         if (idx === -1) return 0;
         return findLastIndex(props.chat.messages, message => props.chat.read[0].messageId === message.id);
