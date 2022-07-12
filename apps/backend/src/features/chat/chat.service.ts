@@ -282,13 +282,14 @@ export class ChatService {
         const messages = await this._messageService.getAllMessagesFromChat({ chatId });
         console.log(`MESSAGE: ${JSON.stringify(message)}`);
         const newRead = messages.find(m => m.id === message.body);
-        const oldReadIdx = read.findIndex(r => r.userId === message.chatId);
+        const oldReadIdx = read.findIndex(r => r.userId === message.from);
         const oldRead = messages.find(m => m.id === read[oldReadIdx]?.messageId);
 
         if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
 
-        if (!oldRead) read.push({ messageId: message.body, userId: message.chatId });
-        else read[oldReadIdx] = { messageId: message.body, userId: message.chatId };
+        const newReadObj = { messageId: message.body, userId: message.from };
+        if (!oldRead) read.push(newReadObj);
+        else read[oldReadIdx] = newReadObj;
         chat.read = stringifyRead(read);
 
         this._chatGateway.emitMessageToConnectedClients('message', message);
