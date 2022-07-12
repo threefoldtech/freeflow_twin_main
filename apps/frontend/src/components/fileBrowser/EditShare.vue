@@ -22,7 +22,7 @@
     <Table v-if="searchResults?.length > 0" :data="searchResults" :headers="headers">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
-                <span v-if="canWrite()">Write</span>
+                <span v-if="canWrite">Write</span>
                 <span v-else>Read</span>
             </div>
             <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
@@ -115,11 +115,11 @@
         });
     });
 
-    const canWrite = () => {
+    const canWrite = computed(() => {
         return currentShare?.value?.permissions?.some(item => {
-            return item?.types?.includes(SharePermission.Write);
+            return item?.sharePermissionTypes?.includes(SharePermission.Write);
         });
-    };
+    });
 
     const remove = async (data: any) => {
         const chat = chats.value.find(c => c.chatId === data.chatId);
