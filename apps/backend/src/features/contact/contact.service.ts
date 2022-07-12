@@ -257,7 +257,7 @@ export class ContactService {
         const contact = await this.getContact({ id });
         if (contact?.entityId) {
             try {
-                await this._apiService.deleteContact({
+                this._apiService.deleteContact({
                     ownId: this._configService.get<string>('userId'),
                     location: contact.location,
                 });
