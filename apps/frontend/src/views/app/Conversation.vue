@@ -136,7 +136,7 @@
                     </div>
                     <aside
                         v-if="chat"
-                        :key="'aside' + chat.id + selectedId"
+                        :key="'aside' + chat.chatId + selectedId"
                         :class="{ 'flex ': showSideBar, hidden: !showSideBar }"
                         class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[400px] lg:border-l"
                     >
@@ -588,15 +588,6 @@
     };
 
     const unBlockChat = async () => sendUnBlockedChat(chat.value.chatId);
-
-    const reads = computed(() => {
-        const preReads = {};
-        each(chat.value.read, (val: string, key: string) => {
-            if (key === user.id) return;
-            preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
-        });
-        return preReads;
-    });
 
     const viewAnchor = ref(null);
 

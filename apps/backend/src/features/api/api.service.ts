@@ -318,7 +318,7 @@ export class ApiService {
         try {
             return (await axios.put<boolean>(destinationUrl)).data;
         } catch (error) {
-            throw new BadRequestException(`unable to delete contact: ${error}`);
+            return;
         }
     }
 }

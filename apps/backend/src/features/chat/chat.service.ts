@@ -17,7 +17,7 @@ import { MessageService } from '../message/message.service';
 import { stringifyMessage } from '../message/models/message.model';
 import { ChatGateway } from './chat.gateway';
 import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
-import { Chat, stringifyContacts } from './models/chat.model';
+import { Chat, stringifyContacts, stringifyRead } from './models/chat.model';
 import { ChatRedisRepository } from './repositories/chat-redis.repository';
 
 @Injectable()
@@ -278,17 +278,21 @@ export class ChatService {
     async handleMessageRead(message: MessageDTO<string>) {
         const chatId = this._messageService.determineChatID(message);
         const chat = await this.getChat(chatId);
+        const read = chat.parseRead();
+        const messages = await this._messageService.getAllMessagesFromChat({ chatId });
+        console.log(`MESSAGE: ${JSON.stringify(message)}`);
+        const newRead = messages.find(m => m.id === message.body);
+        const oldReadIdx = read.findIndex(r => r.userId === message.chatId);
+        const oldRead = messages.find(m => m.id === read[oldReadIdx]?.messageId);
 
-        // TODO: update
-        // const chatMessages = chat.parseMessage();
-        // const newRead = chatMessages.find(m => m.id === message.body);
-        // const oldRead = chatMessages.find(m => m.id === chat.read[message.from]);
+        if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
 
-        // if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
+        if (!oldRead) read.push({ messageId: message.body, userId: message.chatId });
+        else read[oldReadIdx] = { messageId: message.body, userId: message.chatId };
+        chat.read = stringifyRead(read);
 
-        // chat.read[0] = message.body;
-        // this._chatGateway.emitMessageToConnectedClients('message', message);
-        // await this._chatRepository.updateChat(chat);
+        this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._chatRepository.updateChat(chat);
 
         return chat;
     }
