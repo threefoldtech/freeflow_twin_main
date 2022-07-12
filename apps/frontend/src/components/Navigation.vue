@@ -318,8 +318,10 @@
 
     const totalUnreadChats = computed(() => {
         let total = 0;
-        for (const msg of props.unreadChats) {
-            total++;
+        if (props.unreadChats?.length > 0) {
+            for (const msg of props.unreadChats) {
+                total++;
+            }
         }
         return total > 99 ? '99+' : total;
     });

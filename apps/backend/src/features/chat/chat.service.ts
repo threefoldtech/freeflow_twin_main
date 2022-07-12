@@ -288,7 +288,7 @@ export class ChatService {
         if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
 
         const newReadObj = { messageId: message.body, userId: message.from };
-        if (!oldRead) read.push(newReadObj);
+        if (oldReadIdx < 0) read.push(newReadObj);
         else read[oldReadIdx] = newReadObj;
         chat.read = stringifyRead(read);
 
