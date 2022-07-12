@@ -107,6 +107,17 @@ export class QuantumService {
         }
     }
 
+    async updateSharePermissions({ path, chatId }: { path: string; chatId: string }) {
+        const share = await this.getShareByPath({ path });
+        const permissions = share.parsePermissions().filter(p => p.userId !== chatId);
+        share.permissions = stringifyPermissions(permissions);
+        try {
+            await this.updateShare(share, { ...share.toJSON(), permissions });
+        } catch (error) {
+            throw new BadRequestException(`unable to update share permissions: ${error}`);
+        }
+    }
+
     /**
      * Creates a directory.
      * @param {Object} obj - Object.

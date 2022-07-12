@@ -186,11 +186,11 @@ export const addShare = async (userId: string, path: string, filename: string, s
         size,
     });
 };
-export const removeFilePermissions = async (userId: string, path: string, location: string) => {
-    return await axios.post<GetShareToken>(`${endpoint}/files/removeFilePermissions`, {
-        chatId: userId,
-        path: path,
-        location: location,
+export const removeFilePermissions = async (chatId: string, path: string, location: string) => {
+    return await axios.post<GetShareToken>(`${config.baseUrl}api/v2/quantum/share/permissions`, {
+        chatId,
+        path: btoa(path),
+        loc: location,
     });
 };
 

@@ -122,11 +122,11 @@
     });
 
     const remove = async (data: any) => {
-        const chat = chats.value.find(c => c.chatId === data.chatId);
+        const chat = chats.value.find(c => c.chatId === data.userId);
         if (!chat) return;
         const contact = chat.contacts.find(con => con.id === chat.chatId);
         if ('location' in contact) {
-            await removeFilePermissions(data.chatId, props.selectedFile.path, contact.location);
+            await removeFilePermissions(data.userId, props.selectedFile.path, contact.location);
             await renderPermissionsData();
         }
     };
