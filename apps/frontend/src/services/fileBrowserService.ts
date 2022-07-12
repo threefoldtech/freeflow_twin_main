@@ -251,7 +251,7 @@ export const getSharedFolderContent = async (
 
 export const getShareByPath = async (path: string): Promise<SharedFileInterface> => {
     // TODO: handle in nest
-    return (await axios.get(`${endpoint}/share/path/`, { params: { path } })).data;
+    return (await axios.get(`${endpoint}/share/path?path=${btoa(path)}`)).data;
 };
 
 export const downloadAttachment = async (message: any) => {

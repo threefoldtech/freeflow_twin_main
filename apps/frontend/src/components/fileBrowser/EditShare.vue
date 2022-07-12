@@ -22,7 +22,7 @@
     <Table v-if="searchResults?.length > 0" :data="searchResults" :headers="headers">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
-                <span v-if="canWrite(data.data)">Write</span>
+                <span v-if="canWrite()">Write</span>
                 <span v-else>Read</span>
             </div>
             <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
@@ -39,24 +39,16 @@
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
 </template>
 <script lang="ts" setup>
-    import { Chat, SharedFileInterface } from '@/types';
-    import { selectedPaths, addShare, PathInfoModel } from '@/store/fileBrowserStore';
-    import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
-    import Toggle from '@/components/Toggle.vue';
-    import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-
-    const { sendMessage } = usechatsActions();
-    const { chats } = useChatsState();
-    import { createNotification } from '@/store/notificiationStore';
+    import { SharedFileInterface } from '@/types';
+    import { PathInfoModel } from '@/store/fileBrowserStore';
+    import { ref, computed, onBeforeMount } from 'vue';
+    import { useChatsState } from '@/store/chatStore';
     import { Table, IHeader, TEntry } from '@jimber/shared-components';
-    import { isObject } from 'lodash';
     import { getShareByPath, removeFilePermissions } from '@/services/fileBrowserService';
+    import { SharePermission } from '@/types';
     import { SearchIcon } from '@heroicons/vue/solid';
-    import { useRoute } from 'vue-router';
 
+    const { chats } = useChatsState();
     const headers: IHeader<TEntry>[] = [
         {
             key: 'name',
@@ -91,8 +83,9 @@
         if (!currentShare.value) return;
         currentShare.value.permissions = currentShare.value?.permissions?.map(item => {
             const chat = chats.value.find(chat => {
-                return chat.chatId === item.chatId;
+                return chat.chatId === item.userId;
             });
+            console.log(chat);
             if (chat.isGroup) {
                 //Groups chatId's are UUID
                 return {
@@ -102,7 +95,7 @@
             }
             return {
                 ...item,
-                name: item.chatId,
+                name: item.userId,
             };
         });
     };
@@ -122,11 +115,11 @@
         });
     });
 
-    const canWrite = computed(() => {
-        return param => {
-            return !!param.find(perm => perm == 'w');
-        };
-    });
+    const canWrite = () => {
+        return currentShare?.value?.permissions?.some(item => {
+            return item?.types?.includes(SharePermission.Write);
+        });
+    };
 
     const remove = async (data: any) => {
         const chat = chats.value.find(c => c.chatId === data.chatId);

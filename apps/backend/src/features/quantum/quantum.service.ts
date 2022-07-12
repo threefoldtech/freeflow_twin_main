@@ -311,7 +311,15 @@ export class QuantumService {
         try {
             return await this._shareRepository.getShareById({ id });
         } catch (error) {
-            throw new BadRequestException('share does not exist');
+            throw new NotFoundException('share does not exist');
+        }
+    }
+
+    async getShareByPath({ path }: { path: string }): Promise<Share> {
+        try {
+            return await this._shareRepository.getShareByPath({ path });
+        } catch (error) {
+            throw new NotFoundException('share does not exist');
         }
     }
 

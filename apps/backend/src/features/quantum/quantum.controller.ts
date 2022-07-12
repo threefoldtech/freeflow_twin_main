@@ -180,6 +180,13 @@ export class QuantumController {
         return (await this._quantumService.getShareById({ id })).toJSON();
     }
 
+    @Get('share/path')
+    @UseGuards(AuthGuard)
+    async getShareByPath(@Query('path') path: string): Promise<IFileShare> {
+        path = Buffer.from(path, 'base64').toString('binary');
+        return (await this._quantumService.getShareByPath({ path })).toJSON();
+    }
+
     @Post('dir')
     @UseGuards(AuthGuard)
     async createDirectory(@Body() { path, name }: CreateDirectoryDTO): Promise<DirectoryInfoDTO> {
