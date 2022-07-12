@@ -50,7 +50,7 @@ export class AuthController {
         try {
             await promise;
             return {
-                status: true,
+                success: true,
             };
         } catch (err) {
             return {
