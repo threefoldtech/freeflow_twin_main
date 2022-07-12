@@ -703,7 +703,7 @@ export const getUnreadChats = async () => {
     const arr: string[] = [];
 
     for (let chat of chats.value) {
-        const lastReadMessageId = chat.read[<string>user.id];
+        const lastReadMessageId = chat.read.find(u => u.userId === user.id).messageId;
         const index = chat.messages?.findIndex(m => m.id === lastReadMessageId);
 
         //more than 50 new messages in chat (because of pagination)
