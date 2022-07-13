@@ -34,7 +34,6 @@ export class UserController {
     ) {}
 
     @Get('publickey')
-    @UseGuards(AuthGuard)
     async getPublicKey(): Promise<string> {
         const pk = await this._keyService.getKey({
             keyType: KeyType.Public,
@@ -44,7 +43,6 @@ export class UserController {
     }
 
     @Get('status')
-    @UseGuards(AuthGuard)
     async getStatus(): Promise<IStatus> {
         const isOnline = (await this._userGateway.getConnections()) > 0 ? true : false;
         const userData = await this._userService.getUserData();

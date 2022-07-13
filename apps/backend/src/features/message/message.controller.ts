@@ -1,7 +1,6 @@
-import { Body, Controller, ForbiddenException, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Put } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { AuthGuard } from '../../guards/auth.guard';
 import { MessageType } from '../../types/message-types';
 import { ApiService } from '../api/api.service';
 import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
@@ -104,9 +103,7 @@ export class MessageController {
     }
 
     @Put()
-    @UseGuards(AuthGuard)
     async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
-        console.log(`INCOMING MESSAGE: ${message.type}`);
         const blockedContacts = await this._blockedContactService.getBlockedContactIds();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
