@@ -38,20 +38,20 @@ export class MessageService {
         }
     }
 
-/**
+    /**
      * Fetches data from url
      * @param {string} url- Url.
      */
- async getUrlPreview({url}:{url:string}): Promise<any> {
-    console.log('huts',url);
-    try {
-      const { data } = await axios.get(url)
-      console.log(data)
-      return data
-    } catch (error) {
-      throw new BadRequestException(`unable to get url preview: ${error}`)
+    async getUrlPreview({ url }: { url: string }): Promise<any> {
+        console.log('huts', url);
+        try {
+            const { data } = await axios.get(url);
+            console.log(data);
+            return data;
+        } catch (error) {
+            throw new BadRequestException(`unable to get url preview: ${error}`);
+        }
     }
-}
     /**
      * Gets messages from given chat Id using pagination.
      * @param {Object} obj - Object.

@@ -105,7 +105,7 @@ export class MessageController {
 
     @Get('preview')
     async getUrlPreview(@Query('url') url: string) {
-        return await this._messageService.getUrlPreview({url});
+        return await this._messageService.getUrlPreview({ url });
     }
 
     @Put()
