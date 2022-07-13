@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -101,6 +101,11 @@ export class MessageController {
             MessageType.POST_SHARE,
             new PostShareMessageState(this._chatGateway, this._messageService)
         );
+    }
+
+    @Get('preview')
+    async getUrlPreview(@Query('url') url: string) {
+        return await this._messageService.getUrlPreview({url});
     }
 
     @Put()
