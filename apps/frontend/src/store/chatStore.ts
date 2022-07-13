@@ -296,7 +296,13 @@ const addMessage = (chatId: string, message: any) => {
             return;
         }
 
-        chat.read = { ...chat.read, [<string>message.from]: message.body };
+        const index = chat.read.findIndex(r => r.userId === message.from);
+        if (index === -1) {
+            chat.read.push({ userId: message.from, messageId: message.body });
+            return;
+        }
+
+        chat.read[index].messageId = message.body;
         return;
     }
 
@@ -690,7 +696,13 @@ export const handleRead = (message: Message<string>) => {
         return;
     }
 
-    chat.read[<string>message.from] = message.body;
+    const index = chat.read.findIndex(r => r.userId === message.from);
+    if (index === -1) {
+        chat.read.push({ userId: message.from, messageId: message.body });
+        return;
+    }
+
+    chat.read[index].messageId = message.body;
 };
 
 export const getUnreadChats = async () => {
