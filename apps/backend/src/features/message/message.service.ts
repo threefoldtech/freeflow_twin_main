@@ -57,11 +57,7 @@ export class MessageService {
             const messages = (await this._messageRepo.getMessagesFromChat({ chatId, offset, count })).map(m =>
                 m.toJSON()
             );
-            return messages.sort((a, b) => {
-                if (a.timeStamp < b.timeStamp) return -1;
-                if (a.timeStamp > b.timeStamp) return 1;
-                return 0;
-            });
+            return messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
         } catch (error) {
             throw new BadRequestException(`unable to fetch messages from chat: ${error}`);
         }
@@ -153,11 +149,7 @@ export class MessageService {
     async getAllMessagesFromChat({ chatId }: { chatId: string }): Promise<Message[]> {
         try {
             const messages = await this._messageRepo.getAllMessagesFromChat({ chatId });
-            return messages.sort((a, b) => {
-                if (a.timeStamp > b.timeStamp) return 1;
-                if (a.timeStamp < b.timeStamp) return -1;
-                return 0;
-            });
+            return messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
         } catch (error) {
             return [];
         }
