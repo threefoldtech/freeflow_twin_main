@@ -31,7 +31,6 @@ export class ChatController {
     }
 
     @Put('draft')
-    @UseGuards(AuthGuard)
     async updateDraft(@Body() draftMessage: MessageDTO<unknown>): Promise<ChatDTO> {
         if (!draftMessage) throw new BadRequestException('please provide a valid draft message');
 
