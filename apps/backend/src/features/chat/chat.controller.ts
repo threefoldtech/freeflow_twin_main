@@ -25,7 +25,6 @@ export class ChatController {
     }
 
     @Post('group/invite')
-    @UseGuards(AuthGuard)
     async acceptGroupInvite(@Body() createChatDTO: CreateChatDTO): Promise<{ success: boolean }> {
         await this._chatService.acceptGroupInvite(createChatDTO);
         return { success: true };
@@ -52,7 +51,6 @@ export class ChatController {
     }
 
     @Get('admin/:chatId')
-    @UseGuards(AuthGuard)
     async getAdminChat(@Param('chatId') chatId: string) {
         const messages = (await this._messageService.getAllMessagesFromChat({ chatId })).map(m => m.toJSON());
         const chat = (await this._chatService.getChat(chatId)).toJSON();

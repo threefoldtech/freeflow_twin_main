@@ -57,7 +57,6 @@ export class UserController {
     }
 
     @Put('update-status')
-    @UseGuards(AuthGuard)
     async updateContactStatus(@Body() status: IStatusUpdate) {
         this._userGateway.emitMessageToConnectedClients('update_status', status);
         return true;

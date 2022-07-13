@@ -14,7 +14,6 @@ export class PostController {
     constructor(private readonly _postService: PostService) {}
 
     @Get(':username')
-    @UseGuards(AuthGuard)
     async getPosts(
         @Param() { username }: GetPostsQueryDto,
         @Query('offset') offset = 0,
@@ -25,7 +24,6 @@ export class PostController {
     }
 
     @Get('/:owner/:postId')
-    @UseGuards(AuthGuard)
     async getPost(@Param() { owner, postId }: GetPostQueryDto): Promise<IPostContainerDTO> {
         return await this._postService.getPost({ ownerLocation: owner, postId });
     }
@@ -43,7 +41,6 @@ export class PostController {
     }
 
     @Put('like/:postId')
-    @UseGuards(AuthGuard)
     async likePost(
         @Param() { postId }: GetPostQueryDto,
         @Body() likePostDTO: LikePostDTO
@@ -52,19 +49,16 @@ export class PostController {
     }
 
     @Put('typing')
-    @UseGuards(AuthGuard)
     async handleTyping(@Body() typingDTO: TypingDTO): Promise<{ post: string; user: string }> {
         return await this._postService.handleTyping(typingDTO);
     }
 
     @Post('someone-is-typing')
-    @UseGuards(AuthGuard)
     async handleSendSomeoneIsTyping(@Body() typingDTO: TypingDTO): Promise<boolean> {
         return await this._postService.handleSendSomeoneIsTyping(typingDTO);
     }
 
     @Put('comment/:postId')
-    @UseGuards(AuthGuard)
     async commentOnPost(
         @Param() { postId }: GetPostQueryDto,
         @Body() commentDTO: IPostComment
