@@ -211,7 +211,7 @@
             @update-model-value="showLeaveDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">Leaving group</h1>
+                <h1 class="text-center">{{ chat.isGroup ? 'Leaving group' : 'Deleting chat' }}</h1>
             </template>
             <div v-if="chat?.isGroup && chat?.adminId === user?.id" class="px-4">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
