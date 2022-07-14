@@ -64,8 +64,8 @@ const addContact = (username: DtId, location: string, _dontCheck = false) => {
 export const useContactsState = () => {
     return {
         ...toRefs(state),
-        contacts: calculateContacts(),
-        groupContacts: calculateContacts().map((c: Contact) => {
+        contacts: state.contacts,
+        groupContacts: state.contacts.map((c: Contact) => {
             const contact: GroupContact = {
                 ...c,
                 roles: [Roles.USER],
@@ -75,15 +75,6 @@ export const useContactsState = () => {
         dtContacts: state.dtContacts,
         // ...toRefs(state),
     };
-};
-
-const calculateContacts = () => {
-    const { chats } = useChatsState();
-    const { user } = useAuthState();
-    const contacts = chats.value
-        .filter(chat => !chat.isGroup && chat.acceptedChat)
-        .map(chat => chat.contacts.find(contact => contact.id !== user.id));
-    return contacts;
 };
 
 export const useContactsActions = () => {
