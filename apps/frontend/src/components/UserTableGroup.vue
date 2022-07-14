@@ -39,8 +39,8 @@
                             <tr
                                 v-for="(item, index) in searchResults()"
                                 :key="index"
+                                @click="clickCheckBox(item, index)"
                                 class="w-full block cursor-pointer"
-                                @click="handleChangeCheckbox(item, index)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <label :for="index" class="flex items-center">
@@ -49,7 +49,6 @@
                                                 :id="index"
                                                 :value="item"
                                                 type="checkbox"
-                                                @change="handleChangeCheckbox(item, index)"
                                                 class="focus:ring-white h-5 w-5 text-accent-600 border-gray-300 rounded-full justify-self-start"
                                             />
                                         </div>
@@ -87,6 +86,7 @@
     import { defineProps, ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import { debounce } from 'lodash';
 
     interface IProps {
         modelValue?: string;
@@ -105,21 +105,23 @@
 
     const emit = defineEmits(['update:modelValue', 'clicked']);
 
-    const handleChangeCheckbox = (item: Contact, index: number) => {
-        document.getElementById(index.toString()).click();
+    const clickCheckBox = debounce((item: Contact, index: number) => {
+        const checkbox = document.getElementById(index.toString()) as HTMLInputElement;
         switch (userIsInGroup(item)) {
             case true:
                 // code block
                 removeUserFromGroup(item);
+                checkbox.checked = false;
                 break;
             case false:
                 // code block
                 props.usersInGroup.push(item);
+                checkbox.checked = true;
                 break;
             default:
                 console.log('Something went wrong');
         }
-    };
+    }, 5);
 
     const chosenOption = ref('');
     const searchTerm = ref('');
