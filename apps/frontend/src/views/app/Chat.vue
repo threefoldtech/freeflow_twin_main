@@ -28,19 +28,6 @@
                 </div>
             </div>
         </div>
-        <Dialog
-            :modelValue="showAddUserDialog"
-            :noActions="true"
-            @closeDialog="sendUpdate(false)"
-            @update-model-value="sendUpdate"
-        >
-            <template v-slot:title>
-                <h1>Invite someone to chat</h1>
-            </template>
-            <template v-slot:default>
-                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
-            </template>
-        </Dialog>
     </app-layout>
 </template>
 
