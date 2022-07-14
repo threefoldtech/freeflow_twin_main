@@ -66,13 +66,11 @@ const initializeSocket = (username: string) => {
         addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
     });
     state.socket.on('connection_request', (newContactRequest: Chat) => {
-        console.log(`newContactrequest: ${JSON.stringify(newContactRequest)}`);
         const { addChat } = usechatsActions();
         addChat(newContactRequest);
         newUnreadChats(newContactRequest.chatId);
     });
     state.socket.on('chat_updated', (chat: Chat) => {
-        console.log(`chat_updated: ${JSON.stringify(chat)}`);
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });

@@ -258,13 +258,12 @@
     </Alert>
 </template>
 <script setup lang="ts">
-    import { computed, onMounted, ref } from 'vue';
+    import { computed, ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
     import { userIsBlocked } from '@/store/blockStore';
-    import Dialog from '@/components/Dialog.vue';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
@@ -303,17 +302,14 @@
     const searchInput = ref<string>('');
     const openAddUserToGroup = ref<boolean>(false);
 
-    const { contacts, groupContacts } = useContactsState();
-
     const filteredMembers = computed(() => {
+        const { groupContacts } = useContactsState();
         return groupContacts
             .filter(con => !props.chat.contacts.some(c => c.id === con.id))
             .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()));
     });
 
     const showRemoveUserDialog = ref(false);
-    const showRemoveChatDialog = ref(false);
-    const toBeRemovedUser = ref();
     const showChangeUserRoleDialog = ref(false);
     const selectedUser = ref<GroupContact>();
 
@@ -322,18 +318,6 @@
             ? body.filename
             : `${body?.filename?.slice(0, 15)}...${body?.filename?.slice(-15)}`;
     };
-
-    onMounted(() => {
-        //Calculating already existent objects
-        const computed = contacts.map(contact => {
-            if (!contact) return;
-            for (const i of props.chat.contacts) {
-                if (contact.id === i.id && contact.location === i.location) {
-                    return contact;
-                }
-            }
-        });
-    });
 
     const changeUserRole = (contact: GroupContact | Contact) => {
         if ('roles' in contact) {
@@ -366,12 +350,6 @@
         //@ts-ignore
         updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
-    const filteredContacts = computed(() => {
-        return contacts.filter(
-            //@ts-ignore
-            c => !props.chat.contacts.map(x => x.id).includes(c.id)
-        );
-    });
 
     const { user } = useAuthState();
 

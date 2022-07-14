@@ -397,7 +397,7 @@
     const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
-    const { addContact, retrieveDTContacts } = useContactsActions();
+    const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
     const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
 
     watch(
@@ -410,6 +410,7 @@
     onBeforeMount(async () => {
         await retrieveChats();
         await retrieveDTContacts();
+        await retrieveContacts();
     });
 
     const showProfileDialog = ref(false);

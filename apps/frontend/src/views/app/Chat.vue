@@ -58,12 +58,13 @@
     import AddContact from '@/components/ContactAdd.vue';
     import Dialog from '@/components/Dialog.vue';
 
-    const { retrieveDTContacts } = useContactsActions();
+    const { retrieveDTContacts, retrieveContacts } = useContactsActions();
 
     const { chats, chatRequests } = useChatsState();
 
     onBeforeMount(async () => {
         await retrieveDTContacts();
+        await retrieveContacts();
     });
 
     const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');
