@@ -20,10 +20,4 @@ export class BlockedContactController {
     async getBlockedContacts(): Promise<string[]> {
         return await this._blockedContacService.getBlockedContactIds();
     }
-
-    @Delete(':id')
-    @UseGuards(AuthGuard)
-    async deleteBlockedContact(@Param() { id }: { id: string }) {
-        return await this._blockedContacService.deleteBlockedContact({ id });
-    }
 }

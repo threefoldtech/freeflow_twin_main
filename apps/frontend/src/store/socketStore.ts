@@ -3,7 +3,7 @@ import { reactive } from '@vue/reactivity';
 import { inject, toRefs } from 'vue';
 import { handleRead, newUnreadChats, removeChat, usechatsActions } from './chatStore';
 import { setLocation, useAuthState } from '@/store/authStore';
-import { addUserToBlockList, blocklist } from '@/store/blockStore';
+import { addUserToBlockList, blocklist, removeUserFromBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
@@ -43,6 +43,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('chat_blocked', (chatId: string) => {
         addUserToBlockList(chatId);
+    });
+    state.socket.on('chat_unblocked', (chatId: string) => {
+        removeUserFromBlockList(chatId);
     });
     state.socket.on('message', (message: Message<any>) => {
         const { user } = useAuthState();
