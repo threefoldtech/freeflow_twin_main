@@ -97,6 +97,9 @@ export class ContactService {
         };
 
         let newContact = await this.getContact({ id });
+        if (newContact?.accepted) {
+            message.body.message = `You can start chatting again with ${newContact.id}`;
+        }
         if (!newContact) {
             try {
                 newContact = await this._contactRepo.addNewContact({
