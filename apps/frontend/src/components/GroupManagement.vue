@@ -36,7 +36,7 @@
                 class="flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
                 @click="$emit('app-unblock')"
             >
-                <span class="material-symbols-rounded"> unblock_flipped </span>
+                <span class="material-symbols-rounded"> block</span>
                 <p class="text-xs mt-1">Unblock</p>
             </div>
 
