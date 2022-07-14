@@ -40,6 +40,7 @@
                                 v-for="(item, index) in searchResults()"
                                 :key="index"
                                 class="w-full block cursor-pointer"
+                                @click="handleChangeCheckbox(item, index)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <label :for="index" class="flex items-center">
@@ -48,7 +49,7 @@
                                                 :id="index"
                                                 :value="item"
                                                 type="checkbox"
-                                                @change="handleChangeCheckbox(item)"
+                                                @change="handleChangeCheckbox(item, index)"
                                                 class="focus:ring-white h-5 w-5 text-accent-600 border-gray-300 rounded-full justify-self-start"
                                             />
                                         </div>
@@ -104,7 +105,8 @@
 
     const emit = defineEmits(['update:modelValue', 'clicked']);
 
-    const handleChangeCheckbox = (item: Contact) => {
+    const handleChangeCheckbox = (item: Contact, index: number) => {
+        document.getElementById(index.toString()).click();
         switch (userIsInGroup(item)) {
             case true:
                 // code block
