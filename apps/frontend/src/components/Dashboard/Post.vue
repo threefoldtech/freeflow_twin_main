@@ -175,6 +175,7 @@
                     >
                         <div
                             v-if="!showAllImages && idx === 3 && item.images.length >= 5"
+                            @click="() => (showAllImages = !showAllImages)"
                             class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center"
                         >
                             <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
