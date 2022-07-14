@@ -113,7 +113,10 @@ export class ChatService {
      */
     async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
         const existingChat = await this.getChat(chat.chatId);
-        if (!existingChat) await this.createChat(chat);
+        if (!existingChat) {
+            const adminLocation = chat.contacts.find(c => c.id === chat.adminId).location;
+            await this.syncNewChatWithAdmin({ adminLocation, chatId: chat.chatId });
+        }
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
         return chat;
     }
