@@ -316,6 +316,7 @@
                         placeholder="Type your message here"
                         type="text"
                         @input="onInput"
+                        autofocus
                     />
                     <button type="submit" class="bg-transparent">
                         <span class="material-symbols-rounded text-primary text-4xl"> send </span>
