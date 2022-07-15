@@ -1,7 +1,7 @@
 <template>
     <div
         ref="dialogRef"
-        class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-50 flex justify-center items-center"
+        class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-40 flex justify-center items-center"
         tabindex="0"
         @keydown.esc="$emit('close')"
         @click="$emit('close')"
@@ -34,17 +34,21 @@
                     </div>
                     <div :class="{ 'grid-cols-1': item.images.length === 1 }" class="grid grid-cols-2 my-4 gap-1">
                         <div
-                            v-for="(image, idx) in item.images.slice(0, showAllImages ? item.images.length : 4)"
+                            v-for="(image, idx) in item.images.slice(0, 4)"
                             :key="idx"
                             class="relative overflow-hidden cursor-pointer max-h-96"
                         >
                             <div
-                                v-if="!showAllImages && idx === 3 && item.images.length >= 5"
+                                v-if="idx === 3 && item.images.length >= 5"
                                 class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center"
                             >
                                 <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
                             </div>
-                            <img :src="fetchPostImage(image)" class="object-cover" @click="openImagePreview(image)" />
+                            <img
+                                :src="fetchPostImage(image)"
+                                class="object-cover"
+                                @click="emit('image_clicked', image)"
+                            />
                         </div>
                     </div>
                 </div>
@@ -112,15 +116,15 @@
                                                 Share
                                             </button>
                                             <!--<a
-                                                v-if="
-                                                    !isInQueue(chat.adminId) &&
-                                                    !isAlreadySharedWWithPerson(chat.adminId)
-                                                "
-                                                class="text-indigo-600 hover:text-accent-800"
-                                                href="#"
-                                                @click="sharePostWithFriend(chat.adminId)"
-                                                >Share</a
-                                            >-->
+                        v-if="
+                            !isInQueue(chat.adminId) &&
+                            !isAlreadySharedWWithPerson(chat.adminId)
+                        "
+                        class="text-indigo-600 hover:text-accent-800"
+                        href="#"
+                        @click="sharePostWithFriend(chat.adminId)"
+                        >Share</a
+                    >-->
                                             <p v-if="isAlreadySharedWWithPerson(chat.adminId)">Post shared</p>
                                         </td>
                                     </tr>
@@ -139,13 +143,12 @@
     import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import Spinner from '@/components/Spinner.vue';
-    import { PhotographIcon, XIcon } from '@heroicons/vue/solid';
+    import { XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
     import { IPostContainerDTO } from 'custom-types/post.type';
-    import { Contact } from '@/types';
     import moment from 'moment';
 
-    const emit = defineEmits(['close']);
+    const emit = defineEmits(['close', 'image_clicked']);
 
     const { retrieveChats } = usechatsActions();
     const { chats } = useChatsState();
