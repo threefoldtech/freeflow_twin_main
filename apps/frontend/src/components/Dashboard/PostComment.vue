@@ -13,9 +13,9 @@
             <div class="block">
                 <div class="bg-gray-100 w-auto rounded-lg px-2 py-2">
                     <div class="font-semibold">
-                        <a class="hover:underline text-sm font-semibold" href="#">
+                        <p class="text-sm font-semibold">
                             {{ comment.owner.id }}
-                        </a>
+                        </p>
                     </div>
                     <div class="text-sm">
                         {{ comment.body }}
@@ -39,29 +39,29 @@
             </div>
         </div>
         <!--<div
-        class="self-stretch flex justify-center items-center transform transition-opacity duration-200 opacity-0 translate -translate-y-2 hover:opacity-100"
-    >
-        <a class="" href="#">
-            <div
-                class="text-xs cursor-pointer flex h-6 w-6 transform transition-colors duration-200 hover:bg-gray-100 rounded-full items-center justify-center"
+    class="self-stretch flex justify-center items-center transform transition-opacity duration-200 opacity-0 translate -translate-y-2 hover:opacity-100"
+>
+    <a class="" href="#">
+        <div
+            class="text-xs cursor-pointer flex h-6 w-6 transform transition-colors duration-200 hover:bg-gray-100 rounded-full items-center justify-center"
+        >
+            <svg
+                class="w-4 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
             >
-                <svg
-                    class="w-4 h-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <path
-                        d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                    ></path>
-                </svg>
-            </div>
-        </a>
-    </div>-->
+                <path
+                    d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                ></path>
+            </svg>
+        </div>
+    </a>
+</div>-->
     </div>
     <ReplyComment
         v-for="reply in commentsSorted"
