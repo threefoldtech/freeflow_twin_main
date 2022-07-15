@@ -72,16 +72,11 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="chat in chats" :key="chat.adminId">
+                                    <tr v-for="chat in chats" :key="chat.chatId">
                                         <td class="pl-6 py-4">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full">
-                                                    <img
-                                                        :src="
-                                                            getAvatar(parseContactLocation(chat.chatId, chat.adminId))
-                                                        "
-                                                        class="h-10 w-10 rounded-full"
-                                                    />
+                                                    <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
                                                 </div>
                                                 <div class="ml-4 w-full">
                                                     <div class="text-sm font-medium w-1/2 truncate text-gray-900">
@@ -92,40 +87,29 @@
                                         </td>
                                         <td class="pr-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div
-                                                v-if="!isAlreadySharedWWithPerson(chat.adminId)"
+                                                v-if="!isAlreadySharedWWithPerson(chat.chatId)"
                                                 class="flex items-center justify-end"
                                             >
-                                                <Spinner v-if="isInQueue(chat.adminId)" small />
+                                                <Spinner v-if="isInQueue(chat.chatId)" small />
                                                 <p
-                                                    v-if="isInQueue(chat.adminId)"
+                                                    v-if="isInQueue(chat.chatId)"
                                                     class="cursor-pointer text-red-500 ml-4"
-                                                    @click="cancelShare(chat.adminId)"
+                                                    @click="cancelShare(chat.chatId)"
                                                 >
                                                     Cancel
                                                 </p>
                                             </div>
                                             <button
                                                 v-if="
-                                                    !isInQueue(chat.adminId) &&
-                                                    !isAlreadySharedWWithPerson(chat.adminId)
+                                                    !isInQueue(chat.chatId) && !isAlreadySharedWWithPerson(chat.chatId)
                                                 "
-                                                @click="sharePostWithFriend(chat.adminId)"
+                                                @click="sharePostWithFriend(chat.chatId)"
                                                 type="button"
                                                 class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none"
                                             >
                                                 Share
                                             </button>
-                                            <!--<a
-                        v-if="
-                            !isInQueue(chat.adminId) &&
-                            !isAlreadySharedWWithPerson(chat.adminId)
-                        "
-                        class="text-indigo-600 hover:text-accent-800"
-                        href="#"
-                        @click="sharePostWithFriend(chat.adminId)"
-                        >Share</a
-                    >-->
-                                            <p v-if="isAlreadySharedWWithPerson(chat.adminId)">Post shared</p>
+                                            <p v-if="isAlreadySharedWWithPerson(chat.chatId)">Post shared</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -147,6 +131,7 @@
     import { sendMessageSharePost } from '@/services/socialService';
     import { IPostContainerDTO } from 'custom-types/post.type';
     import moment from 'moment';
+    import AvatarImg from '@/components/AvatarImg.vue';
 
     const emit = defineEmits(['close', 'image_clicked']);
 
