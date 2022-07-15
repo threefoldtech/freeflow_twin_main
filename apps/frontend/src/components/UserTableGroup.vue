@@ -48,6 +48,7 @@
                                             <input
                                                 :id="index"
                                                 :value="item"
+                                                :ref="el => (checkBoxes[index] = el)"
                                                 type="checkbox"
                                                 class="focus:ring-white h-5 w-5 text-accent-600 border-gray-300 rounded-full justify-self-start"
                                             />
@@ -105,22 +106,17 @@
 
     const emit = defineEmits(['update:modelValue', 'clicked']);
 
+    const checkBoxes = ref([]);
+
     const clickCheckBox = debounce((item: Contact, index: number) => {
-        const checkbox = document.getElementById(index.toString()) as HTMLInputElement;
-        switch (userIsInGroup(item)) {
-            case true:
-                // code block
-                removeUserFromGroup(item);
-                checkbox.checked = false;
-                break;
-            case false:
-                // code block
-                props.usersInGroup.push(item);
-                checkbox.checked = true;
-                break;
-            default:
-                console.log('Something went wrong');
+        const checkbox = checkBoxes.value[index] as HTMLInputElement;
+        if (userIsInGroup(item)) {
+            removeUserFromGroup(item);
+            checkbox.checked = false;
+            return;
         }
+        props.usersInGroup.push(item);
+        checkbox.checked = true;
     }, 5);
 
     const chosenOption = ref('');
