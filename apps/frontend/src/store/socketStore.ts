@@ -3,7 +3,7 @@ import { reactive } from '@vue/reactivity';
 import { inject, toRefs } from 'vue';
 import { handleRead, newUnreadChats, removeChat, usechatsActions } from './chatStore';
 import { setLocation, useAuthState } from '@/store/authStore';
-import { addUserToBlockList, blocklist } from '@/store/blockStore';
+import { addUserToBlockList, blocklist, removeUserFromBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
 import { getAllPosts } from '@/services/socialService';
 import { getSharedContent } from '@/store/fileBrowserStore';
@@ -44,6 +44,9 @@ const initializeSocket = (username: string) => {
     state.socket.on('chat_blocked', (chatId: string) => {
         addUserToBlockList(chatId);
     });
+    state.socket.on('chat_unblocked', (chatId: string) => {
+        removeUserFromBlockList(chatId);
+    });
     state.socket.on('message', (message: Message<any>) => {
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
@@ -63,13 +66,11 @@ const initializeSocket = (username: string) => {
         addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
     });
     state.socket.on('connection_request', (newContactRequest: Chat) => {
-        console.log(`newContactrequest: ${JSON.stringify(newContactRequest)}`);
         const { addChat } = usechatsActions();
         addChat(newContactRequest);
         newUnreadChats(newContactRequest.chatId);
     });
     state.socket.on('chat_updated', (chat: Chat) => {
-        console.log(`chat_updated: ${JSON.stringify(chat)}`);
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });

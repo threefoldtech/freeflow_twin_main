@@ -160,7 +160,6 @@
 
     onMounted(() => {
         dialogRef.value.focus();
-        console.log(chats);
     });
 
     const fetchPostImage = (image: string) => {

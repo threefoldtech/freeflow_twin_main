@@ -2,7 +2,6 @@ import axios from 'axios';
 import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
-import { useChatsState } from './chatStore';
 import { useAuthState } from './authStore';
 import { Message, DtId } from '../types/index';
 import { reactive, toRefs } from 'vue';
@@ -13,10 +12,9 @@ const state = reactive<ContactState>({
 });
 
 const retrieveContacts = async () => {
-    return axios.get(`${config.baseUrl}api/v2/contacts`).then(function (response) {
-        const contacts = response.data;
-        state.contacts = contacts;
-    });
+    const { data } = await axios.get(`${config.baseUrl}api/v2/contacts`);
+    state.contacts = data;
+    return data;
 };
 
 const retrieveDTContacts = async () => {
@@ -38,7 +36,7 @@ const retrieveDTContacts = async () => {
 //     return isAvailable
 // }
 
-const addContact = (username: DtId, location: string, _dontCheck = false) => {
+const addContact = async (username: DtId, location: string, _dontCheck = false) => {
     const { user } = useAuthState();
     const addMessage: Message<SystemBody> = {
         id: uuidv4(),
@@ -54,18 +52,19 @@ const addContact = (username: DtId, location: string, _dontCheck = false) => {
         replies: [],
         subject: null,
     };
-    axios.post(`${config.baseUrl}api/v2/contacts`, {
+    const { data } = await axios.post(`${config.baseUrl}api/v2/contacts`, {
         id: username,
         location,
         message: addMessage,
     });
+    if (data) state.contacts.push(data.entityData);
 };
 
 export const useContactsState = () => {
     return {
         ...toRefs(state),
-        contacts: calculateContacts(),
-        groupContacts: calculateContacts().map((c: Contact) => {
+        contacts: state.contacts,
+        groupContacts: state.contacts.map((c: Contact) => {
             const contact: GroupContact = {
                 ...c,
                 roles: [Roles.USER],
@@ -77,14 +76,14 @@ export const useContactsState = () => {
     };
 };
 
-const calculateContacts = () => {
-    const { chats } = useChatsState();
-    const { user } = useAuthState();
-    const contacts = chats.value
-        .filter(chat => !chat.isGroup && chat.acceptedChat)
-        .map(chat => chat.contacts.find(contact => contact.id !== user.id));
-    return contacts;
-};
+// const calculateContacts = () => {
+//     const { chats } = useChatsState();
+//     const { user } = useAuthState();
+//     const contacts = chats.value
+//         .filter(chat => !chat.isGroup && chat.acceptedChat)
+//         .map(chat => chat.contacts.find(contact => contact.id !== user.id));
+//     return contacts;
+// };
 
 export const useContactsActions = () => {
     return {

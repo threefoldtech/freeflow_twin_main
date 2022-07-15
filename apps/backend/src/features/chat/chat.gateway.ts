@@ -108,6 +108,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         this.emitMessageToConnectedClients('chat_blocked', id);
     }
 
+    @SubscribeMessage('unblock_chat')
+    async handleUnBlockChat(@MessageBody() id: string) {
+        await this._blockedContactService.deleteBlockedContact({ id });
+        this.emitMessageToConnectedClients('chat_unblocked', id);
+    }
+
     @SubscribeMessage('remove_chat')
     async handleRemoveChat(@MessageBody() id: string) {
         const chat = await this._chatService.getChat(id);
