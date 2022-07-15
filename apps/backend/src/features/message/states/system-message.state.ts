@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 
-import { GroupUpdate, SystemMessage, UserLeftGroupMessage } from '../../../types/message-types';
+import { GroupUpdate, ROLES, SystemMessage, UserLeftGroupMessage } from '../../../types/message-types';
 import { ApiService } from '../../api/api.service';
 import { ChatGateway } from '../../chat/chat.gateway';
 import { ChatService } from '../../chat/chat.service';
@@ -131,23 +131,25 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
     async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<void> {
         const userId = this._configService.get<string>('userId');
         const { contact, nextAdmin } = message.body as UserLeftGroupMessage;
-        if (contact.id === chat.adminId && chat.contacts.length > 1) {
-            let newAdmin = chat.contacts.find(c => c.id === nextAdmin);
-            if (!newAdmin) newAdmin = chat.contacts.find(c => c.id !== contact.id)[0];
-            chat.adminId = newAdmin.id;
-        }
         if (contact.id === userId) {
             await this._chatService.deleteChat(chat.chatId);
             this._chatGateway.emitMessageToConnectedClients('chat_removed', chat.chatId);
             return;
         }
-        console.log(`here`);
+
         const chatToUpdate = await this._chatService.getChat(chat.chatId);
         const updatedChat = await this._chatService.removeContactFromChat({
             chat: chatToUpdate,
             contactId: contact.id,
         });
         await this._messageService.createMessage(message);
+
+        let newAdmin = chat.contacts.find(c => c.id === nextAdmin);
+        if (!newAdmin) newAdmin = chat.contacts.find(c => c.id !== contact.id)[0];
+        updatedChat.adminId = newAdmin.id;
+        newAdmin.roles = [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN];
+        await this._chatService.updateContact({ chat: updatedChat, contact: newAdmin });
+
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
             ...updatedChat.toJSON(),
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
