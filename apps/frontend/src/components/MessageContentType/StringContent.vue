@@ -3,10 +3,11 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed } from 'vue';
+    import { computed, onBeforeMount } from 'vue';
     import { marked } from 'marked';
     import DOMPurify from 'dompurify';
     import emoji from 'node-emoji';
+    import { getPreview } from '@/store/chatStore';
 
     interface IProp {
         message: {
@@ -29,8 +30,28 @@
                   ))
                 : (body = body)
         );
+
+        const markedBody = marked(body);
+        const sanitizedBody = DOMPurify.sanitize(markedBody);
+
+        const link = getLinkFromString(sanitizedBody);
+
+        console.log(link);
+
+        getPreview(getLinkFromString(sanitizedBody));
+
         return DOMPurify.sanitize(marked(body));
     });
+
+    onBeforeMount(async () => {
+        await getPreview('http://jimber.io');
+    });
+
+    const getLinkFromString = (body: string) => {
+        const regex = /href="([^"]*)/;
+
+        return body.match(regex)[1];
+    };
 </script>
 
 <style></style>
