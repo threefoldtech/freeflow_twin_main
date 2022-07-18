@@ -1,7 +1,7 @@
 <template>
     <div
         ref="dialogRef"
-        class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-50 flex justify-center items-center"
+        class="inset-0 bg-black h-full w-full bg-opacity-50 fixed z-40 flex justify-center items-center"
         tabindex="0"
         @keydown.esc="$emit('close')"
         @click="$emit('close')"
@@ -34,17 +34,21 @@
                     </div>
                     <div :class="{ 'grid-cols-1': item.images.length === 1 }" class="grid grid-cols-2 my-4 gap-1">
                         <div
-                            v-for="(image, idx) in item.images.slice(0, showAllImages ? item.images.length : 4)"
+                            v-for="(image, idx) in item.images.slice(0, 4)"
                             :key="idx"
                             class="relative overflow-hidden cursor-pointer max-h-96"
                         >
                             <div
-                                v-if="!showAllImages && idx === 3 && item.images.length >= 5"
+                                v-if="idx === 3 && item.images.length >= 5"
                                 class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center"
                             >
                                 <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
                             </div>
-                            <img :src="fetchPostImage(image)" class="object-cover" @click="openImagePreview(image)" />
+                            <img
+                                :src="fetchPostImage(image)"
+                                class="object-cover"
+                                @click="emit('image_clicked', image)"
+                            />
                         </div>
                     </div>
                 </div>
@@ -68,16 +72,11 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="chat in chats" :key="chat.adminId">
+                                    <tr v-for="chat in chats" :key="chat.chatId">
                                         <td class="pl-6 py-4">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full">
-                                                    <img
-                                                        :src="
-                                                            getAvatar(parseContactLocation(chat.chatId, chat.adminId))
-                                                        "
-                                                        class="h-10 w-10 rounded-full"
-                                                    />
+                                                    <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
                                                 </div>
                                                 <div class="ml-4 w-full">
                                                     <div class="text-sm font-medium w-1/2 truncate text-gray-900">
@@ -88,40 +87,29 @@
                                         </td>
                                         <td class="pr-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div
-                                                v-if="!isAlreadySharedWWithPerson(chat.adminId)"
+                                                v-if="!isAlreadySharedWWithPerson(chat.chatId)"
                                                 class="flex items-center justify-end"
                                             >
-                                                <Spinner v-if="isInQueue(chat.adminId)" small />
+                                                <Spinner v-if="isInQueue(chat.chatId)" small />
                                                 <p
-                                                    v-if="isInQueue(chat.adminId)"
+                                                    v-if="isInQueue(chat.chatId)"
                                                     class="cursor-pointer text-red-500 ml-4"
-                                                    @click="cancelShare(chat.adminId)"
+                                                    @click="cancelShare(chat.chatId)"
                                                 >
                                                     Cancel
                                                 </p>
                                             </div>
                                             <button
                                                 v-if="
-                                                    !isInQueue(chat.adminId) &&
-                                                    !isAlreadySharedWWithPerson(chat.adminId)
+                                                    !isInQueue(chat.chatId) && !isAlreadySharedWWithPerson(chat.chatId)
                                                 "
-                                                @click="sharePostWithFriend(chat.adminId)"
+                                                @click="sharePostWithFriend(chat.chatId)"
                                                 type="button"
                                                 class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md shadow-sm text-white bg-accent-600 hover:bg-accent-700 focus:outline-none"
                                             >
                                                 Share
                                             </button>
-                                            <!--<a
-                                                v-if="
-                                                    !isInQueue(chat.adminId) &&
-                                                    !isAlreadySharedWWithPerson(chat.adminId)
-                                                "
-                                                class="text-indigo-600 hover:text-accent-800"
-                                                href="#"
-                                                @click="sharePostWithFriend(chat.adminId)"
-                                                >Share</a
-                                            >-->
-                                            <p v-if="isAlreadySharedWWithPerson(chat.adminId)">Post shared</p>
+                                            <p v-if="isAlreadySharedWWithPerson(chat.chatId)">Post shared</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -139,13 +127,13 @@
     import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import Spinner from '@/components/Spinner.vue';
-    import { PhotographIcon, XIcon } from '@heroicons/vue/solid';
+    import { XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
     import { IPostContainerDTO } from 'custom-types/post.type';
-    import { Contact } from '@/types';
     import moment from 'moment';
+    import AvatarImg from '@/components/AvatarImg.vue';
 
-    const emit = defineEmits(['close']);
+    const emit = defineEmits(['close', 'image_clicked']);
 
     const { retrieveChats } = usechatsActions();
     const { chats } = useChatsState();

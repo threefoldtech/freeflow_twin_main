@@ -15,7 +15,8 @@
         :avatarImg="avatarImg"
         :item="item"
         @close="showShareDialog = false"
-        class="z-50"
+        @image_clicked="openImagePreview"
+        class="z-40"
     />
 
     <Alert v-if="showDeletePostDialog" :showAlert="showDeletePostDialog" @close="showDeletePostDialog = false">
@@ -316,6 +317,7 @@
                         placeholder="Type your message here"
                         type="text"
                         @input="onInput"
+                        autofocus
                     />
                     <button type="submit" class="bg-transparent">
                         <span class="material-symbols-rounded text-primary text-4xl"> send </span>

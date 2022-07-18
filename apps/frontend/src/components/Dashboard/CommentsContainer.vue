@@ -3,7 +3,7 @@
         <PostComment
             @replyToComment="e => $emit('replyToComment', e)"
             :key="comment.id"
-            v-for="(comment, idx) in commentsSorted"
+            v-for="comment in commentsSorted"
             :comment="comment"
         />
     </div>
@@ -11,15 +11,15 @@
 
 <script setup lang="ts">
     import PostComment from '@/components/Dashboard/PostComment.vue';
-    import { computed, onBeforeMount, ref } from 'vue';
-    import { COMMENT_MODEL } from '@/store/socialStore';
+    import { computed } from 'vue';
+    import { IPostComment } from 'custom-types/post.type';
 
-    const props = defineProps<{ comments: COMMENT_MODEL[] }>();
+    const props = defineProps<{ comments: IPostComment[] }>();
     const emit = defineEmits(['replyToComment']);
 
     const commentsSorted = computed(() => {
         return props.comments.sort(function (a, b) {
-            return new Date(b.createdOn) - new Date(a.createdOn);
+            return new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime();
         });
     });
 </script>
