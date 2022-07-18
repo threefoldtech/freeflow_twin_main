@@ -482,6 +482,11 @@ const catchErrorsSendFile = (e: { message: string }, uuid: string) => {
     });
 };
 
+export const getPreview = async (url: string) => {
+    const { data } = await axios.get(`${config.baseUrl}api/v2/messages/preview?url=${url}`);
+    console.log(data);
+};
+
 export const retrySendFile = async (file: { id: string; uuid: string; chatId: string; selectedFile: File }) => {
     //When a upload fails in chat and you retry
 
