@@ -56,7 +56,10 @@ export class MessageService {
         count: number;
     }): Promise<MessageDTO<unknown>[]> {
         try {
-            return (await this._messageRepo.getMessagesFromChat({ chatId, offset, count })).map(m => m.toJSON());
+            const messages = (await this._messageRepo.getMessagesFromChat({ chatId, offset, count })).map(m =>
+                m.toJSON()
+            );
+            return messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
         } catch (error) {
             throw new BadRequestException(`unable to fetch messages from chat: ${error}`);
         }
@@ -147,7 +150,8 @@ export class MessageService {
 
     async getAllMessagesFromChat({ chatId }: { chatId: string }): Promise<Message[]> {
         try {
-            return await this._messageRepo.getAllMessagesFromChat({ chatId });
+            const messages = await this._messageRepo.getAllMessagesFromChat({ chatId });
+            return messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
         } catch (error) {
             return [];
         }
@@ -169,10 +173,10 @@ export class MessageService {
             .filter(msg => msg.type === MessageType.FILE_SHARE)
             .filter(msg => (JSON.parse(msg.body) as IFileShareMessage).id === message.body.id);
         Promise.all(
-            msgReferences.map(async message => {
-                message.body = JSON.stringify(message.body);
+            msgReferences.map(async msg => {
+                msg.body = JSON.stringify(message.body);
                 await this._messageRepo.updateMessage({
-                    message,
+                    message: msg,
                 });
             })
         );

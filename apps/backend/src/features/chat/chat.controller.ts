@@ -2,12 +2,13 @@ import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Put, Q
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { MessageDTO } from '../message/dtos/message.dto';
+import { MessageService } from '../message/message.service';
 import { ChatService } from './chat.service';
 import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
 
 @Controller('chats')
 export class ChatController {
-    constructor(private readonly _chatService: ChatService) {}
+    constructor(private readonly _chatService: ChatService, private readonly _messageService: MessageService) {}
 
     @Post()
     @UseGuards(AuthGuard)
@@ -24,14 +25,12 @@ export class ChatController {
     }
 
     @Post('group/invite')
-    @UseGuards(AuthGuard)
     async acceptGroupInvite(@Body() createChatDTO: CreateChatDTO): Promise<{ success: boolean }> {
         await this._chatService.acceptGroupInvite(createChatDTO);
         return { success: true };
     }
 
     @Put('draft')
-    @UseGuards(AuthGuard)
     async updateDraft(@Body() draftMessage: MessageDTO<unknown>): Promise<ChatDTO> {
         if (!draftMessage) throw new BadRequestException('please provide a valid draft message');
 
@@ -48,6 +47,13 @@ export class ChatController {
     @UseGuards(AuthGuard)
     async getChat(@Param('chatId') chatId: string): Promise<ChatDTO> {
         return (await this._chatService.getChat(chatId)).toJSON();
+    }
+
+    @Get('admin/:chatId')
+    async getAdminChat(@Param('chatId') chatId: string) {
+        const messages = (await this._messageService.getAllMessagesFromChat({ chatId })).map(m => m.toJSON());
+        const chat = (await this._chatService.getChat(chatId)).toJSON();
+        return { ...chat, messages };
     }
 
     @Get('accepted')

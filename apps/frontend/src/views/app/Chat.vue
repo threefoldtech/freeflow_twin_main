@@ -27,20 +27,21 @@
                     </div>
                 </div>
             </div>
+            <Dialog
+                v-if="chats.length === 0 && chatRequests.length === 0"
+                :modelValue="showAddUserDialog"
+                :noActions="true"
+                @closeDialog="sendUpdate(false)"
+                @update-model-value="sendUpdate"
+            >
+                <template v-slot:title>
+                    <h1>Invite someone to chat</h1>
+                </template>
+                <template v-slot:default>
+                    <AddContact @closeDialog="sendUpdate(false)"></AddContact>
+                </template>
+            </Dialog>
         </div>
-        <Dialog
-            :modelValue="showAddUserDialog"
-            :noActions="true"
-            @closeDialog="sendUpdate(false)"
-            @update-model-value="sendUpdate"
-        >
-            <template v-slot:title>
-                <h1>Invite someone to chat</h1>
-            </template>
-            <template v-slot:default>
-                <AddContact @closeDialog="sendUpdate(false)"></AddContact>
-            </template>
-        </Dialog>
     </app-layout>
 </template>
 
@@ -58,12 +59,13 @@
     import AddContact from '@/components/ContactAdd.vue';
     import Dialog from '@/components/Dialog.vue';
 
-    const { retrieveDTContacts } = useContactsActions();
+    const { retrieveDTContacts, retrieveContacts } = useContactsActions();
 
     const { chats, chatRequests } = useChatsState();
 
     onBeforeMount(async () => {
         await retrieveDTContacts();
+        await retrieveContacts();
     });
 
     const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');

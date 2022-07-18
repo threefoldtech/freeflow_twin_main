@@ -143,7 +143,7 @@ export const deleteFile = async (path: string) => {
 
 export const downloadFileEndpoint = `${config.baseUrl}api/v2/files/download/compressed`;
 export const getDownloadFileEndpoint = (path: string) => {
-    return `${downloadFileEndpoint}?path=${path}`;
+    return `${downloadFileEndpoint}?path=${btoa(path)}`;
 };
 
 export const downloadFile = async (path: string, responseType: ResponseType = 'blob') => {
@@ -186,11 +186,11 @@ export const addShare = async (userId: string, path: string, filename: string, s
         size,
     });
 };
-export const removeFilePermissions = async (userId: string, path: string, location: string) => {
-    return await axios.post<GetShareToken>(`${endpoint}/files/removeFilePermissions`, {
-        chatId: userId,
-        path: path,
-        location: location,
+export const removeFilePermissions = async (chatId: string, path: string, location: string) => {
+    return await axios.post<GetShareToken>(`${config.baseUrl}api/v2/quantum/share/permissions`, {
+        chatId,
+        path: btoa(path),
+        loc: location,
     });
 };
 
@@ -217,13 +217,13 @@ export const getFileAccessDetails = async (
     path: string,
     attachments: boolean
 ) => {
-    let externalUrl = `https://[${owner.location}]`;
+    let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
     path = encodeURIComponent(path);
 
     // TODO: handle in nest
-    let apiEndPointToCall = `/api/v1/browse/files/getShareFileAccessDetails?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
+    let apiEndPointToCall = `/api/v2/quantum/share/info?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
     externalUrl = externalUrl + apiEndPointToCall;
@@ -251,7 +251,7 @@ export const getSharedFolderContent = async (
 
 export const getShareByPath = async (path: string): Promise<SharedFileInterface> => {
     // TODO: handle in nest
-    return (await axios.get(`${endpoint}/share/path/`, { params: { path } })).data;
+    return (await axios.get(`${endpoint}/share/path?path=${btoa(path)}`)).data;
 };
 
 export const downloadAttachment = async (message: any) => {
@@ -271,7 +271,7 @@ export const downloadAttachment = async (message: any) => {
 };
 
 export const hasSpecialCharacters = (name: string) => {
-    const format = /[`!@#$%^&*()+\=\[\]{};':"\\|,<>\/?~]/;
+    const format = /[`!@#$%^&*=[\]{};':"\\|,<>/?~]/;
     return format.test(name);
 };
 
@@ -302,13 +302,12 @@ export const generateDocumentServerConfig = (
 
     const writeUrl = generateFileBrowserUrl('http', `[${location}]`, path, writeToken);
 
-    //@todo find better way to get name
     const myName = window.location.host.split('.')[0];
 
     return {
         document: {
             fileType: extension,
-            key: key,
+            key,
             title: fileName,
             url: readUrl,
         },

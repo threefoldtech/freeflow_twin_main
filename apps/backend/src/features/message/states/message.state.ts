@@ -23,6 +23,7 @@ import { MessageService } from '../message.service';
 import { Message } from '../models/message.model';
 import {
     AddUserSystemState,
+    ChangeUserRoleMessageState,
     PersistSystemMessage,
     RemoveUserSystemState,
     SubSystemMessageState,
@@ -79,6 +80,7 @@ export class EditMessageState implements MessageState<string> {
         await this._messageService.editMessage({ messageId: message.id, text: message.body });
     }
 }
+
 export class DeleteMessageState implements MessageState<string> {
     constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
@@ -135,6 +137,10 @@ export class RenameFileShareMessageState implements MessageState<IFileShareMessa
         const share = await this._quantumService.getShareById({ id: message.body.id });
         if (!share) return;
         await this._quantumService.updateShare(share, { ...message.body, isSharedWithMe: true }, true);
+        this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+            ...chat.toJSON(),
+            messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
+        });
     }
 }
 
@@ -179,6 +185,17 @@ export class SystemMessageState implements MessageState<SystemMessage> {
                 this._configService,
                 this._chatGateway,
                 this._messageService
+            )
+        );
+        // user role change handler
+        this._subSystemMessageStateHandlers.set(
+            SystemMessageType.CHANGE_USER_ROLE,
+            new ChangeUserRoleMessageState(
+                this._apiService,
+                this._chatService,
+                this._configService,
+                this._messageService,
+                this._chatGateway
             )
         );
         // system default message handler

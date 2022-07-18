@@ -1,7 +1,6 @@
 import { Body, Controller, ForbiddenException, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { AuthGuard } from '../../guards/auth.guard';
 import { MessageType } from '../../types/message-types';
 import { ApiService } from '../api/api.service';
 import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
@@ -109,9 +108,7 @@ export class MessageController {
     }
 
     @Put()
-    @UseGuards(AuthGuard)
     async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
-        console.log(`INCOMING MESSAGE: ${message.type}`);
         const blockedContacts = await this._blockedContactService.getBlockedContactIds();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
@@ -139,7 +136,7 @@ export class MessageController {
         //     throw new ForbiddenException(`not allowed`);
 
         const userId = this._configService.get<string>('userId');
-        if (chat.isGroup && chat.adminId === userId) await this._chatService.handleGroupAdmin({ chat, message });
+        if (chat.isGroup && chat.adminId === userId) this._chatService.handleGroupAdmin({ chat, message });
 
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
     }

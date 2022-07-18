@@ -136,7 +136,7 @@
                     </div>
                     <aside
                         v-if="chat"
-                        :key="'aside' + chat.id + selectedId"
+                        :key="'aside' + chat.chatId + selectedId"
                         :class="{ 'flex ': showSideBar, hidden: !showSideBar }"
                         class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[400px] lg:border-l"
                     >
@@ -211,7 +211,7 @@
             @update-model-value="showLeaveDialog = false"
         >
             <template v-slot:title class="center">
-                <h1 class="text-center">Leaving group</h1>
+                <h1 class="text-center">{{ chat.isGroup ? 'Leaving group' : 'Deleting chat' }}</h1>
             </template>
             <div v-if="chat?.isGroup && chat?.adminId === user?.id" class="px-4">
                 <p v-if="chat?.contacts.length > 1" class="mb-5">
@@ -397,7 +397,7 @@
     const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
-    const { addContact, retrieveDTContacts } = useContactsActions();
+    const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
     const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
 
     watch(
@@ -410,6 +410,7 @@
     onBeforeMount(async () => {
         await retrieveChats();
         await retrieveDTContacts();
+        await retrieveContacts();
     });
 
     const showProfileDialog = ref(false);
@@ -588,15 +589,6 @@
     };
 
     const unBlockChat = async () => sendUnBlockedChat(chat.value.chatId);
-
-    const reads = computed(() => {
-        const preReads = {};
-        each(chat.value.read, (val: string, key: string) => {
-            if (key === user.id) return;
-            preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key];
-        });
-        return preReads;
-    });
 
     const viewAnchor = ref(null);
 

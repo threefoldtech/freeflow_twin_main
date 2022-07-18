@@ -160,11 +160,12 @@
 
     onMounted(() => {
         dialogRef.value.focus();
-        console.log(chats);
     });
 
     const fetchPostImage = (image: string) => {
-        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/files/${image}`);
+        const owner = props.item.owner;
+        const path = `${owner.id}/posts/${image}`;
+        return calcExternalResourceLink(`http://[${owner.location}]/api/v2/files/${btoa(path)}`);
     };
 
     const timeAgo = time => {

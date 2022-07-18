@@ -97,6 +97,9 @@ export class ContactService {
         };
 
         let newContact = await this.getContact({ id });
+        if (newContact?.accepted) {
+            message.body.message = `You can now start chatting with ${newContact.id} again`;
+        }
         if (!newContact) {
             try {
                 newContact = await this._contactRepo.addNewContact({
@@ -255,12 +258,17 @@ export class ContactService {
      */
     async deleteContact({ id }: DeleteContactDTO): Promise<void> {
         const contact = await this.getContact({ id });
-        if (contact?.entityId)
+        if (contact?.entityId) {
             try {
+                this._apiService.deleteContact({
+                    ownId: this._configService.get<string>('userId'),
+                    location: contact.location,
+                });
                 return await this._contactRepo.deleteContact({ id: contact.entityId });
             } catch (error) {
                 throw new BadRequestException(`unable remove contact: ${error}`);
             }
+        }
     }
 
     /**
@@ -272,7 +280,7 @@ export class ContactService {
      */
     async updateContact({ id, contactRequest, accepted }: UpdateContactDTO): Promise<Contact> {
         const contact = await this.getContact({ id });
-        if (!contact) throw new NotFoundException(`contact not found`);
+        if (!contact) return;
         contact.contactRequest = contactRequest;
         contact.accepted = accepted;
         try {

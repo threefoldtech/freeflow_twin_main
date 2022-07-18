@@ -9,9 +9,9 @@ import { ChatService } from '../chat/chat.service';
 import { KeyService } from '../key/key.service';
 import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
+import { MessageService } from '../message/message.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
-import { MessageService } from '../message/message.service';
 
 export enum FileAction {
     ADD_TO_CHAT = 'ADD_TO_CHAT',
@@ -43,16 +43,19 @@ export class ChatFileState implements FileState<IChatFile> {
     async handle({ fileId, payload }: { fileId: string; payload: IChatFile }) {
         const { chatId, messageId, type, filename } = payload;
         const fromPath = `tmp/${fileId}`;
+        const userId = this._configService.get<string>('userId');
+        const path = `${this.storageDir}/${userId}/chats`;
 
         try {
-            this._fileService.makeDirectory({ path: this.storageDir });
-            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, filename) });
+            this._fileService.makeDirectory({ path });
+            this._fileService.moveFile({ from: fromPath, to: join(path, filename) });
         } catch (error) {
             return false;
         }
         // create new message and emit to connected sockets
         const yggdrasilAddress = await this._locationService.getOwnLocation();
-        const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${filename}`;
+        const chatPath = `${userId}/chats/${filename}`;
+        const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${btoa(chatPath)}`;
         const message: MessageDTO<FileMessage> = {
             id: messageId,
             chatId,
@@ -96,10 +99,12 @@ export class PostFileState implements FileState<IPostFile> {
     async handle({ fileId, payload }: { fileId: string; payload: IPostFile }) {
         const { filename } = payload;
         const fromPath = `tmp/${fileId}`;
+        const userId = this._configService.get('userId');
+        const path = `${this.storageDir}/${userId}/posts`;
 
         try {
-            this._fileService.makeDirectory({ path: this.storageDir });
-            this._fileService.moveFile({ from: fromPath, to: join(this.storageDir, filename) });
+            this._fileService.makeDirectory({ path });
+            this._fileService.moveFile({ from: fromPath, to: join(path, filename) });
         } catch (error) {
             return false;
         }

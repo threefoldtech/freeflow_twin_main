@@ -107,6 +107,17 @@ export class QuantumService {
         }
     }
 
+    async updateSharePermissions({ path, chatId }: { path: string; chatId: string }) {
+        const share = await this.getShareByPath({ path });
+        const permissions = share.parsePermissions().filter(p => p.userId !== chatId);
+        share.permissions = stringifyPermissions(permissions);
+        try {
+            await this.updateShare(share, { ...share.toJSON(), permissions });
+        } catch (error) {
+            throw new BadRequestException(`unable to update share permissions: ${error}`);
+        }
+    }
+
     /**
      * Creates a directory.
      * @param {Object} obj - Object.
@@ -129,7 +140,7 @@ export class QuantumService {
      * @param {string} obj.toPath - To path.
      * @param {string} obj.name - Name.
      */
-    createFileWithRetry({
+    async createFileWithRetry({
         fromPath,
         toPath,
         name,
@@ -139,11 +150,20 @@ export class QuantumService {
         toPath: string;
         name: string;
         count?: number;
-    }): void {
+    }): Promise<void> {
         const path = join(toPath, name);
         const pathWithCount = count === 0 ? path : `${path.insert(path.lastIndexOf('.'), ` (${count})`)}`;
         if (this._fileService.exists({ path: pathWithCount }))
             return this.createFileWithRetry({ fromPath, toPath, name, count: count + 1 });
+
+        const share = await this._shareRepository.getShareByPath({ path: fromPath });
+        if (share) {
+            await this.updateShare(share, {
+                ...share.toJSON(),
+                path: pathWithCount,
+                name: name,
+            });
+        }
 
         this._fileService.moveFile({ from: fromPath, to: pathWithCount });
     }
@@ -300,9 +320,17 @@ export class QuantumService {
 
     async getShareById({ id }: { id: string }): Promise<Share> {
         try {
-            return await this._shareRepository.getSharedWithMeById({ id });
+            return await this._shareRepository.getShareById({ id });
         } catch (error) {
-            throw new BadRequestException('share does not exist');
+            throw new NotFoundException('share does not exist');
+        }
+    }
+
+    async getShareByPath({ path }: { path: string }): Promise<Share> {
+        try {
+            return await this._shareRepository.getShareByPath({ path });
+        } catch (error) {
+            throw new NotFoundException('share does not exist');
         }
     }
 
@@ -381,6 +409,7 @@ export class QuantumService {
     /**
      * Updates an existing file share.
      * @param {Share} existingShare - Share to update.
+     * @param isGroup
      * @param {CreateFileShareDTO} dto - Creation object.
      * @return {IFileShare} - Updated file share.
      */
@@ -415,7 +444,13 @@ export class QuantumService {
 
             const chat = await this._chatService.getChat(p.userId);
             if (!chat) return;
-            this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
+            await this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
+            this._chatGateway.emitMessageToConnectedClients('chat_updated', {
+                ...chat.toJSON(),
+                messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
+                    m.toJSON()
+                ),
+            });
 
             if (!isGroup)
                 chat.parseContacts()
@@ -430,6 +465,26 @@ export class QuantumService {
         } catch (error) {
             throw new BadRequestException(`unable to update file share in database: ${error}`);
         }
+    }
+
+    async getSharePermissionsByUser({ shareId, userId }: { shareId: string; userId: string }) {
+        const share = await this.getShareById({ id: shareId });
+        console.log(share);
+        console.log(shareId);
+        if (!share) return [];
+        const permissions: SharePermissionType[] = [];
+        await Promise.all(
+            share.parsePermissions().map(async p => {
+                const chat = await this._chatService.getChat(p.userId);
+                if (chat.parseContacts().find(c => c.id === userId)) {
+                    p.sharePermissionTypes.forEach(t => {
+                        if (!permissions.some(c => c == t)) permissions.push(t);
+                    });
+                    return;
+                }
+            })
+        );
+        return permissions;
     }
 
     async generateQuantumJWT({ payload, exp }: { payload: IFileTokenPayload; exp?: number | string }): Promise<string> {

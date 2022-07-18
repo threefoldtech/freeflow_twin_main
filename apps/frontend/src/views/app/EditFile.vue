@@ -35,7 +35,6 @@
 
 <script setup lang="ts">
     import { computed, onMounted, ref } from 'vue';
-    import { myYggdrasilAddress } from '@/store/authStore';
     import { useRoute } from 'vue-router';
     import {
         accessDenied,
@@ -56,6 +55,7 @@
     } from '@/services/fileBrowserService';
     import Spinner from '@/components/Spinner.vue';
     import { useAuthState } from '@/store/authStore';
+    import { isUndefined } from 'lodash';
 
     const route = useRoute();
     const fileType = ref<FileType>();
@@ -90,110 +90,95 @@
         const shareId = <string>route.params.shareId;
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
+        let documentServerconfig;
+        let location: string = '';
 
-        const initDocumentServer = (fileInfo: EditPathInfo, location: string) => {
-            fileType.value = getFileType(getExtension(fileInfo.fullName));
-            console.log('fileinfo', fileInfo);
-
-            if (isSupported.value) {
-                const documentServerConfig = generateDocumentServerConfig(
-                    location,
-                    fileInfo.path,
-                    fileInfo.key,
-                    fileInfo.readToken,
-                    fileInfo.writeToken,
-                    getExtension(fileInfo.fullName),
-                    fileInfo.extension,
-                    attachments,
-                    isLoading.value
-                );
-
-                console.log('documentServerConfig', documentServerConfig);
-
-                get(
-                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
-                    () => {
-                        //@ts-ignore
-                        new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
-                    }
-                );
-                return;
+        if (shareId) {
+            const shareDetails = await getShareWithId(shareId);
+            if (isUndefined(shareDetails)) isLoading.value = false;
+            await startFetchStatusLoop(shareDetails.owner);
+            if (showUserOfflineMessage.value || accessDenied.value) {
+                isLoading.value = false;
             }
+            location = shareDetails.owner.location;
+            fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
+            isLoading.value = false;
 
+            const apiEndpoint = generateFileBrowserUrl(
+                'http',
+                `[${shareDetails.owner.location}]`,
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
+            );
+            const encodedEndpoint = encodeURIComponent(apiEndpoint);
+            readUrl.value = calcExternalResourceLink(encodedEndpoint);
+        } else {
+            fileAccesDetails = (await getFileInfo(path, attachments)).data;
+            location = useAuthState().user.location;
+
+            readUrl.value = generateFileBrowserUrl(
+                'https',
+                window.location.hostname,
+                fileAccesDetails.path,
+                fileAccesDetails.readToken,
+                attachments
+            );
+            console.log('readUrl', readUrl.value);
+        }
+
+        fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
+
+        if (isSupported.value) {
+            console.log('isSupported', isSupported.value);
+            documentServerconfig = generateDocumentServerConfig(
+                location,
+                fileAccesDetails.path,
+                fileAccesDetails.key,
+                fileAccesDetails.readToken,
+                fileAccesDetails.writeToken,
+                getExtension(fileAccesDetails.fullName),
+                fileAccesDetails.extension,
+                attachments
+            );
+            console.log('documentServerconfig', documentServerconfig);
+            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+                //@ts-ignore
+                new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
+            });
+            return;
+        }
+
+        if (fileType.value === FileType.Image) {
             //If statement so that we don't override the URl of a file that is shared
             if (readUrl.value) {
                 isLoading.value = false;
                 return;
             }
-        };
-
-        const init = async () => {
-            if (accessDenied.value || showUserOfflineMessage.value) {
-                isLoading.value = false;
-                return;
-            }
-
-            const shareDetails = await getShareWithId(shareId);
-
-            if (shareDetails) {
-                await startFetchStatusLoop(shareDetails.owner);
-                const location = shareDetails.owner.location;
-                const fileInfo = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
-
-                const apiEndpoint = generateFileBrowserUrl(
-                    'http',
-                    `[${shareDetails.owner.location}]`,
-                    fileInfo.path,
-                    fileInfo.readToken
-                );
-                const encodedEndpoint = encodeURIComponent(apiEndpoint);
-                readUrl.value = calcExternalResourceLink(encodedEndpoint);
-
-                initDocumentServer(fileInfo, location);
-
-                isLoading.value = false;
-                return;
-            }
-
-            const fileInfo = (await getFileInfo(path, attachments)).data;
-            const location = useAuthState().user.location;
-
-            console.log('fileinfo', fileInfo);
-            console.log('location', location);
-
-            readUrl.value = generateFileBrowserUrl(
+            readUrl.value = generateUrl(
                 'https',
                 window.location.hostname,
-                fileInfo.path,
-                fileInfo.readToken,
-                attachments
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
             );
-            console.log('readUrl', readUrl.value);
-            initDocumentServer(fileInfo, location);
-            readUrl.value = generateFileBrowserUrl(
+            readUrl.value = readUrl.value;
+            isLoading.value = false;
+            return;
+        }
+        if (fileType.value === FileType.Video) {
+            //If statement so that we don't override the URl of a file that is shared
+            if (readUrl.value) {
+                isLoading.value = false;
+                return;
+            }
+            readUrl.value = generateUrl(
                 'https',
                 window.location.hostname,
-                fileInfo.path,
-                fileInfo.readToken
+                fileAccesDetails.path,
+                fileAccesDetails.readToken
             );
             isLoading.value = false;
-            if (fileType.value === FileType.Video) {
-                //If statement so that we don't override the URl of a file that is shared
-                if (readUrl.value) {
-                    isLoading.value = false;
-                    return;
-                }
-                readUrl.value = generateUrl(
-                    'https',
-                    window.location.hostname,
-                    fileAccesDetails.path,
-                    fileAccesDetails.readToken
-                );
-                isLoading.value = false;
-                return;
-            }
-        };
-        init();
+            return;
+        }
     });
 </script>
 

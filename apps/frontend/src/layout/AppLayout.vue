@@ -25,9 +25,7 @@
 
 <script setup lang="ts">
     import { ref, watch } from 'vue';
-    import Sidebar from '@/components/Sidebar.vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
-    import Topbar from '@/components/Topbar.vue';
     import { useSocketState } from '../store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';

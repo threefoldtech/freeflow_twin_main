@@ -55,12 +55,14 @@ export interface GroupUpdate extends MessageBodyType {
     adminLocation: string;
 }
 
+interface IRead {
+    userId: Id;
+    messageId: Id;
+}
 export interface Chat {
     chatId: string;
     messages: Message<MessageBodyType>[];
-    read: {
-        [key: string]: string;
-    };
+    read: IRead[];
     contacts: (GroupContact | Contact)[];
     acceptedChat: boolean;
     name: string;
@@ -167,7 +169,7 @@ export enum SharePermission {
 }
 
 export interface SharePermissionInterface {
-    chatId: string | undefined;
+    userId: string | undefined;
     types: SharePermission[];
     name?: string;
 }

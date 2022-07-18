@@ -115,7 +115,9 @@
     const unreadMessages = computed(() => {
         if (!props.chat || !user) return 0;
 
-        const lastReadMessageId = props.chat.read[<string>user.id];
+        if (props.chat.read.constructor.name !== 'Array') return;
+
+        const lastReadMessageId = props.chat.read.find(u => u.userId === user.id)?.messageId;
         const index = props.chat.messages?.findIndex(m => m.id === lastReadMessageId);
 
         //more than 50 unread messages in chat

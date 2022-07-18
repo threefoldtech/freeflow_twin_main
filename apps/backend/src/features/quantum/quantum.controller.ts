@@ -53,7 +53,6 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getFileInfo(@Query() params: { path: string; attachments: boolean }) {
         const { path } = params;
-        // TODO: handle shares
         // const parsedParams = Buffer.from(JSON.stringify(params), 'base64').toString('utf8');
         // const paramsObj = JSON.parse(parsedParams);
 
@@ -114,18 +113,14 @@ export class QuantumController {
 
         const payload = await this._quantumService.verifyQuantumJWT({ token });
 
-        console.log('got here 5.0', payload);
         if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
             throw new UnauthorizedException(`you do not have the premission to edit this file`);
 
-        console.log('payload', payload.file);
-        console.log('onlyoffice', onlyOfficeResponse);
         if (!payload.file || !onlyOfficeResponse?.url) throw new NotFoundException('no file or url provided');
 
         const url = new URL(onlyOfficeResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
-        console.log('url', url);
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
         await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });
@@ -141,6 +136,34 @@ export class QuantumController {
         return await this._quantumService.search({ search, dir: path });
     }
 
+    @Get('share/info')
+    @UseGuards(AuthGuard)
+    async getShareFileAccessDetaisl(@Query() params: { shareId: string; userId: string; path: string }) {
+        const { shareId, userId, path } = params;
+        const share = await this._quantumService.getShareById({ id: shareId });
+        const userPermissions = await this._quantumService.getSharePermissionsByUser({ shareId, userId });
+        if (userPermissions.length < 1)
+            throw new UnauthorizedException('you do not have the premission to read this file');
+
+        let actualPath = share.path;
+        if (path !== actualPath) actualPath = join(path, actualPath);
+
+        const userCanWrite = !!userPermissions.find(x => x === SharePermissionType.WRITE);
+
+        return {
+            ...(await this._quantumService.getFileInfo({ path: actualPath })),
+            key: this._quantumService.getQuantumFileToken({ writable: userCanWrite, path: actualPath }),
+            readToken: await this._quantumService.generateQuantumJWT({
+                payload: { file: actualPath, permissions: [SharePermissionType.READ] },
+                exp: 5 * 60,
+            }),
+            writeToken: await this._quantumService.generateQuantumJWT({
+                payload: { file: actualPath, permissions: [SharePermissionType.WRITE] },
+                exp: 24 * 60 * 60,
+            }),
+        };
+    }
+
     @Get('shares/shared-with-me')
     @UseGuards(AuthGuard)
     async getSharedWithMe(): Promise<IFileShare[]> {
@@ -151,6 +174,20 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getShareById(@Query('id') id: string): Promise<IFileShare> {
         return (await this._quantumService.getShareById({ id })).toJSON();
+    }
+
+    @Get('share/path')
+    @UseGuards(AuthGuard)
+    async getShareByPath(@Query('path') path: string): Promise<IFileShare> {
+        path = Buffer.from(path, 'base64').toString('binary');
+        return (await this._quantumService.getShareByPath({ path })).toJSON();
+    }
+
+    @Post('share/permissions')
+    @UseGuards(AuthGuard)
+    async updateSharePermissions(@Body() { chatId, path }: { chatId: string; path: string }) {
+        path = Buffer.from(path, 'base64').toString('binary');
+        await this._quantumService.updateSharePermissions({ chatId, path });
     }
 
     @Post('dir')

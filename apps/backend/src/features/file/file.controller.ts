@@ -29,18 +29,20 @@ export class FileController {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
-    @Get(':fileId')
-    downloadFile(@Param('fileId') fileId: string): StreamableFile {
-        const path = join(this.storageDir, fileId);
-        if (!fileId || !this._fileService.exists({ path }))
+    @Get(':path')
+    downloadFile(@Param('path') path: string): StreamableFile {
+        path = Buffer.from(path, 'base64').toString('binary');
+        const filePath = join(`${this.storageDir}`, path);
+        if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
 
-        return new StreamableFile(createReadStream(path));
+        return new StreamableFile(createReadStream(filePath));
     }
 
     @Get('download/compressed')
     @UseGuards(AuthGuard)
     async downloadFilesCompressed(@Req() req: Request, @Query('path') path: string): Promise<StreamableFile> {
+        path = Buffer.from(path, 'base64').toString('binary');
         try {
             const stats = await this._fileService.getStats({ path });
             if (!stats.isDirectory()) return new StreamableFile(createReadStream(path));
@@ -80,7 +82,7 @@ export class FileController {
             fieldName: 'file',
             path: 'tmp',
             limits: {
-                fileSize: Math.pow(2048, 2) * 10, // 20MB in bytes
+                fileSize: Math.pow(1024, 2) * 10000, // 10GB in bytes
             },
         })
     )

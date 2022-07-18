@@ -249,17 +249,17 @@
 
     const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
-        let id = <string>user.id;
-        //@ts-ignore
-        const { [id]: _, ...read } = props.chat.read;
-
-        const reads = Object.values(read);
-
-        return findLastIndex(props.chat.messages, message => reads.includes(<string>message.id));
+        if (props.chat.read.constructor.name !== 'Array') return;
+        const idx = props.chat.read.findIndex(r => r.userId === props.chat.chatId);
+        if (idx === -1) return;
+        return findLastIndex(props.chat.messages, message => props.chat.read[idx].messageId === message.id);
     });
 
     const lastReadByMe = computed(() => {
-        return findLastIndex(props.chat.messages, message => props.chat.read[<string>user.id] === message.id);
+        if (props.chat.read.constructor.name !== 'Array') return;
+        const idx = props.chat.read.findIndex(r => r.userId === user.id);
+        if (idx === -1) return;
+        return findLastIndex(props.chat.messages, message => props.chat.read[idx].messageId === message.id);
     });
     const handleScroll = async e => {
         let element = messageBox.value;

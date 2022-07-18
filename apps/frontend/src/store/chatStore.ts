@@ -296,7 +296,13 @@ const addMessage = (chatId: string, message: any) => {
             return;
         }
 
-        chat.read = { ...chat.read, [<string>message.from]: message.body };
+        const index = chat.read.findIndex(r => r.userId === message.from);
+        if (index === -1) {
+            chat.read.push({ userId: message.from, messageId: message.body });
+            return;
+        }
+
+        chat.read[index].messageId = message.body;
         return;
     }
 
@@ -695,7 +701,13 @@ export const handleRead = (message: Message<string>) => {
         return;
     }
 
-    chat.read[<string>message.from] = message.body;
+    const index = chat.read.findIndex(r => r.userId === message.from);
+    if (index === -1) {
+        chat.read.push({ userId: message.from, messageId: message.body });
+        return;
+    }
+
+    chat.read[index].messageId = message.body;
 };
 
 export const getUnreadChats = async () => {
@@ -708,7 +720,8 @@ export const getUnreadChats = async () => {
     const arr: string[] = [];
 
     for (let chat of chats.value) {
-        const lastReadMessageId = chat.read[<string>user.id];
+        if (chat.read.constructor.name !== 'Array') return;
+        const lastReadMessageId = chat.read.find(u => u.userId === user.id)?.messageId;
         const index = chat.messages?.findIndex(m => m.id === lastReadMessageId);
 
         //more than 50 new messages in chat (because of pagination)

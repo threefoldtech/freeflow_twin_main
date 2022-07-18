@@ -12,13 +12,12 @@ import { ApiService } from '../api/api.service';
 import { ContactService } from '../contact/contact.service';
 import { ContactDTO } from '../contact/dtos/contact.dto';
 import { KeyService } from '../key/key.service';
-import { LocationService } from '../location/location.service';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { stringifyMessage } from '../message/models/message.model';
 import { ChatGateway } from './chat.gateway';
 import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
-import { Chat, stringifyContacts } from './models/chat.model';
+import { Chat, stringifyContacts, stringifyRead } from './models/chat.model';
 import { ChatRedisRepository } from './repositories/chat-redis.repository';
 
 @Injectable()
@@ -31,8 +30,7 @@ export class ChatService {
         private readonly _apiService: ApiService,
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
-        private readonly _chatGateway: ChatGateway,
-        private readonly _locationService: LocationService
+        private readonly _chatGateway: ChatGateway
     ) {}
 
     /**
@@ -87,7 +85,6 @@ export class ChatService {
         const contacts = chat.parseContacts();
         const contact = contacts.find(c => c.id === chatId);
         const ownId = this._configService.get<string>('userId');
-        contact.contactRequest = false;
         try {
             if (contact) {
                 await this._contactService.updateContact({
@@ -116,7 +113,10 @@ export class ChatService {
      */
     async acceptGroupInvite(chat: CreateChatDTO): Promise<ChatDTO> {
         const existingChat = await this.getChat(chat.chatId);
-        if (!existingChat) await this.createChat(chat);
+        if (!existingChat) {
+            const adminLocation = chat.contacts.find(c => c.id === chat.adminId).location;
+            await this.syncNewChatWithAdmin({ adminLocation, chatId: chat.chatId });
+        }
         this._chatGateway.emitMessageToConnectedClients('connection_request', chat);
         return chat;
     }
@@ -232,6 +232,31 @@ export class ChatService {
     }
 
     /**
+     * Updates a contact.
+     */
+    async updateContact({ chat, contact }: { chat: Chat; contact: ContactDTO }) {
+        try {
+            const contacts = chat.parseContacts();
+
+            const index = contacts.findIndex(c => c.id === contact.id);
+            if (index !== -1) contacts.splice(index, 1);
+
+            const updatedContacts = [
+                ...contacts,
+                {
+                    id: contact.id,
+                    location: contact.location,
+                    roles: contact.roles,
+                },
+            ];
+            chat.contacts = stringifyContacts(updatedContacts);
+            await this._chatRepository.updateChat(chat);
+        } catch (error) {
+            throw new BadRequestException(`unable to update contact: ${error}`);
+        }
+    }
+
+    /**
      * Updates a chats draft message.
      * @param {Object} obj - Object.
      * @param {Chat} obj.draftMessage - Draft message to add to chat.
@@ -251,22 +276,27 @@ export class ChatService {
 
     /**
      * Handles a message read.
-     * @param {MessateDTO} message - Message that is read.
+     * @param {MessageDTO} message - Message that is read.
      */
     async handleMessageRead(message: MessageDTO<string>) {
         const chatId = this._messageService.determineChatID(message);
         const chat = await this.getChat(chatId);
+        const read = chat.parseRead();
+        const messages = await this._messageService.getAllMessagesFromChat({ chatId });
+        console.log(`MESSAGE: ${JSON.stringify(message)}`);
+        const newRead = messages.find(m => m.id === message.body);
+        const oldReadIdx = read.findIndex(r => r.userId === message.from);
+        const oldRead = messages.find(m => m.id === read[oldReadIdx]?.messageId);
 
-        // TODO: update
-        // const chatMessages = chat.parseMessage();
-        // const newRead = chatMessages.find(m => m.id === message.body);
-        // const oldRead = chatMessages.find(m => m.id === chat.read[message.from]);
+        if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
 
-        // if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) return;
+        const newReadObj = { messageId: message.body, userId: message.from };
+        if (oldReadIdx < 0) read.push(newReadObj);
+        else read[oldReadIdx] = newReadObj;
+        chat.read = stringifyRead(read);
 
-        // chat.read[0] = message.body;
-        // this._chatGateway.emitMessageToConnectedClients('message', message);
-        // await this._chatRepository.updateChat(chat);
+        this._chatGateway.emitMessageToConnectedClients('message', message);
+        await this._chatRepository.updateChat(chat);
 
         return chat;
     }
@@ -278,8 +308,12 @@ export class ChatService {
      * @param {string} obj.chatId - Chat ID to fetch from location.
      */
     async syncNewChatWithAdmin({ adminLocation, chatId }: { adminLocation: string; chatId: string }) {
-        console.log(`SYNCINGGGGGGGGGGGGGGGGGGG`);
         const chat = await this._apiService.getAdminChat({ location: adminLocation, chatId });
+        Promise.all(
+            chat.messages.map(async message => {
+                await this._messageService.createMessage(message);
+            })
+        );
         this._chatGateway.emitMessageToConnectedClients('new_chat', chat);
 
         const existingChat = await this.getChat(chat.chatId);
@@ -310,7 +344,7 @@ export class ChatService {
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
-        await Promise.all(
+        Promise.all(
             chat.parseContacts().map(async c => {
                 if (c.id !== this._configService.get('userId'))
                     await this._apiService.sendMessageToApi({ location: c.location, message: signedMessage });

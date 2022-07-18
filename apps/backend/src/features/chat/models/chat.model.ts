@@ -4,7 +4,7 @@ import { ContactDTO } from '../../contact/dtos/contact.dto';
 import { Contact } from '../../contact/models/contact.model';
 import { MessageDTO } from '../../message/dtos/message.dto';
 import { Message } from '../../message/models/message.model';
-import { ChatDTO } from '../dtos/chat.dto';
+import { ChatDTO, IRead } from '../dtos/chat.dto';
 
 /**
  * Every model with string[] will later be parsed to the correct model type.
@@ -27,7 +27,7 @@ export class Chat extends Entity {
             chatId: this.chatId,
             name: this.name,
             contacts: this.parseContacts(),
-            read: this.read,
+            read: this.parseRead(),
             acceptedChat: this.acceptedChat,
             adminId: this.adminId,
             isGroup: this.isGroup,
@@ -50,6 +50,14 @@ export class Chat extends Entity {
     parseContacts(): Contact[] {
         return this.contacts.map(contact => JSON.parse(contact));
     }
+
+    /**
+     * Parses read strings to valid JSON.
+     * @return {IRead[]} - The parsed reads.
+     */
+    parseRead(): IRead[] {
+        return this.read.map(read => JSON.parse(read));
+    }
 }
 
 /**
@@ -66,6 +74,14 @@ export function stringifyMessages<T>(messages: MessageDTO<T>[]): string[] {
  */
 export function stringifyContacts(contacts: ContactDTO[]): string[] {
     return contacts.map(contact => JSON.stringify(contact));
+}
+
+/**
+ * Stringifies reads JSON to a string for Redis.
+ * @return {string[]} - The stringified reads.
+ */
+export function stringifyRead(read: IRead[]): string[] {
+    return read.map(r => JSON.stringify(r));
 }
 
 export const chatSchema = new Schema(Chat, {

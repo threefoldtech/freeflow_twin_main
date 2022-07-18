@@ -4,6 +4,11 @@ import { ContactDTO } from '../../contact/dtos/contact.dto';
 import { MessageDTO } from '../../message/dtos/message.dto';
 import { Message } from '../../message/models/message.model';
 
+export interface IRead {
+    userId: string;
+    messageId: string;
+}
+
 export class ChatDTO {
     chatId: string;
     contacts: ContactDTO[];
@@ -12,7 +17,7 @@ export class ChatDTO {
     name: string;
     acceptedChat: boolean;
     adminId: string;
-    read: string[];
+    read: IRead[];
     draft?: MessageDTO<unknown>;
 }
 
@@ -37,7 +42,7 @@ export class CreateChatDTO {
     @IsString()
     adminId: string;
 
-    read: string[];
+    read: IRead[];
 
     @IsBoolean()
     isGroup: boolean;
