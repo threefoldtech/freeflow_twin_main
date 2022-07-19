@@ -103,15 +103,13 @@
 <script lang="ts" setup>
     import { Chat } from '@/types';
     import Spinner from '@/components/Spinner.vue';
-    import { selectedPaths, addShare, PathInfoModel } from '@/store/fileBrowserStore';
-    import { defineComponent, ref, computed, onMounted, onBeforeMount } from 'vue';
-    import Toggle from '@/components/Toggle.vue';
-    import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
-    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-    import { createNotification } from '@/store/notificiationStore';
+    import { addShare, PathInfoModel, selectedPaths } from '@/store/fileBrowserStore';
+    import { computed, onBeforeMount, ref } from 'vue';
     import { SearchIcon } from '@heroicons/vue/solid';
+    import { usechatsActions } from '@/store/chatStore';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { createNotification } from '@/store/notificiationStore';
+    import { Status } from '@/types/notifications';
 
     interface IProps {
         data: any[];
@@ -162,10 +160,15 @@
             : chats?.value.find(chat => chat?.chatId == props.selectedFile?.id);
         const path = selectedPaths.value[0]?.path ? selectedPaths.value[0]?.path : props.selectedFile.path;
         chat.loading = true;
-        await addShare(chatId, path, filename, size, chat.canWrite);
+        const success = await addShare(chatId, path, filename, size, chat.canWrite);
+
         chat.isAlreadySent = true;
         chat.loading = false;
-        createNotification('Shared File', 'File has been shared with ' + chatId);
+        if (success) {
+            createNotification('Shared File', 'File has been shared with ' + chatId);
+            return;
+        }
+        createNotification('Share failed', 'File has already been shared with ' + chatId, Status.Error);
     }
 </script>
 

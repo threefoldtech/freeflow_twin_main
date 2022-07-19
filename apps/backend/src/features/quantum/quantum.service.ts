@@ -267,10 +267,17 @@ export class QuantumService {
 
                 return permission;
             });
-            const permissionExists = updatedPermissions.some(permission => permission.userId === shareWith);
+
+            const existingSharePermissions = existingShare.parsePermissions().find(p => p.userId === shareWith);
+            if (existingSharePermissions?.sharePermissionTypes.length === sharePermissionTypes.length) {
+                return false;
+            }
+
+            const permissionExists = updatedPermissions.some(p => p.userId === shareWith);
             const permissions = permissionExists
                 ? updatedPermissions
                 : [...updatedPermissions, { userId: shareWith, sharePermissionTypes }];
+
             updatedShare = await this.updateShare(existingShare, {
                 ...creationData,
                 permissions,
