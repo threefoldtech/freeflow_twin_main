@@ -317,7 +317,7 @@ export const generateDocumentServerConfig = (
             callbackUrl: writeUrl,
             customization: {
                 chat: false,
-                forcesave: true,
+                forcesave: false,
             },
             user: {
                 id: myName,

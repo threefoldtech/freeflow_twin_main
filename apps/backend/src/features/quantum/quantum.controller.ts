@@ -2,6 +2,7 @@ import {
     Body,
     Controller,
     Get,
+    HttpCode,
     NotFoundException,
     Post,
     Put,
@@ -89,7 +90,7 @@ export class QuantumController {
     }
 
     @Get('file/internal')
-    @UseGuards(AuthGuard)
+    @HttpCode(200)
     async getQuantumFile(@Req() req: Request, @Query() { path, token }: { path: string; token: string }) {
         if (!token) throw new UnauthorizedException('no token provided');
 
@@ -117,10 +118,8 @@ export class QuantumController {
     }
 
     @Post('file/internal')
+    @HttpCode(200)
     async editQuantumFile(@Body() onlyOfficeResponse: IOnlyOfficeResponse, @Query('token') token: string) {
-        return {
-            error: 0,
-        };
         if (!token) throw new UnauthorizedException('no token provided');
 
         if (onlyOfficeResponse.status !== 2 && onlyOfficeResponse.status !== 6)
