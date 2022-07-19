@@ -205,17 +205,24 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         );
     }
 
-    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }) {
+    async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: Chat }) {
         console.log(`SYSTEM MSG HANDLER: ${JSON.stringify(message.body)}`);
         // // TODO: fix
         // const validSignature = await this._messageService.verifySignedMessageByChat({ chat, signedMessage: message });
         // if (!validSignature) throw new BadRequestException(`failed to verify message signature`);
 
         const { type } = message.body as GroupUpdate;
+        const chatDTO: ChatDTO = {
+            ...chat.toJSON(),
+            messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
+        };
 
         if (!type || [SystemMessageType.JOINED_VIDEOROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type))
-            return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({ message, chat });
+            return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({
+                message,
+                chat: chatDTO,
+            });
 
-        return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat });
+        return await this._subSystemMessageStateHandlers.get(type).handle({ message, chat: chatDTO });
     }
 }
