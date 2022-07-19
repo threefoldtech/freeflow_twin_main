@@ -62,18 +62,6 @@
     const readUrl = ref<string>();
     const isLoading = ref<boolean>(true);
 
-    const generateUrl = (
-        protocol: 'http' | 'https',
-        owner: string,
-        path: string,
-        token: string,
-        attachment: boolean = false
-    ) => {
-        path = encodeURIComponent(path);
-        token = encodeURIComponent(token);
-        return `${protocol}://${owner}/api/v2/quantum/file/internal?path=${path}&token=${token}&attachment=${attachment}`;
-    };
-
     const isSupported = computed(() => {
         return [
             FileType.Excel,
@@ -154,7 +142,7 @@
                 isLoading.value = false;
                 return;
             }
-            readUrl.value = generateUrl(
+            readUrl.value = generateFileBrowserUrl(
                 'https',
                 window.location.hostname,
                 fileAccesDetails.path,
@@ -170,7 +158,7 @@
                 isLoading.value = false;
                 return;
             }
-            readUrl.value = generateUrl(
+            readUrl.value = generateFileBrowserUrl(
                 'https',
                 window.location.hostname,
                 fileAccesDetails.path,
