@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Get, Param, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Put } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { MessageType } from '../../types/message-types';
