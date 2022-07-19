@@ -483,8 +483,12 @@ const catchErrorsSendFile = (e: { message: string }, uuid: string) => {
 };
 
 export const getPreview = async (url: string) => {
-    const { data } = await axios.get(`${config.baseUrl}api/v2/messages/preview?url=${url}`);
-    console.log(data);
+    try {
+        const { data } = await axios.get(`${config.baseUrl}api/v2/external/preview?url=${url}`);
+        return data;
+    } catch (error) {
+        return Promise.reject(error);
+    }
 };
 
 export const retrySendFile = async (file: { id: string; uuid: string; chatId: string; selectedFile: File }) => {

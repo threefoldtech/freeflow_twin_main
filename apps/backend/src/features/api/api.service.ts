@@ -4,6 +4,8 @@ import axios, { ResponseType } from 'axios';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 
+import { parse } from 'node-html-parser';
+
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { ContactDTO } from '../contact/dtos/contact.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
@@ -321,4 +323,101 @@ export class ApiService {
             return;
         }
     }
+
+    /**
+     * Fetches data from url
+     * @param {string} url- Url.
+     */
+     async getUrlPreview({ url }: { url: string }): Promise<any> {
+        console.log('huts', url);
+        try {
+            const { data } = await axios.get(url);
+            
+            var htmlDoc = parse(data);  
+            //return htmlDoc.getElementsByTagName('a').toString();
+            
+
+            const propertyList = [];
+
+            const title = this.getTitle(htmlDoc).toString();
+            const description = this.getDescription(htmlDoc).toString()
+
+            const dataList = {
+                title: title,
+                description: description,
+                link: url
+            };
+
+            propertyList.push({...dataList});
+            
+            
+            return propertyList;
+        } catch (error) {
+            throw new BadRequestException(`unable to get url preview: ${error}`);
+        }
+
+    }
+
+    getTitle = (data: any) => {
+        const ogTitle = data.querySelector('meta[property="og:title"]');
+        if (ogTitle != null) {
+            return ogTitle.getAttribute('content');
+        }else{
+            console.log('1');
+        }
+        const twitterTitle = data.querySelector('meta[name="twitter:title"]');
+        if (twitterTitle != null) {
+            return twitterTitle.getAttribute('content');
+        }else{
+            console.log('2');
+        }
+        const docTitle = data.getAttribute('title');
+        if (docTitle != null) {
+            return docTitle;
+        }else{
+            console.log('3');
+        }
+        const h1El = data.querySelector('h1');
+        const h1 = h1El ? h1El.innerHTML : null;
+        if (h1 != null) {
+            return h1;
+        }else{
+            console.log('4');
+        }
+        const h2El = data.querySelector('h2');
+        const h2 = h2El ? h2El.innerHTML : null;
+        if (h2 != null) {
+            return h2;
+        }else{
+            console.log('^');
+        }
+        return 'Title not found';
+    };
+
+    getDescription = (data: any) => {
+        const ogDescription = data.querySelector('meta[property="og:description"]');
+        if (ogDescription != null) {
+            return ogDescription.getAttribute('content');
+        }
+        const twitterDescription = data.querySelector('meta[name="twitter:description"]');
+        if (twitterDescription != null) {
+            return twitterDescription.getAttribute('content');
+        }
+        const metaDescription = data.querySelector('meta[name="description"]');
+        if (metaDescription != null) {
+            return metaDescription.getAttribute('content');
+        }
+        let paragraphs = data.querySelectorAll('p');
+        let fstVisibleParagraph = null;
+        for (let i = 0; i < paragraphs.length; i++) {
+            if (
+                // if object is visible in dom
+                paragraphs[i].offsetParent !== null
+            ) {
+                fstVisibleParagraph = paragraphs[i].textContent;
+                break;
+            }
+        }
+        return fstVisibleParagraph;
+    };
 }
