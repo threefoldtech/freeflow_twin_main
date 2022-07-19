@@ -2,7 +2,7 @@
     <div :class="{ hidden: sharedDir || savedAttachments }" class="mx-2 hidden lg:flex justify-between">
         <button
             class="text-white py-2 px-4 mr-2 rounded-md bg-primary hover:bg-accent-800 transition duration:300"
-            @click="showCreateFolderDialog = true"
+            @click="showNewFolderDialog()"
         >
             <i class="fas fa-plus"></i> New Folder
         </button>
@@ -30,15 +30,7 @@
         </template>
         <template v-slot:content>
             <div class="flex justify-around py-4">
-                <div
-                    class="flex flex-col items-center"
-                    @click="
-                        () => {
-                            showCreateFolderDialog = true;
-                            showMainActionsOverlay = false;
-                        }
-                    "
-                >
+                <div class="flex flex-col items-center" @click="showNewFolderDialog()">
                     <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
                         <FolderAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
                     </div>
@@ -133,7 +125,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, watch } from 'vue';
+    import { nextTick, ref, watch } from 'vue';
     import Dialog from '@/components/Dialog.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
     import { createDirectory, uploadFiles, sharedDir, savedAttachments } from '@/store/fileBrowserStore';
@@ -181,6 +173,14 @@
         uploadFiles(selectedFiles.value);
         clearFiles();
         showCreateFileDialog.value = false;
+    };
+
+    const showNewFolderDialog = () => {
+        showCreateFolderDialog.value = true;
+        showMainActionsOverlay.value = false;
+        nextTick(() => {
+            newFolderInput.value.focus();
+        });
     };
 
     const handleDragAndDrop = (files: File[]) => {

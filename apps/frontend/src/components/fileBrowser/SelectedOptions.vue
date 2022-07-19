@@ -9,14 +9,7 @@
                     <i class="fas fa-share-alt"></i>
                 </span>
             </div>
-            <div
-                v-if="selectedPaths.length === 1"
-                class="mx-2 cursor-pointer"
-                @click="
-                    showRenameDialog = true;
-                    newName = selectedPaths[0].name;
-                "
-            >
+            <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="makeRenameDialogVisible()">
                 <span class="text-gray-400 hover:text-gray-500">
                     <i class="fas fa-pen"></i>
                 </span>
@@ -101,13 +94,7 @@
                     <div
                         v-if="selectedPaths.length === 1"
                         class="mx-4 cursor-pointer flex"
-                        @click="
-                            () => {
-                                showRenameDialog = true;
-                                newName = selectedPaths[0].name;
-                                showSelectedActions = false;
-                            }
-                        "
+                        @click="makeRenameDialogVisible()"
                     >
                         <pencil-icon
                             class="h-5 w-5 text-gray-500"
@@ -155,7 +142,7 @@
         </MainActionsOverlay>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
-            <template #title> Deleting Files </template>
+            <template #title> Deleting Files</template>
             <template #content>
                 Do you really want to delete {{ selectedPaths.length }} item(s)? When deleted these items will be
                 forever lost!
@@ -186,6 +173,7 @@
                 <label for="rename" class="sr-only">Rename</label>
                 <input
                     type="text"
+                    ref="newNameInput"
                     v-model="newName"
                     name="rename"
                     id="rename"
@@ -252,7 +240,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, defineComponent, onBeforeMount, onMounted, ref, watch } from 'vue';
+    import { nextTick, onBeforeMount, onMounted, ref, watch } from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -264,24 +252,16 @@
         searchDir,
         searchDirValue,
         searchResults,
-        isDraggingFiles,
-        moveFiles,
         selectedAction,
         Action,
-        addShare,
-        sharedDir,
         selectedTab,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
     import Button from '@/components/Button.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
-    import { sendMessageObject, usechatsActions, useChatsState } from '@/store/chatStore';
-    import { useSocketActions } from '@/store/socketStore';
-    import Avatar from '@/components/Avatar.vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { SystemMessageTypes, MessageTypes } from '@/types';
-    import { createNotification } from '@/store/notificiationStore';
+    import { usechatsActions, useChatsState } from '@/store/chatStore';
+
     import { showShareDialog } from '@/services/dialogService';
     import {
         currentRightClickedItem,
@@ -295,9 +275,19 @@
     import { DotsHorizontalIcon, XIcon, ShareIcon, PencilIcon, DownloadIcon, TrashIcon } from '@heroicons/vue/outline';
 
     const { chats } = useChatsState();
-    const { retrieveChats, sendMessage } = usechatsActions();
+    const { retrieveChats } = usechatsActions();
 
     const tabs = ['Create shares', 'Edit shares'];
+    const newNameInput = ref<HTMLInputElement>();
+
+    const makeRenameDialogVisible = () => {
+        showRenameDialog.value = true;
+        newName.value = selectedPaths.value[0].name;
+        showSelectedActions.value = false;
+        nextTick(() => {
+            newNameInput.value.focus();
+        });
+    };
 
     watch(
         triggerWatchOnRightClickItem,
@@ -313,6 +303,9 @@
                     case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
                         showRenameDialog.value = true;
                         newName.value = currentRightClickedItem.value.data.name;
+                        nextTick(() => {
+                            newNameInput.value.focus();
+                        });
                         break;
                     case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
                         await downloadFiles();
