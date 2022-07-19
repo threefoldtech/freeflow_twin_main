@@ -6,12 +6,12 @@ import {
     Post,
     Put,
     Query,
-    StreamableFile,
+    Req,
     UnauthorizedException,
     UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createReadStream } from 'fs';
+import { Request } from 'express';
 import { join } from 'path';
 import syncRequest from 'sync-request';
 
@@ -19,6 +19,7 @@ import { AuthGuard } from '../../guards/auth.guard';
 import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
 import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
+import { FileService } from '../file/file.service';
 import { MoveFileDTO } from './dtos/move-file.dto';
 import { RenameFileDTO } from './dtos/rename-file.dto';
 import { ShareFileRequesDTO } from './dtos/share-file.dto';
@@ -31,7 +32,11 @@ import { QuantumService } from './quantum.service';
 export class QuantumController {
     private storageDir = '';
 
-    constructor(private readonly _configService: ConfigService, private readonly _quantumService: QuantumService) {
+    constructor(
+        private readonly _configService: ConfigService,
+        private readonly _quantumService: QuantumService,
+        private readonly _fileService: FileService
+    ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
@@ -77,7 +82,7 @@ export class QuantumController {
                 exp: 5 * 60,
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: path, permissions: [SharePermissionType.WRITE] },
+                payload: { file: path, permissions: [SharePermissionType.WRITE, SharePermissionType.WRITE] },
                 exp: 24 * 60 * 60,
             }),
         };
@@ -85,7 +90,7 @@ export class QuantumController {
 
     @Get('file/internal')
     @UseGuards(AuthGuard)
-    async getQuantumFile(@Query() { path, token }: { path: string; token: string }) {
+    async getQuantumFile(@Req() req: Request, @Query() { path, token }: { path: string; token: string }) {
         if (!token) throw new UnauthorizedException('no token provided');
 
         // TODO: handle blocked tokens
@@ -96,11 +101,22 @@ export class QuantumController {
 
         // TODO: handle attachments
 
-        return new StreamableFile(createReadStream(path));
+        const fileBuffer = this._fileService.readFile({ path });
+        const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
+        const fileInfo = await this._quantumService.getFileInfo({ path });
+        if (req.res)
+            req.res.setHeader(`Content-disposition`, `attachment; filename=${fileInfo.fullName}.${fileInfo.extension}`);
+
+        fileStream.pipe(req.res);
+
+        await new Promise(resolve => {
+            fileStream.on('end', () => {
+                resolve(req.res.end());
+            });
+        });
     }
 
     @Post('file/internal')
-    @UseGuards(AuthGuard)
     async editQuantumFile(@Body() onlyOfficeResponse: IOnlyOfficeResponse, @Query('token') token: string) {
         if (!token) throw new UnauthorizedException('no token provided');
 
@@ -121,6 +137,7 @@ export class QuantumController {
         const url = new URL(onlyOfficeResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
+        console.log(`URL: ${url}`);
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
         await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });
@@ -137,7 +154,6 @@ export class QuantumController {
     }
 
     @Get('share/info')
-    @UseGuards(AuthGuard)
     async getShareFileAccessDetaisl(@Query() params: { shareId: string; userId: string; path: string }) {
         const { shareId, userId, path } = params;
         const share = await this._quantumService.getShareById({ id: shareId });
@@ -158,7 +174,7 @@ export class QuantumController {
                 exp: 5 * 60,
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: actualPath, permissions: [SharePermissionType.WRITE] },
+                payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.WRITE] },
                 exp: 24 * 60 * 60,
             }),
         };

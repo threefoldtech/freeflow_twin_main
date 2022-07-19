@@ -298,9 +298,9 @@ export const generateDocumentServerConfig = (
     isAttachement: boolean = false,
     isLoading: boolean = false
 ) => {
-    const readUrl = generateFileBrowserUrl('http', `[${location}]`, path, readToken, isAttachement);
+    const readUrl = generateFileBrowserUrl('https', `[${location}]`, path, readToken, isAttachement);
 
-    const writeUrl = generateFileBrowserUrl('http', `[${location}]`, path, writeToken);
+    const writeUrl = generateFileBrowserUrl('https', `[${location}]`, path, writeToken);
 
     const myName = window.location.host.split('.')[0];
 

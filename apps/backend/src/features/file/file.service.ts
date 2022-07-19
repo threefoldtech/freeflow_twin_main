@@ -19,6 +19,7 @@ import {
     writeFileSync,
 } from 'fs';
 import { join, parse, ParsedPath } from 'path';
+import { ReadableStreamBuffer } from 'stream-buffers';
 
 import { RenameFileDTO } from '../quantum/dtos/rename-file.dto';
 
@@ -215,5 +216,16 @@ export class FileService {
         };
     }): Promise<Dirent[]> {
         return await promises.readdir(path, options);
+    }
+
+    async getFileStream({ file }: { file: Buffer }): Promise<ReadableStreamBuffer> {
+        const decryptedStreamBuffer = new ReadableStreamBuffer({
+            frequency: 10,
+            // 512 kb
+            chunkSize: 512 * 1024,
+        });
+        decryptedStreamBuffer.put(file);
+        decryptedStreamBuffer.stop();
+        return decryptedStreamBuffer;
     }
 }
