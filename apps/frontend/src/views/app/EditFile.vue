@@ -117,27 +117,22 @@
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            setTimeout(() => {
-                location = user.location;
-                documentServerconfig = generateDocumentServerConfig(
-                    location,
-                    fileAccesDetails.path,
-                    fileAccesDetails.key,
-                    fileAccesDetails.readToken,
-                    fileAccesDetails.writeToken,
-                    getExtension(fileAccesDetails.fullName),
-                    fileAccesDetails.extension,
-                    attachments
-                );
-                console.log('documentServerconfig', documentServerconfig);
-                get(
-                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
-                    () => {
-                        //@ts-ignore
-                        new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
-                    }
-                );
-            }, 50);
+            location = user.location;
+            documentServerconfig = generateDocumentServerConfig(
+                location,
+                fileAccesDetails.path,
+                fileAccesDetails.key,
+                fileAccesDetails.readToken,
+                fileAccesDetails.writeToken,
+                getExtension(fileAccesDetails.fullName),
+                fileAccesDetails.extension,
+                attachments
+            );
+            console.log('documentServerconfig', documentServerconfig);
+            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+                //@ts-ignore
+                new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
+            });
             return;
         }
 

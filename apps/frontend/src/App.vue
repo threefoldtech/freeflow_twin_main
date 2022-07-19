@@ -31,7 +31,7 @@
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
     import { useAuthState } from '@/store/authStore';
-    import { computed } from 'vue';
+    import { computed, onBeforeMount } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
     import { useSocketActions } from '@/store/socketStore';
@@ -40,10 +40,12 @@
     const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
 
-    if (user) {
-        initializeSocket(user.id.toString());
-        initBlocklist();
-    }
+    onBeforeMount(() => {
+        if (user) {
+            initializeSocket(user.id.toString());
+            initBlocklist();
+        }
+    });
 
     console.log('Version: ' + version);
 
