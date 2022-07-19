@@ -154,7 +154,6 @@
                 fileAccesDetails.path,
                 fileAccesDetails.readToken
             );
-            readUrl.value = readUrl.value;
             isLoading.value = false;
             return;
         }
