@@ -82,7 +82,7 @@ export class QuantumController {
                 exp: 5 * 60,
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: path, permissions: [SharePermissionType.WRITE, SharePermissionType.WRITE] },
+                payload: { file: path, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
                 exp: 24 * 60 * 60,
             }),
         };
@@ -118,6 +118,9 @@ export class QuantumController {
 
     @Post('file/internal')
     async editQuantumFile(@Body() onlyOfficeResponse: IOnlyOfficeResponse, @Query('token') token: string) {
+        return {
+            error: 0,
+        };
         if (!token) throw new UnauthorizedException('no token provided');
 
         if (onlyOfficeResponse.status !== 2 && onlyOfficeResponse.status !== 6)
@@ -174,7 +177,7 @@ export class QuantumController {
                 exp: 5 * 60,
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.WRITE] },
+                payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
                 exp: 24 * 60 * 60,
             }),
         };
