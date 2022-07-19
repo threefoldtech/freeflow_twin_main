@@ -339,7 +339,7 @@ export class ApiService {
             propertyList.push({
                 title: this.getTitle(htmlDoc).toString(),
                 description: this.getDescription(htmlDoc).toString(),
-                link: url
+                link: url,
             });
 
             return propertyList;
