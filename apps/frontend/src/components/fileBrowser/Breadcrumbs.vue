@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import { computed } from 'vue';
     import { ChevronRightIcon, HomeIcon } from '@heroicons/vue/solid';
     import {
         clickBreadcrumb,
