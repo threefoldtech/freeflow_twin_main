@@ -4,10 +4,20 @@ import http from 'http';
 
 import { ContactService } from '../contact/contact.service';
 import { LocationService } from '../location/location.service';
+import { ApiService } from './api.service';
 
 @Controller('external')
 export class ApiController {
-    constructor(private readonly _contactService: ContactService, private readonly _locationService: LocationService) {}
+    constructor(
+        private readonly _contactService: ContactService,
+        private readonly _locationService: LocationService,
+        private readonly _apiService: ApiService
+    ) {}
+
+    @Get('preview')
+    async getUrlPreview(@Query('url') url: string) {
+        return await this._apiService.getUrlPreview({ url });
+    }
 
     @Get('resource')
     async getExternalResource(@Res() res: Response, @Query('loc') loc: string) {

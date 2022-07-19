@@ -84,7 +84,7 @@
 </template>
 <script setup lang="ts">
     import { Contact, GroupContact } from '@/types';
-    import { defineProps, ref } from 'vue';
+    import { ref } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
     import { debounce } from 'lodash';
