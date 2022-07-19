@@ -128,7 +128,6 @@
                 fileAccesDetails.extension,
                 attachments
             );
-            console.log('documentServerconfig', documentServerconfig);
             get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
                 //@ts-ignore
                 new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
