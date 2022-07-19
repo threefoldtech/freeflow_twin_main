@@ -100,6 +100,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
                     message: signedMessage,
                 });
             });
+
+        if (message.type === MessageType.DELETE) {
+            await this._messageService.deleteMessage({ messageId: message.id });
+        }
     }
 
     @SubscribeMessage('block_chat')
