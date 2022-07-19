@@ -20,11 +20,7 @@
     >
         <PlusSmIconOutline class="h-6 w-6" aria-hidden="true" />
     </button>
-    <MainActionsOverlay
-        :model-value="showMainActionsOverlay"
-        class="md:hidden"
-        @update-model-value="showMainActionsOverlay = false"
-    >
+    <MainActionsOverlay :model-value="showMainActionsOverlay" @update-model-value="showMainActionsOverlay = false">
         <template v-slot:header>
             <h2 class="py-2">Create new</h2>
         </template>
