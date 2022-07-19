@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, onMounted, ref, nextTick } from 'vue';
+    import { computed, onMounted, ref } from 'vue';
     import { useRoute } from 'vue-router';
     import {
         accessDenied,
@@ -112,13 +112,12 @@
                 fileAccesDetails.readToken,
                 attachments
             );
-            console.log('readUrl', readUrl.value);
         }
 
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            nextTick(() => {
+            setTimeout(() => {
                 location = user.location;
                 documentServerconfig = generateDocumentServerConfig(
                     location,
@@ -138,7 +137,7 @@
                         new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
                     }
                 );
-            });
+            }, 50);
             return;
         }
 
