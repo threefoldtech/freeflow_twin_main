@@ -299,7 +299,7 @@
     };
 
     const changePage = (name: string) => {
-        emit('clicked');
+        mobileMenuOpen.value = false;
         router.push({ name });
     };
 
