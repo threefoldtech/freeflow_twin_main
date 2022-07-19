@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, onMounted, ref } from 'vue';
+    import { computed, onMounted, ref, nextTick } from 'vue';
     import { useRoute } from 'vue-router';
     import {
         accessDenied,
@@ -74,12 +74,14 @@
     });
 
     onMounted(async () => {
+        const { user } = useAuthState();
+
         const path = atob(<string>route.params.path);
         const shareId = <string>route.params.shareId;
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
         let documentServerconfig;
-        let location: string = '';
+        let location = '';
 
         if (shareId) {
             const shareDetails = await getShareWithId(shareId);
@@ -102,7 +104,6 @@
             readUrl.value = calcExternalResourceLink(encodedEndpoint);
         } else {
             fileAccesDetails = (await getFileInfo(path, attachments)).data;
-            location = useAuthState().user.location;
 
             readUrl.value = generateFileBrowserUrl(
                 'https',
@@ -117,21 +118,26 @@
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            console.log('isSupported', isSupported.value);
-            documentServerconfig = generateDocumentServerConfig(
-                location,
-                fileAccesDetails.path,
-                fileAccesDetails.key,
-                fileAccesDetails.readToken,
-                fileAccesDetails.writeToken,
-                getExtension(fileAccesDetails.fullName),
-                fileAccesDetails.extension,
-                attachments
-            );
-            console.log('documentServerconfig', documentServerconfig);
-            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
-                //@ts-ignore
-                new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
+            nextTick(() => {
+                location = user.location;
+                documentServerconfig = generateDocumentServerConfig(
+                    location,
+                    fileAccesDetails.path,
+                    fileAccesDetails.key,
+                    fileAccesDetails.readToken,
+                    fileAccesDetails.writeToken,
+                    getExtension(fileAccesDetails.fullName),
+                    fileAccesDetails.extension,
+                    attachments
+                );
+                console.log('documentServerconfig', documentServerconfig);
+                get(
+                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
+                    () => {
+                        //@ts-ignore
+                        new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
+                    }
+                );
             });
             return;
         }
