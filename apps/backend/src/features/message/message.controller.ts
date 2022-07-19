@@ -102,7 +102,6 @@ export class MessageController {
         );
     }
 
-
     @Put()
     async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
         const blockedContacts = await this._blockedContactService.getBlockedContactIds();

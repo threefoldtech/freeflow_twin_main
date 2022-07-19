@@ -8,10 +8,14 @@ import { ApiService } from './api.service';
 
 @Controller('external')
 export class ApiController {
-    constructor(private readonly _contactService: ContactService, private readonly _locationService: LocationService, private readonly _apiService: ApiService) {}
+    constructor(
+        private readonly _contactService: ContactService,
+        private readonly _locationService: LocationService,
+        private readonly _apiService: ApiService
+    ) {}
 
     @Get('preview')
-    async getUrlPreview(@Query('url') url: string)  {
+    async getUrlPreview(@Query('url') url: string) {
         return await this._apiService.getUrlPreview({ url });
     }
 

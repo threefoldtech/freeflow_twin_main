@@ -328,67 +328,64 @@ export class ApiService {
      * Fetches data from url
      * @param {string} url- Url.
      */
-     async getUrlPreview({ url }: { url: string }): Promise<any> {
+    async getUrlPreview({ url }: { url: string }): Promise<any> {
         console.log('huts', url);
         try {
             const { data } = await axios.get(url);
-            
-            var htmlDoc = parse(data);  
+
+            var htmlDoc = parse(data);
             //return htmlDoc.getElementsByTagName('a').toString();
-            
 
             const propertyList = [];
 
             const title = this.getTitle(htmlDoc).toString();
-            const description = this.getDescription(htmlDoc).toString()
+            const description = this.getDescription(htmlDoc).toString();
 
             const dataList = {
                 title: title,
                 description: description,
-                link: url
+                link: url,
             };
 
-            propertyList.push({...dataList});
-            
-            
+            propertyList.push({ ...dataList });
+
             return propertyList;
         } catch (error) {
             throw new BadRequestException(`unable to get url preview: ${error}`);
         }
-
     }
 
     getTitle = (data: any) => {
         const ogTitle = data.querySelector('meta[property="og:title"]');
         if (ogTitle != null) {
             return ogTitle.getAttribute('content');
-        }else{
+        } else {
             console.log('1');
         }
         const twitterTitle = data.querySelector('meta[name="twitter:title"]');
         if (twitterTitle != null) {
             return twitterTitle.getAttribute('content');
-        }else{
+        } else {
             console.log('2');
         }
         const docTitle = data.getAttribute('title');
         if (docTitle != null) {
             return docTitle;
-        }else{
+        } else {
             console.log('3');
         }
         const h1El = data.querySelector('h1');
         const h1 = h1El ? h1El.innerHTML : null;
         if (h1 != null) {
             return h1;
-        }else{
+        } else {
             console.log('4');
         }
         const h2El = data.querySelector('h2');
         const h2 = h2El ? h2El.innerHTML : null;
         if (h2 != null) {
             return h2;
-        }else{
+        } else {
             console.log('^');
         }
         return 'Title not found';
