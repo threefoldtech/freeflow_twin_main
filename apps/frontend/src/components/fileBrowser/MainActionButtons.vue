@@ -58,7 +58,7 @@
         <template v-slot:title>
             <h1 class="font-medium">Create folder</h1>
         </template>
-        <div class='px-4'>
+        <div class="px-4">
             <p v-for="(error, idx) in createFolderErrors" :key="idx" class="text-sm font-medium text-red-500">
                 {{ error }}
             </p>
