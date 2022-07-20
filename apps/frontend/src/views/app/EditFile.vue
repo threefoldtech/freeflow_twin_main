@@ -81,7 +81,7 @@
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
         let documentServerconfig;
-        let location = '';
+        let location = user.location;
 
         if (shareId) {
             const shareDetails = await getShareWithId(shareId);
@@ -104,6 +104,7 @@
             readUrl.value = calcExternalResourceLink(encodedEndpoint);
         } else {
             fileAccesDetails = (await getFileInfo(path, attachments)).data;
+            isLoading.value = false;
 
             readUrl.value = generateFileBrowserUrl(
                 'https',
@@ -117,7 +118,7 @@
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            location = user.location;
+            shareId ? null : (location = user.location);
             documentServerconfig = generateDocumentServerConfig(
                 location,
                 fileAccesDetails.path,
@@ -126,7 +127,8 @@
                 fileAccesDetails.writeToken,
                 getExtension(fileAccesDetails.fullName),
                 fileAccesDetails.extension,
-                attachments
+                attachments,
+                isLoading.value
             );
             get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
                 //@ts-ignore

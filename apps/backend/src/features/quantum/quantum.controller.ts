@@ -1,9 +1,12 @@
 import {
+    BadRequestException,
     Body,
     Controller,
+    Delete,
     Get,
     HttpCode,
     NotFoundException,
+    Param,
     Post,
     Put,
     Query,
@@ -17,6 +20,8 @@ import { join } from 'path';
 import syncRequest from 'sync-request';
 
 import { AuthGuard } from '../../guards/auth.guard';
+import { ApiService } from '../api/api.service';
+import { ContactService } from '../contact/contact.service';
 import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
 import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
@@ -36,7 +41,9 @@ export class QuantumController {
     constructor(
         private readonly _configService: ConfigService,
         private readonly _quantumService: QuantumService,
-        private readonly _fileService: FileService
+        private readonly _fileService: FileService,
+        private readonly _apiService: ApiService,
+        private readonly _contactService: ContactService
     ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
@@ -45,24 +52,24 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getDirectoryContent(@Query('path') path: string): Promise<PathInfoDTO[]> {
         const actualPath = path === '/' ? this.storageDir : path;
-        const directoryContent = await this._quantumService.getDirectoryContent({ path: actualPath });
-        return directoryContent.map(file => ({
-            ...file,
-            path: file.path.replace(`${this.storageDir}`, ''),
-            directory: file.directory.replace(this.storageDir, '/'),
-        }));
+        return await this._quantumService.getDirectoryContent({ path: actualPath });
+        // return directoryContent.map(file => ({
+        //     ...file,
+        //     path: file.path.replace(`${this.storageDir}`, ''),
+        //     directory: file.directory.replace(this.storageDir, '/'),
+        // }));
     }
 
     @Get('dir/info')
     @UseGuards(AuthGuard)
     async getDirectoryInfo(@Query('path') path: string): Promise<PathInfoDTO> {
         const actualPath = path === '/' ? this.storageDir : path;
-        const directoryInfo = await this._quantumService.getDirectoryInfo({ path: actualPath });
-        return {
-            ...directoryInfo,
-            path: directoryInfo.path.replace(this.storageDir, ''),
-            directory: directoryInfo.directory.replace(this.storageDir, '/'),
-        };
+        return await this._quantumService.getDirectoryInfo({ path: actualPath });
+        // return {
+        //     ...directoryInfo,
+        //     path: directoryInfo.path.replace(this.storageDir, ''),
+        //     directory: directoryInfo.directory.replace(this.storageDir, '/'),
+        // };
     }
 
     @Get('file/info')
@@ -149,13 +156,33 @@ export class QuantumController {
         const url = new URL(onlyOfficeResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
-        console.log(`URL: ${url}`);
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
         await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });
         return {
             error: 0,
         };
+    }
+
+    @Delete('file/internal')
+    @UseGuards(AuthGuard)
+    async deleteFile(@Query('path') path: string) {
+        path = Buffer.from(path, 'base64').toString('binary');
+        try {
+            const share = await this._quantumService.getShareByPath({ path });
+            if (share) {
+                await this._quantumService.deleteShare({ id: share.entityId });
+                share.parsePermissions().map(async permission => {
+                    const contact = await this._contactService.getContact({ id: permission.userId });
+                    this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
+                });
+            }
+            const stats = await this._fileService.getStats({ path });
+            if (stats.isDirectory()) return this._fileService.deleteDirectory({ path });
+            return this._fileService.deleteFile({ path });
+        } catch (error) {
+            throw new BadRequestException(`unable to get delete file or folder: ${error}`);
+        }
     }
 
     @Get('search')
@@ -202,6 +229,12 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getShareById(@Query('id') id: string): Promise<IFileShare> {
         return (await this._quantumService.getShareById({ id })).toJSON();
+    }
+
+    @Delete('share/:id')
+    async deleteShare(@Param('id') id: string) {
+        const share = await this._quantumService.getShareById({ id });
+        return await this._quantumService.deleteShare({ id: share.entityId });
     }
 
     @Get('share/path')

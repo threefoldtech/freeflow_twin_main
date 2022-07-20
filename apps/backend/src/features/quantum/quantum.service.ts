@@ -94,7 +94,7 @@ export class QuantumService {
 
             return await this.formatFileDetails({ path });
         } catch (error) {
-            throw new BadRequestException(`unable to get file info: ${error}`);
+            throw new NotFoundException(`unable to get file info: ${error}`);
         }
     }
 
@@ -337,7 +337,7 @@ export class QuantumService {
         try {
             return await this._shareRepository.getShareByPath({ path });
         } catch (error) {
-            throw new NotFoundException('share does not exist');
+            return null;
         }
     }
 
@@ -476,8 +476,6 @@ export class QuantumService {
 
     async getSharePermissionsByUser({ shareId, userId }: { shareId: string; userId: string }) {
         const share = await this.getShareById({ id: shareId });
-        console.log(share);
-        console.log(shareId);
         if (!share) return [];
         const permissions: SharePermissionType[] = [];
         await Promise.all(
