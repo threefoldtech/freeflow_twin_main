@@ -45,24 +45,24 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getDirectoryContent(@Query('path') path: string): Promise<PathInfoDTO[]> {
         const actualPath = path === '/' ? this.storageDir : path;
-        const directoryContent = await this._quantumService.getDirectoryContent({ path: actualPath });
-        return directoryContent.map(file => ({
-            ...file,
-            path: file.path.replace(`${this.storageDir}`, ''),
-            directory: file.directory.replace(this.storageDir, '/'),
-        }));
+        return await this._quantumService.getDirectoryContent({ path: actualPath });
+        // return directoryContent.map(file => ({
+        //     ...file,
+        //     path: file.path.replace(`${this.storageDir}`, ''),
+        //     directory: file.directory.replace(this.storageDir, '/'),
+        // }));
     }
 
     @Get('dir/info')
     @UseGuards(AuthGuard)
     async getDirectoryInfo(@Query('path') path: string): Promise<PathInfoDTO> {
         const actualPath = path === '/' ? this.storageDir : path;
-        const directoryInfo = await this._quantumService.getDirectoryInfo({ path: actualPath });
-        return {
-            ...directoryInfo,
-            path: directoryInfo.path.replace(this.storageDir, ''),
-            directory: directoryInfo.directory.replace(this.storageDir, '/'),
-        };
+        return await this._quantumService.getDirectoryInfo({ path: actualPath });
+        // return {
+        //     ...directoryInfo,
+        //     path: directoryInfo.path.replace(this.storageDir, ''),
+        //     directory: directoryInfo.directory.replace(this.storageDir, '/'),
+        // };
     }
 
     @Get('file/info')
@@ -85,16 +85,15 @@ export class QuantumController {
 
         // actualPath = attachments ? join(actualPath, '/appdata/attachments') : actualPath;
 
-        const actualPath = join(this.storageDir, path);
         return {
-            ...(await this._quantumService.getFileInfo({ path: actualPath })),
-            key: this._quantumService.getQuantumFileToken({ writable: true, path: actualPath }),
+            ...(await this._quantumService.getFileInfo({ path })),
+            key: this._quantumService.getQuantumFileToken({ writable: true, path }),
             readToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: actualPath, permissions: [SharePermissionType.READ] },
+                payload: { file: path, permissions: [SharePermissionType.READ] },
                 exp: 5 * 60,
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
+                payload: { file: path, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
                 exp: 24 * 60 * 60,
             }),
         };
