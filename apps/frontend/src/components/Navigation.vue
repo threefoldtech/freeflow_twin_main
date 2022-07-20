@@ -238,25 +238,16 @@
     import { AppItemType, AppType } from '@/types/apps';
     import { doLogout } from '@/services/authService';
     import Alert from '@/components/Alert.vue';
-
-    import {
-        Dialog,
-        DialogPanel,
-        Menu,
-        MenuButton,
-        MenuItem,
-        MenuItems,
-        TransitionChild,
-        TransitionRoot,
-    } from '@headlessui/vue';
-
+    import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue';
     import { MenuIcon, XIcon } from '@heroicons/vue/solid';
+    import { getUnreadChats, useChatsState } from '@/store/chatStore';
 
-    interface IProps {
-        unreadChats?: string[];
-    }
+    const { unreadChats } = useChatsState();
 
-    const props = defineProps<IProps>();
+    const init = async () => {
+        await getUnreadChats();
+    };
+    init();
 
     const apps: Array<AppItemType> = [
         {
@@ -308,7 +299,7 @@
     };
 
     const changePage = (name: string) => {
-        emit('clicked');
+        mobileMenuOpen.value = false;
         router.push({ name });
     };
 
@@ -318,8 +309,8 @@
 
     const totalUnreadChats = computed(() => {
         let total = 0;
-        if (props.unreadChats?.length > 0) {
-            for (const msg of props.unreadChats) {
+        if (unreadChats.value?.length > 0) {
+            for (const msg of unreadChats.value) {
                 total++;
             }
         }

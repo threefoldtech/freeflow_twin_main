@@ -996,7 +996,7 @@ export const goTo = async (item: SharedFileInterface) => {
 };
 
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable) => {
-    return await Api.addShare(userId, path, filename, size, writable);
+    return (await Api.addShare(userId, path, filename, size, writable)).data;
 };
 
 export const parseJwt = token => {

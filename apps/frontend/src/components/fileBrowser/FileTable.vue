@@ -7,8 +7,8 @@
                     rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
                 }
             "
-            >Share</v-contextmenu-item
-        >
+            >Share
+        </v-contextmenu-item>
         <v-contextmenu-item
             @click="
                 () => {
@@ -16,8 +16,8 @@
                     rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
                 }
             "
-            >Download</v-contextmenu-item
-        >
+            >Download
+        </v-contextmenu-item>
         <v-contextmenu-item
             @click="
                 () => {
@@ -25,8 +25,8 @@
                     rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME;
                 }
             "
-            >Rename</v-contextmenu-item
-        >
+            >Rename
+        </v-contextmenu-item>
         <v-contextmenu-item
             @click="
                 () => {
@@ -34,8 +34,8 @@
                     rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE;
                 }
             "
-            >Delete</v-contextmenu-item
-        >
+            >Delete
+        </v-contextmenu-item>
     </v-contextmenu>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
@@ -358,8 +358,15 @@
     };
 
     const handleSelect = (item: PathInfoModel) => {
-        if (!selectedPaths.value.includes(item)) selectItem(item);
-        else deselectItem(item);
+        if (!selectedPaths.value.includes(item)) {
+            selectItem(item);
+            return;
+        }
+        if (selectedPaths.value.length === 1 && selectedPaths.value[0] === item) {
+            handleItemClick(item);
+            return;
+        }
+        deselectItem(item);
     };
 
     const isSelected = (item: PathInfoModel) => {

@@ -45,14 +45,24 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getDirectoryContent(@Query('path') path: string): Promise<PathInfoDTO[]> {
         const actualPath = path === '/' ? this.storageDir : path;
-        return await this._quantumService.getDirectoryContent({ path: actualPath });
+        const directoryContent = await this._quantumService.getDirectoryContent({ path: actualPath });
+        return directoryContent.map(file => ({
+            ...file,
+            path: file.path.replace(`${this.storageDir}`, ''),
+            directory: file.directory.replace(this.storageDir, '/'),
+        }));
     }
 
     @Get('dir/info')
     @UseGuards(AuthGuard)
     async getDirectoryInfo(@Query('path') path: string): Promise<PathInfoDTO> {
         const actualPath = path === '/' ? this.storageDir : path;
-        return await this._quantumService.getDirectoryInfo({ path: actualPath });
+        const directoryInfo = await this._quantumService.getDirectoryInfo({ path: actualPath });
+        return {
+            ...directoryInfo,
+            path: directoryInfo.path.replace(this.storageDir, ''),
+            directory: directoryInfo.directory.replace(this.storageDir, '/'),
+        };
     }
 
     @Get('file/info')

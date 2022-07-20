@@ -6,7 +6,7 @@
         <NotificationSection />
 
         <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
-            <Navigation :unreadChats="totalUnreadChats" :class="[smallScreen ? 'top' : 'side']">
+            <Navigation :class="[smallScreen ? 'top' : 'side']">
                 <template #content>
                     <slot name="topbar" />
                 </template>
@@ -31,16 +31,6 @@
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
 
     import Navigation from '@/components/Navigation.vue';
-
-    import { usechatsActions } from '@/store/chatStore';
-
-    const totalUnreadChats = ref<string[]>([]);
-
-    const init = async () => {
-        const { getUnreadChats } = usechatsActions();
-        totalUnreadChats.value = await getUnreadChats();
-    };
-    init();
 
     const { notification } = useSocketState();
     const showNav = ref(false);
