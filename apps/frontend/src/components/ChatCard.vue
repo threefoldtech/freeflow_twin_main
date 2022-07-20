@@ -1,6 +1,6 @@
 <template>
     <li
-        class="py-4 px-2 flex cursor-pointer"
+        class="py-4 px-2 max-w-full grid grid-cols-10 lg:grid-cols-6 cursor-pointer items-center"
         :class="{
             'hover:bg-gray-100': !router.currentRoute?.value.path.includes(chat.chatId),
             'bg-gray-200 hover:bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
@@ -9,12 +9,11 @@
         @keyup.enter="$emit('selectChat')"
     >
         <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
-        <div v-if="!collapsed" class="ml-3 w-full relative">
+        <div v-if="!collapsed" class="relative col-span-9 lg:col-span-5">
             <p class="flex items-center">
                 <span class="text-sm text-gray-900 font-bold break-normal overflow-ellipsis overflow-hidden name">
                     {{ chat.name }}
                 </span>
-                <span v-if="chat.isGroup" class="ml-2 text-sm"> (group)</span>
                 <span v-if="blocked" class="ml-2 text-red-500"> BLOCKED</span>
                 <span
                     v-if="lastMessage"
@@ -25,7 +24,7 @@
                 </span>
             </p>
             <p
-                class="text-sm max-h-6 max-w-[60vw] truncate"
+                class="text-sm max-h-6 max-w-[20vw] truncate"
                 :class="unreadMessages > 0 ? 'font-bold' : 'text-gray-500'"
             >
                 {{ lastMessageBody }}

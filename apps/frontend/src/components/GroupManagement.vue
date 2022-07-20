@@ -1,7 +1,7 @@
 <template>
-    <div class="px-2 py-2 w-full flex flex-col justify-start">
+    <div class="px-2 py-2 w-full flex justify-start">
         <!--<h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>-->
-        <div class="flex items-center justify-evenly space-x-2 lg:justify-between">
+        <div class="flex xl:grid xl:grid-cols-2 w-full gap-y-2 items-center justify-around xl:justify-items-center">
             <!--<div v-if="!chat.isGroup" class="flex flex-col px-2 py-4 w-full cursor-pointer">
                 <i class="fas fa-minus-circle m-3"></i>
                 <p class="text-xs text-gray-300">Bio</p>

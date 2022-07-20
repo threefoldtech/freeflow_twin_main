@@ -4,7 +4,7 @@
         :class="{
             'collapsed-bar': collapsed,
             'lg:w-16': collapsed,
-            'lg:w-[400px]': !collapsed,
+            'lg:w-[350px]': !collapsed,
         }"
         class="bg-white w-full flex flex-col overflow-hidden border-r"
     >

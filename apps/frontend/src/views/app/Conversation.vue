@@ -138,7 +138,7 @@
                         v-if="chat"
                         :key="'aside' + chat.chatId + selectedId"
                         :class="{ 'flex ': showSideBar, hidden: !showSideBar }"
-                        class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[400px] lg:border-l"
+                        class="min-h-full flex-1 xl:flex-initial flex-col overflow-y-hidden lg:w-[300px] lg:border-l"
                     >
                         <div class="max-w-full w-full bg-gray-100 xl:bg-white flex flex-col flex-grow">
                             <div class="bg-white p-4 w-full mb-4 lg:flex min-h-64 justify-between items-center hidden">
