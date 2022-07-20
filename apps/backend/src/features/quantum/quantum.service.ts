@@ -9,6 +9,7 @@ import { uuidv4 } from '../../utils/uuid';
 import { ApiService } from '../api/api.service';
 import { ChatGateway } from '../chat/chat.gateway';
 import { ChatService } from '../chat/chat.service';
+import { ContactService } from '../contact/contact.service';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { FileService } from '../file/file.service';
 import { KeyService } from '../key/key.service';
@@ -38,7 +39,8 @@ export class QuantumService {
         private readonly _keyService: KeyService,
         private readonly _apiService: ApiService,
         private readonly _chatService: ChatService,
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _contactService: ContactService
     ) {
         this.userId = this._configService.get<string>('userId');
     }
@@ -313,6 +315,34 @@ export class QuantumService {
         return true;
     }
 
+    async deleteFile({ path }: { path: string }) {
+        try {
+            const share = await this.getShareByPath({ path });
+            if (share) {
+                await this.deleteShare({ id: share.entityId });
+                share.parsePermissions().map(async permission => {
+                    const contact = await this._contactService.getContact({ id: permission.userId });
+                    const sharedMessage = (await this._messageService.getAllMessagesFromChat({ chatId: contact.id }))
+                        .map(m => m.toJSON())
+                        .filter(m => m.type === MessageType.FILE_SHARE)
+                        .find(m => (m.body as { id: string }).id === share.id);
+                    if (sharedMessage) {
+                        sharedMessage.type = MessageType.STRING;
+                        sharedMessage.body = 'File deleted';
+                        this._chatGateway.emitMessageToConnectedClients('message', sharedMessage);
+                        await this._messageService.deleteMessage({ messageId: sharedMessage.id });
+                    }
+                    this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
+                });
+            }
+            const stats = await this._fileService.getStats({ path });
+            if (stats.isDirectory()) return this._fileService.deleteDirectory({ path });
+            return this._fileService.deleteFile({ path });
+        } catch (error) {
+            throw new BadRequestException(`unable to delete file or folder: ${error}`);
+        }
+    }
+
     /**
      * Get shares that have been shared with the user.
      * @return {IFileShare[]} - File shares.
@@ -344,6 +374,24 @@ export class QuantumService {
     async deleteShare({ id }: { id: string }) {
         try {
             return await this._shareRepository.deleteShare({ entityId: id });
+        } catch (error) {
+            throw new BadRequestException(`unable to delete share: ${error}`);
+        }
+    }
+
+    async handleIncomingDeleteShare({ share }: { share: Share }) {
+        try {
+            const sharedMessage = (await this._messageService.getAllMessagesFromChat({ chatId: share.parseOwner().id }))
+                .map(m => m.toJSON())
+                .filter(m => m.type === MessageType.FILE_SHARE)
+                .find(m => (m.body as { id: string }).id === share.id);
+            if (sharedMessage) {
+                sharedMessage.type = MessageType.STRING;
+                sharedMessage.body = 'File deleted';
+                this._chatGateway.emitMessageToConnectedClients('message', sharedMessage);
+                await this._messageService.deleteMessage({ messageId: sharedMessage.id });
+            }
+            return await this._shareRepository.deleteShare({ entityId: share.entityId });
         } catch (error) {
             throw new BadRequestException(`unable to delete share: ${error}`);
         }

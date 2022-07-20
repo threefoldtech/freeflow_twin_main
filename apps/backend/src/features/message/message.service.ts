@@ -158,7 +158,8 @@ export class MessageService {
     async editMessage({ messageId, text }: { messageId: string; text: string }) {
         try {
             const message = await this._messageRepo.findMessageById(messageId);
-            message.body = JSON.stringify(text);
+            message.body = text;
+            message.type = MessageType.STRING;
             await this._messageRepo.updateMessage({ message });
             return message.toJSON();
         } catch (error) {
