@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 
 import { ApiModule } from '../api/api.module';
 import { ChatModule } from '../chat/chat.module';
+import { ContactModule } from '../contact/contact.module';
 import { DbModule } from '../db/db.module';
 import { FileModule } from '../file/file.module';
 import { KeyModule } from '../key/key.module';
@@ -16,6 +17,7 @@ import { ShareRedisRepository } from './repositories/share-redis.repository';
     imports: [
         KeyModule,
         DbModule,
+        forwardRef(() => ContactModule),
         forwardRef(() => ApiModule),
         forwardRef(() => FileModule),
         forwardRef(() => ChatModule),

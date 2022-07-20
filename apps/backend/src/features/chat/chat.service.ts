@@ -25,6 +25,7 @@ export class ChatService {
     constructor(
         private readonly _chatRepository: ChatRedisRepository,
         private readonly _configService: ConfigService,
+        @Inject(forwardRef(() => ContactService))
         private readonly _contactService: ContactService,
         private readonly _messageService: MessageService,
         private readonly _apiService: ApiService,

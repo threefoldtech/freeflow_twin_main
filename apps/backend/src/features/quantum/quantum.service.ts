@@ -337,7 +337,7 @@ export class QuantumService {
         try {
             return await this._shareRepository.getShareByPath({ path });
         } catch (error) {
-            throw new NotFoundException('share does not exist');
+            return null;
         }
     }
 

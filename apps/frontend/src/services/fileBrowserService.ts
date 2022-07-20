@@ -10,7 +10,6 @@ import { FileAction } from 'custom-types/file-actions.type';
 import { showUserOfflineMessage } from '@/store/statusStore';
 import Spinner from '@/components/Spinner.vue';
 
-// TODO: delete when everything is handled by nestjs
 const endpoint = `${config.baseUrl}api/v2/quantum`;
 
 export interface PathInfo {
@@ -138,7 +137,7 @@ export const uploadFile = async (
 };
 
 export const deleteFile = async (path: string) => {
-    return await axios.delete<PathInfo>(`${config.baseUrl}api/v2/files?path=${path}`);
+    return await axios.delete<PathInfo>(`${config.baseUrl}api/v2/quantum/file/internal?path=${btoa(path)}`);
 };
 
 export const downloadFileEndpoint = `${config.baseUrl}api/v2/files/download/compressed`;

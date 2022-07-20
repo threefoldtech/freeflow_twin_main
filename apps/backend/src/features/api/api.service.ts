@@ -3,9 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import axios, { ResponseType } from 'axios';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
-
 import { parse } from 'node-html-parser';
 
+import { getURLDescription, getURLTitle } from '../../utils/scraper';
 import { ChatDTO } from '../chat/dtos/chat.dto';
 import { ContactDTO } from '../contact/dtos/contact.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
@@ -110,6 +110,21 @@ export class ApiService {
      */
     async sendRemoveChat({ location, chatId }: { location: string; chatId: string }) {
         const destinationUrl = `http://[${location}]/api/v2/chats/${chatId}`;
+        try {
+            return await axios.delete(destinationUrl);
+        } catch (error) {
+            return;
+        }
+    }
+
+    /**
+     * Sends a delete share request to contact.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to send request to.
+     * @param {string} obj.shareId - Share id to delete.
+     */
+    async sendRemoveShare({ location, shareId }: { location: string; shareId: string }) {
+        const destinationUrl = `http://[${location}]/api/v2/quantum/share/${shareId}`;
         try {
             return await axios.delete(destinationUrl);
         } catch (error) {
@@ -328,17 +343,17 @@ export class ApiService {
      * Fetches data from url
      * @param {string} url- Url.
      */
-    async getUrlPreview({ url }: { url: string }): Promise<any> {
+    async getUrlPreview({ url }: { url: string }) {
         try {
             const { data } = await axios.get(url);
 
-            var htmlDoc = parse(data);
+            const htmlDoc = parse(data);
 
             const propertyList = [];
 
             propertyList.push({
-                title: this.getTitle(htmlDoc).toString(),
-                description: this.getDescription(htmlDoc).toString(),
+                title: getURLTitle(htmlDoc).toString(),
+                description: getURLDescription(htmlDoc).toString(),
                 link: url,
             });
 
@@ -347,57 +362,4 @@ export class ApiService {
             throw new BadRequestException(`unable to get url preview: ${error}`);
         }
     }
-
-    getTitle = (data: any) => {
-        const ogTitle = data.querySelector('meta[property="og:title"]');
-        if (ogTitle != null) {
-            return ogTitle.getAttribute('content');
-        }
-        const twitterTitle = data.querySelector('meta[name="twitter:title"]');
-        if (twitterTitle != null) {
-            return twitterTitle.getAttribute('content');
-        }
-        const docTitle = data.getAttribute('title');
-        if (docTitle != null) {
-            return docTitle;
-        }
-        const h1El = data.querySelector('h1');
-        const h1 = h1El ? h1El.innerHTML : null;
-        if (h1 != null) {
-            return h1;
-        }
-        const h2El = data.querySelector('h2');
-        const h2 = h2El ? h2El.innerHTML : null;
-        if (h2 != null) {
-            return h2;
-        }
-        return 'Title not found';
-    };
-
-    getDescription = (data: any) => {
-        const ogDescription = data.querySelector('meta[property="og:description"]');
-        if (ogDescription != null) {
-            return ogDescription.getAttribute('content');
-        }
-        const twitterDescription = data.querySelector('meta[name="twitter:description"]');
-        if (twitterDescription != null) {
-            return twitterDescription.getAttribute('content');
-        }
-        const metaDescription = data.querySelector('meta[name="description"]');
-        if (metaDescription != null) {
-            return metaDescription.getAttribute('content');
-        }
-        let paragraphs = data.querySelectorAll('p');
-        let fstVisibleParagraph = null;
-        for (let i = 0; i < paragraphs.length; i++) {
-            if (
-                // if object is visible in dom
-                paragraphs[i].offsetParent !== null
-            ) {
-                fstVisibleParagraph = paragraphs[i].textContent;
-                break;
-            }
-        }
-        return fstVisibleParagraph;
-    };
 }
