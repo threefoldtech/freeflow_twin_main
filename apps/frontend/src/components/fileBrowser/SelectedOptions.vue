@@ -48,11 +48,11 @@
 
         <div
             v-if="selectedPaths.length > 0"
-            class="lg:hidden fixed top-0 left-0 flex-shrink-0 h-[5rem] w-full bg-white border-b border-gray-200 flex flex-col justify-evenly"
-            style="z-index: 60"
+            class="lg:hidden fixed top-0 left-0 flex-shrink-0 h-16 w-full bg-white border-b border-gray-200 flex items-center"
+            style="z-index: 40"
         >
-            <x-icon @click="selectedPaths = []" class="h-5 w-5 ml-3 text-blue-500" aria-hidden="true" />
-            <div class="flex justify-between px-4 items-center">
+            <x-icon @click="selectedPaths = []" class="h-7 w-7 ml-3 text-blue-500" aria-hidden="true" />
+            <div class="flex justify-between w-full px-4 items-center">
                 <p class="text-lg text-blue-500">
                     {{ selectedPaths.length }} item<span v-if="selectedPaths.length > 1">s</span>
                 </p>

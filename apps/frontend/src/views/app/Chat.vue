@@ -5,7 +5,10 @@
             :class="chats.length === 0 && chatRequests.length === 0 ? '' : 'grid'"
         >
             <ChatList v-model="showAddUserDialog" />
-            <div class="hidden w-full h-full lg:grid place-items-center border-2">
+            <div class="w-full h-full place-items-center" :class="{
+                'hidden lg:grid' : chats.length !== 0 || chatRequests.length !== 0,
+                'grid' : chats.length === 0 && chatRequests.length === 0
+            }">
                 <div class="text-center">
                     <ChatAlt2Icon class="mx-auto h-16 w-16 text-gray-400" aria-hidden="true" />
                     <h3 class="mt-2 text-base font-medium text-gray-900">

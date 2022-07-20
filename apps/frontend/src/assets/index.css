@@ -101,7 +101,7 @@
             grid-template-rows: auto 1fr;
         }
         .customgrid {
-            grid-template-columns: 400px 1fr;
+            grid-template-columns: 350px 1fr;
         }
         .topgrid {
             display: grid !important;

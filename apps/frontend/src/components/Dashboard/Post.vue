@@ -107,7 +107,7 @@
                             </div>
                         </div>
                         <div class="group">
-                            <Popover v-slot="{ open }" class="relative z-40">
+                            <Popover v-slot="{ open }" class="relative z-30">
                                 <PopoverButton
                                     :class="open ? '' : 'text-opacity-90'"
                                     class="items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none"

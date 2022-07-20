@@ -52,12 +52,13 @@
     <Dialog
         :model-value="showCreateFolderDialog"
         :noActions="false"
+        okButtonText="Create"
         @update-model-value="val => updateCreateFolderDialog(val)"
     >
         <template v-slot:title>
             <h1 class="font-medium">Create folder</h1>
         </template>
-        <div>
+        <div class='px-4'>
             <p v-for="(error, idx) in createFolderErrors" :key="idx" class="text-sm font-medium text-red-500">
                 {{ error }}
             </p>
@@ -82,12 +83,13 @@
     <Dialog
         :model-value="showCreateFileDialog"
         :noActions="false"
+        okButtonText="Add"
         @update-model-value="val => updateCreateFileDialog(val)"
     >
         <template v-slot:title>
             <h1 class="font-medium">Add files</h1>
         </template>
-        <div class="flex flex-col">
+        <div class="flex flex-col px-4">
             <p class="text-sm font-medium text-red-500">
                 {{ fileUploadErrors }}
             </p>
@@ -98,9 +100,9 @@
         </div>
         <input ref="newFileInput" hidden multiple type="file" @change="handleFileSelectChange" />
         <FileDropArea :show="true" @send-file="handleDragAndDrop">
-            <div class="h-44"></div>
+            <div class="md:h-44"></div>
         </FileDropArea>
-        <div class="">
+        <div class="px-4">
             <div
                 v-for="file in selectedFiles"
                 v-if="selectedFiles.length"

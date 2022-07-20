@@ -203,50 +203,51 @@
                 </button>
             </template>
         </Alert>
-        <Dialog
-            v-if="showLeaveDialog"
-            v-model="showLeaveDialog"
-            class="max-w-10"
-            :noActions="true"
-            @update-model-value="showLeaveDialog = false"
-        >
-            <template v-slot:title class="center">
-                <h1 class="text-center">{{ chat.isGroup ? 'Leaving group' : 'Deleting chat' }}</h1>
+        <Alert v-if="showLeaveDialog" :showAlert="showLeaveDialog" @close="showLeaveDialog = false">
+            <template #title>
+                {{ chat.isGroup ? 'Leaving group' : 'Deleting chat' }}
             </template>
-            <div v-if="chat?.isGroup && chat?.adminId === user?.id" class="px-4">
-                <p v-if="chat?.contacts.length > 1" class="mb-5">
-                    Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
-                </p>
-                <div
-                    v-for="(contact, i) in chat?.contacts.filter(c => c.id !== user.id)"
-                    :key="i"
-                    @click="setNextAdmin"
-                    class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
-                    :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
-                >
-                    <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
-                        <AvatarImg :id="String(contact.id)" small />
-                    </div>
-                    <p
-                        class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"
-                    >
-                        {{ contact.id }}
+            <template #content>
+                <div v-if="chat?.isGroup && chat?.adminId === user?.id">
+                    <p v-if="chat?.contacts.length > 1" class="mb-5">
+                        Please select the next admin before leaving the group <b>{{ chat?.name }}</b>
                     </p>
+                    <div class="w-full max-h-[40vw] overflow-y-auto">
+                        <div
+                            v-for="(contact, i) in chat?.contacts.filter(c => c.id !== user.id)"
+                            :key="i"
+                            @click="setNextAdmin"
+                            class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
+                            :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
+                        >
+                            <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
+                                <AvatarImg :id="String(contact.id)" small />
+                            </div>
+                            <p
+                                class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"
+                            >
+                                {{ contact.id }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="px-4" v-else>Do you really want to delete all chat history?</div>
-            <div class="flex justify-end mt-2 px-4">
+                <div v-else>Do you really want to delete all chat history?</div>
+            </template>
+            <template #actions>
                 <button
-                    class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
+                    @click="doLeaveChat"
+                >
+                    {{ chat?.isGroup ? 'Leave' : 'Delete' }}
+                </button>
+                <button
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm"
                     @click="showLeaveDialog = false"
                 >
                     Cancel
                 </button>
-                <button class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-btnred" @click="doLeaveChat">
-                    {{ chat?.isGroup ? 'Leave' : 'Delete' }}
-                </button>
-            </div>
-        </Dialog>
+            </template>
+        </Alert>
 
         <Alert v-if="showDeleteUserDialog" :showAlert="showDeleteUserDialog" @close="showDeleteUserDialog = false">
             <template #title> Deleting user</template>

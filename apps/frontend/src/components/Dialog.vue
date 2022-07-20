@@ -13,7 +13,7 @@
                 class="bg-white w-full h-full lg:h-auto lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto hide-scrollbar lg:overflow-hidden"
                 @mousedown.stop
             >
-                <div class="bg-accent-700 text-white md:rounded-t-lg">
+                <div class="bg-accent-700 text-white lg:rounded-t-lg">
                     <div class="px-4 pt-8 pb-4 flex items-center justify-between">
                         <slot name="title" />
                         <XIcon
