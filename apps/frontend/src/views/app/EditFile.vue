@@ -81,7 +81,7 @@
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
         let documentServerconfig;
-        let location = user.location;
+        let location = '';
 
         if (shareId) {
             const shareDetails = await getShareWithId(shareId);
@@ -102,10 +102,11 @@
             );
             const encodedEndpoint = encodeURIComponent(apiEndpoint);
             readUrl.value = calcExternalResourceLink(encodedEndpoint);
-        } else {
+        }
+        if (!shareId) {
             fileAccesDetails = (await getFileInfo(path, attachments)).data;
-            isLoading.value = false;
 
+            isLoading.value = false;
             readUrl.value = generateFileBrowserUrl(
                 'https',
                 window.location.hostname,
@@ -113,12 +114,14 @@
                 fileAccesDetails.readToken,
                 attachments
             );
+
+            //todo: fix race condition with (user.location and socket.on('yggdrasil'))
+            location = user.location;
         }
 
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            shareId ? null : (location = user.location);
             documentServerconfig = generateDocumentServerConfig(
                 location,
                 fileAccesDetails.path,
