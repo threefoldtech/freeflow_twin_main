@@ -476,8 +476,6 @@ export class QuantumService {
 
     async getSharePermissionsByUser({ shareId, userId }: { shareId: string; userId: string }) {
         const share = await this.getShareById({ id: shareId });
-        console.log(share);
-        console.log(shareId);
         if (!share) return [];
         const permissions: SharePermissionType[] = [];
         await Promise.all(

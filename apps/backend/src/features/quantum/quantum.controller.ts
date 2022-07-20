@@ -149,7 +149,6 @@ export class QuantumController {
         const url = new URL(onlyOfficeResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
-        console.log(`URL: ${url}`);
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
         await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });

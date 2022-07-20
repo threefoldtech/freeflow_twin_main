@@ -81,7 +81,7 @@
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
         let documentServerconfig;
-        let location = '';
+        let location = user.location;
 
         if (shareId) {
             const shareDetails = await getShareWithId(shareId);
@@ -117,7 +117,6 @@
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            location = user.location;
             documentServerconfig = generateDocumentServerConfig(
                 location,
                 fileAccesDetails.path,

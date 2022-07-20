@@ -7,7 +7,7 @@
         </p>
         <div class="w-auto h-auto flex flex-row">
             <div
-                class="flex-shrink-0 icon mr-2 bg-gray-600 rounded-full h-9 w-9 flex justify-center items-center text-white my-message:bg-accent-500 flex-shrink-0"
+                class="icon mr-2 bg-gray-600 rounded-full h-9 w-9 flex justify-center items-center text-white my-message:bg-accent-500 flex-shrink-0"
             >
                 <i class="fas fa-share-alt"></i>
             </div>
