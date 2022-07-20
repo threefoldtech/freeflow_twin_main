@@ -85,15 +85,16 @@ export class QuantumController {
 
         // actualPath = attachments ? join(actualPath, '/appdata/attachments') : actualPath;
 
+        const actualPath = join(this.storageDir, path);
         return {
-            ...(await this._quantumService.getFileInfo({ path })),
-            key: this._quantumService.getQuantumFileToken({ writable: true, path }),
+            ...(await this._quantumService.getFileInfo({ path: actualPath })),
+            key: this._quantumService.getQuantumFileToken({ writable: true, path: actualPath }),
             readToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: path, permissions: [SharePermissionType.READ] },
+                payload: { file: actualPath, permissions: [SharePermissionType.READ] },
                 exp: 5 * 60,
             }),
             writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: path, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
+                payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
                 exp: 24 * 60 * 60,
             }),
         };

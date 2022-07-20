@@ -94,7 +94,7 @@ export class QuantumService {
 
             return await this.formatFileDetails({ path });
         } catch (error) {
-            throw new BadRequestException(`unable to get file info: ${error}`);
+            throw new NotFoundException(`unable to get file info: ${error}`);
         }
     }
 
