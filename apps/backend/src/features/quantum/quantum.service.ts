@@ -300,8 +300,6 @@ export class QuantumService {
         };
         const signedMsg = await this._keyService.appendSignatureToMessage({ message: msg });
 
-        await this._messageService.createMessage(signedMsg);
-
         const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
 
         for (const contact of contacts) {
@@ -310,7 +308,10 @@ export class QuantumService {
             this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
         }
 
-        this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
+        if (!existingShare) {
+            await this._messageService.createMessage(signedMsg);
+            this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
+        }
 
         return true;
     }
