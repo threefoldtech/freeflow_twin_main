@@ -59,6 +59,6 @@ RUN chmod +x /startup.sh
 RUN mkdir /appdata
 RUN mkdir /appdata/user 
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
-COPY ./docker/redis.conf /etc/redis/redis.conf
+COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
 CMD /startup.sh
