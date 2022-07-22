@@ -211,7 +211,7 @@ export class QuantumController {
     @Get('share')
     @UseGuards(AuthGuard)
     async getShareById(@Query('id') id: string): Promise<IFileShare> {
-        return (await this._quantumService.getShareById({ id })).toJSON();
+        return (await this._quantumService.getShareById({ id }))?.toJSON();
     }
 
     @Delete('share/:id')
@@ -224,7 +224,7 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getShareByPath(@Query('path') path: string): Promise<IFileShare> {
         path = Buffer.from(path, 'base64').toString('binary');
-        return (await this._quantumService.getShareByPath({ path })).toJSON();
+        return (await this._quantumService.getShareByPath({ path }))?.toJSON();
     }
 
     @Post('share/permissions')
