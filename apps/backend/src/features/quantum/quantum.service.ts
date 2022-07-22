@@ -111,9 +111,17 @@ export class QuantumService {
 
     async updateSharePermissions({ path, chatId }: { path: string; chatId: string }) {
         const share = await this.getShareByPath({ path });
+        if (!share) return;
         const permissions = share.parsePermissions().filter(p => p.userId !== chatId);
-        share.permissions = stringifyPermissions(permissions);
         try {
+            const chat = await this._chatService.getChat(chatId);
+            if (!chat) return;
+
+            const contacts = chat.parseContacts().filter(c => c.id !== this.userId || permissions.length === 0);
+            for (const c of contacts) {
+                this._apiService.sendRemoveShare({ location: c.location, shareId: share.id });
+            }
+            if (permissions.length === 0) return;
             await this.updateShare(share, { ...share.toJSON(), permissions });
         } catch (error) {
             throw new BadRequestException(`unable to update share permissions: ${error}`);
@@ -300,8 +308,6 @@ export class QuantumService {
         };
         const signedMsg = await this._keyService.appendSignatureToMessage({ message: msg });
 
-        await this._messageService.createMessage(signedMsg);
-
         const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
 
         for (const contact of contacts) {
@@ -310,7 +316,12 @@ export class QuantumService {
             this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
         }
 
-        this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
+        const userHasPermissions = existingShare?.parsePermissions().some(p => p.userId === shareWith);
+
+        if (!existingShare || !userHasPermissions) {
+            await this._messageService.createMessage(signedMsg);
+            this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
+        }
 
         return true;
     }
@@ -387,7 +398,7 @@ export class QuantumService {
                 .find(m => (m.body as { id: string }).id === share.id);
             if (sharedMessage) {
                 sharedMessage.type = MessageType.STRING;
-                sharedMessage.body = 'File deleted';
+                sharedMessage.body = 'Share deleted';
                 this._chatGateway.emitMessageToConnectedClients('message', sharedMessage);
                 await this._messageService.deleteMessage({ messageId: sharedMessage.id });
             }

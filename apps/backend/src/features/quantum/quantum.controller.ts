@@ -174,7 +174,7 @@ export class QuantumController {
     }
 
     @Get('share/info')
-    async getShareFileAccessDetaisl(@Query() params: { shareId: string; userId: string; path: string }) {
+    async getShareFileAccessDetails(@Query() params: { shareId: string; userId: string; path: string }) {
         const { shareId, userId, path } = params;
         const share = await this._quantumService.getShareById({ id: shareId });
         const userPermissions = await this._quantumService.getSharePermissionsByUser({ shareId, userId });
@@ -193,10 +193,12 @@ export class QuantumController {
                 payload: { file: actualPath, permissions: [SharePermissionType.READ] },
                 exp: 5 * 60,
             }),
-            writeToken: await this._quantumService.generateQuantumJWT({
-                payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
-                exp: 24 * 60 * 60,
-            }),
+            writeToken: userCanWrite
+                ? await this._quantumService.generateQuantumJWT({
+                      payload: { file: actualPath, permissions: [SharePermissionType.WRITE, SharePermissionType.READ] },
+                      exp: 24 * 60 * 60,
+                  })
+                : undefined,
         };
     }
 
@@ -209,7 +211,7 @@ export class QuantumController {
     @Get('share')
     @UseGuards(AuthGuard)
     async getShareById(@Query('id') id: string): Promise<IFileShare> {
-        return (await this._quantumService.getShareById({ id })).toJSON();
+        return (await this._quantumService.getShareById({ id }))?.toJSON();
     }
 
     @Delete('share/:id')
@@ -222,7 +224,7 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async getShareByPath(@Query('path') path: string): Promise<IFileShare> {
         path = Buffer.from(path, 'base64').toString('binary');
-        return (await this._quantumService.getShareByPath({ path })).toJSON();
+        return (await this._quantumService.getShareByPath({ path }))?.toJSON();
     }
 
     @Post('share/permissions')

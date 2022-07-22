@@ -17,11 +17,11 @@
         <div class="flex-1 mr-4">
             <div class="flex items-center" v-if="!sharedDir && !isQuantumChatFiles && !savedAttachments">
                 <template v-for="(item, i) in parts">
-                    <span v-if="i !== 0 && item">
+                    <span v-if="i > 2 && item">
                         <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
                     <span
-                        v-if="item && i !== 0"
+                        v-if="item && i > 2"
                         :title="item"
                         class="cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-700 p-2 rounded-md"
                         @click="i === 0 ? goToHome() : goToAPreviousDirectory(i)"
@@ -111,6 +111,8 @@
     const router = useRouter();
 
     const parts = computed(() => currentDirectory.value.split('/'));
+
+    console.log('parts', parts.value);
 
     const onDragEnter = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
