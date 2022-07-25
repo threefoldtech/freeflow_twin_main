@@ -164,7 +164,7 @@
         rightClickItemAction,
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
-    import { downloadAttachment } from '@/services/fileBrowserService';
+    import { calcExternalResourceLink } from '@/services/urlService';
 
     interface IProps {
         message: Message<MessageBodyType>;
@@ -267,17 +267,22 @@
     };
 
     const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
-        if (count >= 4) {
-            isDownloadingAttachment.value = false;
-            console.log("Couldn't download attachments");
-            return;
-        }
-        isDownloadingAttachment.value = true;
-        const response = await downloadAttachment(message);
-        count++;
-        if (response !== 'OK') await downloadAttachmentToQuantum(message);
-        await sleep(1500);
-        isDownloadingAttachment.value = false;
+        //todo: save downloaded file in attachments folder
+        const url = calcExternalResourceLink((message.body as { url: string }).url);
+        window.open(url, '_blank');
+        return;
+
+        // if (count >= 4) {
+        //     isDownloadingAttachment.value = false;
+        //     console.log("Couldn't download attachments");
+        //     return;
+        // }
+        // isDownloadingAttachment.value = true;
+        // const response = await downloadAttachment(message);
+        // count++;
+        // if (response !== 'OK') await downloadAttachmentToQuantum(message);
+        // await sleep(1500);
+        // isDownloadingAttachment.value = false;
     };
 </script>
 <style lang="css" scoped></style>
