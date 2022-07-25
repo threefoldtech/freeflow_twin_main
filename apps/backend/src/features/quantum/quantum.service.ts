@@ -311,8 +311,6 @@ export class QuantumService {
         const contacts = chat.parseContacts().filter(c => c.id !== this.userId);
 
         for (const contact of contacts) {
-            const permission = existingShare?.parsePermissions().find(p => p.userId === contact.id);
-            if (permission?.sharePermissionTypes.length === sharePermissionTypes.length) continue;
             this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
         }
 
