@@ -19,10 +19,12 @@ import { join } from 'path';
 import syncRequest from 'sync-request';
 
 import { AuthGuard } from '../../guards/auth.guard';
+import { ApiService } from '../api/api.service';
 import { CreateDirectoryDTO } from '../file/dtos/directory.dto';
 import { DirectoryInfoDTO } from '../file/dtos/directory-info.dto';
 import { PathInfoDTO } from '../file/dtos/path-info.dto';
 import { FileService } from '../file/file.service';
+import { KeyService } from '../key/key.service';
 import { MoveFileDTO } from './dtos/move-file.dto';
 import { RenameFileDTO } from './dtos/rename-file.dto';
 import { ShareFileRequesDTO } from './dtos/share-file.dto';
@@ -38,7 +40,9 @@ export class QuantumController {
     constructor(
         private readonly _configService: ConfigService,
         private readonly _quantumService: QuantumService,
-        private readonly _fileService: FileService
+        private readonly _fileService: FileService,
+        private readonly _keyService: KeyService,
+        private readonly _apiService: ApiService
     ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
@@ -48,11 +52,6 @@ export class QuantumController {
     async getDirectoryContent(@Query('path') path: string): Promise<PathInfoDTO[]> {
         const actualPath = path === '/' ? this.storageDir : path;
         return await this._quantumService.getDirectoryContent({ path: actualPath });
-        // return directoryContent.map(file => ({
-        //     ...file,
-        //     path: file.path.replace(`${this.storageDir}`, ''),
-        //     directory: file.directory.replace(this.storageDir, '/'),
-        // }));
     }
 
     @Get('dir/info')
@@ -60,11 +59,74 @@ export class QuantumController {
     async getDirectoryInfo(@Query('path') path: string): Promise<PathInfoDTO> {
         const actualPath = path === '/' ? this.storageDir : path;
         return await this._quantumService.getDirectoryInfo({ path: actualPath });
-        // return {
-        //     ...directoryInfo,
-        //     path: directoryInfo.path.replace(this.storageDir, ''),
-        //     directory: directoryInfo.directory.replace(this.storageDir, '/'),
+    }
+
+    @Get('attachment/download')
+    @UseGuards(AuthGuard)
+    async downloadAttachment(@Query() params: { owner: string; path: string; to: string; messageId: string }) {
+        //todo: save downloaded file in attachments folder
+        return 'OK';
+        // const { path, owner, to, messageId } = params;
+        // const userId = this._configService.get('userId');
+        //
+        // const location = new URL(path).hostname.replace('[', '').replace(']', '');
+        //
+        // const msg: MessageDTO<StringMessageType> = {
+        //     id: uuidv4(),
+        //     body: path,
+        //     from: userId,
+        //     to: owner,
+        //     timeStamp: new Date(),
+        //     type: MessageTypes.DOWNLOAD_ATTACHMENT,
+        //     replies: [],
+        //     signatures: [],
+        //     subject: null,
+        //     chatId: to,
         // };
+        //
+        // let result: Buffer | undefined = undefined;
+        //
+        // if (owner === userId) {
+        //     const path = `/appdata/chats/${to}/files/${messageId}`;
+        //     const folder = fs.readdirSync(path);
+        //     if (!folder || folder.length === 0) return 'File does not exist';
+        //     result = fs.readFileSync(path + '/' + folder[0]);
+        // }
+        //
+        // if (owner !== userId) {
+        //     const parsedmsg = parseMessage(msg);
+        //     await this._keyService.appendSignatureToMessage({ message: parsedmsg });
+        //     result = (
+        //         await this._apiService.sendMessageToApi({
+        //             location,
+        //             message: parsedmsg,
+        //             responseType: 'arraybuffer',
+        //         })
+        //     ).data;
+        // }
+        //
+        // const mimetype = (await fromBuffer(Buffer.from(JSON.stringify(result), 'utf8')))?.mime || null;
+        // const file: UploadedFile = {
+        //     name: null,
+        //     data: Buffer.from(result),
+        //     size: null,
+        //     encoding: null,
+        //     tempFilePath: null,
+        //     truncated: null,
+        //     mimetype,
+        //     md5: null,
+        //     mv: null,
+        // };
+        //
+        // this._quantumService.createFileWithRetry({ fromPath, toPath, name });
+        // await saveFileWithRetry(
+        //     new Path(<string>owner + '/' + path.split('/').pop(), '/appdata/attachments/'),
+        //     file,
+        //     0,
+        //     '/appdata/attachments/'
+        // );
+        //
+        // return 'OK';
     }
 
     @Get('file/info')
