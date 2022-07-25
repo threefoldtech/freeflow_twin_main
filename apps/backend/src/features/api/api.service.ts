@@ -349,8 +349,6 @@ export class ApiService {
 
             const htmlDoc = parse(data);
 
-            // console.log( url ,data);
-
             const propertyList = [];
 
             propertyList.push({
