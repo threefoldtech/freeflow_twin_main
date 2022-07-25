@@ -48,15 +48,17 @@
                 </button>
 
                 <suspense>
-                    <textarea
-                        v-model="userStatus"
-                        style="resize: none"
-                        class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
-                        :disabled="!isEditingStatus"
-                        :placeholder="myStatus"
-                        maxlength="150"
-                    >
-                    </textarea>
+                    <div @click="!isEditingStatus ? setEditStatus(true) : null">
+                        <textarea
+                            v-model="userStatus"
+                            style="resize: none"
+                            class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
+                            :disabled="!isEditingStatus"
+                            :placeholder="myStatus"
+                            maxlength="150"
+                        >
+                        </textarea>
+                    </div>
                 </suspense>
                 <div v-if="isEditingStatus" class="flex justify-end">
                     <span id="current">{{ userStatus?.length }}</span>
