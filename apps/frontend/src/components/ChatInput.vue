@@ -276,7 +276,7 @@
         showTagPerson.value = false;
         console.log(`MESSAGE INPUT: ${messageInput.value}`);
         const messageInputs = messageInput.value?.split(' ');
-        const latestMessage =  messageInputs ? messageInputs[messageInputs?.length - 1] : '';
+        const latestMessage = messageInputs ? messageInputs[messageInputs?.length - 1] : '';
         if (props.chat.isGroup && latestMessage.startsWith('@')) {
             showTagPerson.value = true;
             contacts.value = [...props.chat.contacts].filter(c =>
