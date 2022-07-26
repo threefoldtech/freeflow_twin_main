@@ -110,7 +110,8 @@ export class FileShareMessageState implements MessageState<IFileShareMessage> {
     async handle({ message }: { message: MessageDTO<IFileShareMessage>; chat?: Chat }): Promise<Message> {
         if (message.from === this._configService.get<string>('userId')) return;
         this._chatGateway.emitMessageToConnectedClients('message', message);
-        await this._quantumService.createFileShare({ ...message.body, isSharedWithMe: true });
+        const share = await this._quantumService.getShareById({ id: message.body.id });
+        if (!share) await this._quantumService.createFileShare({ ...message.body, isSharedWithMe: true });
         return await this._messageService.createMessage(message);
     }
 }
