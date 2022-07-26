@@ -1,20 +1,20 @@
 changelog:
-  categories:
-    - title: Breaking Changes 🛠
-      labels:
-        - Semver-Major
-        - breaking-change
-        - priority_critical
-    - title: Exciting New Features 🎉
-      labels:
-        - Semver-Minor
-        - enhancement
-        - priority_minor
-        - priority_major
-        - type_bug
-        - type_feature
-        - type_improvement
-        - acceptance testing
-    - title: Other Changes
-      labels:
-        - "*"
+    categories:
+        - title: Breaking Changes 🛠
+          labels:
+              - Semver-Major
+              - breaking-change
+              - priority_critical
+        - title: Exciting New Features 🎉
+          labels:
+              - Semver-Minor
+              - enhancement
+              - priority_minor
+              - priority_major
+              - type_bug
+              - type_feature
+              - type_improvement
+              - acceptance testing
+        - title: Other Changes
+          labels:
+              - '*'
