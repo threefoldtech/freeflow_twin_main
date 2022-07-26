@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-    import { defineComponent, defineProps } from 'vue';
+    import { defineComponent } from 'vue';
     import { clock, minuteClock, hourClock, ClockType } from '@/services/clockService';
     import TimeContent from '@/components/TimeContent.vue';
 
