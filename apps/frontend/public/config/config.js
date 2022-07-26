@@ -1,6 +1,6 @@
 const config = {
-    appBackend: 'https://login.staging.jimber.io/',
-    documentServerLocation: 'https://documentserver.digitaltwin-test.jimbertesting.be/',
+  appBackend: process.env.NODE_ENV !== 'production' ? 'https://login.staging.jimber.io/': 'https://login.threefold.me/',
+    documentServerLocation: process.env.NODE_ENV !== 'production' ? 'https://documentserver.digitaltwin-test.jimbertesting.be/': 'https://documentserver.digitaltwin.jimbertesting.be/',
     giphyApiKey: 'uk3XRSO0vYrPDEQKDPZJ2wGz33qzIxST',
     beta: true,
 };
