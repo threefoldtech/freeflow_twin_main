@@ -11,6 +11,7 @@ import { FileAction } from 'custom-types/file-actions.type';
 import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
+import { useRouter } from 'vue-router';
 
 const state = reactive<State>({
     socket: '',
@@ -28,6 +29,7 @@ const notify = ({ id, sound = 'beep.mp3' }) => {
 };
 
 const initializeSocket = (username: string) => {
+    const router = useRouter();
     state.socket = inject('socket');
 
     state.socket.on('connect', () => {
@@ -48,7 +50,9 @@ const initializeSocket = (username: string) => {
         removeUserFromBlockList(chatId);
     });
     state.socket.on('message', (message: Message<any>) => {
-        if (message.type !== 'READ') createOSNotification('Message received', `From: ${message.from}`);
+        const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
+        if (message.type !== 'READ' && !isChatOpen)
+            createOSNotification('Message received', `From: ${message.from}\nMessage: ${message.body}`);
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
