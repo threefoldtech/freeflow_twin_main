@@ -19,7 +19,7 @@
     import { marked } from 'marked';
     import DOMPurify from 'dompurify';
     import emoji from 'node-emoji';
-    //import { getPreview } from '@/store/chatStore';
+    // import { getPreview } from '@/store/chatStore';
 
     interface IProp {
         message: {
@@ -45,9 +45,19 @@
                   ))
                 : (oldBody = oldBody)
         );
+        oldBody = oldBody.replace(/`/g, '');
+        oldBody = oldBody.replace(/<[a-zA-Z]+.*?(?<!\?)>/g, '```$&');
+        oldBody = oldBody.replace(/<\/[a-zA-Z]+>/g, '$&```');
 
         return oldBody;
     };
+
+    body = bodyReplacer(body);
+
+    const markedBody = marked(body);
+    const sanitizedBody = DOMPurify.sanitize(markedBody);
+
+    const computedMessage = DOMPurify.sanitize(marked(body));
 
     // const isValidURL = url => {
     //     var res = url.match(
@@ -65,13 +75,6 @@
     //         return null;
     //     }
     // };
-
-    body = bodyReplacer(body);
-
-    const markedBody = marked(body);
-    const sanitizedBody = DOMPurify.sanitize(markedBody);
-
-    const computedMessage = DOMPurify.sanitize(marked(body));
 
     // onMounted(async () => {
     //     if (isValidURL(sanitizedBody)) {
