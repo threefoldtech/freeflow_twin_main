@@ -51,7 +51,7 @@
                                         </div>
                                         <div class="md:ml-4">
                                             <div
-                                                class="text-sm font-medium text-gray-900 text-ellipsis overflow-hidden"
+                                                class="text-sm font-medium text-gray-900 max-w-[100px] truncate "
                                             >
                                                 {{ item.name }}
                                             </div>

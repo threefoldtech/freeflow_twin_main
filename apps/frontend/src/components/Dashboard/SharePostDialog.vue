@@ -79,7 +79,7 @@
                                                     <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
                                                 </div>
                                                 <div class="ml-4 w-full">
-                                                    <div class="text-sm font-medium w-1/2 truncate text-gray-900">
+                                                    <div class="text-sm font-medium max-w-[50%] truncate text-gray-900">
                                                         {{ chat.name }}
                                                     </div>
                                                 </div>
