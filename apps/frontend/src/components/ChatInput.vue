@@ -211,8 +211,9 @@
     };
 
     if (props.chat.draft) {
+        console.log("CALLED")
         if (props.chat.draft?.action === 'EDIT') {
-            messageInput.value = String(props.chat.draft.body.body);
+            messageInput.value = String(props.chat.draft.body);
             editMessage(props.chat.draft.to, props.chat.draft.body);
         }
         if (props.chat.draft?.action === 'REPLY') {
@@ -274,8 +275,8 @@
 
     watch(messageInput, () => {
         showTagPerson.value = false;
-        const messageInputs = messageInput.value.split(' ');
-        const latestMessage = messageInputs[messageInputs.length - 1];
+        const messageInputs = messageInput.value?.split(' ');
+        const latestMessage = messageInputs ? messageInputs[messageInputs.length - 1] : '';
         if (props.chat.isGroup && latestMessage.startsWith('@')) {
             showTagPerson.value = true;
             contacts.value = [...props.chat.contacts].filter(c =>
