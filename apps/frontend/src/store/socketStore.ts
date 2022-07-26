@@ -48,6 +48,7 @@ const initializeSocket = (username: string) => {
         removeUserFromBlockList(chatId);
     });
     state.socket.on('message', (message: Message<any>) => {
+        if (message.type !== 'READ') createOSNotification('Message received', `From: ${message.from}`);
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
@@ -66,6 +67,8 @@ const initializeSocket = (username: string) => {
         addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
     });
     state.socket.on('connection_request', (newContactRequest: Chat) => {
+        const contact = newContactRequest.contacts.find(x => x.id !== username);
+        createOSNotification('New contact request', `From: ${contact.id}`);
         const { addChat } = usechatsActions();
         addChat(newContactRequest);
         newUnreadChats(newContactRequest.chatId);
@@ -171,3 +174,14 @@ interface State {
     socket: any;
     notification: object;
 }
+
+const createOSNotification = (title: string, body: string) => {
+    const notifImg = '/purple_uhuru_logo.ico';
+    const options = {
+        body,
+        icon: notifImg,
+    };
+    Notification.requestPermission().then(result => {
+        if (result === 'granted') new Notification(title, options);
+    });
+};

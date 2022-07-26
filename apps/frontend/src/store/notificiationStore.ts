@@ -9,6 +9,7 @@ import {
 } from '@/types/notifications';
 import { uuidv4 } from '@/common';
 
+export const notifcationPermissionGranted = ref(false);
 export const notifications = ref<Notification[]>([]);
 export const addNotification = (n: Notification) => {
     notifications.value.push(n);
