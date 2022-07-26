@@ -45,7 +45,7 @@
                   ))
                 : (oldBody = oldBody)
         );
-        oldBody = oldBody.replace(/`/g, "");
+        oldBody = oldBody.replace(/`/g, '');
         oldBody = oldBody.replace(/<[a-zA-Z]+.*?(?<!\?)>/g, '```$&');
         oldBody = oldBody.replace(/<\/[a-zA-Z]+>/g, '$&```');
 
