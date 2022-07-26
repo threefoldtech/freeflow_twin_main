@@ -44,6 +44,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: 'Home',
         component: Home,
+        meta: { requiresUnAuth: true },
     },
     {
         path: '/callback',
@@ -273,6 +274,9 @@ const router = createRouter({
 router.beforeEach(async (to, _from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
         next({ name: 'Home' });
+    }
+    if (to.matched.some(record => record.meta.requiresUnAuth) && (await isUserAuthenticated())) {
+        next({ name: 'dashboard' });
     }
     //Starts the browser if the user navigates to /glass as first page
     if (to.name === 'glass') {
