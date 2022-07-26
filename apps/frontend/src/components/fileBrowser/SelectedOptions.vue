@@ -6,32 +6,32 @@
             </div>
             <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="showShareDialog = true">
                 <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-share-alt"></i>
+                    <i class="fas fa-lg fa-share-alt"></i>
                 </span>
             </div>
             <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="makeRenameDialogVisible()">
                 <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-pen"></i>
+                    <i class="fas fa-lg fa-pen"></i>
                 </span>
             </div>
             <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="downloadFiles">
                 <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-download"></i>
+                    <i class="fas fa-lg fa-download"></i>
                 </span>
             </div>
             <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="copyFiles()">
                 <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-copy"></i>
+                    <i class="fas fa-lg fa-copy"></i>
                 </span>
             </div>
             <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="cutFiles()">
                 <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-cut"></i>
+                    <i class="fas fa-lg fa-cut"></i>
                 </span>
             </div>
             <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="showDeleteDialog = true">
                 <span class="text-red-300 hover:text-red-500">
-                    <i class="fas fa-trash-alt"></i>
+                    <i class="fas fa-lg fa-trash-alt"></i>
                 </span>
             </div>
             <div
@@ -273,6 +273,7 @@
     import Alert from '@/components/Alert.vue';
     import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
     import { DotsHorizontalIcon, XIcon, ShareIcon, PencilIcon, DownloadIcon, TrashIcon } from '@heroicons/vue/outline';
+    import Tooltip from '@/components/Tooltip.vue';
 
     const { chats } = useChatsState();
     const { retrieveChats } = usechatsActions();
