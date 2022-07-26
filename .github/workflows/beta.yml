@@ -25,7 +25,7 @@ jobs:
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
     deploy:
         needs: [build]
-        runs-on: staging
+        runs-on: beta
         environment:
             name: beta.uhuru
             url: https://beta.uhuru.me/
