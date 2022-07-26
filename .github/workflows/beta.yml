@@ -25,7 +25,7 @@ jobs:
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
     deploy:
         needs: [build]
-        runs-on: beta
+        runs-on: staging
         environment:
             name: beta.uhuru
             url: https://beta.uhuru.me/
@@ -42,6 +42,6 @@ jobs:
               run: |
                   docker pull registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
                   echo "registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
-                  echo stopping all existing chat containers.
-                  [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker stop $(docker ps --filter "name=-chat" -q)     
+                  echo Removing all existing chat containers / volumes.
+                  [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)     
                   echo Completed.
