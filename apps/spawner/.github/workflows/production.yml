@@ -1,0 +1,56 @@
+name: production-spawner
+
+on:
+    push:
+        tags:
+            - 'v[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - uses: satackey/action-docker-layer-caching@v0.0.11
+              continue-on-error: true
+            - name: Build the Docker image
+              run: docker-compose build
+              env:
+                  digitaltwin_spawner_tag: ${{ github.sha }}
+                  digitaltwin_frontend_tag: ${{ github.sha }}
+                  digitaltwin_proxy_tag: ${{ github.sha }}
+                  DIGITALTWIN_APPID: 'beta.uhuru.me'
+                  ENVIRONMENT: 'production'
+            - name: Log into GitHub Container Registry
+              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            - name: Push all to dockerhub
+              run: |
+                  docker tag threefoldjimber/digitaltwin-spawner:${{ github.sha }} threefoldjimber/digitaltwin-spawner:latest
+                  docker tag threefoldjimber/digitaltwin-frontend:${{ github.sha }} threefoldjimber/digitaltwin-frontend:latest
+                  #docker tag threefoldjimber/digitaltwin-proxy:${{ github.sha }} threefoldjimber/digitaltwin-proxy:latest
+                  docker push threefoldjimber/digitaltwin-spawner:latest
+                  docker push threefoldjimber/digitaltwin-frontend:latest
+                  #docker push threefoldjimber/digitaltwin-proxy:latest
+                  docker push threefoldjimber/digitaltwin-spawner:${{ github.sha }}
+                  docker push threefoldjimber/digitaltwin-frontend:${{ github.sha }}
+              # docker push threefoldjimber/digitaltwin-proxy:${{ github.sha }}
+    deploy:
+        needs: [build]
+        runs-on: production
+        environment:
+            name: digitaltwin.production
+            url: https://beta.uhuru.me/
+        steps:
+            - uses: actions/checkout@v2
+            - name: Deploying on production server
+              run: |
+                  docker pull threefoldjimber/digitaltwin-spawner:${{ github.sha }}
+                  docker pull threefoldjimber/digitaltwin-frontend:${{ github.sha }}
+                  #docker pull threefoldjimber/digitaltwin-proxy:${{ github.sha }}
+                  docker-compose up -d
+                  echo Completed.
+              env:
+                  digitaltwin_spawner_tag: ${{ github.sha }}
+                  digitaltwin_frontend_tag: ${{ github.sha }}
+                  #digitaltwin_proxy_tag: ${{ github.sha }}
+                  DIGITALTWIN_APPID: 'beta.uhuru.me'
+                  ENVIRONMENT: 'production'

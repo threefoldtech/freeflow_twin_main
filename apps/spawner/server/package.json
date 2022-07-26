@@ -1,0 +1,43 @@
+{
+    "name": "digitaltwin-spawner",
+    "version": "1.0.0",
+    "description": "",
+    "main": "dist/server.js",
+    "scripts": {
+        "serve": "yarn run clean tsc && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
+        "build": "tsc",
+        "clean": "rm -rf dist",
+        "prod": "node dist/server.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@threefoldjimber/threefold_login": "^1.4.0",
+        "bip39": "^3.0.4",
+        "cors": "^2.8.5",
+        "dockerode": "^3.2.1",
+        "express": "^4.17.1",
+        "express-session": "^1.17.1",
+        "morgan": "^1.10.0",
+        "typescript": "^4.0.2",
+        "winston": "^3.3.3"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.9",
+        "@types/dockerode": "^3.2.2",
+        "@types/express": "^4.17.7",
+        "@types/express-session": "^1.17.3",
+        "@types/morgan": "^1.9.2",
+        "@types/node": "^14.14.22",
+        "@typescript-eslint/eslint-plugin": "^4.0.1",
+        "@typescript-eslint/parser": "^4.0.1",
+        "concurrently": "^5.3.0",
+        "eslint": "^7.8.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-jsdoc": "^30.3.1",
+        "eslint-plugin-prefer-arrow": "^1.2.2",
+        "husky": "^4.2.5",
+        "nodemon": "^2.0.4",
+        "ts-node": "^8.10.2"
+    }
+}

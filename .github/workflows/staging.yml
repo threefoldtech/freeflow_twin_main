@@ -1,0 +1,41 @@
+name: staging-digitaltwin
+
+on:
+    push:
+        tags:
+            - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
+
+jobs:
+    build:
+        runs-on: staging
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  submodules: recursive
+            - uses: satackey/action-docker-layer-caching@v0.0.11
+              continue-on-error: true
+            - name: Build the Docker image
+              run: docker build . --file ./docker/prod/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+            - name: Log into GitHub Container Registry
+              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry.gitlab.com -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+            - name: Push to gitlab registry
+              run: docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+            - name: Push latest to gitlab registry
+              run: |
+                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+    deploy:
+        needs: [build]
+        runs-on: staging
+        environment:
+            name: digitaltwin.staging
+            url: https://digitaltwin-test.jimbertesting.be/
+        steps:
+            - name: Deploying on staging server
+              run: |
+                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+                  echo "registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
+                  echo Removing all existing chat containers / volumes.
+                  [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)     
+                  echo Completed.

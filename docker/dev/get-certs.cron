@@ -1,0 +1,1 @@
+@daily wget -O /certs/privkey.pem https://keys.jimbertesting.be/live/digitaltwin-local.jimbertesting.be/privkey.pem && wget -O /certs/fullchain.pem https://keys.jimbertesting.be/live/digitaltwin-local.jimbertesting.be/fullchain.pem
