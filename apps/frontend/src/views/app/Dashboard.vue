@@ -29,12 +29,22 @@
     import Spinner from '@/components/Spinner.vue';
     import { usechatsActions } from '@/store/chatStore';
     import { notifcationPermissionGranted } from '@/store/notificiationStore';
+    import { registerSW } from 'virtual:pwa-register';
 
     const { retrieveChats } = usechatsActions();
 
     (async () => {
         await getAllPosts();
         await retrieveChats();
+
+        registerSW({
+            onOfflineReady() {
+                console.log('SW: Offline ready');
+            },
+            onRegisterError(error) {
+                console.log('SW: Error registering', error);
+            },
+        });
         Notification.requestPermission().then(result => {
             if (result === 'granted') notifcationPermissionGranted.value = true;
         });
