@@ -25,7 +25,7 @@
                 <div class="py-2 flex-col">
                     <slot />
                 </div>
-                <div v-if="!noActions" class="flex justify-end px-4 mt-2">
+                <div v-if="!noActions" class="flex justify-end px-4 mt-2 pb-2">
                     <button
                         class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                         @click="$emit('update-model-value', false)"
