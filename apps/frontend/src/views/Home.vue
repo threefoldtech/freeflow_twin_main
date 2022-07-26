@@ -15,14 +15,14 @@
                             {{ name }}
                         </h1>
                         <p class="mt-4 text-base text-gray-500">Automatically redirecting you in 5 seconds ...</p>
-                        <div class="mt-6">
-                            <a
-                                href="#"
-                                class="text-base font-medium text-indigo-600 hover:text-indigo-500"
-                                @click="loginAndPush"
-                                >Verify my identity now<span aria-hidden="true"> &rarr;</span></a
-                            >
-                        </div>
+                        <!-- <div class="mt-6"> -->
+                        <!--     <a -->
+                        <!--         href="#" -->
+                        <!--         class="text-base font-medium text-indigo-600 hover:text-indigo-500" -->
+                        <!--         @click="loginAndPush" -->
+                        <!--         >Verify my identity now<span aria-hidden="true"> &rarr;</span></a -->
+                        <!--     > -->
+                        <!-- </div> -->
                     </div>
                 </div>
             </main>
