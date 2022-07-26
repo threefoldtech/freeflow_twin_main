@@ -26,6 +26,9 @@ export default defineConfig({
                 'favicon-16x16.png',
                 'safari-pinned-tab.svg',
             ],
+            workbox: {
+                maximumFileSizeToCacheInBytes: 4000000, // 4MB
+            },
             manifest: {
                 name: 'Uhuru',
                 short_name: 'Uhuru',
@@ -45,9 +48,6 @@ export default defineConfig({
                         type: 'image/png',
                     },
                 ],
-            },
-            devOptions: {
-                enabled: true,
             },
         }),
     ],
