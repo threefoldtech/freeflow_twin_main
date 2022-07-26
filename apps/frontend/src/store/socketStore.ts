@@ -52,7 +52,7 @@ const initializeSocket = (username: string) => {
     state.socket.on('message', (message: Message<any>) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
         if (message.type !== 'READ' && !isChatOpen)
-            createOSNotification('Message received', `From: ${message.from}\nMessage: ${message.body}`);
+            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
@@ -187,3 +187,6 @@ const createOSNotification = (title: string, body: string) => {
         if (result === 'granted') new Notification(title, options);
     });
 };
+
+// truncate string to fit given Length
+const truncate = (str: string, length: number) => (str.length > length ? str.substring(0, length) + '...' : str);
