@@ -330,8 +330,9 @@ export class QuantumService {
             if (share) {
                 await this.deleteShare({ id: share.entityId });
                 share.parsePermissions().map(async permission => {
-                    const contact = await this._contactService.getContact({ id: permission.userId });
-                    const sharedMessage = (await this._messageService.getAllMessagesFromChat({ chatId: contact.id }))
+                    const sharedMessage = (
+                        await this._messageService.getAllMessagesFromChat({ chatId: permission.userId })
+                    )
                         .map(m => m.toJSON())
                         .filter(m => m.type === MessageType.FILE_SHARE)
                         .find(m => (m.body as { id: string }).id === share.id);
@@ -341,7 +342,16 @@ export class QuantumService {
                         this._chatGateway.emitMessageToConnectedClients('message', sharedMessage);
                         await this._messageService.deleteMessage({ messageId: sharedMessage.id });
                     }
-                    this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
+                    const contact = await this._contactService.getContact({ id: permission.userId });
+                    if (!contact) {
+                        const chat = await this._chatService.getChat(permission.userId);
+                        chat.parseContacts()
+                            .filter(c => c.id !== this.userId)
+                            .forEach(c =>
+                                this._apiService.sendRemoveShare({ location: c.location, shareId: share.id })
+                            );
+                    }
+                    if (contact) this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
                 });
             }
             const stats = await this._fileService.getStats({ path });
