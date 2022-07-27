@@ -44,9 +44,8 @@
                                     class="bg-black text-white mt-2 p-4 h-16 overflow-x-scroll overflow-y-hidden whitespace-nowrap rounded-md"
                                 >
                                     <p class="text-white text-left">
-                                        docker run -ti --sysctl net.ipv6.conf.all.disable_ipv6=0 -e "USER_ID={{
-                                            USERNAME
-                                        }}" -e "DIGITALTWIN_APPID=digitaltwin-local.jimbertesting.be" -e
+                                        docker run -ti --sysctl net.ipv6.conf.all.disable_ipv6=0 -e "USER_ID={{ name }}"
+                                        -e "DIGITALTWIN_APPID=digitaltwin-local.jimbertesting.be" -e
                                         "ENVIRONMENT=staging" --cap-add=NET_ADMIN --device=/dev/net/tun:/dev/net/tun -p
                                         443:443 threefoldjimber/digitaltwin:latest
                                         <span class="text-black">/////</span>
@@ -55,8 +54,7 @@
                             </DisclosurePanel>
                         </Disclosure>
                         <p class="text-left max-w-md mt-2 self-start">
-                            3. Browse to https://{{ username }}.digitaltwin-local.jimbertesting.be<br />
-                            4. Replace {{ USERNAME }} with your own name.
+                            3. Browse to https://{{ name }}.digitaltwin-local.jimbertesting.be<br />
                         </p>
                     </div>
                 </DisclosurePanel>
