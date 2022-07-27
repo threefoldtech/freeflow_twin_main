@@ -4,36 +4,68 @@
             <div v-if="selectedPaths.length > 0" class="mx-2">
                 <p>{{ selectedPaths.length }} File(s) selected</p>
             </div>
-            <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="showShareDialog = true">
-                <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-share-alt"></i>
-                </span>
-            </div>
-            <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="makeRenameDialogVisible()">
-                <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-pen"></i>
-                </span>
-            </div>
-            <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="downloadFiles">
-                <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-download"></i>
-                </span>
-            </div>
-            <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="copyFiles()">
-                <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-copy"></i>
-                </span>
-            </div>
-            <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="cutFiles()">
-                <span class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-cut"></i>
-                </span>
-            </div>
-            <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="showDeleteDialog = true">
-                <span class="text-red-300 hover:text-red-500">
-                    <i class="fas fa-trash-alt"></i>
-                </span>
-            </div>
+            <Tooltip v-if="selectedPaths.length === 1" textItem="Share">
+                <template #source>
+                    <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="showShareDialog = true">
+                        <span class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-lg fa-share-alt"></i>
+                        </span>
+                    </div>
+                </template>
+            </Tooltip>
+            <Tooltip v-if="selectedPaths.length === 1" textItem="Rename">
+                <template #source>
+                    <div
+                        v-if="selectedPaths.length === 1"
+                        class="mx-2 cursor-pointer"
+                        @click="makeRenameDialogVisible()"
+                    >
+                        <span class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-lg fa-pen"></i>
+                        </span>
+                    </div>
+                </template>
+            </Tooltip>
+            <Tooltip v-if="selectedPaths.length > 0" textItem="Download">
+                <template #source>
+                    <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="downloadFiles">
+                        <span class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-lg fa-download"></i>
+                        </span>
+                    </div>
+                </template>
+            </Tooltip>
+
+            <Tooltip v-if="selectedPaths.length > 0" textItem="Copy">
+                <template #source>
+                    <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="copyFiles()">
+                        <span class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-lg fa-copy"></i>
+                        </span>
+                    </div>
+                </template>
+            </Tooltip>
+
+            <Tooltip v-if="selectedPaths.length > 0" textItem="Cut">
+                <template #source>
+                    <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="cutFiles()">
+                        <span class="text-gray-400 hover:text-gray-500">
+                            <i class="fas fa-lg fa-cut"></i>
+                        </span>
+                    </div>
+                </template>
+            </Tooltip>
+
+            <Tooltip v-if="selectedPaths.length > 0" textItem="Delete">
+                <template #source>
+                    <div v-if="selectedPaths.length > 0" class="mx-2 cursor-pointer" @click="showDeleteDialog = true">
+                        <span class="text-red-300 hover:text-red-500">
+                            <i class="fas fa-lg fa-trash-alt"></i>
+                        </span>
+                    </div>
+                </template>
+            </Tooltip>
+
             <div
                 v-if="copiedFiles.length > 0"
                 class="mx-2 px-2 py-1 text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer flex flex-row"
@@ -273,6 +305,7 @@
     import Alert from '@/components/Alert.vue';
     import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
     import { DotsHorizontalIcon, XIcon, ShareIcon, PencilIcon, DownloadIcon, TrashIcon } from '@heroicons/vue/outline';
+    import Tooltip from '@/components/Tooltip.vue';
 
     const { chats } = useChatsState();
     const { retrieveChats } = usechatsActions();
