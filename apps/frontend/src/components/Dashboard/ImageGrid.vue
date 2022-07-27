@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-    import { defineProps } from 'vue';
     import { XIcon } from '@heroicons/vue/solid';
 
     const props = defineProps<{ images: File[] }>();

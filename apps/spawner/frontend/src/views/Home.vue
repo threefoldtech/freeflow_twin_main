@@ -55,7 +55,7 @@
                             </DisclosurePanel>
                         </Disclosure>
                         <p class="text-left max-w-md mt-2 self-start">
-                            3. Browse to https://{{ username }}.digitaltwin-local.jimbertesting.be<br />
+                            3. Browse to https://{{ USERNAME }}.digitaltwin-local.jimbertesting.be<br />
                             4. Replace {{ USERNAME }} with your own name.
                         </p>
                     </div>
@@ -88,6 +88,7 @@
         },
         setup() {
             const name = ref('');
+            const USERNAME = ref('{{ USERNAME }}');
             const loginAndSpawn = () => {
                 const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
                 console.log('Username', actualName);
@@ -96,6 +97,7 @@
             };
 
             return {
+                USERNAME,
                 name,
                 loginAndSpawn,
             };

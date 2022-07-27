@@ -4,6 +4,7 @@ import { ApiModule } from '../api/api.module';
 import { ChatModule } from '../chat/chat.module';
 import { ContactModule } from '../contact/contact.module';
 import { DbModule } from '../db/db.module';
+import { EncryptionModule } from '../encryption/encryption.module';
 import { FileModule } from '../file/file.module';
 import { KeyModule } from '../key/key.module';
 import { LocationModule } from '../location/location.module';
@@ -17,6 +18,7 @@ import { ShareRedisRepository } from './repositories/share-redis.repository';
     imports: [
         KeyModule,
         DbModule,
+        EncryptionModule,
         forwardRef(() => ContactModule),
         forwardRef(() => ApiModule),
         forwardRef(() => FileModule),

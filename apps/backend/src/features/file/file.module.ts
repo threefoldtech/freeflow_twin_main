@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 
 import { ApiModule } from '../api/api.module';
 import { ChatModule } from '../chat/chat.module';
+import { EncryptionModule } from '../encryption/encryption.module';
 import { KeyModule } from '../key/key.module';
 import { LocationModule } from '../location/location.module';
 import { MessageModule } from '../message/message.module';
@@ -20,6 +21,7 @@ import { FileTasks } from './file.tasks';
         KeyModule,
         ChatModule,
         MessageModule,
+        EncryptionModule,
         forwardRef(() => QuantumModule),
     ],
     controllers: [FileController],
