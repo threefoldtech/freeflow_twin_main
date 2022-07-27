@@ -53,6 +53,7 @@
                         v-for="(contact, idx) in contacts"
                         :key="idx"
                         class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
+                        @click="tagPerson(contact)"
                         :class="{ 'bg-gray-100': activeTag === idx }"
                     >
                         <AvatarImg :id="String(contact.id)" small />
@@ -111,6 +112,12 @@
                                 placeholder="Write a message ..."
                                 @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
                                 @keyup.arrow-down="activeTag < contacts.length - 1 ? activeTag++ : (activeTag = 0)"
+                                @keydown.tab.prevent="
+                                    () => {
+                                        activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1);
+                                        message.focus();
+                                    }
+                                "
                                 @keyup.esc="
                                     () => {
                                         showTagPerson = false;
@@ -362,15 +369,21 @@
         resizeTextarea();
     };
 
+    const tagPerson = contact => {
+        const atIdx = messageInput.value.lastIndexOf('@');
+        messageInput.value = messageInput.value.substring(0, atIdx + 1);
+        messageInput.value += `${contact.id} `;
+        showTagPerson.value = false;
+        contacts.value = [...props.chat.contacts];
+        message.value.focus();
+        return;
+    };
+
     const chatsend = async () => {
         const atIdx = messageInput.value.lastIndexOf('@');
         if (showTagPerson.value && atIdx > -1) {
-            const contact = contacts.value[activeTag.value].id;
-            messageInput.value = messageInput.value.substring(0, atIdx + 1);
-            messageInput.value += `${contact} `;
-            showTagPerson.value = false;
-            contacts.value = [...props.chat.contacts];
-            return;
+            const contact = contacts.value[activeTag.value];
+            return tagPerson(contact);
         }
 
         messageInput.value = '';

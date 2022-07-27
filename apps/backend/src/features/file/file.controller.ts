@@ -18,6 +18,7 @@ import { createReadStream } from 'fs';
 import { join } from 'path';
 
 import { AuthGuard } from '../../guards/auth.guard';
+import { QuantumService } from '../quantum/quantum.service';
 import { LocalFilesInterceptor } from './file.interceptor';
 import { FileService } from './file.service';
 
@@ -25,18 +26,34 @@ import { FileService } from './file.service';
 export class FileController {
     private storageDir = '';
 
-    constructor(private readonly _configService: ConfigService, private readonly _fileService: FileService) {
+    constructor(
+        private readonly _configService: ConfigService,
+        private readonly _fileService: FileService,
+        private readonly _quantumService: QuantumService
+    ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
 
     @Get(':path')
-    downloadFile(@Param('path') path: string): StreamableFile {
+    async downloadFile(@Req() req: Request, @Param('path') path: string) {
         path = Buffer.from(path, 'base64').toString('binary');
         const filePath = join(`${this.storageDir}`, path);
         if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
 
-        return new StreamableFile(createReadStream(filePath));
+        const fileBuffer = this._fileService.readFile({ path: filePath });
+        const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
+        const fileInfo = await this._quantumService.getFileInfo({ path: filePath });
+
+        if (req.res) req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
+
+        fileStream.pipe(req.res);
+
+        await new Promise(resolve => {
+            fileStream.on('end', () => {
+                resolve(req.res.end());
+            });
+        });
     }
 
     @Get('download/compressed')

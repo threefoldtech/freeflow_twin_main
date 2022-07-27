@@ -179,8 +179,7 @@ export class QuantumController {
         const fileBuffer = this._fileService.readFile({ path });
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
         const fileInfo = await this._quantumService.getFileInfo({ path });
-        if (req.res)
-            req.res.setHeader(`Content-disposition`, `attachment; filename=${fileInfo.fullName}.${fileInfo.extension}`);
+        if (req.res) req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
 
         fileStream.pipe(req.res);
 
