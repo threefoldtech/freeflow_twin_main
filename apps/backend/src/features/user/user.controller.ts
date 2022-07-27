@@ -44,6 +44,7 @@ export class UserController {
 
     @Get('status')
     async getStatus(): Promise<IStatus> {
+        console.log('getStatus');
         const isOnline = (await this._userGateway.getConnections()) > 0 ? true : false;
         const userData = await this._userService.getUserData();
         const avatar = await this._userService.getUserAvatar();
