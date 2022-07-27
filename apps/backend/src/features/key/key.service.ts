@@ -37,7 +37,7 @@ export class KeyService {
                     keyType,
                 } as Key);
             } catch (error) {
-                throw new BadRequestException(error);
+                throw new BadRequestException(`error creating ${keyType} key: ${error}`);
             }
 
         existingKey.key = pkString;
