@@ -45,8 +45,7 @@ export class FileController {
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
         const fileInfo = await this._quantumService.getFileInfo({ path: filePath });
 
-        if (req.res)
-            req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
+        if (req.res) req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
 
         fileStream.pipe(req.res);
 
