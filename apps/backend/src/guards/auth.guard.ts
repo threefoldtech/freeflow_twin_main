@@ -36,7 +36,6 @@ export class AuthGuard implements CanActivate {
             return true;
         }
 
-
         const sessionUserId = req.session?.userId;
         if (!sessionUserId) return false;
 

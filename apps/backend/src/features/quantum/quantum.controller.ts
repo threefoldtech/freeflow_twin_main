@@ -311,10 +311,13 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     moveFiles(@Body() { paths, destination }: MoveFileDTO): boolean {
         paths.map(path => {
+            const name = path.split('/').pop();
+            const actualPath = path === '/' ? join(this.storageDir, name) : path;
+            const actualDestination = destination === '/' ? this.storageDir : destination;
             this._quantumService.createFileWithRetry({
-                fromPath: path,
-                toPath: destination,
-                name: path.split('/').pop(),
+                fromPath: actualPath,
+                toPath: actualDestination,
+                name,
             });
         });
         return true;
