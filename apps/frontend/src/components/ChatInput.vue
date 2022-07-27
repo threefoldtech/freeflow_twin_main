@@ -369,7 +369,7 @@
         resizeTextarea();
     };
 
-    const tagPerson = (contact) => {
+    const tagPerson = contact => {
         const atIdx = messageInput.value.lastIndexOf('@');
         messageInput.value = messageInput.value.substring(0, atIdx + 1);
         messageInput.value += `${contact.id} `;
@@ -377,7 +377,7 @@
         contacts.value = [...props.chat.contacts];
         message.value.focus();
         return;
-    }
+    };
 
     const chatsend = async () => {
         const atIdx = messageInput.value.lastIndexOf('@');
