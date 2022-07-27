@@ -3,6 +3,7 @@ node_modules/
 /dist/
 # Ignore built ts files
 dist/**/*
+dev-dist/
 # local env files
 .env.local
 .env.*.local
