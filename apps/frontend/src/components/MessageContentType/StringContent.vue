@@ -46,8 +46,6 @@
                 : (oldBody = oldBody)
         );
         oldBody = oldBody.replace(/`/g, '');
-        oldBody = oldBody.replace(/<[a-zA-Z]+.*?(?<!\?)>/g, '```$&');
-        oldBody = oldBody.replace(/<\/[a-zA-Z]+>/g, '$&```');
 
         return oldBody;
     };
@@ -57,7 +55,7 @@
     const markedBody = marked(body);
     const sanitizedBody = DOMPurify.sanitize(markedBody);
 
-    const computedMessage = DOMPurify.sanitize(marked(body));
+    const computedMessage = sanitizedBody;
 
     // const isValidURL = url => {
     //     var res = url.match(
