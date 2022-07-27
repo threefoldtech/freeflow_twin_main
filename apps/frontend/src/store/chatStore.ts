@@ -198,20 +198,18 @@ const addGroupchat = (name: string, contacts: GroupContact[]) => {
         });
 };
 
-const acceptChat = (id: string) => {
-    axios
-        .post(`${config.baseUrl}api/v2/chats?id=${id}`)
-        .then(() => {
-            const index = state.chatRequests.findIndex(c => c.chatId == id);
-            state.chatRequests[index].acceptedChat = true;
-            addChat(state.chatRequests[index]);
-            const { user } = useAuthState();
-            sendSystemMessage(id, `${user.id} accepted invitation`);
-            state.chatRequests.splice(index, 1);
-        })
-        .catch(error => {
-            console.log('Got an error: ', error);
-        });
+const acceptChat = async (id: string) => {
+    try {
+        await axios.post(`${config.baseUrl}api/v2/chats?id=${id}`);
+        const index = state.chatRequests.findIndex(c => c.chatId == id);
+        state.chatRequests[index].acceptedChat = true;
+        addChat(state.chatRequests[index]);
+        const { user } = useAuthState();
+        sendSystemMessage(id, `${user.id} accepted invitation`);
+        state.chatRequests.splice(index, 1);
+    } catch (e) {
+        console.log('failed to accept chat', e);
+    }
 };
 
 const updateChat = (chat: Chat) => {
@@ -366,7 +364,7 @@ const sendMessage = (chatId: string, message: any, type: string = 'STRING') => {
     const msg: Message<String> = {
         chatId,
         id: uuidv4(),
-        body: message.replace(/`/g, ''),
+        body: message,
         from: user.id,
         to: chatId,
         timeStamp: new Date(),

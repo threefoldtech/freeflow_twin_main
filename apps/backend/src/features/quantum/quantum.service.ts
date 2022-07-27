@@ -162,7 +162,10 @@ export class QuantumService {
         count?: number;
     }): Promise<void> {
         const path = join(toPath, name);
-        const pathWithCount = count === 0 ? path : `${path.insert(path.lastIndexOf('.'), ` (${count})`)}`;
+        const pathWithCount =
+            count === 0
+                ? path
+                : `${path.substring(0, path.lastIndexOf('.'))} (${count})${path.substring(path.lastIndexOf('.'))}`;
         if (this._fileService.exists({ path: pathWithCount }))
             return this.createFileWithRetry({ fromPath, toPath, name, count: count + 1 });
 
