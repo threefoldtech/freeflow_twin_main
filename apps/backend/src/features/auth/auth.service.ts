@@ -70,8 +70,8 @@ export class AuthService {
             if (!publicKey || !secretKey) throw new UnauthorizedException('invalid key pair');
 
             try {
-                this._keyService.updateKey({ pk: publicKey, keyType: KeyType.Public });
-                this._keyService.updateKey({ pk: secretKey, keyType: KeyType.Private });
+                await this._keyService.updateKey({ pk: publicKey, keyType: KeyType.Public });
+                await this._keyService.updateKey({ pk: secretKey, keyType: KeyType.Private });
             } catch (error) {
                 throw new UnauthorizedException(`${error}`);
             }
