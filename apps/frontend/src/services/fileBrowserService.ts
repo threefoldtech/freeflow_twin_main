@@ -1,6 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
-import { createNotification, createPercentProgressNotification, fail, success } from '@/store/notificiationStore';
+import {
+    createNotification,
+    createPercentProgressNotification,
+    fail,
+    success,
+    updateNotification,
+} from '@/store/notificiationStore';
 import { ProgressNotification, Status } from '@/types/notifications';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
@@ -100,8 +106,9 @@ export const uploadFile = async (
         cfg = {
             ...cfg,
             onUploadProgress: function (progressEvent) {
-                //console.log('test', Math.round((progressEvent.loaded * 100) / progressEvent.total));
-                notification.progress = Math.round(progressEvent.loaded / progressEvent.total);
+                notification.progress = Math.round((progressEvent.loaded / progressEvent.total) * 100) / 100;
+                if (notification.progress === 1) return;
+                updateNotification(notification);
             },
         };
     }
