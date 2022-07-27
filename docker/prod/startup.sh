@@ -20,12 +20,12 @@ fi
 if [ "$ENVIRONMENT" = 'production' ]
 then
   echo "Copying production config"
-  cp /usr/share/nginx/html/config/production.json /usr/share/nginx/html/config/config.json
+  cp /usr/share/nginx/html/config/production.js /usr/share/nginx/html/config/config-def.js
 fi
 if [ "$ENVIRONMENT" = 'staging' ]
 then
   echo "Copying staging config"
-  cp /usr/share/nginx/html/config/staging.json /usr/share/nginx/html/config/config.json
+  cp /usr/share/nginx/html/config/staging.js /usr/share/nginx/html/config/config-def.js
 fi
 
 nginx
