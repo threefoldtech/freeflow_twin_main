@@ -199,13 +199,17 @@ const addGroupchat = (name: string, contacts: GroupContact[]) => {
 };
 
 const acceptChat = async (id: string) => {
-    await axios.post(`${config.baseUrl}api/v2/chats?id=${id}`);
-    const index = state.chatRequests.findIndex(c => c.chatId == id);
-    state.chatRequests[index].acceptedChat = true;
-    addChat(state.chatRequests[index]);
-    const { user } = useAuthState();
-    sendSystemMessage(id, `${user.id} accepted invitation`);
-    state.chatRequests.splice(index, 1);
+    try {
+        await axios.post(`${config.baseUrl}api/v2/chats?id=${id}`);
+        const index = state.chatRequests.findIndex(c => c.chatId == id);
+        state.chatRequests[index].acceptedChat = true;
+        addChat(state.chatRequests[index]);
+        const { user } = useAuthState();
+        sendSystemMessage(id, `${user.id} accepted invitation`);
+        state.chatRequests.splice(index, 1);
+    } catch (e) {
+        console.log('failed to accept chat', e);
+    }
 };
 
 const updateChat = (chat: Chat) => {
