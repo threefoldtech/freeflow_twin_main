@@ -162,6 +162,7 @@ export class QuantumService {
         count?: number;
     }): Promise<void> {
         const path = join(toPath, name);
+        if (path === fromPath) return;
         const pathWithCount =
             count === 0
                 ? path
