@@ -350,8 +350,7 @@ export class QuantumService {
                             .forEach(c =>
                                 this._apiService.sendRemoveShare({ location: c.location, shareId: share.id })
                             );
-                    }
-                    else this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
+                    } else this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
                 });
             }
             const stats = await this._fileService.getStats({ path });
