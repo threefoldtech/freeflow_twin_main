@@ -42,8 +42,8 @@
     import { fetchStatus, statusList, startFetchStatusLoop } from '@/store/statusStore';
     import { calcExternalResourceLink } from '../services/urlService';
     import { useAuthState } from '@/store/authStore';
-    import { Contact, GroupContact } from '@/types'
-    import axios from "axios"
+    import { Contact, GroupContact } from '@/types';
+    import axios from 'axios';
 
     interface IProps {
         id: string;
@@ -65,9 +65,7 @@
     onBeforeMount(async () => {
         const { user } = useAuthState();
         await fetchStatus(user.id);
-        if (!statusList[<string>props.id] && props.contact?.location) 
-            await startFetchStatusLoop(props.contact)
-        
+        if (!statusList[<string>props.id] && props.contact?.location) await startFetchStatusLoop(props.contact);
     });
 
     const status = computed(() => {
