@@ -267,6 +267,7 @@
     };
 
     const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
+      console.log(`message: ${JSON.stringify(message.body)}`);
         //todo: save downloaded file in attachments folder
         const url = calcExternalResourceLink((message.body as { url: string }).url);
         window.open(url, '_blank');
