@@ -323,6 +323,22 @@ export class QuantumController {
         return true;
     }
 
+    @Post('files/copy')
+    @UseGuards(AuthGuard)
+    copyFiles(@Body() { paths, destination }: MoveFileDTO): boolean {
+        paths.map(path => {
+            const name = path.split('/').pop();
+            const actualPath = path === '/' ? join(this.storageDir, name) : path;
+            const actualDestination = destination === '/' ? this.storageDir : destination;
+            this._quantumService.copyFileWithRetry({
+                fromPath: actualPath,
+                toPath: actualDestination,
+                name,
+            });
+        });
+        return true;
+    }
+
     @Post('share')
     @UseGuards(AuthGuard)
     async shareFile(@Body() shareFileDTO: ShareFileRequesDTO) {

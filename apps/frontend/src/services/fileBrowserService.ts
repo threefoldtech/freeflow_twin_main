@@ -169,7 +169,7 @@ export const searchDir = async (searchTerm: string, currentDir: string) => {
     return await axios.get<PathInfo[]>(`${config.baseUrl}api/v2/quantum/search`, { params: params });
 };
 export const copyFiles = async (paths: string[], pathToPaste: string) => {
-    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destinationPath: pathToPaste });
+    return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destination: pathToPaste });
 };
 
 export const moveFiles = async (paths: string[], pathToPaste: string) => {
