@@ -99,6 +99,22 @@ export class FileService {
     }
 
     /**
+     * Copies a file from to given path.
+     * @param {Object} obj - Object.
+     * @param {string} obj.from - Path to copy file from.
+     * @param {string} obj.to - Path to copy file to.
+     * @return {boolean} success or not.
+     */
+    copyFile({ from, to }: { from: string; to: string }): boolean {
+        if (!from || !to) throw new BadRequestException('please specify a from and a to path to copy the file to');
+        if (!this.exists({ path: from })) throw new BadRequestException('file does not exist');
+        copyFile(from, to, err => {
+            if (err) throw err;
+        });
+        return true;
+    }
+
+    /**
      * Deletes a file by given path.
      * @param {Object} obj - Object.
      * @param {string} obj.path - Path to delete file from.

@@ -182,6 +182,30 @@ export class QuantumService {
         this._fileService.moveFile({ from: fromPath, to: pathWithCount });
     }
 
+    async copyFileWithRetry({
+        fromPath,
+        toPath,
+        name,
+        count = 0,
+    }: {
+        fromPath: string;
+        toPath: string;
+        name: string;
+        count?: number;
+    }): Promise<void> {
+        const path = join(toPath, name);
+        const pathWithCount =
+            count === 0
+                ? path
+                : `${path.substring(0, path.lastIndexOf('.'))} (${count})${path.substring(path.lastIndexOf('.'))}`;
+
+        if (this._fileService.exists({ path: pathWithCount })) {
+            return this.copyFileWithRetry({ fromPath, toPath, name, count: count + 1 });
+        }
+
+        this._fileService.copyFile({ from: fromPath, to: pathWithCount });
+    }
+
     async writeFile({ path, file }: { path: string; file: Buffer }) {
         this._fileService.writeFile({ path, content: file });
         return await this.formatFileDetails({ path });
