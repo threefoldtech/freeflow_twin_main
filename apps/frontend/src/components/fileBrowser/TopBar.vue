@@ -10,13 +10,6 @@
                     class="focus:ring-primary focus:border-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
                     placeholder="Search"
                     type="text"
-                    :class="{
-                        'opacity-50':
-                            route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir,
-                    }"
-                    :disabled="
-                        route.name === 'savedAttachments' || route.name === 'savedAttachmentsFromChat' || sharedDir
-                    "
                     @input="debounceSearch"
                 />
                 <div
