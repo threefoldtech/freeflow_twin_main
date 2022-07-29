@@ -354,7 +354,7 @@ export class ApiService {
             const title = getURLTitle(htmlDoc).toString();
 
             propertyList.push({
-                title: title == 'Title not found' ? url.toString().split('.')[1] : title ,
+                title: title == 'Title not found' ? url.toString().split('.')[1] : title,
                 description: getURLDescription(htmlDoc).toString(),
                 link: url,
             });
