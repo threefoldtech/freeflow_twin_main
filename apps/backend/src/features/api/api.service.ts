@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios, { ResponseType } from 'axios';
+import axios, { AxiosRequestConfig, ResponseType } from 'axios';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 import { parse } from 'node-html-parser';
@@ -14,6 +14,8 @@ import { TypingDTO } from '../post/dtos/request/typing.dto';
 
 @Injectable()
 export class ApiService {
+    private failedRequests: { location: string; requestParams: AxiosRequestConfig }[] = [];
+
     constructor(private readonly _configService: ConfigService) {}
 
     /**
@@ -43,20 +45,20 @@ export class ApiService {
      * @param {MessageDTO} obj.message - Message to send.
      * @param {ResponseType} obj.responseType - Axios optional response type.
      */
-    async sendMessageToApi({
-        location,
-        message,
-        responseType,
-    }: {
-        location: string;
-        message: MessageDTO<unknown>;
-        responseType?: ResponseType;
-    }) {
+    async sendMessageToApi({ location, message }: { location: string; message: MessageDTO<unknown> }) {
+        const config: AxiosRequestConfig = {
+            method: 'PUT',
+            url: `http://[${location}]/api/v2/messages`,
+            data: message,
+            timeout: 5000,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
         try {
-            return await axios.put(`http://[${location}]/api/v2/messages`, message, {
-                responseType: responseType || 'json',
-            });
-        } catch {
+            return await axios(config);
+        } catch (error) {
+            this.failedRequests.push({ location, requestParams: config });
             return;
         }
     }
@@ -363,5 +365,33 @@ export class ApiService {
         } catch (error) {
             throw new BadRequestException(`unable to get url preview: ${error}`);
         }
+    }
+
+    /**
+     * Retries failed axios requests.
+     */
+    async retryFailedRequests() {
+        if (this.failedRequests.length < 1) return;
+        console.info(`retrying [${this.failedRequests.length}] failed requests...`);
+        Promise.all(
+            this.failedRequests.map(async request => {
+                const { location, requestParams } = request;
+                console.info(`retrying request to: [${location}]...`);
+                try {
+                    const res = await axios(requestParams);
+                    if (res.status === 200)
+                        this.failedRequests = this.failedRequests.filter(r => r.location !== location);
+                } catch (error) {
+                    return;
+                }
+            })
+        );
+    }
+
+    /**
+     * Clears the failed requests array.
+     */
+    clearFailedRequests() {
+        this.failedRequests = [];
     }
 }

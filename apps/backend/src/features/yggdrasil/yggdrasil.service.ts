@@ -194,7 +194,6 @@ export class YggdrasilService {
      */
     private getReplacements(seed: string): string | YggdrasilConfig {
         if (this._fileService.exists({ path: this.jsonPath })) {
-            console.log('existing replacements for yggdrasil found');
             return this._fileService.readJSONFile({ path: this.jsonPath });
         }
         const hash = this._encryptionService.generateHashFromSeed(seed);
