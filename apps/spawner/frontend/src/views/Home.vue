@@ -88,7 +88,7 @@
         },
         setup() {
             const name = ref('');
-            const USERNAME = '< USERNAME >';
+            const USERNAME = '{{ USERNAME }}';
             const loginAndSpawn = () => {
                 const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
                 console.log('Username', actualName);
