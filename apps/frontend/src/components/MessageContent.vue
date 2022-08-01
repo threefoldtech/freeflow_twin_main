@@ -3,6 +3,7 @@
     <SystemContent v-else-if="message.type === MessageTypes.SYSTEM" :message="message" />
     <AudioContent v-else-if="message.type === MessageTypes.FILE && isAudio(message.body.filename)" :message="message" />
     <ImageContent v-else-if="message.type === MessageTypes.FILE && isImage(message.body.filename)" :message="message" />
+    <VideoContent v-else-if="message.type === MessageTypes.FILE && isVideo(message.body.filename)" :message="message" />
     <FileContent
         v-else-if="message.type === MessageTypes.FILE"
         :message="message"
@@ -29,8 +30,9 @@
     import QuoteContent from '@/components/MessageContentType/QuoteContent.vue';
     import FileShareContent from '@/components/MessageContentType/FileShareContent.vue';
     import PostShareContent from '@/components/MessageContentType/PostShareContent.vue';
+    import VideoContent from '@/components/MessageContentType/VideoContent.vue';
 
-    import { isAudio, isImage } from '@/services/contentService';
+    import { isAudio, isImage, isVideo } from '@/services/contentService';
     import { Message, MessageBodyType, MessageTypes } from '@/types';
     import { watch } from 'vue';
 
