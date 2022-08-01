@@ -523,6 +523,10 @@
             case MessageTypes.FILE:
                 if (message.body.type === FileTypes.RECORDING) return 'Voice message';
                 return message.type;
+            case MessageTypes.EDIT:
+                const body = message.body as string | QuoteBodyType;
+                if (typeof body !== 'string') return body.message;
+                return body;
             default:
                 return message.type;
         }
