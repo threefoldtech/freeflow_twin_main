@@ -97,10 +97,9 @@ export class ContactService {
         };
 
         let newContact = await this.getContact({ id });
-        if (newContact?.accepted) {
-            message.body.message = `You can now start chatting with ${newContact.id} again`;
-        }
-        if (!newContact) {
+        if (newContact?.accepted) message.body.message = `You can now start chatting with ${newContact.id} again`;
+
+        if (!newContact)
             try {
                 newContact = await this._contactRepo.addNewContact({
                     id,
@@ -111,7 +110,6 @@ export class ContactService {
             } catch (error) {
                 throw new BadRequestException(`unable to create contact: ${error}`);
             }
-        }
 
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
         const newMessage = await this._messageService.createMessage(signedMessage);
