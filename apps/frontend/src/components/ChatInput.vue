@@ -113,7 +113,8 @@
                                 @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
                                 @keyup.arrow-down="activeTag < contacts.length - 1 ? activeTag++ : (activeTag = 0)"
                                 @keydown.tab.prevent="
-                                    () => {
+                                    e => {
+                                        e.preventDefault();
                                         activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1);
                                         message.focus();
                                     }
