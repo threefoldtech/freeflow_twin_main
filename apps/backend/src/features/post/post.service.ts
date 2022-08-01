@@ -17,6 +17,7 @@ import { PostRedisRepository } from './repositories/post-redis.repository';
 @Injectable()
 export class PostService {
     private ownLocation = '';
+    private user: string | null = null;
 
     constructor(
         private readonly _postRepo: PostRedisRepository,
@@ -27,7 +28,9 @@ export class PostService {
         private readonly _blockedContactService: BlockedContactService,
         private readonly _userService: UserService,
         private readonly _userGateway: UserGateway
-    ) {}
+    ) {
+        this.user = this._configService.get<string>('userId');
+    }
 
     /**
      * Creates a new post.
@@ -46,7 +49,6 @@ export class PostService {
         signatures,
     }: CreatePostDTO): Promise<IPostContainerDTO> {
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
-        const userId = this._configService.get<string>('userId');
         try {
             const postContainer: IPostContainerDTO = {
                 id,
@@ -62,10 +64,10 @@ export class PostService {
                     signatures,
                 },
                 owner: {
-                    id: userId,
+                    id: this.user,
                     location: this.ownLocation,
                 },
-                ownerId: userId,
+                ownerId: this.user,
                 images: images || [],
                 replies,
                 likes: [],
@@ -186,8 +188,7 @@ export class PostService {
     async deletePost({ postId }: { postId: string }): Promise<string> {
         try {
             const post = await this._postRepo.getPost({ id: postId });
-            if (post.ownerId !== this._configService.get<string>('userId'))
-                throw new ForbiddenException("cannot delete someone else's post");
+            if (post.ownerId !== this.user) throw new ForbiddenException("cannot delete someone else's post");
             await this._postRepo.deletePost({ id: post.entityId });
             return postId;
         } catch (error) {
@@ -242,12 +243,14 @@ export class PostService {
         postId: string;
         commentDTO: IPostComment;
     }): Promise<{ status: string }> {
-        const { post, replyTo, isReplyToComment } = commentDTO;
+        const { post, replyTo, isReplyToComment, owner } = commentDTO;
 
         if (!this.ownLocation) this.ownLocation = (await this._locationService.getOwnLocation()) as string;
 
-        if (post.owner.location !== this.ownLocation)
+        if (post.owner.location !== this.ownLocation) {
+            if (owner.id !== this.user) throw new ForbiddenException('cannot comment as someone else');
             return await this._apiService.commentOnExternalPost({ location: post.owner.location, commentDTO });
+        }
 
         try {
             const dbPost = await this._postRepo.getPost({ id: postId });
