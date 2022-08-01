@@ -35,6 +35,7 @@ export class Chat extends Entity {
             messages: [],
         };
     }
+
     /**
      * Parses message or draft strings to valid JSON.
      * @return {Message} - The parsed message.

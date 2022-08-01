@@ -12,20 +12,14 @@ import { ContactDTO } from '../contact/dtos/contact.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
-
-interface IRequest {
-    location: string;
-    requestParams: AxiosRequestConfig;
-}
+import { FailedRequestRepository } from './repositories/failed-request.repository';
 
 @Injectable()
 export class ApiService {
-    private failedRequests: IRequest[] = [];
-
-    // requests that have failed for more than 7 days.
-    private longAwaitedFailedRequests: IRequest[] = [];
-
-    constructor(private readonly _configService: ConfigService) {}
+    constructor(
+        private readonly _configService: ConfigService,
+        private readonly _failedRequestRepository: FailedRequestRepository
+    ) {}
 
     /**
      * Registers a digital twin to the central users backend API.
@@ -75,7 +69,11 @@ export class ApiService {
         try {
             return await axios(config);
         } catch {
-            this.failedRequests.push({ location, requestParams: config });
+            await this._failedRequestRepository.createFailedRequestEntry({
+                requestParams: config,
+                lastAttempt: new Date(),
+                location,
+            });
             return;
         }
     }
@@ -388,16 +386,20 @@ export class ApiService {
      * Retries failed axios requests.
      */
     async retryFailedRequests() {
-        if (this.failedRequests.length < 1) return;
-        console.info(`retrying [${this.failedRequests.length}] failed requests...`);
+        const failedRequests = await this._failedRequestRepository.getFailedRequests();
+        console.log(`FAILED REQUESTS: ${failedRequests.length}`);
+        if (failedRequests.length < 1) return;
+        console.info(`retrying [${failedRequests.length}] failed requests...`);
         Promise.all(
-            this.failedRequests.map(async request => {
+            failedRequests.map(async request => {
                 const { location, requestParams } = request;
                 console.info(`retrying request to: [${location}]...`);
                 try {
                     const res = await axios(requestParams);
-                    if (res.status === 200)
-                        this.failedRequests = this.failedRequests.filter(r => r.location !== location);
+                    if (res.status === 200) {
+                        const reqToDelete = failedRequests.find(r => r.location !== location);
+                        if (reqToDelete) await this._failedRequestRepository.deleteFailedRequest(reqToDelete.entityId);
+                    }
                 } catch (error) {
                     return;
                 }
@@ -409,17 +411,18 @@ export class ApiService {
      * Retries long awaited (7 days or more) failed axios requests.
      */
     async retryLongAwaitedFailedRequests() {
-        if (this.longAwaitedFailedRequests.length < 1) return;
-        console.info(`retrying [${this.longAwaitedFailedRequests.length}] long awaited failed requests...`);
+        const longAwaitedFailedRequests = await this._failedRequestRepository.getLongAwaitedFailedRequests();
+        if (longAwaitedFailedRequests.length < 1) return;
+        console.info(`retrying [${longAwaitedFailedRequests.length}] long awaited failed requests...`);
         Promise.all(
-            this.longAwaitedFailedRequests.map(async request => {
+            longAwaitedFailedRequests.map(async request => {
                 const { location, requestParams } = request;
                 try {
                     const res = await axios(requestParams);
-                    if (res.status === 200)
-                        this.longAwaitedFailedRequests = this.longAwaitedFailedRequests.filter(
-                            r => r.location !== location
-                        );
+                    if (res.status === 200) {
+                        const reqToDelete = longAwaitedFailedRequests.find(r => r.location !== location);
+                        if (reqToDelete) await this._failedRequestRepository.deleteFailedRequest(reqToDelete.entityId);
+                    }
                 } catch (error) {
                     return;
                 }
@@ -430,8 +433,15 @@ export class ApiService {
     /**
      * Clears the failed requests array.
      */
-    clearFailedRequests() {
-        this.longAwaitedFailedRequests = [...this.longAwaitedFailedRequests, ...this.failedRequests];
-        this.failedRequests = [];
-    }
+    // async clearFailedRequests() {
+    //     const failedRequests = await this._failedRequestRepository.getFailedRequests();
+    //     if (failedRequests.length < 1) return;
+    //     Promise.all(
+    //         failedRequests.map(async request => {
+    //             if (request.lastAttempt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) {
+    //                 await this._failedRequestRepository.deleteFailedRequest(request.entityId);
+    //             }
+    //         })
+    //     );
+    // }
 }
