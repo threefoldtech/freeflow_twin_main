@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosRequestConfig, ResponseType } from 'axios';
+import axiosRetry from 'axios-retry';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 import { parse } from 'node-html-parser';
@@ -12,9 +13,17 @@ import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
 
+interface IRequest {
+    location: string;
+    requestParams: AxiosRequestConfig;
+}
+
 @Injectable()
 export class ApiService {
-    private failedRequests: { location: string; requestParams: AxiosRequestConfig }[] = [];
+    private failedRequests: IRequest[] = [];
+
+    // requests that have failed for more than 7 days.
+    private longAwaitedFailedRequests: IRequest[] = [];
 
     constructor(private readonly _configService: ConfigService) {}
 
@@ -46,6 +55,14 @@ export class ApiService {
      * @param {ResponseType} obj.responseType - Axios optional response type.
      */
     async sendMessageToApi({ location, message }: { location: string; message: MessageDTO<unknown> }) {
+        axiosRetry(axios, {
+            retries: 5,
+            shouldResetTimeout: true,
+            retryDelay: retryCount => {
+                return retryCount * 2000; // time interval between retries
+            },
+            retryCondition: () => true,
+        });
         const config: AxiosRequestConfig = {
             method: 'PUT',
             url: `http://[${location}]/api/v2/messages`,
@@ -57,7 +74,7 @@ export class ApiService {
         };
         try {
             return await axios(config);
-        } catch (error) {
+        } catch {
             this.failedRequests.push({ location, requestParams: config });
             return;
         }
@@ -389,9 +406,32 @@ export class ApiService {
     }
 
     /**
+     * Retries long awaited (7 days or more) failed axios requests.
+     */
+    async retryLongAwaitedFailedRequests() {
+        if (this.longAwaitedFailedRequests.length < 1) return;
+        console.info(`retrying [${this.longAwaitedFailedRequests.length}] long awaited failed requests...`);
+        Promise.all(
+            this.longAwaitedFailedRequests.map(async request => {
+                const { location, requestParams } = request;
+                try {
+                    const res = await axios(requestParams);
+                    if (res.status === 200)
+                        this.longAwaitedFailedRequests = this.longAwaitedFailedRequests.filter(
+                            r => r.location !== location
+                        );
+                } catch (error) {
+                    return;
+                }
+            })
+        );
+    }
+
+    /**
      * Clears the failed requests array.
      */
     clearFailedRequests() {
+        this.longAwaitedFailedRequests = [...this.longAwaitedFailedRequests, ...this.failedRequests];
         this.failedRequests = [];
     }
 }
