@@ -25,7 +25,7 @@
                 placeholder="Search for user..."
                 @addContact="contactAdd"
             ></UserTable>
-            <Disclosure v-slot="{ open }">
+            <Disclosure v-if="isDevelopment" v-slot="{ open }">
                 <DisclosureButton
                     class="flex justify-between w-full mt-4 ml-0 py-2 text-sm font-medium text-left text-gray-500 bg-gray-50 rounded-lg hover:bg-gray-100 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75"
                 >
@@ -179,12 +179,15 @@
     const manualContactAddUsername = ref<string>('');
     const manualContactAddLocation = ref('');
 
+    const isDevelopment = ref<boolean>(false);
+
     const navigation = ref([
         { name: 'user', text: 'Add a user' },
         { name: 'group', text: 'Create a group' },
     ]);
 
     onBeforeMount(async () => {
+        isDevelopment.value = process.env.NODE_ENV === 'development';
         const { dtContacts } = useContactsState();
         possibleUsers.value = dtContacts;
         await retrieveContacts();
