@@ -44,10 +44,9 @@
                                     class="bg-black text-white mt-2 p-4 h-16 overflow-x-scroll overflow-y-hidden whitespace-nowrap rounded-md"
                                 >
                                     <p class="text-white text-left">
-                                        docker run -ti --sysctl net.ipv6.conf.all.disable_ipv6=0 -e "USER_ID=<span
-                                            v-pre
-                                            >{{ USERNAME }}</span
-                                        >" -e "DIGITALTWIN_APPID=digitaltwin-local.jimbertesting.be" -e
+                                        docker run -ti --sysctl net.ipv6.conf.all.disable_ipv6=0 -e "USER_ID={{
+                                            USERNAME
+                                        }}" -e "DIGITALTWIN_APPID=digitaltwin-local.jimbertesting.be" -e
                                         "ENVIRONMENT=staging" --cap-add=NET_ADMIN --device=/dev/net/tun:/dev/net/tun -p
                                         443:443 threefoldjimber/digitaltwin:latest
                                         <span class="text-black">/////</span>
@@ -56,9 +55,8 @@
                             </DisclosurePanel>
                         </Disclosure>
                         <p class="text-left max-w-md mt-2 self-start">
-                            3. Browse to https://<span v-pre>{{ USERNAME }}</span
-                            >.digitaltwin-local.jimbertesting.be<br />
-                            4. Replace <span v-pre>{{ USERNAME }}</span> with your own name.
+                            3. Browse to https://{{ USERNAME }}.digitaltwin-local.jimbertesting.be<br />
+                            4. Replace {{ USERNAME }} with your own name.
                         </p>
                     </div>
                 </DisclosurePanel>
@@ -90,6 +88,7 @@
         },
         setup() {
             const name = ref('');
+            const USERNAME = '{{ USERNAME }}';
             const loginAndSpawn = () => {
                 const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
                 console.log('Username', actualName);
@@ -98,6 +97,7 @@
             };
 
             return {
+                USERNAME,
                 name,
                 loginAndSpawn,
             };
