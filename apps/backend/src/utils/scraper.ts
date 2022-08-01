@@ -11,7 +11,7 @@ export const getURLTitle = (data: HTMLElement) => {
     }
     const title = data.querySelector('title');
     if (title != null) {
-        return title.textContent;
+        return title;
     }
     const docTitle = data.getAttribute('title');
     if (docTitle != null) {

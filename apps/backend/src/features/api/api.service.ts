@@ -351,8 +351,10 @@ export class ApiService {
 
             const propertyList = [];
 
+            const title = getURLTitle(htmlDoc).toString();
+
             propertyList.push({
-                title: getURLTitle(htmlDoc).toString(),
+                title: title == 'Title not found' ? url.toString().split('.')[1] : title,
                 description: getURLDescription(htmlDoc).toString(),
                 link: url,
             });

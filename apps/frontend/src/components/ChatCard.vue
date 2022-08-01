@@ -107,7 +107,7 @@
             }
             case 'DELETE':
             default:
-                return lstmsg.body?.replace(/[&\/\\#,+()$~%.'":*?{}]/g, '');
+                return lstmsg.body;
         }
     });
 

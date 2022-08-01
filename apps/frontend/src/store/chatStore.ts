@@ -94,7 +94,6 @@ export const editMessage = (chatId: string, message: any) => {
     clearMessageAction(chatId);
     //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
     nextTick(() => {
-        // message.body = message.body.replace(/`/g, '');
         setMessageAction(chatId, message, MessageAction.EDIT);
     });
 };
