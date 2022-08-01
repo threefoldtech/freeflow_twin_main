@@ -338,6 +338,7 @@ const addMessage = (chatId: string, message: any) => {
         const index = chat.messages.findIndex(mes => mes.id.toString() === message.id.toString());
 
         if (index === -1) return;
+        message.type = chat.messages[index].type;
         chat.messages[index] = message;
         return;
     }

@@ -7,6 +7,7 @@ import {
     GroupUpdate,
     IFileShareMessage,
     IPostShare,
+    MessageType,
     SystemMessage,
     SystemMessageType,
 } from '../../../types/message-types';
@@ -76,8 +77,9 @@ export class EditMessageState implements MessageState<string> {
     constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
     async handle({ message }: { message: MessageDTO<string> }) {
-        this._chatGateway.emitMessageToConnectedClients('message', message);
-        await this._messageService.editMessage({ messageId: message.id, text: message.body });
+        const editedMessage = await this._messageService.editMessage({ messageId: message.id, text: message.body });
+        editedMessage.type = MessageType.EDIT;
+        this._chatGateway.emitMessageToConnectedClients('message', editedMessage);
     }
 }
 

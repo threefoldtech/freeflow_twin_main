@@ -29,7 +29,7 @@
 
     interface IProp {
         message: {
-            body: string | QuoteBodyType;
+            body: string | QuoteBodyType | number;
         };
     }
 
@@ -38,7 +38,8 @@
     const hyperlink = ref(null);
 
     let { body } = props.message;
-    if (typeof body !== 'string') body = body.message;
+    if (typeof body === 'object') body = body.message;
+    if (typeof body === 'number') body = body.toString();
 
     const replacer = (match: string) => emoji.emojify(match);
     const words = body.split(' ');

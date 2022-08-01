@@ -38,7 +38,7 @@
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
                         <MessageContent
                             :message="message"
-                            :key="String(message.id)"
+                            :key="String(message.id) + message.body"
                             :isDownloadingAttachment="isDownloadingAttachment"
                         ></MessageContent>
                     </main>
