@@ -20,15 +20,15 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onMounted, ref, onBeforeMount } from 'vue';
+    import { ref, onBeforeMount } from 'vue';
     import DOMPurify from 'dompurify';
-    import { marked } from 'marked';
     import emoji from 'node-emoji';
     import { getPreview } from '@/store/chatStore';
+    import { QuoteBodyType } from '@/types';
 
     interface IProp {
         message: {
-            body: string;
+            body: string | QuoteBodyType;
         };
     }
 
@@ -37,6 +37,8 @@
     let hyperlink = ref(null);
 
     let { body } = props.message;
+    if (typeof body !== 'string') body = body.message;
+
     const replacer = (match: string) => emoji.emojify(match);
     const words = body.split(' ');
 
