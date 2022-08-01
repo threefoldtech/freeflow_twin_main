@@ -392,6 +392,7 @@
 
         if (action.value) {
             const newMessage = createMessage();
+            //todo: if message has been edited, change the type back to string or quote before sending it back from server to client
             sendMessageObject(selectedId, newMessage);
             clearAction();
             clearMessage();
