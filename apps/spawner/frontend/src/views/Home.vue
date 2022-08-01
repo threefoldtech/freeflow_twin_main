@@ -25,7 +25,7 @@
         <div class="mt-5 h-72 flex flex-col items-center">
             <Disclosure v-slot="{ open }">
                 <DisclosureButton class="flex justify-between items-center">
-                    <span class="">Do you want to run the decentralized Uhuru machine on your own machine?</span>
+                    <span class="">Do you want to run the decentralized Uhuru machine on your own machine</span>
                     <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
                 </DisclosureButton>
                 <DisclosurePanel style="width: 28rem" class="px-4 pt-4 pb-2 text-sm text-gray-500">
@@ -88,7 +88,7 @@
         },
         setup() {
             const name = ref('');
-            const USERNAME = '{{ USERNAME }}';
+            const USERNAME = '< USERNAME >';
             const loginAndSpawn = () => {
                 const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
                 console.log('Username', actualName);
