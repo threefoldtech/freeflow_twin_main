@@ -56,8 +56,8 @@ jobs:
                   docker-compose up -d
                   echo Completed.
               env:
-                  digitaltwin_spawner_tag: ${{ github.sha }}
-                  digitaltwin_frontend_tag: ${{ github.sha }}
-                  digitaltwin_proxy_tag: ${{ github.sha }}
+                  digital_twin_spawner_tag: ${{ github.sha }}
+                  digital_twin_frontend_tag: ${{ github.sha }}
+                  digital_twin_proxy_tag: ${{ github.sha }}
                   DIGITALTWIN_APPID: 'digitaltwin-test.jimbertesting.be'
                   ENVIRONMENT: 'staging'
