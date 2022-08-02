@@ -90,7 +90,12 @@ const retrieveChats = async () => {
     });
 };
 
-export const editMessage = (chatId: string, message: any) => {
+export const editMessage = (chatId: string, message: any, messageId?: string) => {
+    if (messageId && typeof message === 'string') {
+        const chat = state.chats.find(c => c.chatId === chatId);
+        const msg = chat.messages.find(c => c.id === messageId);
+        message = { ...msg, body: message };
+    }
     clearMessageAction(chatId);
     //nextTick is needed because vue throws dom errors if you switch between Reply and Edit
     nextTick(() => {

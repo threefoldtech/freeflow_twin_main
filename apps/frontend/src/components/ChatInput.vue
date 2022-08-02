@@ -221,7 +221,7 @@
     if (props.chat.draft) {
         if (props.chat.draft?.action === 'EDIT') {
             messageInput.value = String(props.chat.draft.body);
-            editMessage(props.chat.draft.to, props.chat.draft.body);
+            editMessage(props.chat.draft.to, props.chat.draft.body, props.chat.draft.id);
         }
         if (props.chat.draft?.action === 'REPLY') {
             messageInput.value = String(props.chat.draft.body.message);
@@ -392,7 +392,6 @@
 
         if (action.value) {
             const newMessage = createMessage();
-            //todo: if message has been edited, change the type back to string or quote before sending it back from server to client
             sendMessageObject(selectedId, newMessage);
             clearAction();
             clearMessage();
