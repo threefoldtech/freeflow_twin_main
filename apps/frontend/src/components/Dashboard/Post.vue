@@ -159,7 +159,7 @@
             </div>
             <div class="mt-4 text-gray-600">
                 <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
-                <div class="my-2 break-words">
+                <div class="my-2 break-words whitespace-pre-wrap">
                     <p v-if="!readMore && item.post.body.length > 200">
                         {{ item.post.body.slice(0, 200) }}
                     </p>
