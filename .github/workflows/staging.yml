@@ -54,6 +54,7 @@ jobs:
                   echo "registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)     
+                  cd digitaltwin_spawner && docker-compose up -d
                   echo Completed.
               env:
                   digital_twin_spawner_tag: ${{ github.sha }}
