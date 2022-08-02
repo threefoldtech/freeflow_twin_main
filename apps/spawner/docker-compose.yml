@@ -30,7 +30,7 @@ services:
         networks:
             - chatnet
 
-    digitaltwin-frontend:
+    digital_twin_frontend:
         image: registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${digital_twin_frontend_tag}
         container_name: digital_twin_frontend
         restart: always
