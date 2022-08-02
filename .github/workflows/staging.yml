@@ -17,8 +17,8 @@ jobs:
             - name: Build the spawner
               working-directory: ./apps/spawner
               run: |
-                cp .env.sample .env
-                docker-compose build
+                  cp .env.sample .env
+                  docker-compose build
               env:
                   digital_twin_spawner_tag: ${{ github.sha }}
                   digital_twin_frontend_tag: ${{ github.sha }}
