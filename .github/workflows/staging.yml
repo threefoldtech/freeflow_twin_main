@@ -16,7 +16,9 @@ jobs:
               run: docker build . --file ./docker/prod/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
             - name: Build the spawner
               working-directory: ./apps/spawner
-              run: docker-compose build
+              run: |
+                cp .env.sample .env
+                docker-compose build
               env:
                   digital_twin_spawner_tag: ${{ github.sha }}
                   digital_twin_frontend_tag: ${{ github.sha }}
