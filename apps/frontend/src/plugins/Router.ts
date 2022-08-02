@@ -44,7 +44,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/',
         name: 'Home',
         component: Home,
-        // meta: { requiresUnAuth: true },
+        meta: { requiresUnAuth: true },
     },
     {
         path: '/callback',

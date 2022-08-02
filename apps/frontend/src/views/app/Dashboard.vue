@@ -37,14 +37,14 @@
         await getAllPosts();
         await retrieveChats();
 
-        registerSW({
-            onOfflineReady() {
-                console.log('SW: Offline ready');
-            },
-            onRegisterError(error) {
-                console.log('SW: Error registering', error);
-            },
-        });
+        // registerSW({
+        //     onOfflineReady() {
+        //         console.log('SW: Offline ready');
+        //     },
+        //     onRegisterError(error) {
+        //         console.log('SW: Error registering', error);
+        //     },
+        // });
         Notification.requestPermission().then(result => {
             if (result === 'granted') notifcationPermissionGranted.value = true;
         });
