@@ -36,8 +36,8 @@ jobs:
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
+                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
 
     deploy:
         needs: [build]
