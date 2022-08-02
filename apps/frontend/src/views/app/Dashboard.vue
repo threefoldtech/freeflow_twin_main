@@ -29,7 +29,7 @@
     import Spinner from '@/components/Spinner.vue';
     import { usechatsActions } from '@/store/chatStore';
     import { notifcationPermissionGranted } from '@/store/notificiationStore';
-    import { registerSW } from 'virtual:pwa-register';
+    // import { registerSW } from 'virtual:pwa-register';
 
     const { retrieveChats } = usechatsActions();
 
