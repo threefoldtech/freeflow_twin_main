@@ -20,7 +20,7 @@ export default defineConfig({
         //     registerType: 'autoUpdate',
         //     injectRegister: 'auto',
         //     includeAssets: [
-        //         'purple_uhuru_logo.ico',
+        //         'freeflow_logo.ico',
         //         'apple-touch-icon.png',
         //         'favicon-32x32.png',
         //         'favicon-16x16.png',
@@ -30,20 +30,20 @@ export default defineConfig({
         //         maximumFileSizeToCacheInBytes: 4000000, // 4MB
         //     },
         //     manifest: {
-        //         name: 'Uhuru',
-        //         short_name: 'Uhuru',
+        //         name: 'FreeFlow Twin',
+        //         short_name: 'FreeFlow',
         //         description: 'Decentralized social network',
         //         theme_color: '#ffffff',
         //         background_color: '#ffffff',
         //         display: 'standalone',
         //         icons: [
         //             {
-        //                 src: '/android-chrome-192x192.png',
+        //                 src: '/freeflow_icon_192x192.png',
         //                 sizes: '192x192',
         //                 type: 'image/png',
         //             },
         //             {
-        //                 src: '/android-chrome-512x512.png',
+        //                 src: '/freeflow_icon_512x512.png',
         //                 sizes: '512x512',
         //                 type: 'image/png',
         //             },
