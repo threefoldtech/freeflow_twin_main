@@ -53,6 +53,7 @@
                         v-for="(contact, idx) in contacts"
                         :key="idx"
                         class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
+                        @click="tagPerson(contact)"
                         :class="{ 'bg-gray-100': activeTag === idx }"
                     >
                         <AvatarImg :id="String(contact.id)" small />
@@ -111,6 +112,13 @@
                                 placeholder="Write a message ..."
                                 @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
                                 @keyup.arrow-down="activeTag < contacts.length - 1 ? activeTag++ : (activeTag = 0)"
+                                @keydown.tab.prevent="
+                                    e => {
+                                        e.preventDefault();
+                                        activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1);
+                                        message.focus();
+                                    }
+                                "
                                 @keyup.esc="
                                     () => {
                                         showTagPerson = false;
@@ -212,8 +220,8 @@
 
     if (props.chat.draft) {
         if (props.chat.draft?.action === 'EDIT') {
-            messageInput.value = String(props.chat.draft.body.body);
-            editMessage(props.chat.draft.to, props.chat.draft.body);
+            messageInput.value = String(props.chat.draft.body);
+            editMessage(props.chat.draft.to, props.chat.draft.body, props.chat.draft.id);
         }
         if (props.chat.draft?.action === 'REPLY') {
             messageInput.value = String(props.chat.draft.body.message);
@@ -274,8 +282,8 @@
 
     watch(messageInput, () => {
         showTagPerson.value = false;
-        const messageInputs = messageInput.value.split(' ');
-        const latestMessage = messageInputs[messageInputs.length - 1];
+        const messageInputs = messageInput.value?.split(' ');
+        const latestMessage = messageInputs ? messageInputs[messageInputs.length - 1] : '';
         if (props.chat.isGroup && latestMessage.startsWith('@')) {
             showTagPerson.value = true;
             contacts.value = [...props.chat.contacts].filter(c =>
@@ -362,15 +370,21 @@
         resizeTextarea();
     };
 
+    const tagPerson = contact => {
+        const atIdx = messageInput.value.lastIndexOf('@');
+        messageInput.value = messageInput.value.substring(0, atIdx + 1);
+        messageInput.value += `${contact.id} `;
+        showTagPerson.value = false;
+        contacts.value = [...props.chat.contacts];
+        message.value.focus();
+        return;
+    };
+
     const chatsend = async () => {
         const atIdx = messageInput.value.lastIndexOf('@');
         if (showTagPerson.value && atIdx > -1) {
-            const contact = contacts.value[activeTag.value].id;
-            messageInput.value = messageInput.value.substring(0, atIdx + 1);
-            messageInput.value += `${contact} `;
-            showTagPerson.value = false;
-            contacts.value = [...props.chat.contacts];
-            return;
+            const contact = contacts.value[activeTag.value];
+            return tagPerson(contact);
         }
 
         messageInput.value = '';
@@ -510,6 +524,10 @@
             case MessageTypes.FILE:
                 if (message.body.type === FileTypes.RECORDING) return 'Voice message';
                 return message.type;
+            case MessageTypes.EDIT:
+                const body = message.body as string | QuoteBodyType;
+                if (typeof body !== 'string') return body.message;
+                return body;
             default:
                 return message.type;
         }

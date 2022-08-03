@@ -1,31 +1,32 @@
 <template>
-    <div
-        style="display: flex; flex-direction: column; justify-content: justify-around; align-items: center"
-        class="overflow-hidden"
-    >
-        <div style="display: flex; flex-direction: row; justify-content: center; align-items: center">
-            <img class="h-28" src="@/assets/uhuru_spawner.svg" alt="uhuru logo" />
+    <div class="flex flex-col justify-around items-center overflow-hidden h-screen">
+        <div class="flex flex-row justify-center items-center mt-10 mb-5">
+            <img class="h-16" src="@/assets/freeflow.svg" alt="FreeFlow logo" />
         </div>
-        <div style="background-color: white; padding: 50px" class="mt-5 rounded-md shadow">
-            <div class="flex flex-col">
-                <h1>Start your Uhuru journey</h1>
-                <p>Please enter your <strong>ThreeFold Connect</strong> name</p>
-                <input
-                    v-model="name"
-                    type="text"
-                    class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md mt-7"
-                    pattern="[0-9a-zA-Z\.]"
-                    placeholder="Username"
-                    @keyup.enter="loginAndSpawn"
-                />
+        <div class="flex flex-row justify-center items-center">
+            <img class="h-80" src="@/assets/freeflow_spawner.png" alt="FreeFlow spawner" />
+        </div>
 
-                <button class="py-2 px-4 mt-2 text-white rounded-md bg-primary" @click="loginAndSpawn">GO!</button>
-            </div>
+        <div class="flex flex-col">
+            <h1 class="uppercase text-center">
+                Welcome to your<br /><span class="font-bold">freeflow experiences.</span>
+            </h1>
+            <p class="font-medium text-base">Please enter your ThreeFold Connect username in order to continue.</p>
+            <input
+                v-model="name"
+                type="text"
+                class="py-2 uppercase text-center bg-[#e3dbd5] block w-full sm:text-base border-gray-300 rounded-md mt-7"
+                pattern="[0-9a-zA-Z\.]"
+                placeholder="Username"
+                @keyup.enter="loginAndSpawn"
+            />
+
+            <button class="py-2 px-4 mt-2 text-white rounded-md bg-[#66c9bf]" @click="loginAndSpawn">GO!</button>
         </div>
         <div class="mt-5 h-72 flex flex-col items-center">
             <Disclosure v-slot="{ open }">
                 <DisclosureButton class="flex justify-between items-center">
-                    <span class="">Do you want to run the decentralized Uhuru machine on your own machine?</span>
+                    <span class="">Do you want to run the decentralized FreeFlow machine on your own machine</span>
                     <ChevronUpIcon :class="{ 'rotate-180': !open }" class="w-5 h-5 text-gray-500 transform mx-2" />
                 </DisclosureButton>
                 <DisclosurePanel style="width: 28rem" class="px-4 pt-4 pb-2 text-sm text-gray-500">
@@ -33,7 +34,7 @@
                         <p class="text-left max-w-md self-start">1. Install Docker</p>
                         <Disclosure v-slot="{ open }">
                             <DisclosureButton class="flex justify-between items-center self-start">
-                                <p>2. Run your own Uhuru environment inside a Docker</p>
+                                <p>2. Run your own FreeFlow environment inside a Docker</p>
                                 <ChevronUpIcon
                                     :class="{ 'rotate-180': !open }"
                                     class="w-5 h-5 text-gray-500 transform mx-2"
@@ -55,7 +56,7 @@
                             </DisclosurePanel>
                         </Disclosure>
                         <p class="text-left max-w-md mt-2 self-start">
-                            3. Browse to https://{{ username }}.digitaltwin-local.jimbertesting.be<br />
+                            3. Browse to https://{{ USERNAME }}.digitaltwin-local.jimbertesting.be<br />
                             4. Replace {{ USERNAME }} with your own name.
                         </p>
                     </div>
@@ -79,6 +80,7 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { spawn } from '@/service/spawnService';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
+
     export default defineComponent({
         components: {
             Disclosure,
@@ -88,6 +90,7 @@
         },
         setup() {
             const name = ref('');
+            const USERNAME = '{{ USERNAME }}';
             const loginAndSpawn = () => {
                 const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
                 console.log('Username', actualName);
@@ -96,6 +99,7 @@
             };
 
             return {
+                USERNAME,
                 name,
                 loginAndSpawn,
             };

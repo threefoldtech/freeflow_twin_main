@@ -4,6 +4,7 @@ import { ApiModule } from '../api/api.module';
 import { BlockedContactModule } from '../blocked-contact/blocked-contact.module';
 import { ChatModule } from '../chat/chat.module';
 import { DbModule } from '../db/db.module';
+import { EncryptionModule } from '../encryption/encryption.module';
 import { KeyModule } from '../key/key.module';
 import { LocationModule } from '../location/location.module';
 import { MessageModule } from '../message/message.module';
@@ -22,6 +23,7 @@ import { ContactRedisRepository } from './repositories/contact-redis.repository'
         forwardRef(() => ChatModule),
         forwardRef(() => MessageModule),
         BlockedContactModule,
+        EncryptionModule,
     ],
     controllers: [ContactController],
     providers: [ContactService, ContactRedisRepository],

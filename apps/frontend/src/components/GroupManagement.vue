@@ -86,7 +86,7 @@
                     @click="$emit('clickedProfile', contact)"
                     class="flex items-center justify-self-start overflow-hidden overflow-ellipsis cursor-pointer"
                 >
-                    <AvatarImg :id="contact.id" small />
+                    <AvatarImg :id="String(contact.id)" :contact="contact" small />
                     <div class="ml-3">
                         <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
                     </div>

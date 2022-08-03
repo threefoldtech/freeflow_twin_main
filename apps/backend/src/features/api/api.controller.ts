@@ -25,16 +25,16 @@ export class ApiController {
 
         const openIdx = loc.indexOf('[');
         const closingIdx = loc.indexOf(']');
+        const ipv6 = loc.substring(openIdx + 1, closingIdx);
+        if (!ipv6) return;
         if (openIdx === -1 || closingIdx === -1) throw new BadRequestException('invalid resource location');
 
-        const ownLocation = await this._locationService.getOwnLocation();
+        // const ownLocation = await this._locationService.getOwnLocation();
 
-        const ipv6 = loc.substring(openIdx + 1, closingIdx);
-
-        if (ownLocation !== ipv6) {
-            const contact = await this._contactService.getContactByLocation({ location: ipv6 });
-            if (!contact) return;
-        }
+        // if (ownLocation !== ipv6) {
+        //     const contact = await this._contactService.getContactByLocation({ location: ipv6 });
+        //     if (!contact) return;
+        // }
 
         http.get(loc, response => {
             const length = response.rawHeaders.length;

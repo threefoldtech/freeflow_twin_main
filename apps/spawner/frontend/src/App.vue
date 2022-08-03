@@ -26,7 +26,7 @@
         width: 100%;
         height: 100%;
         margin: 0 auto;
-        background-color: #f3f5fe;
+        background-color: #dacfc7;
         display: flex;
         justify-content: center;
         align-items: center;

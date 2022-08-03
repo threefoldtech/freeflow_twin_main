@@ -1,9 +1,9 @@
 version: '3'
 
 services:
-    digitaltwin-spawner:
-        image: threefoldjimber/digitaltwin-spawner:${digitaltwin_spawner_tag}
-        container_name: digitaltwin-spawner
+    digital_twin_spawner:
+        image: registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${digital_twin_spawner_tag}
+        container_name: digital_twin_spawner
         build: server
         restart: always
         env_file:
@@ -17,9 +17,9 @@ services:
             - DIGITALTWIN_APPID=${DIGITALTWIN_APPID}
             - ENVIRONMENT=${ENVIRONMENT}
 
-    digitaltwin-proxy:
+    digitaltwin_proxy:
         image: nginx:alpine
-        container_name: digitaltwin-proxy
+        container_name: digital_twin_proxy
         restart: always
         volumes:
             - ../../docker/certs:/etc/nginx/certs
@@ -31,8 +31,8 @@ services:
             - chatnet
 
     digitaltwin-frontend:
-        image: threefoldjimber/digitaltwin-frontend:${digitaltwin_frontend_tag}
-        container_name: digitaltwin-frontend
+        image: registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${digital_twin_frontend_tag}
+        container_name: digital_twin_frontend
         restart: always
         build: frontend
         networks:

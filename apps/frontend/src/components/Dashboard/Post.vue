@@ -91,7 +91,7 @@
                             <div>
                                 <p
                                     class="text-base font-medium cursor-pointer hover:underline"
-                                    @click="showComingSoonToUhuru = true"
+                                    @click="showComingSoonToFreeFlow = true"
                                     @mouseover="
                                         mouseFocussed = true;
                                         panelTimer();
@@ -159,7 +159,7 @@
             </div>
             <div class="mt-4 text-gray-600">
                 <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
-                <div class="my-2 break-words">
+                <div class="my-2 break-words whitespace-pre-wrap">
                     <p v-if="!readMore && item.post.body.length > 200">
                         {{ item.post.body.slice(0, 200) }}
                     </p>
@@ -361,7 +361,7 @@
     import { ref, computed, onBeforeMount, watch } from 'vue';
     import moment from 'moment';
     import { TransitionRoot } from '@headlessui/vue';
-    import { showComingSoonToUhuru } from '@/services/dashboardService';
+    import { showComingSoonToFreeFlow } from '@/services/dashboardService';
     import CommentsContainer from '@/components/Dashboard/CommentsContainer.vue';
     import { LIKE_STATUS } from '@/store/socialStore';
     import { calcExternalResourceLink } from '@/services/urlService';

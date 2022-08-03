@@ -15,12 +15,12 @@
             :class="{
                 'opacity-0': !isLastMessage,
             }"
-            :id="message.from"
+            :id="String(message.from)"
             :showOnlineStatus="false"
         />
         <div class="flex-1">
             <div
-                class="flex flex-row flex-wrap my-message:flex-row-reverse my-message:md:flex-row lg:my-message:flex-row-reverse xl:my-message:flex-row"
+                class="flex flex-row flex-wrap my-message:flex-row-reverse md:my-message:flex-row lg:my-message:flex-row-reverse xl:my-message:flex-row"
             >
                 <div
                     tabindex="0"
@@ -38,11 +38,11 @@
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
                         <MessageContent
                             :message="message"
-                            :key="message.type"
+                            :key="String(message.id) + message.body"
                             :isDownloadingAttachment="isDownloadingAttachment"
                         ></MessageContent>
                     </main>
-                    <div class="h-9 flex items-center absolute right-1.5 -bottom-3 hidden my-message:block">
+                    <div class="h-9 items-center absolute right-1.5 -bottom-3 hidden my-message:block">
                         <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
                         <i class="fas fa-check text-gray-400" v-else></i>
                     </div>
@@ -101,8 +101,8 @@
             </div>
             <div class="flex flex-col mb-4 ml-4 border-l-2 pl-2" v-if="message.replies?.length > 0">
                 <div class="text-gray-400 self-start">Replies:</div>
-                <div v-for="reply in message.replies" :key="reply.id" class="card flex mb-1">
-                    <AvatarImg class="mr-2" small :id="reply.from" :showOnlineStatus="false" />
+                <div v-for="reply in message.replies" :key="String(reply.id)" class="card flex mb-1">
+                    <AvatarImg class="mr-2" small :id="String(reply.from)" :showOnlineStatus="false" />
                     <div
                         class="flex rounded-xl overflow-hidden"
                         :class="{
@@ -144,7 +144,7 @@
     import { onMounted, ref, watch } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
-    import { Message, MessageBodyType, QuoteBodyType, StringMessageType, MessageTypes } from '@/types';
+    import { Message, MessageBodyType, StringMessageType, MessageTypes } from '@/types';
     import { useAuthState } from '@/store/authStore';
     import {
         sendMessageObject,
@@ -155,10 +155,10 @@
     } from '@/store/chatStore';
     import { useScrollActions } from '@/store/scrollStore';
     import Time from '@/components/Time.vue';
+    import axios from 'axios';
 
     import {
         currentRightClickedItem,
-        RIGHT_CLICK_ACTIONS,
         RIGHT_CLICK_ACTIONS_MESSAGE,
         RIGHT_CLICK_TYPE,
         rightClickItemAction,
@@ -180,7 +180,7 @@
     const isDownloadingAttachment = ref<boolean>(false);
     const props = defineProps<IProps>();
 
-    const emit = defineEmits(['openEditShare', 'clickedProfile']);
+    defineEmits(['openEditShare', 'clickedProfile']);
 
     const { user } = useAuthState();
 
@@ -189,7 +189,7 @@
         async () => {
             if (
                 currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE &&
-                currentRightClickedItem.value.data.id === props.message.id
+                (currentRightClickedItem.value.data as unknown as { id: string }).id === props.message.id
             ) {
                 switch (rightClickItemAction.value) {
                     case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
@@ -211,10 +211,6 @@
         { deep: true }
     );
 
-    const toggleSendForwardMessage = () => {
-        console.log('toggleSendForwardMessage');
-    };
-
     const { addScrollEvent } = useScrollActions();
 
     onMounted(() => {
@@ -230,7 +226,7 @@
         read();
     }
 
-    const deleteMessage = message => {
+    const deleteMessage = (message: Message<MessageBodyType>) => {
         //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
             chatId: props.chatId,
@@ -246,11 +242,7 @@
         sendMessageObject(props.chatId, updatedMessage);
     };
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    const deleteReply = (message, reply) => {
+    const deleteReply = (message: Message<StringMessageType>, reply) => {
         //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
             chatId: props.chatId,
@@ -269,7 +261,14 @@
     const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
         //todo: save downloaded file in attachments folder
         const url = calcExternalResourceLink((message.body as { url: string }).url);
-        window.open(url, '_blank');
+        const res = await axios.get(url, { responseType: 'blob' });
+        const blob = new Blob([res.data], { type: res.headers['content-type'] });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        const filename = res.headers['content-disposition'].split('filename=')[1].split('.')[0];
+        const extension = res.headers['content-disposition'].split('.')[1].split(';')[0];
+        link.download = `${filename}.${extension}`;
+        link.click();
         return;
 
         // if (count >= 4) {

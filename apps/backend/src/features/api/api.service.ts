@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import axios, { ResponseType } from 'axios';
+import axios, { AxiosRequestConfig, ResponseType } from 'axios';
+import axiosRetry from 'axios-retry';
 import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
 import { IStatusUpdate } from 'custom-types/status.type';
 import { parse } from 'node-html-parser';
@@ -11,10 +12,14 @@ import { ContactDTO } from '../contact/dtos/contact.dto';
 import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
+import { FailedRequestRepository } from './repositories/failed-request.repository';
 
 @Injectable()
 export class ApiService {
-    constructor(private readonly _configService: ConfigService) {}
+    constructor(
+        private readonly _configService: ConfigService,
+        private readonly _failedRequestRepository: FailedRequestRepository
+    ) {}
 
     /**
      * Registers a digital twin to the central users backend API.
@@ -43,20 +48,32 @@ export class ApiService {
      * @param {MessageDTO} obj.message - Message to send.
      * @param {ResponseType} obj.responseType - Axios optional response type.
      */
-    async sendMessageToApi({
-        location,
-        message,
-        responseType,
-    }: {
-        location: string;
-        message: MessageDTO<unknown>;
-        responseType?: ResponseType;
-    }) {
+    async sendMessageToApi({ location, message }: { location: string; message: MessageDTO<unknown> }) {
+        axiosRetry(axios, {
+            retries: 5,
+            shouldResetTimeout: true,
+            retryDelay: retryCount => {
+                return retryCount * 2000; // time interval between retries
+            },
+            retryCondition: () => true,
+        });
+        const config: AxiosRequestConfig = {
+            method: 'PUT',
+            url: `http://[${location}]/api/v2/messages`,
+            data: message,
+            timeout: 5000,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
         try {
-            return await axios.put(`http://[${location}]/api/v2/messages`, message, {
-                responseType: responseType || 'json',
-            });
+            return await axios(config);
         } catch {
+            await this._failedRequestRepository.createFailedRequestEntry({
+                requestParams: config,
+                lastAttempt: new Date(),
+                location,
+            });
             return;
         }
     }
@@ -351,8 +368,10 @@ export class ApiService {
 
             const propertyList = [];
 
+            const title = getURLTitle(htmlDoc).toString();
+
             propertyList.push({
-                title: getURLTitle(htmlDoc).toString(),
+                title: title == 'Title not found' ? url.toString().split('.')[1] : title,
                 description: getURLDescription(htmlDoc).toString(),
                 link: url,
             });
@@ -362,4 +381,67 @@ export class ApiService {
             throw new BadRequestException(`unable to get url preview: ${error}`);
         }
     }
+
+    /**
+     * Retries failed axios requests.
+     */
+    async retryFailedRequests() {
+        const failedRequests = await this._failedRequestRepository.getFailedRequests();
+        console.log(`FAILED REQUESTS: ${failedRequests.length}`);
+        if (failedRequests.length < 1) return;
+        console.info(`retrying [${failedRequests.length}] failed requests...`);
+        Promise.all(
+            failedRequests.map(async request => {
+                const { location, requestParams } = request;
+                console.info(`retrying request to: [${location}]...`);
+                try {
+                    const res = await axios(requestParams);
+                    if (res.status === 200) {
+                        const reqToDelete = failedRequests.find(r => r.location !== location);
+                        if (reqToDelete) await this._failedRequestRepository.deleteFailedRequest(reqToDelete.entityId);
+                    }
+                } catch (error) {
+                    return;
+                }
+            })
+        );
+    }
+
+    /**
+     * Retries long awaited (7 days or more) failed axios requests.
+     */
+    async retryLongAwaitedFailedRequests() {
+        const longAwaitedFailedRequests = await this._failedRequestRepository.getLongAwaitedFailedRequests();
+        if (longAwaitedFailedRequests.length < 1) return;
+        console.info(`retrying [${longAwaitedFailedRequests.length}] long awaited failed requests...`);
+        Promise.all(
+            longAwaitedFailedRequests.map(async request => {
+                const { location, requestParams } = request;
+                try {
+                    const res = await axios(requestParams);
+                    if (res.status === 200) {
+                        const reqToDelete = longAwaitedFailedRequests.find(r => r.location !== location);
+                        if (reqToDelete) await this._failedRequestRepository.deleteFailedRequest(reqToDelete.entityId);
+                    }
+                } catch (error) {
+                    return;
+                }
+            })
+        );
+    }
+
+    /**
+     * Clears the failed requests array.
+     */
+    // async clearFailedRequests() {
+    //     const failedRequests = await this._failedRequestRepository.getFailedRequests();
+    //     if (failedRequests.length < 1) return;
+    //     Promise.all(
+    //         failedRequests.map(async request => {
+    //             if (request.lastAttempt < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) {
+    //                 await this._failedRequestRepository.deleteFailedRequest(request.entityId);
+    //             }
+    //         })
+    //     );
+    // }
 }

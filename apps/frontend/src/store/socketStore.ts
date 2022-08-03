@@ -11,6 +11,7 @@ import { FileAction } from 'custom-types/file-actions.type';
 import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
+import { useRouter } from 'vue-router';
 
 const state = reactive<State>({
     socket: '',
@@ -28,6 +29,7 @@ const notify = ({ id, sound = 'beep.mp3' }) => {
 };
 
 const initializeSocket = (username: string) => {
+    const router = useRouter();
     state.socket = inject('socket');
 
     state.socket.on('connect', () => {
@@ -48,6 +50,9 @@ const initializeSocket = (username: string) => {
         removeUserFromBlockList(chatId);
     });
     state.socket.on('message', (message: Message<any>) => {
+        const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
+        if (message.type !== 'READ' && !isChatOpen)
+            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
@@ -171,3 +176,17 @@ interface State {
     socket: any;
     notification: object;
 }
+
+const createOSNotification = (title: string, body: string) => {
+    const notifImg = '/freeflow_logo.ico';
+    const options = {
+        body,
+        icon: notifImg,
+    };
+    Notification.requestPermission().then(result => {
+        if (result === 'granted') new Notification(title, options);
+    });
+};
+
+// truncate string to fit given Length
+const truncate = (str: string, length: number) => (str.length > length ? str.substring(0, length) + '...' : str);

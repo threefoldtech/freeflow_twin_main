@@ -179,8 +179,7 @@ export class QuantumController {
         const fileBuffer = this._fileService.readFile({ path });
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
         const fileInfo = await this._quantumService.getFileInfo({ path });
-        if (req.res)
-            req.res.setHeader(`Content-disposition`, `attachment; filename=${fileInfo.fullName}.${fileInfo.extension}`);
+        if (req.res) req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
 
         fileStream.pipe(req.res);
 
@@ -312,10 +311,29 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     moveFiles(@Body() { paths, destination }: MoveFileDTO): boolean {
         paths.map(path => {
+            const name = path.split('/').pop();
+            const actualPath = path === '/' ? join(this.storageDir, name) : path;
+            const actualDestination = destination === '/' ? this.storageDir : destination;
             this._quantumService.createFileWithRetry({
-                fromPath: path,
-                toPath: destination,
-                name: path.split('/').pop(),
+                fromPath: actualPath,
+                toPath: actualDestination,
+                name,
+            });
+        });
+        return true;
+    }
+
+    @Post('files/copy')
+    @UseGuards(AuthGuard)
+    copyFiles(@Body() { paths, destination }: MoveFileDTO): boolean {
+        paths.map(path => {
+            const name = path.split('/').pop();
+            const actualPath = path === '/' ? join(this.storageDir, name) : path;
+            const actualDestination = destination === '/' ? this.storageDir : destination;
+            this._quantumService.copyFileWithRetry({
+                fromPath: actualPath,
+                toPath: actualDestination,
+                name,
             });
         });
         return true;
