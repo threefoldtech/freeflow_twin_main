@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col justify-around items-center">
+    <div class="flex flex-col justify-around items-center overflow-hidden h-screen">
         <div class="flex flex-row justify-center items-center mt-10 mb-5">
             <img class="h-16" src="@/assets/freeflow.svg" alt="FreeFlow logo" />
         </div>
