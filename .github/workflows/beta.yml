@@ -42,7 +42,7 @@ jobs:
         runs-on: beta
         environment:
             name: beta.uhuru
-            url: https://beta.uhuru.me/
+            url: https://demo.freeflow.life/
         steps:
             - name: debugging runner
               run: |
