@@ -178,7 +178,7 @@ interface State {
 }
 
 const createOSNotification = (title: string, body: string) => {
-    const notifImg = '/purple_uhuru_logo.ico';
+    const notifImg = '/freeflow_logo.ico';
     const options = {
         body,
         icon: notifImg,

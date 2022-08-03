@@ -123,7 +123,7 @@
                                 </div>
                             </TransitionChild>
                             <div class="flex-shrink-0 px-4 mb-4 flex items-center">
-                                <img class="h-6 w-auto" src="/uhuru.svg" alt="Workflow" />
+                                <img class="h-10 w-auto" src="/freeflow_white.svg" alt="Workflow" />
                             </div>
                             <div class="mt-5 flex-1 h-0 px-2 overflow-y-auto">
                                 <nav class="h-full flex flex-col">
@@ -204,7 +204,7 @@
                     <span class="sr-only">Open sidebar</span>
                     <MenuIcon class="h-8 text-primary" aria-hidden="true" />
                 </button>
-                <img alt="logo uhuru" src="/Logo_secundary.png" class="h-6 ml-4 mt-4" />
+                <img alt="logo FreeFlow" src="/freeflow_purple.svg" class="h-10 ml-4 mt-3" />
             </div>
             <slot name="content" />
         </header>
