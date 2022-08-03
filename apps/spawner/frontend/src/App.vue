@@ -1,5 +1,5 @@
 <template>
-    <router-view />
+    <router-view class="overflow-hidden h-screen" />
 </template>
 
 <script lang="ts">
