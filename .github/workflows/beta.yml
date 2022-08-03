@@ -66,7 +66,7 @@ jobs:
                   cp .env.sample .env
                   docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
                   docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
-                  docker-compose down
+                  docker-compose down --remove-orphans
                   docker-compose up -d
                   echo Completed.
               env:
