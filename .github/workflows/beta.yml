@@ -27,7 +27,7 @@ jobs:
         needs: [build]
         runs-on: beta
         environment:
-            name: beta.uhuru
+            name: demo.freeflow
             url: https://demo.freeflow.life/
         steps:
             - name: debugging runner

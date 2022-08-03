@@ -18,7 +18,7 @@ jobs:
                   digitaltwin_spawner_tag: ${{ github.sha }}
                   digitaltwin_frontend_tag: ${{ github.sha }}
                   digitaltwin_proxy_tag: ${{ github.sha }}
-                  DIGITALTWIN_APPID: 'beta.uhuru.me'
+                  DIGITALTWIN_APPID: 'demo.freeflow.life'
                   ENVIRONMENT: 'production'
             - name: Log into GitHub Container Registry
               run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
@@ -38,7 +38,7 @@ jobs:
         runs-on: production
         environment:
             name: digitaltwin.production
-            url: https://beta.uhuru.me/
+            url: https://demo.freeflow.life/
         steps:
             - uses: actions/checkout@v2
             - name: Deploying on production server
@@ -52,5 +52,5 @@ jobs:
                   digitaltwin_spawner_tag: ${{ github.sha }}
                   digitaltwin_frontend_tag: ${{ github.sha }}
                   #digitaltwin_proxy_tag: ${{ github.sha }}
-                  DIGITALTWIN_APPID: 'beta.uhuru.me'
+                  DIGITALTWIN_APPID: 'demo.freeflow.life'
                   ENVIRONMENT: 'production'
