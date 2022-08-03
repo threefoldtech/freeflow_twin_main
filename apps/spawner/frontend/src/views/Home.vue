@@ -1,13 +1,10 @@
 <template>
-    <div
-        style="display: flex; flex-direction: column; justify-content: justify-around; align-items: center"
-        class="overflow-hidden"
-    >
-        <div class="flex flex-row justify-center items-center mb-10">
+    <div class="flex flex-col justify-around items-center overflow-hidden h-screen">
+        <div class="flex flex-row justify-center items-center mt-10 mb-5">
             <img class="h-16" src="@/assets/freeflow.svg" alt="FreeFlow logo" />
         </div>
         <div class="flex flex-row justify-center items-center">
-            <img class="h-96" src="@/assets/freeflow_spawner.png" alt="FreeFlow spawner" />
+            <img class="h-80" src="@/assets/freeflow_spawner.png" alt="FreeFlow spawner" />
         </div>
 
         <div class="flex flex-col">
