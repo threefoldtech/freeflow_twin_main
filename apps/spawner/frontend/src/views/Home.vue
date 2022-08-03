@@ -3,26 +3,26 @@
         style="display: flex; flex-direction: column; justify-content: justify-around; align-items: center"
         class="overflow-hidden"
     >
-        <div class="flex flex-row justify-center items-center">
+        <div class="flex flex-row justify-center items-center mb-10">
             <img class="h-16" src="@/assets/freeflow.svg" alt="FreeFlow logo" />
         </div>
         <div class="flex flex-row justify-center items-center">
-            <img class="h-72" src="@/assets/freeflow_spawner.png" alt="FreeFlow spawner" />
+            <img class="h-96" src="@/assets/freeflow_spawner.png" alt="FreeFlow spawner" />
         </div>
 
         <div class="flex flex-col">
-            <h1 class="uppercase">Welcome to your <span class="font-bold">freeflow experiences.</span></h1>
-            <p>Please enter your ThreeFold Connect username in order to continue.</p>
+            <h1 class="uppercase text-center">Welcome to your<br><span class="font-bold">freeflow experiences.</span></h1>
+            <p class='font-medium text-base'>Please enter your ThreeFold Connect username in order to continue.</p>
             <input
                 v-model="name"
                 type="text"
-                class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md mt-7"
+                class="py-2 uppercase text-center bg-[#e3dbd5] block w-full sm:text-base border-gray-300 rounded-md mt-7"
                 pattern="[0-9a-zA-Z\.]"
                 placeholder="Username"
                 @keyup.enter="loginAndSpawn"
             />
 
-            <button class="py-2 px-4 mt-2 text-white rounded-md bg-primary" @click="loginAndSpawn">GO!</button>
+            <button class="py-2 px-4 mt-2 text-white rounded-md bg-[#66c9bf]" @click="loginAndSpawn">GO!</button>
         </div>
         <div class="mt-5 h-72 flex flex-col items-center">
             <Disclosure v-slot="{ open }">
