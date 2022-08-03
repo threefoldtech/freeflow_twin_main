@@ -4,7 +4,7 @@
         <div class="hidden w-28 bg-accent-700 overflow-y-auto lg:block">
             <div class="w-full h-full py-6 flex flex-col items-center">
                 <div class="flex-shrink-0 flex items-center" @click="changePage('dashboard')">
-                    <img src='/freeflow_icon_192x192.png' class='w-12'/>
+                    <img src="/freeflow_icon_192x192.png" class="w-12" />
                 </div>
                 <div class="flex-1 mt-6 w-full px-2 space-y-3">
                     <div
@@ -168,7 +168,7 @@
             </Dialog>
         </TransitionRoot>
         <header class="w-full lg:hidden">
-            <div class="z-10  h-16 bg-white border-b border-gray-200 flex justify-between">
+            <div class="z-10 h-16 bg-white border-b border-gray-200 flex justify-between">
                 <button
                     type="button"
                     class="px-4 text-gray-500 focus:outline-none lg:hidden"
@@ -178,7 +178,7 @@
                     <MenuIcon class="h-8 text-primary" aria-hidden="true" />
                 </button>
                 <img alt="logo FreeFlow" src="/freeflow_purple.svg" class="h-10 mt-3" />
-                <div class='w-16 h-10'> </div>
+                <div class="w-16 h-10"></div>
             </div>
             <slot name="content" />
         </header>

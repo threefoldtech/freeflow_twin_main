@@ -11,8 +11,10 @@
         </div>
 
         <div class="flex flex-col">
-            <h1 class="uppercase text-center">Welcome to your<br><span class="font-bold">freeflow experiences.</span></h1>
-            <p class='font-medium text-base'>Please enter your ThreeFold Connect username in order to continue.</p>
+            <h1 class="uppercase text-center">
+                Welcome to your<br /><span class="font-bold">freeflow experiences.</span>
+            </h1>
+            <p class="font-medium text-base">Please enter your ThreeFold Connect username in order to continue.</p>
             <input
                 v-model="name"
                 type="text"
