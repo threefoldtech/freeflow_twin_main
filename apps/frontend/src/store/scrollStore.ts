@@ -1,7 +1,9 @@
 import { reactive } from '@vue/reactivity';
+import { toRefs } from 'vue';
 
 const state = reactive<State>({
     scrollEvents: [],
+    scrollToNewComment: false,
 });
 
 const addScrollEvent = (force = false) => {
@@ -20,9 +22,13 @@ const clearScrollEvents = () => {
     state.scrollEvents = [];
 };
 
+const isScrollToNewComment = (force = false) => {
+    state.scrollToNewComment = force;
+}
+
 export const useScrollState = () => {
     return {
-        ...state,
+        ...toRefs(state),
     };
 };
 
@@ -32,9 +38,11 @@ export const useScrollActions = () => {
         popScrollEvent,
         clearScrollEvents,
         shiftScrollEvent,
+        isScrollToNewComment,
     };
 };
 
 interface State {
     scrollEvents: boolean[];
+    scrollToNewComment: boolean;
 }
