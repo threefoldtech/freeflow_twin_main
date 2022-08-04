@@ -32,7 +32,6 @@ export class FileService {
      * @param {string} obj.content - File contents.
      */
     writeFile({ path, content, flag }: { path: string; content: string | Buffer; flag?: WriteFileOptions }) {
-        if (this.exists({ path })) this.deleteFile({ path });
         writeFileSync(path, content, flag);
     }
 
