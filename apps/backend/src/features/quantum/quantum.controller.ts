@@ -170,9 +170,10 @@ export class QuantumController {
 
         // TODO: handle blocked tokens
 
-        const payload = await this._quantumService.verifyQuantumJWT({ token });
-        if (payload.permissions.indexOf(SharePermissionType.READ) < 0 || payload.file !== path)
-            throw new UnauthorizedException(`you do not have the premission to read this file`);
+        // TODO: fix
+        // const payload = await this._quantumService.verifyQuantumJWT({ token });
+        // if (payload.permissions.indexOf(SharePermissionType.READ) < 0 || payload.file !== path)
+        //     throw new UnauthorizedException(`you do not have the premission to read this file`);
 
         // TODO: handle attachments
 
