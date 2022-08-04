@@ -78,4 +78,6 @@ RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
+ENV NODE_ENV=production
+
 CMD /startup.sh
