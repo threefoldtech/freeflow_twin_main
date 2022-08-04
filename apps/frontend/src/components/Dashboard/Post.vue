@@ -371,6 +371,9 @@
     import Alert from '@/components/Alert.vue';
     import { IPostContainerDTO } from 'custom-types/post.type';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
+    import { useScrollActions } from '@/store/scrollStore';
+
+    const { isScrollToNewComment } = useScrollActions();
 
     const props = defineProps<{ item: IPostContainerDTO }>();
     const inputRef = ref(null);
@@ -468,6 +471,9 @@
         messageInput.value = '';
         const response = await getSinglePost(props.item.post.id, props.item.owner.location);
         postingCommentInProgress.value = false;
+        if (!isReplyToComment) {
+            isScrollToNewComment(true);
+        }
         emit('refreshPost', response);
     };
 
