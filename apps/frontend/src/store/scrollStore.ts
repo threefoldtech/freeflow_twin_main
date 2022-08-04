@@ -24,7 +24,7 @@ const clearScrollEvents = () => {
 
 const isScrollToNewComment = (force = false) => {
     state.scrollToNewComment = force;
-}
+};
 
 export const useScrollState = () => {
     return {
