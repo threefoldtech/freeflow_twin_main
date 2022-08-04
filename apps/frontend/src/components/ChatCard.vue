@@ -8,7 +8,7 @@
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"
     >
-        <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" class='col-span-2 sm:col-span-1 lg:col-span-2'/>
+        <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" class="col-span-2 sm:col-span-1 lg:col-span-2" />
         <div v-if="!collapsed" class="relative col-span-8 sm:col-span-9 lg:col-span-8">
             <p class="flex items-center">
                 <span class="text-sm text-gray-900 font-bold break-normal overflow-ellipsis overflow-hidden name">
