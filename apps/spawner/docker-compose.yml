@@ -17,20 +17,21 @@ services:
             - DIGITALTWIN_APPID=${DIGITALTWIN_APPID}
             - ENVIRONMENT=${ENVIRONMENT}
 
-    digitaltwin_proxy:
-        image: nginx:alpine
-        container_name: digital_twin_proxy
-        restart: always
-        volumes:
-            - ../../docker/certs:/etc/nginx/certs
-            - ./proxy/nginx.conf:/etc/nginx/nginx.conf
-        ports:
-            - 443:443
-            - 80:80
-        networks:
-            - chatnet
+    # ONLY ENABLE IN DEVELOPMENT
+    # digitaltwin_proxy:
+    #     image: nginx:alpine
+    #     container_name: digital_twin_proxy
+    #     restart: always
+    #     volumes:
+    #         - ../../docker/certs:/etc/nginx/certs
+    #         - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    #     ports:
+    #         - 443:443
+    #         - 80:80
+    #     networks:
+    #         - chatnet
 
-    digitaltwin-frontend:
+    digital_twin_frontend:
         image: registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${digital_twin_frontend_tag}
         container_name: digital_twin_frontend
         restart: always
@@ -39,7 +40,8 @@ services:
             - chatnet
 
     onlyoffice-documentserver:
-        image: jimbersoftware/onlyoffice_yggdrasil
+        build:
+            context: ./onlyoffice
         container_name: onlyoffice-documentserver
         restart: always
         networks:
