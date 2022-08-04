@@ -44,7 +44,7 @@
                 <div class="relative">
                     <TransitionRoot
                         :show="openPanel"
-                        class="absolute z-50 -top-44 -left-20"
+                        class="absolute z-50 -top-44 -left-0"
                         enter="transition-opacity duration-150"
                         enter-from="opacity-0"
                         enter-to="opacity-100"
