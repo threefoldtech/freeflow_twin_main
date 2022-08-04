@@ -17,6 +17,7 @@ services:
             - DIGITALTWIN_APPID=${DIGITALTWIN_APPID}
             - ENVIRONMENT=${ENVIRONMENT}
 
+    # ONLY ENABLE IN DEVELOPMENT
     # digitaltwin_proxy:
     #     image: nginx:alpine
     #     container_name: digital_twin_proxy
@@ -39,7 +40,8 @@ services:
             - chatnet
 
     onlyoffice-documentserver:
-        image: jimbersoftware/onlyoffice_yggdrasil
+        build:
+            context: ./onlyoffice
         container_name: onlyoffice-documentserver
         restart: always
         networks:
