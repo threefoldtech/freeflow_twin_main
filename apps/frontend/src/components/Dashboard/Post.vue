@@ -44,7 +44,7 @@
                 <div class="relative">
                     <TransitionRoot
                         :show="openPanel"
-                        class="absolute z-50 -top-44 -left-20"
+                        class="absolute z-50 -top-44 -left-0"
                         enter="transition-opacity duration-150"
                         enter-from="opacity-0"
                         enter-to="opacity-100"
@@ -371,6 +371,9 @@
     import Alert from '@/components/Alert.vue';
     import { IPostContainerDTO } from 'custom-types/post.type';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
+    import { useScrollActions } from '@/store/scrollStore';
+
+    const { isScrollToNewComment } = useScrollActions();
 
     const props = defineProps<{ item: IPostContainerDTO }>();
     const inputRef = ref(null);
@@ -468,6 +471,9 @@
         messageInput.value = '';
         const response = await getSinglePost(props.item.post.id, props.item.owner.location);
         postingCommentInProgress.value = false;
+        if (!isReplyToComment) {
+            isScrollToNewComment(true);
+        }
         emit('refreshPost', response);
     };
 

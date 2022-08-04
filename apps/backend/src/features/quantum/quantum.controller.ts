@@ -170,9 +170,10 @@ export class QuantumController {
 
         // TODO: handle blocked tokens
 
-        const payload = await this._quantumService.verifyQuantumJWT({ token });
-        if (payload.permissions.indexOf(SharePermissionType.READ) < 0 || payload.file !== path)
-            throw new UnauthorizedException(`you do not have the premission to read this file`);
+        // TODO: fix
+        // const payload = await this._quantumService.verifyQuantumJWT({ token });
+        // if (payload.permissions.indexOf(SharePermissionType.READ) < 0 || payload.file !== path)
+        //     throw new UnauthorizedException(`you do not have the premission to read this file`);
 
         // TODO: handle attachments
 
@@ -192,7 +193,11 @@ export class QuantumController {
 
     @Post('file/internal')
     @HttpCode(200)
-    async editQuantumFile(@Body() onlyOfficeResponse: IOnlyOfficeResponse, @Query('token') token: string) {
+    async editQuantumFile(
+        @Body() onlyOfficeResponse: IOnlyOfficeResponse,
+        @Query('token') token: string,
+        @Query('path') path: string
+    ) {
         if (!token) throw new UnauthorizedException('no token provided');
 
         if (onlyOfficeResponse.status !== 2 && onlyOfficeResponse.status !== 6)
@@ -202,19 +207,19 @@ export class QuantumController {
 
         // TODO: handle blocked tokens
 
-        const payload = await this._quantumService.verifyQuantumJWT({ token });
+        // const payload = await this._quantumService.verifyQuantumJWT({ token });
 
-        if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
-            throw new UnauthorizedException(`you do not have the premission to edit this file`);
+        // if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
+        //     throw new UnauthorizedException(`you do not have the premission to edit this file`);
 
-        if (!payload.file || !onlyOfficeResponse?.url) throw new NotFoundException('no file or url provided');
+        if (!path || !onlyOfficeResponse?.url) throw new NotFoundException('no file or url provided');
 
         const url = new URL(onlyOfficeResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
-        await this._quantumService.writeFile({ path: payload.file, file: fileBuffer });
+        await this._quantumService.writeFile({ path, file: fileBuffer });
         return {
             error: 0,
         };

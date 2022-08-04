@@ -51,7 +51,7 @@
 
     document.querySelector('body').classList.add('overflow-y-hidden');
 
-    const isDev = import.meta.env.DEV;
+    const isDev = import.meta.env.DEV || process.env.NODE_ENV === 'staging';
 
     const route = useRoute();
     const path = computed(() => route.path);

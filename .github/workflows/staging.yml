@@ -14,7 +14,7 @@ jobs:
             - uses: satackey/action-docker-layer-caching@v0.0.11
               continue-on-error: true
             - name: Build the Docker image
-              run: docker build . --file ./docker/prod/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+              run: docker build . --file ./docker/staging/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
             # - name: Build the spawner
             #   working-directory: ./apps/spawner
             #   run: |
@@ -59,7 +59,7 @@ jobs:
             #       cp .env.sample .env
             #       docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
             #       docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
-            # docker-compose down --remove-orphans
+            #       docker-compose down --remove-orphans
             #       docker-compose up -d
             #       echo Completed.
             #   env:

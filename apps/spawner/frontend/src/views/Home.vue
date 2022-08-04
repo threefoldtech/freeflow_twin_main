@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col justify-around items-center overflow-hidden h-screen">
+    <div class="flex flex-col justify-around relative items-center min-h-screen">
         <div class="flex flex-row justify-center items-center mt-10 mb-5">
             <img class="h-16" src="@/assets/freeflow.svg" alt="FreeFlow logo" />
         </div>
@@ -15,7 +15,7 @@
             <input
                 v-model="name"
                 type="text"
-                class="py-2 uppercase text-center bg-[#e3dbd5] block w-full sm:text-base border-gray-300 rounded-md mt-7"
+                class="py-2 uppercase text-center bg-[#e3dbd5] block w-full sm:text-base border-transparent text-gray-900 rounded-md mt-7"
                 pattern="[0-9a-zA-Z\.]"
                 placeholder="Username"
                 @keyup.enter="loginAndSpawn"

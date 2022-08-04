@@ -72,14 +72,16 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <tr v-for="chat in chats" :key="chat.chatId">
-                                        <td class="pl-6 py-4">
+                                    <tr v-for="chat in chats" :key="chat.chatId" class="max-w-full">
+                                        <td class="pl-6 py-4 truncate max-w-[1px]">
                                             <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full">
                                                     <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
                                                 </div>
                                                 <div class="ml-4 w-full">
-                                                    <div class="text-sm font-medium max-w-[50%] truncate text-gray-900">
+                                                    <div
+                                                        class="text-sm font-medium m-0 max-w-[70%] truncate text-gray-900"
+                                                    >
                                                         {{ chat.name }}
                                                     </div>
                                                 </div>
