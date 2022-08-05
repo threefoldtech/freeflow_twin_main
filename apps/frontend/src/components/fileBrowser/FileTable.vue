@@ -37,6 +37,25 @@
             >Delete
         </v-contextmenu-item>
     </v-contextmenu>
+    <div
+        v-if="showFilePreview"
+        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
+        @click="showFilePreview = false"
+    >
+        <XIcon
+            class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50"
+            @click="showFilePreview = false"
+        />
+        <div v-if="filePreviewType === 'image'">
+            <img :src="filePreviewSrc" class="pointer-events-none z-50 max-h-full" @click.stop alt="filePreview" />
+        </div>
+
+        <div v-else-if="filePreviewType === 'video'">
+            <video controls>
+                <source :src="filePreviewSrc" />
+            </video>
+        </div>
+    </div>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
@@ -299,7 +318,9 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onBeforeMount, ref } from 'vue';
+    import { computed, ref } from 'vue';
+    import { XIcon } from '@heroicons/vue/solid';
+
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -339,6 +360,8 @@
         RIGHT_CLICK_TYPE,
     } from '@/store/contextmenuStore';
     import Spinner from '@/components/Spinner.vue';
+    import { isImage, isVideo } from '@/services/contentService';
+    import { calcExternalResourceLink } from '@/services/urlService';
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -379,7 +402,21 @@
         else deselectAll();
     };
 
+    const showFilePreview = ref(false);
+    const filePreviewSrc = ref('');
+    const filePreviewType = ref('');
+
     const handleItemClick = (item: PathInfoModel) => {
+        if (isVideo(item.fullName) || isImage(item.fullName)) {
+            const ownerLocation = user.location;
+            let path = item.path;
+            path = path.replace('/appdata/storage/', '');
+            showFilePreview.value = true;
+            const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
+            filePreviewSrc.value = calcExternalResourceLink(src);
+            filePreviewType.value = isVideo(item.fullName) ? 'video' : 'image';
+            return;
+        }
         itemAction(item, router);
     };
 

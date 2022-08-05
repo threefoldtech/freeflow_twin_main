@@ -1,4 +1,5 @@
 export const isImage = filename => {
+    if (!filename) return false;
     return (
         filename.indexOf('.gif') !== -1 ||
         filename.indexOf('.png') !== -1 ||
@@ -12,6 +13,7 @@ export const isAudio = filename => {
 };
 
 export const isVideo = filename => {
+    if (!filename) return false;
     return (
         filename?.indexOf('.mp4') !== -1 ||
         filename?.indexOf('.mov') !== -1 ||
