@@ -30,6 +30,13 @@ export default defineConfig({
             workbox: {
                 maximumFileSizeToCacheInBytes: 4000000, // 4MB
                 cleanupOutdatedCaches: true,
+                navigateFallbackDenylist: [/\/api\/v2\/.*\/*/],
+                runtimeCaching: [
+                    {
+                        handler: 'NetworkOnly',
+                        urlPattern: /\/api\/v2\/.*\/*/,
+                    },
+                ],
             },
             manifest: {
                 name: 'FreeFlow Twin',
