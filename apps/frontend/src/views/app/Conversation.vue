@@ -303,7 +303,7 @@
                 <h1 class="mb-5">User info</h1>
             </template>
 
-            <div class='py-2'>
+            <div class="py-2">
                 <div class="flex space-x-5 mb-5 px-4">
                     <AvatarImg :id="selectedUser?.id" large />
                     <h2 class="mt-3 text-xl">{{ selectedUser?.id }}</h2>
