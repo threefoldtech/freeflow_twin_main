@@ -3,7 +3,7 @@
         <!-- Narrow sidebar -->
         <div class="hidden w-28 bg-accent-700 overflow-y-auto lg:block">
             <div class="w-full h-full py-6 flex flex-col items-center">
-                <div class="flex-shrink-0 flex items-center" @click="changePage('dashboard')">
+                <div class="flex-shrink-0 flex items-center cursor-pointer" @click="changePage('dashboard')">
                     <img src="/freeflow_icon_192x192.png" class="w-12" />
                 </div>
                 <div class="flex-1 mt-6 w-full px-2 space-y-3">
