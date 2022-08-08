@@ -160,12 +160,8 @@
             <div class="mt-4 text-gray-600">
                 <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
                 <div class="my-2 break-words whitespace-pre-wrap">
-                    <p
-                        v-if="!readMore && amount_lines + 1 > 5"
-                    >
-                        <span 
-                            v-for="value in item.post.body.split(/\r\n|\r|\n/).slice(0, 5)"
-                        >
+                    <p v-if="!readMore && amount_lines + 1 > 5">
+                        <span v-for="value in item.post.body.split(/\r\n|\r|\n/).slice(0, 5)">
                             {{ value == '' ? ' ' : value }}
                         </span>
                     </p>
