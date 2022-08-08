@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+    BadRequestException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+    UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createHash } from 'crypto';
 import { sign, verify } from 'jsonwebtoken';
@@ -135,6 +141,7 @@ export class QuantumService {
      * @return {PathInfoDTO} - PathInfoDTO.
      */
     async createDirectoryWithRetry({ path, count = 0 }: { path: string; count?: number }): Promise<PathInfoDTO> {
+        if (this.isUserFolder({ path })) throw new ForbiddenException('cannot create new user data folder');
         const pathWithCount = count === 0 ? path : `${path} (${count})`;
         if (this._fileService.exists({ path: pathWithCount }))
             return await this.createDirectoryWithRetry({ path, count: count + 1 });
@@ -193,6 +200,8 @@ export class QuantumService {
         name: string;
         count?: number;
     }): Promise<void> {
+        if (this.isUserFolder({ path: fromPath })) throw new ForbiddenException('cannot copy user data');
+
         const path = join(toPath, name);
         const pathWithCount =
             count === 0
@@ -207,6 +216,7 @@ export class QuantumService {
     }
 
     async writeFile({ path, file }: { path: string; file: Buffer }) {
+        if (this.isUserFolder({ path })) throw new ForbiddenException('cannot create user data file');
         this._fileService.writeFile({ path, content: file });
         return await this.formatFileDetails({ path });
     }
@@ -218,6 +228,7 @@ export class QuantumService {
      * @param {string} obj.to - Path to rename to.
      */
     async renameFileOrDirectory({ from, to }: RenameFileDTO): Promise<void> {
+        if (this.isUserFolder({ path: from })) throw new ForbiddenException('cannot rename user data folder');
         if (!this._fileService.exists({ path: from }))
             throw new BadRequestException('unable to rename file, file does not exist');
         if (this._fileService.exists({ path: to }))
@@ -264,6 +275,8 @@ export class QuantumService {
      * @param {string} obj.filename - Share filename.
      */
     async shareFile({ path, isPublic, isWritable, userId: shareWith, filename }: ShareFileRequesDTO): Promise<boolean> {
+        if (this.isUserFolder({ path })) throw new ForbiddenException('cannot share user data folder');
+
         if (isWritable && isPublic) throw new BadRequestException('cannot share file as public and writable');
 
         const chat = await this._chatService.getChat(shareWith);
@@ -353,8 +366,10 @@ export class QuantumService {
     }
 
     async deleteFile({ path }: { path: string }) {
+        if (this.isUserFolder({ path })) throw new ForbiddenException('cannot delete user data');
+
+        const share = await this.getShareByPath({ path });
         try {
-            const share = await this.getShareByPath({ path });
             if (share) {
                 await this.deleteShare({ id: share.entityId });
                 share.parsePermissions().map(async permission => {
@@ -486,6 +501,8 @@ export class QuantumService {
         size,
         lastModified,
     }: CreateFileShareDTO): Promise<IFileShare> {
+        if (this.isUserFolder({ path })) throw new ForbiddenException('cannot share user data folder');
+
         if (!id) id = uuidv4();
 
         try {
@@ -519,6 +536,8 @@ export class QuantumService {
         { path, owner, name, isFolder, isSharedWithMe, permissions, size }: CreateFileShareDTO,
         isGroup?: boolean
     ): Promise<IFileShare> {
+        if (this.isUserFolder({ path })) throw new ForbiddenException('cannot share user data folder');
+
         existingShare.path = path;
         existingShare.owner = stringifyOwner(owner);
         existingShare.name = name;
@@ -642,5 +661,16 @@ export class QuantumService {
         } catch (error) {
             throw new BadRequestException(`unable to get file details: ${error}`);
         }
+    }
+
+    /**
+     * Checks if the given path is the users config directory.
+     * @param {Object} obj - Object containing the path to check.
+     * @param {string} obj.path - Path to check.
+     * @return {boolean} - True if the path is the users config directory.
+     */
+    private isUserFolder({ path }: { path: string }): boolean {
+        const pathDetails = this._fileService.getPathDetails({ path });
+        return pathDetails.name === this.userId;
     }
 }
