@@ -228,7 +228,6 @@ export const getFileAccessDetails = async (
 
     path = encodeURIComponent(path);
 
-    // TODO: handle in nest
     let apiEndPointToCall = `/api/v2/quantum/share/info?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
