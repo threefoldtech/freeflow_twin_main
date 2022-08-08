@@ -81,12 +81,7 @@
                                     panelTimer();
                                 "
                             >
-                                <AvatarImg
-                                    :id="item.owner.id"
-                                    :showOnlineStatus="false"
-                                    class="w-12 h-12 rounded-full"
-                                    alt="avatar"
-                                />
+                                <img :src="avatarImg" alt="" class="h-12 w-12 object-fill rounded-full" />
                             </div>
                             <div>
                                 <p

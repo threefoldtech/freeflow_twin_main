@@ -1,7 +1,7 @@
 <template>
     <div :class="{ 'ml-10': comment.type === CommentType.COMMENT_REPLY }" class="flex items-center space-x-2 relative">
         <VMenu placement="top">
-            <AvatarImg :id="comment.owner.id" :showOnlineStatus="false" :small="true" alt="avatar" />
+            <img :src="avatarImg" alt="" class="h-10 w-10 object-fill rounded-full" />
 
             <template #popper>
                 <keep-alive>

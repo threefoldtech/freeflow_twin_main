@@ -269,7 +269,7 @@
         </Alert>
 
         <Alert v-if="showDeleteDialog" :showAlert="showDeleteDialog" @close="showDeleteDialog = false">
-            <template #title> Deleting group</template>
+            <template #title>Deleting group</template>
             <template #content>
                 Do you really want to delete this group
                 <b>{{ chat?.name }}</b
