@@ -160,11 +160,17 @@
             <div class="mt-4 text-gray-600">
                 <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
                 <div class="my-2 break-words whitespace-pre-wrap">
-                    <p v-if="!readMore && item.post.body.length > 200">
-                        {{ item.post.body.slice(0, 200) }}
+                    <p
+                        v-if="!readMore && amount_lines + 1 > 5"
+                    >
+                        <span 
+                            v-for="value in item.post.body.split(/\r\n|\r|\n/).slice(0, 5)"
+                        >
+                            {{ value == '' ? ' ' : value }}
+                        </span>
                     </p>
                     <p v-else>{{ item.post.body }}</p>
-                    <a class="text-gray-800" v-if="item.post.body.length > 200" @click="readMore = !readMore" href="#">
+                    <a class="text-gray-800" v-if="amount_lines + 1 > 5" @click="readMore = !readMore" href="#">
                         {{ readMore ? 'Show less' : 'Read more' }}
                     </a>
                 </div>
@@ -389,6 +395,7 @@
     const mouseFocussed = ref(false);
     const postingCommentInProgress = ref<boolean>(false);
     const readMore = ref<boolean>(false);
+    const amount_lines = ref<number>(0);
     const { user } = useAuthState();
     const emit = defineEmits(['refreshPost']);
 
@@ -416,6 +423,14 @@
     const doDeletePost = () => {
         deletePost(props.item);
         showDeletePostDialog.value = false;
+    };
+
+    const countLines = (body: string) => {
+        try {
+            return body.match(/[^\n]*\n[^\n]*/gi).length;
+        } catch (e) {
+            return 0;
+        }
     };
 
     const countComments = (total = 0, comments = props.item.replies) => {
@@ -455,6 +470,7 @@
         if (props.item.likes.some(item => item.id === user.id)) {
             localLike.value = true;
         }
+        amount_lines.value = countLines(props.item.post.body.trimEnd());
     });
 
     const openImagePreview = image => {
