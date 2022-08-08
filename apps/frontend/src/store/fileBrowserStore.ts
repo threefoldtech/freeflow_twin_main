@@ -114,7 +114,8 @@ export const updateContent = async (path = currentDirectory.value) => {
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-    currentDirectoryContent.value = result.data.map(createModel);
+    const { user } = useAuthState();
+    currentDirectoryContent.value = result.data.map(createModel).filter(item => item.name !== user.id);
 
     savedAttachments.value = false;
 };
