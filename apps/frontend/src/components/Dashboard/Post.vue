@@ -393,7 +393,6 @@
     const emit = defineEmits(['refreshPost']);
 
     const smallScreen = ref(window.innerWidth < 640);
-    console.log(smallScreen.value);
 
     window.onresize = () => {
         smallScreen.value = window.innerWidth < 640;
