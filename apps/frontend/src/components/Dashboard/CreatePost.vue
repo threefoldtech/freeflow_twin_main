@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col" v-if="error">
-                            <small class="px-4 text-gray-500">{{ errorMessage }}</small>
+                            <small class="px-4 text-sm text-red-500">{{ errorMessage }}</small>
                         </div>
                         <div v-if="new_post_images.length >= 1 && createPostModalStatus" class="p-4">
                             <ImageGrid

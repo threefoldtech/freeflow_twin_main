@@ -25,6 +25,14 @@
     th {
         @apply font-bold;
     }
+
+    .top {
+        grid-area: top;
+    }
+
+    .side {
+        grid-area: side;
+    }
     /* input,
     textarea,
     select {

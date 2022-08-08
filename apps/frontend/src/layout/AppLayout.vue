@@ -6,7 +6,7 @@
         <NotificationSection />
 
         <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
-            <Navigation :class="[smallScreen ? 'top' : 'side']">
+            <Navigation class="top lg:side">
                 <template #content>
                     <slot name="topbar" />
                 </template>
@@ -33,15 +33,8 @@
     import Navigation from '@/components/Navigation.vue';
 
     const { notification } = useSocketState();
-    const showNav = ref(false);
-    const smallScreen = ref(window.innerWidth < 1024);
 
     let audio = null;
-
-    window.onresize = () => {
-        smallScreen.value = window.innerWidth < 1024;
-        if (window.innerWidth > 1024) showNav.value = false;
-    };
 
     watch(notification, (newNot: any, oldNot: any) => {
         const focused = document.hasFocus();
@@ -59,14 +52,6 @@
 </script>
 
 <style scoped>
-    .top {
-        grid-area: top;
-    }
-
-    .side {
-        grid-area: side;
-    }
-
     .content {
         grid-area: content;
     }

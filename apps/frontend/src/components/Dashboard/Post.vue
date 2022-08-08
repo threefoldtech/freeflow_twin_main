@@ -106,7 +106,7 @@
                                 <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                             </div>
                         </div>
-                        <div class="group">
+                        <div class="group" v-if="smallScreen || props.item.owner.id === user.id.toString()">
                             <Popover v-slot="{ open }" class="relative z-30">
                                 <PopoverButton
                                     :class="open ? '' : 'text-opacity-90'"
@@ -310,7 +310,7 @@
                         <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :small="true" alt="avatar" />
                     </div>
                     <input
-                        :ref="inputRef"
+                        ref="inputRef"
                         v-model="messageInput"
                         :disabled="postingCommentInProgress"
                         class="text-xs font-medium rounded-lg border border-gray-300 outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
@@ -358,7 +358,7 @@
     } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
-    import { ref, computed, onBeforeMount, watch } from 'vue';
+    import { ref, computed, onBeforeMount, watch, nextTick } from 'vue';
     import moment from 'moment';
     import { TransitionRoot } from '@headlessui/vue';
     import { showComingSoonToFreeFlow } from '@/services/dashboardService';
@@ -392,11 +392,25 @@
     const { user } = useAuthState();
     const emit = defineEmits(['refreshPost']);
 
+    const smallScreen = ref(window.innerWidth < 640);
+
+    window.onresize = () => {
+        smallScreen.value = window.innerWidth < 640;
+    };
+
     //only shows user panel if mouse stays focussed for a moment
     const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
 
     watch([showComments, amount_likes], () => {
         getSinglePost(props.item.post.id, props.item.owner.location);
+    });
+
+    watch(showComments, () => {
+        nextTick(() => {
+            if (showComments.value) {
+                inputRef.value.focus();
+            }
+        });
     });
 
     const doDeletePost = () => {

@@ -15,7 +15,7 @@
                 'h-10 w-10': small,
                 'h-8 w-8': xsmall,
             }"
-            class="bg-icon rounded-full"
+            class="bg-icon rounded-full focus:outline-none focus-visible:outline-none"
             alt="avatar"
             :src="src"
         />
