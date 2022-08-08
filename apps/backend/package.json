@@ -50,7 +50,7 @@
         "jsonwebtoken": "^8.5.1",
         "lodash": "^4.17.20",
         "mime": "^2.5.2",
-        "moment": "^2.29.1",
+        "moment": "^2.29.4",
         "morgan": "^1.10.0",
         "node-html-parser": "^5.3.3",
         "passport": "^0.5.2",
