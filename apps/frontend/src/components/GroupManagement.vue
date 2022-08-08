@@ -231,13 +231,15 @@
     <Alert
         v-if="showChangeUserRoleDialog"
         :showAlert="showChangeUserRoleDialog"
+        type="info"
         @close="
             showChangeUserRoleDialog = false;
             selectedUser = null;
         "
     >
         <template #title v-if="selectedUser?.roles?.includes(Roles.MODERATOR)"> Demote user</template>
-        <template #title v-else>Promote user</template>
+        <template #title v-else>You are about to promote {{ selectedUser.id }}</template>
+        <template #content> By promoting this user will have more rights then others in this chat. </template>
         <template #actions>
             <button
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"

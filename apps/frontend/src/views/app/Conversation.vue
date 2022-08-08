@@ -303,13 +303,13 @@
                 <h1 class="mb-5">User info</h1>
             </template>
 
-            <div>
-                <div class="flex space-x-5 mb-5">
+            <div class="py-2">
+                <div class="flex space-x-5 mb-5 px-4">
                     <AvatarImg :id="selectedUser?.id" large />
                     <h2 class="mt-3 text-xl">{{ selectedUser?.id }}</h2>
                 </div>
 
-                <div class="flex space-x-3" v-if="isPersonFriend !== null">
+                <div class="flex space-x-3 px-4" v-if="isPersonFriend !== null">
                     <div class="w-auto">
                         <a
                             class="text-xs text-accent-600 hover:bg-opacity-60 font-semibold flex items-center justify-center px-3 py-2 bg-accent-300 bg-opacity-50 rounded-lg"
