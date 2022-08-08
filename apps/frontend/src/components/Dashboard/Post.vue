@@ -162,9 +162,12 @@
                 <div class="my-2 break-words whitespace-pre-wrap">
                     <p
                         v-if="!readMore && amount_lines + 1 > 5"
-                        v-for="value in item.post.body.split(/\r\n|\r|\n/).slice(0, 5)"
                     >
-                        {{ value == '' ? ' ' : value }}
+                        <span 
+                            v-for="value in item.post.body.split(/\r\n|\r|\n/).slice(0, 5)"
+                        >
+                            {{ value == '' ? ' ' : value }}
+                        </span>
                     </p>
                     <p v-else>{{ item.post.body }}</p>
                     <a class="text-gray-800" v-if="amount_lines + 1 > 5" @click="readMore = !readMore" href="#">
