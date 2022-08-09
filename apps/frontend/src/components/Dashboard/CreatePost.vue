@@ -76,9 +76,22 @@
                                 @resetImage="new_post_images = []"
                             />
                         </div>
-                        <video v-if="new_post_video_url !== '' && createPostModalStatus" class="p-4" controls>
-                            <source :src="new_post_video_url" />
-                        </video>
+                        <div v-if="new_post_video_url !== '' && createPostModalStatus" class="relative">
+                            <div
+                                @click="
+                                    () => {
+                                        new_post_video_url = '';
+                                        new_post_video = null;
+                                    }
+                                "
+                                class="z-40 absolute right-6 top-6 cursor-pointer bg-gray-800 hover:bg-gray-500 rounded-full w-8 h-8 flex items-center justify-center"
+                            >
+                                <XIcon class="w-6 text-gray-400" />
+                            </div>
+                            <video class="p-4" controls>
+                                <source :src="new_post_video_url" />
+                            </video>
+                        </div>
                         <input
                             @change="handleFileInput"
                             type="file"
@@ -257,13 +270,13 @@
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
         error.value = false;
         if (
-            new_post_text.value.trim() === '' &&
-            new_post_video_url.value.trim() === '' &&
-            new_post_images.value.length === 0
+            (new_post_text.value.trim() === '' &&
+                new_post_video_url.value.trim() === '' &&
+                new_post_images.value.length === 0) ||
+            new_post_images.value.length > 10
         )
             return;
 
-        if (new_post_images.value.length > 10) return;
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
         await createSocialPost(new_post_text.value, [...new_post_images.value, new_post_video.value]);
@@ -271,33 +284,16 @@
         isPublishingNewPost.value = false;
         new_post_images.value = [];
         new_post_text.value = '';
+        new_post_video.value = null;
+        new_post_video_url.value = '';
         createPostModalStatus.value = false;
     };
-
-    const actions = ref([
-        {
-            name: 'Like',
-            component: HeartIcon,
-        },
-        {
-            name: 'Comment',
-            component: ChatAltIcon,
-        },
-    ]);
 
     const navigation = ref([
         {
             name: 'Publish',
             component: PencilAltIcon,
-        } /*,
-        {
-            name: 'Albums',
-            component: PhotographIcon,
         },
-        {
-            name: 'Video',
-            component: FilmIcon,
-        },*/,
     ]);
 
     const { user } = useAuthState();
