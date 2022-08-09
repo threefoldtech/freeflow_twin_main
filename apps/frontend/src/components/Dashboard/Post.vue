@@ -83,6 +83,7 @@
                             >
                                 <AvatarImg
                                     :id="item.owner.id"
+                                    :contact="item.owner"
                                     :showOnlineStatus="false"
                                     class="w-12 h-12 rounded-full"
                                     alt="avatar"
