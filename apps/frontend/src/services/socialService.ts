@@ -4,7 +4,7 @@ import { uuidv4 } from '@/common';
 import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@/store/socialStore';
 import { useAuthState, myYggdrasilAddress } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
-import { sendMessageObject } from '@/store/chatStore';
+import { newUnreadChats, sendMessageObject } from '@/store/chatStore';
 import { CommentType, IPostComment, IPostContainerDTO, IPostDTO, PostType } from 'custom-types/post.type';
 import { useSocketActions } from '../store/socketStore';
 import { FileAction } from 'custom-types/file-actions.type';
@@ -231,6 +231,7 @@ export const createMessage = async (
 export const sendMessageSharePost = async (chatId: string, post: IPostContainerDTO) => {
     const newMessage: Message<MESSAGE_POST_SHARE_BODY> = await createMessage(chatId, post);
     sendMessageObject(chatId, newMessage);
+    newUnreadChats(chatId);
 };
 
 export const deletePost = async (item: IPostContainerDTO) => {
