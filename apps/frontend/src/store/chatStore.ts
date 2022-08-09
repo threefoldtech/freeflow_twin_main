@@ -222,10 +222,10 @@ const updateChat = (chat: Chat) => {
 };
 
 function getMessage(chat: Chat, id: string) {
-    let message = chat.messages.find(m => m.id === id);
+    let message = chat?.messages.find(m => m.id === id);
 
     if (!message) {
-        chat.messages.find(m => {
+        chat?.messages.find(m => {
             const found = m.replies.find(r => r.id === id);
             if (!found) {
                 return false;
@@ -314,6 +314,7 @@ const addMessage = (chatId: string, message: any) => {
     }
 
     const chat: Chat = getChat(chatId);
+    if (!chat) return;
 
     if (message.subject) {
         const subjectMessageIndex = chat.messages.findIndex(m => m.id === message.subject);
@@ -701,6 +702,7 @@ export const handleRead = (message: Message<string>) => {
 
     const { chats } = useChatsState();
     const chat = chats.value.find(c => c.chatId == chatId);
+    if (!chat) return;
 
     const newRead = getMessage(chat, message.body);
     const oldRead = getMessage(chat, <string>message.from);

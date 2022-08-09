@@ -100,7 +100,12 @@ export class ChatService {
             }
             chat.acceptedChat = true;
             await this._chatRepository.updateChat(chat);
-            this._chatGateway.emitMessageToConnectedClients('new_chat', chat.toJSON());
+            this._chatGateway.emitMessageToConnectedClients('new_chat', {
+                ...chat.toJSON(),
+                messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
+                    m.toJSON()
+                ),
+            });
             return chat.toJSON();
         } catch (error) {
             throw new BadRequestException(`unable to accept chat request: ${error}`);
