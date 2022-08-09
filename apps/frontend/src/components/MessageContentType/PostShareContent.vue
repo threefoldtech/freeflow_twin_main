@@ -18,7 +18,7 @@
             <XIcon class="w-12 h-12 absolute right-4 top-4 text-white cursor-pointer" />
             <div
                 @click.stop
-                class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[80%] rounded-lg"
+                class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[95%] rounded-lg overflow-y-auto"
             >
                 <Post @click.stop @refreshPost="refreshPost" :item="postData" />
             </div>

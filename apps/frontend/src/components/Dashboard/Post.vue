@@ -136,7 +136,7 @@
                                                     "
                                                 >
                                                     <TrashIcon class="w-6 mr-4" />
-                                                    <p>Delete</p>
+                                                    <p class="w-12">Delete</p>
                                                 </div>
                                                 <div
                                                     class="sm:hidden flex items-center cursor-pointer text-gray-500 hover:text-green-500"
