@@ -144,11 +144,12 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
         });
         await this._messageService.createMessage(message);
 
-        let newAdmin = chat.contacts.find(c => c.id === nextAdmin);
-        if (!newAdmin) newAdmin = chat.contacts.find(c => c.id !== contact.id)[0];
-        updatedChat.adminId = newAdmin.id;
-        newAdmin.roles = [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN];
-        await this._chatService.updateContact({ chat: updatedChat, contact: newAdmin });
+        const newAdmin = chat.contacts.find(c => c.id === nextAdmin);
+        if (newAdmin) {
+            updatedChat.adminId = newAdmin.id;
+            newAdmin.roles = [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN];
+            await this._chatService.updateContact({ chat: updatedChat, contact: newAdmin });
+        }
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
             ...updatedChat.toJSON(),

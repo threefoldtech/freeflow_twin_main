@@ -670,7 +670,7 @@ export class QuantumService {
      * @return {boolean} - True if the path is the users config directory.
      */
     private isUserFolder({ path }: { path: string }): boolean {
-        const pathDetails = this._fileService.getPathDetails({ path });
-        return pathDetails.name === this.userId;
+        const configPath = `${this._configService.get<string>('baseDir')}storage/${this.userId}`;
+        return path.startsWith(configPath);
     }
 }
