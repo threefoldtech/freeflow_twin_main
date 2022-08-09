@@ -63,6 +63,7 @@
     import Post from '@/components/Dashboard/Post.vue';
     import { XIcon } from '@heroicons/vue/solid';
     import { IPostContainerDTO } from 'custom-types/post.type';
+    import { createErrorNotification } from '@/store/notificiationStore';
 
     const props = defineProps<{ message: Message<MESSAGE_POST_SHARE_BODY> }>();
     const showPost = ref<boolean>(false);
@@ -97,7 +98,10 @@
 
     const goToSocialPost = async () => {
         const post = await getSinglePost(props.message.body.post.id, props.message.body.owner.location);
-        if (!post) return;
+        if (!post) {
+            createErrorNotification('Failed to load post', 'The post has been deleted');
+            return;
+        }
         postData.value = post;
         showPost.value = true;
     };
