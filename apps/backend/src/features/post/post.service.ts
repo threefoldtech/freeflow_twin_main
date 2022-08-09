@@ -13,6 +13,7 @@ import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { stringifyLikes, stringifyReplies } from './models/post.model';
 import { PostRedisRepository } from './repositories/post-redis.repository';
+import { PostGateway } from './post.gateway';
 
 @Injectable()
 export class PostService {
@@ -27,7 +28,8 @@ export class PostService {
         private readonly _contactService: ContactService,
         private readonly _blockedContactService: BlockedContactService,
         private readonly _userService: UserService,
-        private readonly _userGateway: UserGateway
+        private readonly _userGateway: UserGateway,
+        private readonly _postGateway: PostGateway
     ) {
         this.user = this._configService.get<string>('userId');
     }
@@ -188,8 +190,16 @@ export class PostService {
     async deletePost({ postId }: { postId: string }): Promise<string> {
         try {
             const post = await this._postRepo.getPost({ id: postId });
-            if (post.ownerId !== this.user) throw new ForbiddenException("cannot delete someone else's post");
-            await this._postRepo.deletePost({ id: post.entityId });
+
+            if (post?.ownerId === this.user) {
+                await this._postRepo.deletePost({ id: post.entityId });
+                const contacts = await this._contactService.getContacts();
+                for (const contact of contacts) {
+                    this._apiService.deletePost({ location: contact.location, postId });
+                }
+            }
+
+            this._postGateway.emitMessageToConnectedClients('post_deleted', postId);
             return postId;
         } catch (error) {
             throw new BadRequestException(`unable to delete post: ${error}`);

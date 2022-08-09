@@ -431,6 +431,21 @@ export class ApiService {
     }
 
     /**
+     * Let the other twin know that a post has been deleted.
+     * @param {Object} obj - Object.
+     * @param {string} obj.location - IPv6 location to send message to.
+     * @param {string} obj.postId - Post id that has been deleted.
+     */
+    async deletePost({ location, postId }: { location: string; postId: string }) {
+        const url = `http://[${location}]/api/v2/posts/${postId}`;
+        try {
+            return (await axios.delete(url)).data;
+        } catch {
+            return;
+        }
+    }
+
+    /**
      * Clears the failed requests array.
      */
     // async clearFailedRequests() {

@@ -12,6 +12,7 @@ import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
+import { allSocialPosts } from '@/store/socialStore';
 
 const state = reactive<State>({
     socket: '',
@@ -97,6 +98,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on('appID', (url: string) => {
         config.setAppId(url);
+    });
+    state.socket.on('post_deleted', (id: string) => {
+        allSocialPosts.value = allSocialPosts.value.filter(p => p.id !== id);
     });
     state.socket.on('yggdrasil', (location: string) => {
         console.log(`YGGDRASIL LOCATION SET TO: ${location}`);
