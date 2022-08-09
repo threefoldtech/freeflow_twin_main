@@ -76,12 +76,15 @@
                                 @resetImage="new_post_images = []"
                             />
                         </div>
+                            <video v-if="new_post_videos.length >= 1 && createPostModalStatus" class="p-4" controls>
+                                <source :src="new_post_videos[0]" />
+                            </video>
                         <input
                             @change="handleFileInput"
                             type="file"
                             multiple="multiple"
                             ref="create_post_file_upload"
-                            accept="image/png, image/jpeg"
+                            accept="image/png, image/jpeg, video/mp4, video/mov, video/mkv, video/mpg, video/mpeg"
                             class="hidden border-none outline-none ring-0"
                         />
                         <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
@@ -90,7 +93,7 @@
                                 class="px-4 py-2 rounded-full flex items-center w-40 cursor-pointer"
                             >
                                 <PhotographIcon class="text-blue-600 w-6 h-6" />
-                                <span class="ml-2 font-medium text-blue-600">Photo/ Video</span>
+                                <span class="ml-2 font-medium text-blue-600">Photo/Video</span>
                             </div>
                         </div>
                     </FileDropArea>
@@ -136,7 +139,7 @@
 
 <script setup lang="ts">
     import { XIcon, PencilAltIcon } from '@heroicons/vue/solid';
-    import { CameraIcon, HeartIcon, ChatAltIcon, PhotographIcon } from '@heroicons/vue/outline';
+    import { HeartIcon, ChatAltIcon, PhotographIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { computed, ref } from 'vue';
@@ -150,6 +153,7 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const new_post_images = ref<File[]>([]);
+    const new_post_videos = ref<string[]>([]);
     const new_post_text = ref<string>('');
     const error = ref<boolean>(false);
     const errorMessage = ref('');
@@ -171,16 +175,25 @@
         }
     };
 
-    enum SUPPORTED_EXTENSIONS {
+    enum SUPPORTED_IMAGE_EXTENSIONS {
         JPEG = 'image/jpeg',
         PNG = 'image/png',
     }
 
+    enum SUPPORTED_VIDEO_EXTENSIONS {
+        MP4 = 'video/mp4',
+        MOV = 'video/mov',
+        MKV = 'video/mkv',
+        MPG = 'video/mpg',
+        MPEG = 'video/mpeg',
+    }
+
     const isExtensionSupported = (image: File) => {
-        const options = Object.values(SUPPORTED_EXTENSIONS);
-        if (!options.includes(image.type)) {
+        const extensions = { ...SUPPORTED_IMAGE_EXTENSIONS, ...SUPPORTED_VIDEO_EXTENSIONS };
+        const options = Object.values(extensions);
+        if (!options.includes(<SUPPORTED_IMAGE_EXTENSIONS | SUPPORTED_VIDEO_EXTENSIONS>image.type)) {
             error.value = true;
-            errorMessage.value = 'Only png/jpeg files allowed';
+            errorMessage.value = 'Only png/jpeg/mkv/mp4/mpg/mpeg/mov files allowed';
         }
     };
 
@@ -196,8 +209,16 @@
                 errorMessage.value = 'A post can only have a maximum of 10 images';
                 break;
             }
+            const vidOptions = Object.values(SUPPORTED_VIDEO_EXTENSIONS);
+            if (vidOptions.includes(<SUPPORTED_VIDEO_EXTENSIONS>file.type)) {
+                console.log(`VIDEO: ${URL.createObjectURL(file)}`);
+                new_post_videos.value.push(URL.createObjectURL(file));
+                return;
+            }
+
             new_post_images.value.push(file);
         }
+
         error.value ? (new_post_images.value = []) : '';
     };
 
