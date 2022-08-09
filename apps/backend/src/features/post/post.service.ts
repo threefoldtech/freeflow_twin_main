@@ -135,7 +135,7 @@ export class PostService {
 
         if (ownerLocation === this.ownLocation)
             try {
-                return (await this._postRepo.getPost({ id: postId })).toJSON();
+                return (await this._postRepo.getPost({ id: postId }))?.toJSON();
             } catch (error) {
                 throw new BadRequestException(`unable to get post: ${error}`);
             }
