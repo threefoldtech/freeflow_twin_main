@@ -12,6 +12,7 @@ export interface Post {
     ownerId: string;
     likes: string[];
     images: string[];
+    video: string;
     replies: string[];
     isTyping?: string[];
 }
@@ -25,6 +26,7 @@ export class Post extends Entity {
             ownerId: this.ownerId,
             likes: this.parseLikes(),
             images: this.images,
+            video: this.video,
             replies: this.parseReplies(),
             isTyping: this.isTyping,
         };
@@ -82,6 +84,7 @@ export const postSchema = new Schema(Post, {
     ownerId: { type: 'string' },
     likes: { type: 'string[]' },
     images: { type: 'string[]' },
+    video: { type: 'string' },
     replies: { type: 'string[]' },
     isTyping: { type: 'string[]' },
 });

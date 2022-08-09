@@ -49,13 +49,22 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
             const formData = new FormData();
             formData.append(`file`, file);
             // Upload file to tmp
-            const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const { data } = await axios.post<{ id: string; filename: string; filetype: string }>(
+                `${config.baseUrl}api/v2/files/upload`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
             if (!data.id) return false;
-            post.images ? post.images.push(data.filename) : (post.images = [data.filename]);
+            data.filetype.includes('video')
+                ? (post.video = data.filename)
+                : post.images
+                ? post.images.push(data.filename)
+                : (post.images = [data.filename]);
+
             const { sendHandleUploadedFile } = useSocketActions();
             sendHandleUploadedFile({
                 fileId: String(data.id),

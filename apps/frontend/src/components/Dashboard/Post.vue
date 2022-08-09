@@ -185,7 +185,7 @@
                             <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
                         </div>
                         <img
-                            :src="fetchPostImage(image)"
+                            :src="fetchPostAttachment(image)"
                             class="object-cover rounded"
                             @click="openImagePreview(image)"
                         />
@@ -198,6 +198,9 @@
                 >
                     {{ showAllImages ? 'Hide images' : 'Show all images' }}
                 </p>
+                <video v-if="item.video !== ''" controls class="mb-4">
+                    <source :src="fetchPostAttachment(item.video)" />
+                </video>
             </div>
             <div>
                 <div class="flex items-center w-full">
@@ -471,7 +474,7 @@
     });
 
     const openImagePreview = image => {
-        imagePreviewSrc.value = fetchPostImage(image);
+        imagePreviewSrc.value = fetchPostAttachment(image);
         showImagePreview.value = true;
     };
 
@@ -479,9 +482,9 @@
         return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/user/avatar/default`);
     });
 
-    const fetchPostImage = (image: string) => {
+    const fetchPostAttachment = (attachment: string) => {
         const owner = props.item.owner;
-        const path = `${owner.id}/posts/${image}`;
+        const path = `${owner.id}/posts/${attachment}`;
         return calcExternalResourceLink(`http://[${owner.location}]/api/v2/files/${btoa(path)}`);
     };
 

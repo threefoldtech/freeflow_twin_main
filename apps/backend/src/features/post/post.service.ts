@@ -12,8 +12,8 @@ import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { stringifyLikes, stringifyReplies } from './models/post.model';
-import { PostRedisRepository } from './repositories/post-redis.repository';
 import { PostGateway } from './post.gateway';
+import { PostRedisRepository } from './repositories/post-redis.repository';
 
 @Injectable()
 export class PostService {
@@ -42,11 +42,10 @@ export class PostService {
     async createPost({
         id,
         body,
-        createdOn,
-        lastModified,
         isGroupPost,
         type,
         images,
+        video,
         replies,
         signatures,
     }: CreatePostDTO): Promise<IPostContainerDTO> {
@@ -57,11 +56,12 @@ export class PostService {
                 post: {
                     id,
                     body,
-                    createdOn,
-                    lastModified,
+                    createdOn: new Date(),
+                    lastModified: new Date(),
                     isGroupPost,
                     type,
                     images: images || [],
+                    video: video || '',
                     replies,
                     signatures,
                 },
@@ -71,6 +71,7 @@ export class PostService {
                 },
                 ownerId: this.user,
                 images: images || [],
+                video: video || '',
                 replies,
                 likes: [],
             };

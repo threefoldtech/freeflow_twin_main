@@ -76,15 +76,15 @@
                                 @resetImage="new_post_images = []"
                             />
                         </div>
-                            <video v-if="new_post_videos.length >= 1 && createPostModalStatus" class="p-4" controls>
-                                <source :src="new_post_videos[0]" />
-                            </video>
+                        <video v-if="new_post_video_url !== '' && createPostModalStatus" class="p-4" controls>
+                            <source :src="new_post_video_url" />
+                        </video>
                         <input
                             @change="handleFileInput"
                             type="file"
                             multiple="multiple"
                             ref="create_post_file_upload"
-                            accept="image/png, image/jpeg, video/mp4, video/mov, video/mkv, video/mpg, video/mpeg"
+                            accept="image/png, image/jpeg, video/*"
                             class="hidden border-none outline-none ring-0"
                         />
                         <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
@@ -153,7 +153,8 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const new_post_images = ref<File[]>([]);
-    const new_post_videos = ref<string[]>([]);
+    const new_post_video = ref<File>();
+    const new_post_video_url = ref<string>('');
     const new_post_text = ref<string>('');
     const error = ref<boolean>(false);
     const errorMessage = ref('');
@@ -162,6 +163,7 @@
     const isAllowedToPost = computed(() => {
         return new_post_images.value.length >= 1 ||
             new_post_text.value !== '' ||
+            new_post_video_url.value !== '' ||
             !isPublishingNewPost ||
             !isPublishingNewPost.value
             ? true
@@ -183,9 +185,16 @@
     enum SUPPORTED_VIDEO_EXTENSIONS {
         MP4 = 'video/mp4',
         MOV = 'video/mov',
+        AVI = 'video/avi',
         MKV = 'video/mkv',
+        FLV = 'video/flv',
+        WMV = 'video/wmv',
         MPG = 'video/mpg',
         MPEG = 'video/mpeg',
+        M4V = 'video/m4v',
+        M2TS = 'video/m2ts',
+        MTS = 'video/mts',
+        MPE = 'video/mpe',
     }
 
     const isExtensionSupported = (image: File) => {
@@ -193,7 +202,7 @@
         const options = Object.values(extensions);
         if (!options.includes(<SUPPORTED_IMAGE_EXTENSIONS | SUPPORTED_VIDEO_EXTENSIONS>image.type)) {
             error.value = true;
-            errorMessage.value = 'Only png/jpeg/mkv/mp4/mpg/mpeg/mov files allowed';
+            errorMessage.value = 'Only png/jpeg and video formats are allowed';
         }
     };
 
@@ -211,8 +220,8 @@
             }
             const vidOptions = Object.values(SUPPORTED_VIDEO_EXTENSIONS);
             if (vidOptions.includes(<SUPPORTED_VIDEO_EXTENSIONS>file.type)) {
-                console.log(`VIDEO: ${URL.createObjectURL(file)}`);
-                new_post_videos.value.push(URL.createObjectURL(file));
+                new_post_video.value = file;
+                new_post_video_url.value = URL.createObjectURL(file);
                 return;
             }
 
@@ -233,6 +242,8 @@
         createPostModalStatus.value = true;
         error.value = false;
         new_post_images.value = [];
+        new_post_video.value = null;
+        new_post_video_url.value = '';
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
@@ -245,11 +256,17 @@
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
         error.value = false;
-        if (new_post_text.value.trim() === '' && new_post_images.value.length === 0) return;
+        if (
+            new_post_text.value.trim() === '' &&
+            new_post_video_url.value.trim() === '' &&
+            new_post_images.value.length === 0
+        )
+            return;
+
         if (new_post_images.value.length > 10) return;
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
-        await createSocialPost(new_post_text.value, new_post_images.value);
+        await createSocialPost(new_post_text.value, [...new_post_images.value, new_post_video.value]);
         await getAllPosts();
         isPublishingNewPost.value = false;
         new_post_images.value = [];

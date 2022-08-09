@@ -29,4 +29,7 @@ export class CreatePostDTO {
     @IsOptional()
     @ArrayMaxSize(10)
     images?: string[];
+
+    @IsOptional()
+    video?: string;
 }
