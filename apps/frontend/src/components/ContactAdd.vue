@@ -160,7 +160,7 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
-    import { blocklist, checkIfBlocked } from '@/store/blockStore';
+    import { blocklist, getUnblockedContacts } from '@/store/blockStore';
 
     const emit = defineEmits(['closeDialog']);
     const { groupContacts, contacts } = useContactsState();
@@ -193,7 +193,7 @@
         const { dtContacts } = useContactsState();
         possibleUsers.value = dtContacts;
         await retrieveContacts();
-        filteredContacts.value = await checkIfBlocked(filteredContacts.value, user.id.toString());
+        filteredContacts.value = await getUnblockedContacts(filteredContacts.value, user.id.toString());
     });
 
     const contactAdd = (contact: Contact) => {

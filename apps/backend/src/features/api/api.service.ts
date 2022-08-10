@@ -453,7 +453,7 @@ export class ApiService {
         try {
             return (await axios.get(url)).data;
         } catch {
-            return;
+            return false;
         }
     }
 

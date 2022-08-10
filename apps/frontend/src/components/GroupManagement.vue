@@ -265,7 +265,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
-    import { blocklist, checkIfBlocked, userIsBlocked } from '@/store/blockStore';
+    import { blocklist, getUnblockedContacts, userIsBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
@@ -316,7 +316,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
     const unblockedMembers = ref<GroupContact[]>(filteredMembers.value);
 
     const loadUnblocked = async () => {
-        unblockedMembers.value = await checkIfBlocked(filteredMembers.value, user.id.toString());
+        unblockedMembers.value = await getUnblockedContacts(filteredMembers.value, user.id.toString());
     };
 
     watch(filteredMembers, val => {

@@ -27,9 +27,9 @@ export class AddUserSystemState implements SubSystemMessageState {
     async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<unknown> {
         const { contact, adminLocation } = message.body as GroupUpdate;
         const userId = this._configService.get<string>('userId');
-        const iAmBlocked = await this._apiService.checkIfBlocked({ userId, location: contact.location });
+        const isCurrentUserBlocked = await this._apiService.checkIfBlocked({ userId, location: contact.location });
         const contactIsBlocked = await this._blockedContactService.isBlocked({ userId: contact.id });
-        if (iAmBlocked || contactIsBlocked) return;
+        if (isCurrentUserBlocked || contactIsBlocked) return;
 
         if (userId === contact.id) {
             const adminChat = await this._chatService.syncNewChatWithAdmin({ adminLocation, chatId: message.to });
