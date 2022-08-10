@@ -159,15 +159,23 @@
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
                 <div class="my-2 break-words whitespace-pre-wrap">
-                    <p v-if="!readMore && amount_lines + 1 > 5">
-                        <span v-for="value in item.post.body.split(/\r\n|\r|\n/).slice(0, 5)">
-                            {{ value == '' ? ' ' : value }}
+                    <p v-if="!readMore && amount_lines > 5">
+                        <span>
+                            {{
+                                item.post.body
+                                    .split(/\r\n|\r|\n/)
+                                    .slice(0, 5)
+                                    .join('\n')
+                            }}
                         </span>
                     </p>
                     <p v-else>{{ item.post.body }}</p>
-                    <a class="text-gray-800" v-if="amount_lines + 1 > 5" @click="readMore = !readMore" href="#">
+                    <a
+                        class="text-gray-800 cursor-pointer"
+                        v-if="amount_lines > 5"
+                        @click.prevent="readMore = !readMore"
+                    >
                         {{ readMore ? 'Show less' : 'Read more' }}
                     </a>
                 </div>
@@ -179,7 +187,7 @@
                     >
                         <div
                             v-if="!showAllImages && idx === 3 && item.images.length >= 5"
-                            @click="() => (showAllImages = !showAllImages)"
+                            @click="showAllImages = !showAllImages"
                             class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center"
                         >
                             <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
@@ -427,7 +435,7 @@
 
     const countLines = (body: string) => {
         try {
-            return body.match(/[^\n]*\n[^\n]*/gi).length;
+            return body.match(/[^\n]*\n[^\n]*/gi).length + 1;
         } catch (e) {
             return 0;
         }
@@ -576,12 +584,12 @@
 
     /*
 .some-holder-styles{
-  display: none;
-  position: absolute;
-  z-index: 9;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+display: none;
+position: absolute;
+z-index: 9;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
 }
 */
 
