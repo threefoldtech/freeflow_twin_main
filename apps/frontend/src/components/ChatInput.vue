@@ -54,7 +54,7 @@
                         :key="idx"
                         class="py-3 px-2 flex items-center justify-self-start cursor-pointer hover:bg-gray-100"
                         @click="tagPerson(contact)"
-                        :class="{ 'bg-gray-100': activeTag === idx }"
+                        :class="{ 'bg-gray-200': activeTag === idx }"
                     >
                         <AvatarImg :id="String(contact.id)" small />
                         <div class="ml-3">
@@ -115,6 +115,9 @@
                                 @keydown.tab.prevent="
                                     e => {
                                         e.preventDefault();
+                                        if (contacts.length === 1) {
+                                            tagPerson(contacts[0]);
+                                        }
                                         activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1);
                                         message.focus();
                                     }
