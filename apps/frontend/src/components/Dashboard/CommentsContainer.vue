@@ -30,7 +30,7 @@
 
     watch(scrollToNewComment, () => {
         if (scrollToNewComment.value) {
-            comments.scrollTop = 0;
+            comments.value.scrollTop = 0;
             scrollToNewComment.value = false;
         }
     });
