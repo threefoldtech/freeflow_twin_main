@@ -279,7 +279,10 @@
 
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
-        await createSocialPost(new_post_text.value, [...new_post_images.value, new_post_video.value]);
+        const files = [];
+        new_post_images.value.forEach(file => files.push(file));
+        new_post_video.value ? files.push(new_post_video.value) : '';
+        await createSocialPost(new_post_text.value, files);
         await getAllPosts();
         isPublishingNewPost.value = false;
         new_post_images.value = [];
