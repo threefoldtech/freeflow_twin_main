@@ -19,6 +19,7 @@ import { ChatGateway } from './chat.gateway';
 import { ChatDTO, CreateChatDTO, CreateGroupChatDTO } from './dtos/chat.dto';
 import { Chat, stringifyContacts, stringifyRead } from './models/chat.model';
 import { ChatRedisRepository } from './repositories/chat-redis.repository';
+import { BlockedContactService } from '../blocked-contact/blocked-contact.service';
 
 @Injectable()
 export class ChatService {
@@ -31,7 +32,8 @@ export class ChatService {
         private readonly _apiService: ApiService,
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        private readonly _blockedContactService: BlockedContactService
     ) {}
 
     /**
@@ -60,6 +62,12 @@ export class ChatService {
             const msg = await this._messageService.createMessage(createGroupChatDTO.messages[0]);
             Promise.all(
                 chat.parseContacts().map(async c => {
+                    const isBlocked = await this._blockedContactService.isBlocked({ userId: c.id });
+                    const isCurrentUserBlocked = await this._apiService.checkIfBlocked({
+                        userId,
+                        location: c.location,
+                    });
+                    if (isBlocked || isCurrentUserBlocked) return;
                     if (c.id === userId) {
                         this._chatGateway.emitMessageToConnectedClients('connection_request', {
                             ...chat.toJSON(),

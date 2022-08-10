@@ -446,6 +446,18 @@ export class ApiService {
     }
 
     /**
+     * Check if you are blocked by the other twin.
+     */
+    async checkIfBlocked({ location, userId }: { location: string; userId: string }): Promise<boolean> {
+        const url = `http://[${location}]/api/v2/blocked/${userId}`;
+        try {
+            return (await axios.get(url)).data;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
      * Clears the failed requests array.
      */
     // async clearFailedRequests() {
