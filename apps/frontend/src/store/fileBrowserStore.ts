@@ -376,7 +376,10 @@ export const searchDir = async () => {
         searchResults.value = 'None';
         return;
     }
-    searchResults.value = result.data.map(createModel);
+    searchResults.value = result.data.map(createModel).filter(item => {
+        const configPath = `/appdata/storage/${user.id}`;
+        return !item.path.startsWith(configPath);
+    });
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {
