@@ -96,7 +96,7 @@
             isLoading.value = false;
 
             const apiEndpoint = generateFileBrowserUrl(
-                'https',
+                'http',
                 `[${shareDetails.owner.location}]`,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken
@@ -110,7 +110,7 @@
 
             isLoading.value = false;
             readUrl.value = generateFileBrowserUrl(
-                'https',
+                'http',
                 window.location.hostname,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken,
@@ -147,7 +147,7 @@
                 return;
             }
             readUrl.value = generateFileBrowserUrl(
-                'https',
+                'http',
                 window.location.hostname,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken
@@ -162,7 +162,7 @@
                 return;
             }
             readUrl.value = generateFileBrowserUrl(
-                'https',
+                'http',
                 window.location.hostname,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken

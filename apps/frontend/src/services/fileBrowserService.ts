@@ -242,7 +242,7 @@ export const getSharedFolderContent = async (
     _userId: string,
     path: string
 ) => {
-    let externalUrl = `https://[${owner.location}]`;
+    let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
     // TODO: handle in nest
