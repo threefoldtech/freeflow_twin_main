@@ -276,7 +276,7 @@ export const downloadAttachment = async (message: any) => {
 };
 
 export const hasSpecialCharacters = (name: string) => {
-    const format = /[`!@#$%^*=[\]{};':"\\|<>/?~]/;
+    const format = /[`!@#$%^*=[\]{};':"\\|<>\/?~]/;
     return format.test(name);
 };
 
