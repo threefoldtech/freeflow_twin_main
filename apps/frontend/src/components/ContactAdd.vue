@@ -124,7 +124,7 @@
             <div>
                 <UserTableGroup
                     v-model="usernameInGroupAdd"
-                    :data="groupContacts"
+                    :data="filteredContacts"
                     :error="usernameAddError"
                     :usersInGroup="usersInGroup"
                     placeholder="Search for user..."
@@ -160,12 +160,12 @@
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
+    import { blocklist, checkIfBlocked } from '@/store/blockStore';
 
     const emit = defineEmits(['closeDialog']);
     const { groupContacts, contacts } = useContactsState();
     const { retrieveContacts } = useContactsActions();
-    console.log('groupContacts', groupContacts);
-    console.log('contacts', contacts);
+    const { user } = useAuthState();
 
     const userAddLocation = ref('');
     const usernameAddError = ref('');
@@ -186,11 +186,14 @@
         { name: 'group', text: 'Create a group' },
     ]);
 
+    const filteredContacts = ref<GroupContact[]>(groupContacts.filter(c => !blocklist.value.includes(c.id.toString())));
+
     onBeforeMount(async () => {
         isDevelopment.value = process.env.NODE_ENV === 'development';
         const { dtContacts } = useContactsState();
         possibleUsers.value = dtContacts;
         await retrieveContacts();
+        filteredContacts.value = await checkIfBlocked(filteredContacts.value, user.id.toString());
     });
 
     const contactAdd = (contact: Contact) => {
@@ -239,7 +242,6 @@
 
     const groupAdd = async () => {
         const { addGroupchat } = usechatsActions();
-        const { user } = useAuthState();
 
         if (groupnameAdd.value == '') {
             groupnameAddError.value = 'Please enter a group name';

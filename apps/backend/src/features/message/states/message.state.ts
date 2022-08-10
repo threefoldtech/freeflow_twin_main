@@ -30,6 +30,7 @@ import {
     SubSystemMessageState,
     UserLeftGroupMessageState,
 } from './system-message.state';
+import { BlockedContactService } from '../../blocked-contact/blocked-contact.service';
 
 export abstract class MessageState<T> {
     abstract handle({ message }: { message: MessageDTO<T>; chat?: Chat | ChatDTO }): Promise<unknown>;
@@ -155,7 +156,8 @@ export class SystemMessageState implements MessageState<SystemMessage> {
         private readonly _configService: ConfigService,
         private readonly _apiService: ApiService,
         private readonly _chatGateway: ChatGateway,
-        private readonly _messageService: MessageService
+        private readonly _messageService: MessageService,
+        private readonly _blockedContactService: BlockedContactService
     ) {
         // system add user message handler
         this._subSystemMessageStateHandlers.set(
@@ -165,7 +167,8 @@ export class SystemMessageState implements MessageState<SystemMessage> {
                 this._chatService,
                 this._configService,
                 this._chatGateway,
-                this._messageService
+                this._messageService,
+                this._blockedContactService
             )
         );
         // system remove user message handler

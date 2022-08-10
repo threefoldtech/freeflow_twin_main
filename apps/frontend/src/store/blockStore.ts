@@ -1,8 +1,10 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import config from '@/config';
+import { calcExternalResourceLink } from '@/services/urlService';
+import { GroupContact } from '@/types';
 
-export const blocklist = ref([]);
+export const blocklist = ref<string[]>([]);
 
 export const initBlocklist = async () => {
     try {
@@ -22,3 +24,16 @@ export const removeUserFromBlockList = (userId: string) => {
 };
 
 export const userIsBlocked = (userId: string) => blocklist.value.includes(userId);
+
+export const iAmBlocked = async (location: string, userId: string): Promise<boolean> => {
+    const url = `http://[${location}]/api/v2/blocked/${userId}`;
+    return (await axios.get(calcExternalResourceLink(url))).data;
+};
+
+export const checkIfBlocked = async (contacts: GroupContact[], userId: string) => {
+    for (let con of contacts) {
+        const blocked = await iAmBlocked(con.location, userId);
+        if (blocked) contacts = contacts.filter(c => c.id !== con.id);
+    }
+    return contacts;
+};
