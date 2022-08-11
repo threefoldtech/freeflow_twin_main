@@ -114,7 +114,8 @@ export const updateContent = async (path = currentDirectory.value) => {
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-    currentDirectoryContent.value = result.data.map(createModel);
+    const { user } = useAuthState();
+    currentDirectoryContent.value = result.data.map(createModel).filter(item => item.name !== user.id);
 
     savedAttachments.value = false;
 };
@@ -924,8 +925,6 @@ export const sharedWithMeCurrentFolder = ref<string>('');
 export const loadSharedItems = () => {
     sharedBreadcrumbs.value = [];
 
-    //https://bertmeeuws.digitaltwin.jimbertesting.be/quantum/shared/:sharedId/:path
-
     const params = router.currentRoute.value.params;
 
     if (params.sharedId) {
@@ -1032,7 +1031,7 @@ export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, sh
         location = `${window.location.origin}${locationApiEndpoint}`;
     } else {
         location = calcExternalResourceLink(
-            `https://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
+            `http://[${watchingUsers[<string>digitalTwinId].location}]${locationApiEndpoint}`
         );
     }
     // TODO: url encoding

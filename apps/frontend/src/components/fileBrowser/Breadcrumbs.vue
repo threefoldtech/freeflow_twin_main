@@ -1,6 +1,14 @@
 <template>
     <div class="flex flex-row items-center">
-        <div class="cursor-pointer" @click="goToHome">
+        <div
+            id="drop"
+            class="cursor-pointer p-2"
+            @click="goToHome"
+            @dragenter.self="event => onDragEnter(event, 0)"
+            @dragleave="event => onDragLeave(event, 0)"
+            @dragover="event => event.preventDefault()"
+            @drop="event => onDrop(event, 0)"
+        >
             <HomeIcon class="h-5 w-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
         </div>
         <!--<div
@@ -106,7 +114,6 @@
         savedAttachmentsBreadcrumbs,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
-    import { createNotification } from '@/store/notificiationStore';
 
     const router = useRouter();
 
@@ -117,13 +124,11 @@
     const onDragEnter = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
         (e.target as HTMLElement).classList.add('bg-accent-300');
-        (e.target as HTMLElement).classList.add('text-white');
     };
 
     const onDragLeave = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;
         (e.target as HTMLElement).classList.remove('bg-accent-300');
-        (e.target as HTMLElement).classList.remove('text-white');
     };
 
     const onDrop = (e: Event, i: number) => {
@@ -149,5 +154,9 @@
     input:checked ~ .dot {
         transform: translateX(100%);
         background-color: #48bb78;
+    }
+
+    #drop * {
+        pointer-events: none;
     }
 </style>

@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         <div class="flex flex-col" v-if="error">
-                            <small class="px-4 text-gray-500">{{ errorMessage }}</small>
+                            <small class="px-4 text-sm text-red-500">{{ errorMessage }}</small>
                         </div>
                         <div v-if="new_post_images.length >= 1 && createPostModalStatus" class="p-4">
                             <ImageGrid
@@ -76,12 +76,28 @@
                                 @resetImage="new_post_images = []"
                             />
                         </div>
+                        <div v-if="new_post_video_url !== '' && createPostModalStatus" class="relative">
+                            <div
+                                @click="
+                                    () => {
+                                        new_post_video_url = '';
+                                        new_post_video = null;
+                                    }
+                                "
+                                class="z-40 absolute right-6 top-6 cursor-pointer bg-gray-800 hover:bg-gray-500 rounded-full w-8 h-8 flex items-center justify-center"
+                            >
+                                <XIcon class="w-6 text-gray-400" />
+                            </div>
+                            <video class="p-4" controls>
+                                <source :src="new_post_video_url" />
+                            </video>
+                        </div>
                         <input
                             @change="handleFileInput"
                             type="file"
                             multiple="multiple"
                             ref="create_post_file_upload"
-                            accept="image/png, image/jpeg"
+                            accept="image/png, image/jpeg, video/*"
                             class="hidden border-none outline-none ring-0"
                         />
                         <div :class="{ 'border-b-lg': createPostModalStatus }" class="border-t-2 p-4 block">
@@ -90,7 +106,7 @@
                                 class="px-4 py-2 rounded-full flex items-center w-40 cursor-pointer"
                             >
                                 <PhotographIcon class="text-blue-600 w-6 h-6" />
-                                <span class="ml-2 font-medium text-blue-600">Photo/ Video</span>
+                                <span class="ml-2 font-medium text-blue-600">Photo/Video</span>
                             </div>
                         </div>
                     </FileDropArea>
@@ -136,7 +152,7 @@
 
 <script setup lang="ts">
     import { XIcon, PencilAltIcon } from '@heroicons/vue/solid';
-    import { CameraIcon, HeartIcon, ChatAltIcon, PhotographIcon } from '@heroicons/vue/outline';
+    import { HeartIcon, ChatAltIcon, PhotographIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { computed, ref } from 'vue';
@@ -150,6 +166,8 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
 
     const new_post_images = ref<File[]>([]);
+    const new_post_video = ref<File>();
+    const new_post_video_url = ref<string>('');
     const new_post_text = ref<string>('');
     const error = ref<boolean>(false);
     const errorMessage = ref('');
@@ -158,6 +176,7 @@
     const isAllowedToPost = computed(() => {
         return new_post_images.value.length >= 1 ||
             new_post_text.value !== '' ||
+            new_post_video_url.value !== '' ||
             !isPublishingNewPost ||
             !isPublishingNewPost.value
             ? true
@@ -171,16 +190,32 @@
         }
     };
 
-    enum SUPPORTED_EXTENSIONS {
+    enum SUPPORTED_IMAGE_EXTENSIONS {
         JPEG = 'image/jpeg',
         PNG = 'image/png',
     }
 
+    enum SUPPORTED_VIDEO_EXTENSIONS {
+        MP4 = 'video/mp4',
+        MOV = 'video/mov',
+        AVI = 'video/avi',
+        MKV = 'video/mkv',
+        FLV = 'video/flv',
+        WMV = 'video/wmv',
+        MPG = 'video/mpg',
+        MPEG = 'video/mpeg',
+        M4V = 'video/m4v',
+        M2TS = 'video/m2ts',
+        MTS = 'video/mts',
+        MPE = 'video/mpe',
+    }
+
     const isExtensionSupported = (image: File) => {
-        const options = Object.values(SUPPORTED_EXTENSIONS);
-        if (!options.includes(image.type)) {
+        const extensions = { ...SUPPORTED_IMAGE_EXTENSIONS, ...SUPPORTED_VIDEO_EXTENSIONS };
+        const options = Object.values(extensions);
+        if (!options.includes(<SUPPORTED_IMAGE_EXTENSIONS | SUPPORTED_VIDEO_EXTENSIONS>image.type)) {
             error.value = true;
-            errorMessage.value = 'Only png/jpeg files allowed';
+            errorMessage.value = 'Only png/jpeg and video formats are allowed';
         }
     };
 
@@ -196,8 +231,16 @@
                 errorMessage.value = 'A post can only have a maximum of 10 images';
                 break;
             }
+            const vidOptions = Object.values(SUPPORTED_VIDEO_EXTENSIONS);
+            if (vidOptions.includes(<SUPPORTED_VIDEO_EXTENSIONS>file.type)) {
+                new_post_video.value = file;
+                new_post_video_url.value = URL.createObjectURL(file);
+                return;
+            }
+
             new_post_images.value.push(file);
         }
+
         error.value ? (new_post_images.value = []) : '';
     };
 
@@ -212,6 +255,8 @@
         createPostModalStatus.value = true;
         error.value = false;
         new_post_images.value = [];
+        new_post_video.value = null;
+        new_post_video_url.value = '';
         for (const file of files) {
             checkFileSize(file);
             isExtensionSupported(file);
@@ -224,42 +269,34 @@
     const handleCreatePost = async () => {
         if (!isAllowedToPost.value || isPublishingNewPost.value) return;
         error.value = false;
-        if (new_post_text.value.trim() === '' && new_post_images.value.length === 0) return;
-        if (new_post_images.value.length > 10) return;
+        if (
+            (new_post_text.value.trim() === '' &&
+                new_post_video_url.value.trim() === '' &&
+                new_post_images.value.length === 0) ||
+            new_post_images.value.length > 10
+        )
+            return;
+
         isPublishingNewPost.value = true;
         if (!isAllowedToPost.value) return;
-        await createSocialPost(new_post_text.value, new_post_images.value);
+        const files = [];
+        new_post_images.value.forEach(file => files.push(file));
+        new_post_video.value ? files.push(new_post_video.value) : '';
+        await createSocialPost(new_post_text.value, files);
         await getAllPosts();
         isPublishingNewPost.value = false;
         new_post_images.value = [];
         new_post_text.value = '';
+        new_post_video.value = null;
+        new_post_video_url.value = '';
         createPostModalStatus.value = false;
     };
-
-    const actions = ref([
-        {
-            name: 'Like',
-            component: HeartIcon,
-        },
-        {
-            name: 'Comment',
-            component: ChatAltIcon,
-        },
-    ]);
 
     const navigation = ref([
         {
             name: 'Publish',
             component: PencilAltIcon,
-        } /*,
-        {
-            name: 'Albums',
-            component: PhotographIcon,
         },
-        {
-            name: 'Video',
-            component: FilmIcon,
-        },*/,
     ]);
 
     const { user } = useAuthState();

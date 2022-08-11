@@ -53,7 +53,8 @@ export class MessageController {
                 this._configService,
                 this._apiService,
                 this._chatGateway,
-                this._messageService
+                this._messageService,
+                this._blockedContactService
             )
         );
         // string message handler

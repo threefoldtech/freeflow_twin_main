@@ -176,7 +176,6 @@ export class QuantumController {
         //     throw new UnauthorizedException(`you do not have the premission to read this file`);
 
         // TODO: handle attachments
-
         const fileBuffer = this._fileService.readFile({ path });
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
         const fileInfo = await this._quantumService.getFileInfo({ path });

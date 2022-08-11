@@ -83,6 +83,7 @@
                             >
                                 <AvatarImg
                                     :id="item.owner.id"
+                                    :contact="item.owner"
                                     :showOnlineStatus="false"
                                     class="w-12 h-12 rounded-full"
                                     alt="avatar"
@@ -106,7 +107,7 @@
                                 <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                             </div>
                         </div>
-                        <div class="group">
+                        <div class="group" v-if="smallScreen || props.item.owner.id === user.id.toString()">
                             <Popover v-slot="{ open }" class="relative z-30">
                                 <PopoverButton
                                     :class="open ? '' : 'text-opacity-90'"
@@ -136,7 +137,7 @@
                                                     "
                                                 >
                                                     <TrashIcon class="w-6 mr-4" />
-                                                    <p>Delete</p>
+                                                    <p class="w-12">Delete</p>
                                                 </div>
                                                 <div
                                                     class="sm:hidden flex items-center cursor-pointer text-gray-500 hover:text-green-500"
@@ -158,13 +159,23 @@
                 </div>
             </div>
             <div class="mt-4 text-gray-600">
-                <!-- <p class="my-2 break-words">{{ item.post.body }}</p>-->
                 <div class="my-2 break-words whitespace-pre-wrap">
-                    <p v-if="!readMore && item.post.body.length > 200">
-                        {{ item.post.body.slice(0, 200) }}
+                    <p v-if="!readMore && amount_lines > 5">
+                        <span>
+                            {{
+                                item.post.body
+                                    .split(/\r\n|\r|\n/)
+                                    .slice(0, 5)
+                                    .join('\n')
+                            }}
+                        </span>
                     </p>
                     <p v-else>{{ item.post.body }}</p>
-                    <a class="text-gray-800" v-if="item.post.body.length > 200" @click="readMore = !readMore" href="#">
+                    <a
+                        class="text-gray-800 cursor-pointer"
+                        v-if="amount_lines > 5"
+                        @click.prevent="readMore = !readMore"
+                    >
                         {{ readMore ? 'Show less' : 'Read more' }}
                     </a>
                 </div>
@@ -176,13 +187,13 @@
                     >
                         <div
                             v-if="!showAllImages && idx === 3 && item.images.length >= 5"
-                            @click="() => (showAllImages = !showAllImages)"
+                            @click="showAllImages = !showAllImages"
                             class="absolute inset-0 bg-black w-full h-full bg-opacity-50 flex justify-center items-center"
                         >
                             <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
                         </div>
                         <img
-                            :src="fetchPostImage(image)"
+                            :src="fetchPostAttachment(image)"
                             class="object-cover rounded"
                             @click="openImagePreview(image)"
                         />
@@ -195,6 +206,9 @@
                 >
                     {{ showAllImages ? 'Hide images' : 'Show all images' }}
                 </p>
+                <video v-if="item.video !== ''" controls class="mb-4">
+                    <source :src="fetchPostAttachment(item.video)" />
+                </video>
             </div>
             <div>
                 <div class="flex items-center w-full">
@@ -310,7 +324,7 @@
                         <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :small="true" alt="avatar" />
                     </div>
                     <input
-                        :ref="inputRef"
+                        ref="inputRef"
                         v-model="messageInput"
                         :disabled="postingCommentInProgress"
                         class="text-xs font-medium rounded-lg border border-gray-300 outline-none focus:ring-0 ring-0 px-4 h-10 flex-grow"
@@ -358,7 +372,7 @@
     } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
-    import { ref, computed, onBeforeMount, watch } from 'vue';
+    import { ref, computed, onBeforeMount, watch, nextTick } from 'vue';
     import moment from 'moment';
     import { TransitionRoot } from '@headlessui/vue';
     import { showComingSoonToFreeFlow } from '@/services/dashboardService';
@@ -389,8 +403,15 @@
     const mouseFocussed = ref(false);
     const postingCommentInProgress = ref<boolean>(false);
     const readMore = ref<boolean>(false);
+    const amount_lines = ref<number>(0);
     const { user } = useAuthState();
     const emit = defineEmits(['refreshPost']);
+
+    const smallScreen = ref(window.innerWidth < 640);
+
+    window.onresize = () => {
+        smallScreen.value = window.innerWidth < 640;
+    };
 
     //only shows user panel if mouse stays focussed for a moment
     const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
@@ -399,9 +420,25 @@
         getSinglePost(props.item.post.id, props.item.owner.location);
     });
 
+    watch(showComments, () => {
+        nextTick(() => {
+            if (showComments.value) {
+                inputRef.value.focus();
+            }
+        });
+    });
+
     const doDeletePost = () => {
         deletePost(props.item);
         showDeletePostDialog.value = false;
+    };
+
+    const countLines = (body: string) => {
+        try {
+            return body.match(/[^\n]*\n[^\n]*/gi).length + 1;
+        } catch (e) {
+            return 0;
+        }
     };
 
     const countComments = (total = 0, comments = props.item.replies) => {
@@ -441,10 +478,11 @@
         if (props.item.likes.some(item => item.id === user.id)) {
             localLike.value = true;
         }
+        amount_lines.value = countLines(props.item.post.body.trimEnd());
     });
 
     const openImagePreview = image => {
-        imagePreviewSrc.value = fetchPostImage(image);
+        imagePreviewSrc.value = fetchPostAttachment(image);
         showImagePreview.value = true;
     };
 
@@ -452,9 +490,9 @@
         return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/user/avatar/default`);
     });
 
-    const fetchPostImage = (image: string) => {
+    const fetchPostAttachment = (attachment: string) => {
         const owner = props.item.owner;
-        const path = `${owner.id}/posts/${image}`;
+        const path = `${owner.id}/posts/${attachment}`;
         return calcExternalResourceLink(`http://[${owner.location}]/api/v2/files/${btoa(path)}`);
     };
 
@@ -546,12 +584,12 @@
 
     /*
 .some-holder-styles{
-  display: none;
-  position: absolute;
-  z-index: 9;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+display: none;
+position: absolute;
+z-index: 9;
+top: 50%;
+left: 50%;
+transform: translate(-50%,-50%);
 }
 */
 

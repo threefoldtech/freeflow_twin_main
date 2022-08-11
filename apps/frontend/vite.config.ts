@@ -16,40 +16,49 @@ export default defineConfig({
     },
     plugins: [
         vue(),
-        // VitePWA({
-        //     registerType: 'autoUpdate',
-        //     injectRegister: 'auto',
-        //     includeAssets: [
-        //         'freeflow_logo.ico',
-        //         'apple-touch-icon.png',
-        //         'favicon-32x32.png',
-        //         'favicon-16x16.png',
-        //         'safari-pinned-tab.svg',
-        //     ],
-        //     workbox: {
-        //         maximumFileSizeToCacheInBytes: 4000000, // 4MB
-        //     },
-        //     manifest: {
-        //         name: 'FreeFlow Twin',
-        //         short_name: 'FreeFlow',
-        //         description: 'Decentralized social network',
-        //         theme_color: '#ffffff',
-        //         background_color: '#ffffff',
-        //         display: 'standalone',
-        //         icons: [
-        //             {
-        //                 src: '/freeflow_icon_192x192.png',
-        //                 sizes: '192x192',
-        //                 type: 'image/png',
-        //             },
-        //             {
-        //                 src: '/freeflow_icon_512x512.png',
-        //                 sizes: '512x512',
-        //                 type: 'image/png',
-        //             },
-        //         ],
-        //     },
-        // }),
+        VitePWA({
+            registerType: 'autoUpdate',
+            mode: 'production',
+            injectRegister: 'auto',
+            includeAssets: [
+                'freeflow_logo.ico',
+                'apple-touch-icon.png',
+                'favicon-32x32.png',
+                'favicon-16x16.png',
+                'safari-pinned-tab.svg',
+            ],
+            workbox: {
+                maximumFileSizeToCacheInBytes: 4000000, // 4MB
+                cleanupOutdatedCaches: true,
+                navigateFallbackDenylist: [/\/api\/v2\/.*\/*/],
+                runtimeCaching: [
+                    {
+                        handler: 'NetworkOnly',
+                        urlPattern: /\/api\/v2\/.*\/*/,
+                    },
+                ],
+            },
+            manifest: {
+                name: 'FreeFlow Twin',
+                short_name: 'FreeFlow',
+                description: 'Decentralized social network',
+                theme_color: '#ffffff',
+                background_color: '#ffffff',
+                display: 'standalone',
+                icons: [
+                    {
+                        src: '/freeflow_icon_192x192.png',
+                        sizes: '192x192',
+                        type: 'image/png',
+                    },
+                    {
+                        src: '/freeflow_icon_512x512.png',
+                        sizes: '512x512',
+                        type: 'image/png',
+                    },
+                ],
+            },
+        }),
     ],
     resolve: {
         alias: {

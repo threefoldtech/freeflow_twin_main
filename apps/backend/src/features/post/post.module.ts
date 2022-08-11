@@ -12,6 +12,7 @@ import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { PostRedisRepository } from './repositories/post-redis.repository';
+import { PostGateway } from './post.gateway';
 
 @Module({
     imports: [
@@ -26,7 +27,7 @@ import { PostRedisRepository } from './repositories/post-redis.repository';
         EncryptionModule,
     ],
     controllers: [PostController],
-    providers: [PostService, PostRedisRepository],
+    providers: [PostService, PostRedisRepository, PostGateway],
     exports: [PostService],
 })
 export class PostModule {}

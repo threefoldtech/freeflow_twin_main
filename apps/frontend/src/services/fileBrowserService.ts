@@ -228,7 +228,6 @@ export const getFileAccessDetails = async (
 
     path = encodeURIComponent(path);
 
-    // TODO: handle in nest
     let apiEndPointToCall = `/api/v2/quantum/share/info?shareId=${shareId}&userId=${userId}&path=${path}&attachments=${attachments}`;
     apiEndPointToCall = encodeURIComponent(apiEndPointToCall);
 
@@ -243,7 +242,7 @@ export const getSharedFolderContent = async (
     _userId: string,
     path: string
 ) => {
-    let externalUrl = `https://[${owner.location}]`;
+    let externalUrl = `http://[${owner.location}]`;
     externalUrl = calcExternalResourceLink(externalUrl);
 
     // TODO: handle in nest
@@ -277,7 +276,7 @@ export const downloadAttachment = async (message: any) => {
 };
 
 export const hasSpecialCharacters = (name: string) => {
-    const format = /[`!@#$%^&*=[\]{};':"\\|,<>/?~]/;
+    const format = /[`!@#$%^*=[\]{};':"\\|<>\/?~]/;
     return format.test(name);
 };
 

@@ -12,6 +12,7 @@ import { CreatePostDTO } from './dtos/request/create-post.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { stringifyLikes, stringifyReplies } from './models/post.model';
+import { PostGateway } from './post.gateway';
 import { PostRedisRepository } from './repositories/post-redis.repository';
 
 @Injectable()
@@ -27,7 +28,8 @@ export class PostService {
         private readonly _contactService: ContactService,
         private readonly _blockedContactService: BlockedContactService,
         private readonly _userService: UserService,
-        private readonly _userGateway: UserGateway
+        private readonly _userGateway: UserGateway,
+        private readonly _postGateway: PostGateway
     ) {
         this.user = this._configService.get<string>('userId');
     }
@@ -40,11 +42,10 @@ export class PostService {
     async createPost({
         id,
         body,
-        createdOn,
-        lastModified,
         isGroupPost,
         type,
         images,
+        video,
         replies,
         signatures,
     }: CreatePostDTO): Promise<IPostContainerDTO> {
@@ -55,11 +56,12 @@ export class PostService {
                 post: {
                     id,
                     body,
-                    createdOn,
-                    lastModified,
+                    createdOn: new Date(),
+                    lastModified: new Date(),
                     isGroupPost,
                     type,
                     images: images || [],
+                    video: video || '',
                     replies,
                     signatures,
                 },
@@ -69,6 +71,7 @@ export class PostService {
                 },
                 ownerId: this.user,
                 images: images || [],
+                video: video || '',
                 replies,
                 likes: [],
             };
@@ -135,7 +138,7 @@ export class PostService {
 
         if (ownerLocation === this.ownLocation)
             try {
-                return (await this._postRepo.getPost({ id: postId })).toJSON();
+                return (await this._postRepo.getPost({ id: postId }))?.toJSON();
             } catch (error) {
                 throw new BadRequestException(`unable to get post: ${error}`);
             }
@@ -188,8 +191,16 @@ export class PostService {
     async deletePost({ postId }: { postId: string }): Promise<string> {
         try {
             const post = await this._postRepo.getPost({ id: postId });
-            if (post.ownerId !== this.user) throw new ForbiddenException("cannot delete someone else's post");
-            await this._postRepo.deletePost({ id: post.entityId });
+
+            if (post?.ownerId === this.user) {
+                await this._postRepo.deletePost({ id: post.entityId });
+                const contacts = await this._contactService.getContacts();
+                for (const contact of contacts) {
+                    this._apiService.deletePost({ location: contact.location, postId });
+                }
+            }
+
+            this._postGateway.emitMessageToConnectedClients('post_deleted', postId);
             return postId;
         } catch (error) {
             throw new BadRequestException(`unable to delete post: ${error}`);

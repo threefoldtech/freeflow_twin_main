@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { AuthGuard } from '../../guards/auth.guard';
 import { BlockedContactService } from './blocked-contact.service';
@@ -19,5 +19,11 @@ export class BlockedContactController {
     @Get()
     async getBlockedContacts(): Promise<string[]> {
         return await this._blockedContactService.getBlockedContactIds();
+    }
+
+    @Get(':id')
+    async isBlocked(@Param('id') id: string): Promise<boolean> {
+        const blockedContacts = await this._blockedContactService.getBlockedContactIds();
+        return blockedContacts.includes(id);
     }
 }

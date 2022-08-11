@@ -13,7 +13,13 @@
 
     const props = defineProps<IProp>();
     const { addScrollEvent } = useScrollActions();
-    const msgUrl = props.message.body.url;
+    let msgUrl = props.message.body.url;
+    if (!msgUrl) {
+        const ownerLocation = props.message.body.owner.location;
+        let path = props.message.body.path;
+        path = path.replace('/appdata/storage/', '');
+        msgUrl = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
+    }
     const src = calcExternalResourceLink(msgUrl);
     const imageLoaded = () => {
         addScrollEvent();

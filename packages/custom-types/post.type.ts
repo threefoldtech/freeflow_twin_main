@@ -52,6 +52,7 @@ export interface IPostDTO {
     replies: IPostComment[];
     signatures: string;
     images?: string[];
+    video?: string;
 }
 
 export interface IPostContainerDTO {
@@ -61,6 +62,7 @@ export interface IPostContainerDTO {
     ownerId: string;
     likes: IPostLike[];
     images: string[];
+    video: string;
     replies: IPostComment[];
     isTyping?: String[];
 }

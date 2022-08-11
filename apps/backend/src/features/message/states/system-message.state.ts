@@ -8,6 +8,7 @@ import { ChatDTO } from '../../chat/dtos/chat.dto';
 import { MessageDTO } from '../dtos/message.dto';
 import { MessageService } from '../message.service';
 import { Message } from '../models/message.model';
+import { BlockedContactService } from '../../blocked-contact/blocked-contact.service';
 
 export abstract class SubSystemMessageState {
     abstract handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat?: ChatDTO }): Promise<unknown>;
@@ -19,12 +20,17 @@ export class AddUserSystemState implements SubSystemMessageState {
         private readonly _chatService: ChatService,
         private readonly _configService: ConfigService,
         private readonly _chatGateway: ChatGateway,
-        private readonly _messageService: MessageService
+        private readonly _messageService: MessageService,
+        private readonly _blockedContactService: BlockedContactService
     ) {}
 
     async handle({ message, chat }: { message: MessageDTO<SystemMessage>; chat: ChatDTO }): Promise<unknown> {
         const { contact, adminLocation } = message.body as GroupUpdate;
         const userId = this._configService.get<string>('userId');
+        const isCurrentUserBlocked = await this._apiService.checkIfBlocked({ userId, location: contact.location });
+        const contactIsBlocked = await this._blockedContactService.isBlocked({ userId: contact.id });
+        if (isCurrentUserBlocked || contactIsBlocked) return;
+
         if (userId === contact.id) {
             const adminChat = await this._chatService.syncNewChatWithAdmin({ adminLocation, chatId: message.to });
             await this._messageService.createMessage(message);
@@ -144,11 +150,12 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
         });
         await this._messageService.createMessage(message);
 
-        let newAdmin = chat.contacts.find(c => c.id === nextAdmin);
-        if (!newAdmin) newAdmin = chat.contacts.find(c => c.id !== contact.id)[0];
-        updatedChat.adminId = newAdmin.id;
-        newAdmin.roles = [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN];
-        await this._chatService.updateContact({ chat: updatedChat, contact: newAdmin });
+        const newAdmin = chat.contacts.find(c => c.id === nextAdmin);
+        if (newAdmin) {
+            updatedChat.adminId = newAdmin.id;
+            newAdmin.roles = [ROLES.USER, ROLES.MODERATOR, ROLES.ADMIN];
+            await this._chatService.updateContact({ chat: updatedChat, contact: newAdmin });
+        }
 
         this._chatGateway.emitMessageToConnectedClients('chat_updated', {
             ...updatedChat.toJSON(),

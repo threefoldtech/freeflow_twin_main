@@ -3,10 +3,10 @@
         <!--<h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>-->
         <div class="flex xl:grid xl:grid-cols-2 w-full gap-y-2 items-center justify-around xl:justify-items-center">
             <!--<div v-if="!chat.isGroup" class="flex flex-col px-2 py-4 w-full cursor-pointer">
-                <i class="fas fa-minus-circle m-3"></i>
-                <p class="text-xs text-gray-300">Bio</p>
-                <p class="text-xs text-gray-500">Block user</p>
-            </div>-->
+<i class="fas fa-minus-circle m-3"></i>
+<p class="text-xs text-gray-300">Bio</p>
+<p class="text-xs text-gray-500">Block user</p>
+</div>-->
             <div
                 v-if="!blocked"
                 class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
@@ -16,13 +16,13 @@
                 <p class="text-xs mt-1">Video</p>
             </div>
             <!--<div 
-                v-if="!blocked"
-                class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
-                @click="$emit('app-mute')"
-            >
-                <span class="material-symbols-rounded"> notifications_off </span>
-                <p class="text-xs mt-1">{{ chat.isMute ? 'Unmute' : 'Mute' }}</p>
-            </div>-->
+v-if="!blocked"
+class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+@click="$emit('app-mute')"
+>
+<span class="material-symbols-rounded"> notifications_off </span>
+<p class="text-xs mt-1">{{ chat.isMute ? 'Unmute' : 'Mute' }}</p>
+</div>-->
             <div
                 v-if="!chat.isGroup && !blocked"
                 class="flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
@@ -167,14 +167,14 @@
                 </div>
             </div>
             <div class="flex flex-col relative max-h-82 p-4">
-                <div v-if="!filteredMembers.length">
+                <div v-if="!unblockedMembers.length">
                     <p class="text-gray-400 text-center py-4 leading-7">
                         You don't have any contacts that are not already in the group. <br />
                         You can only add contacts from your connections list.
                     </p>
                 </div>
                 <div
-                    v-for="(contact, i) in filteredMembers"
+                    v-for="(contact, i) in unblockedMembers"
                     :key="i"
                     @click="addToGroup(contact)"
                     class="grid grid-cols-12 py-4 mb-4 w-full hover:bg-gray-200 cursor-pointer"
@@ -231,13 +231,15 @@
     <Alert
         v-if="showChangeUserRoleDialog"
         :showAlert="showChangeUserRoleDialog"
+        type="info"
         @close="
             showChangeUserRoleDialog = false;
             selectedUser = null;
         "
     >
         <template #title v-if="selectedUser?.roles?.includes(Roles.MODERATOR)"> Demote user</template>
-        <template #title v-else>Promote user</template>
+        <template #title v-else>You are about to promote {{ selectedUser.id }}</template>
+        <template #content> By promoting this user will have more rights then others in this chat.</template>
         <template #actions>
             <button
                 class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm"
@@ -258,12 +260,12 @@
     </Alert>
 </template>
 <script setup lang="ts">
-    import { computed, ref } from 'vue';
+    import { computed, ref, watch } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
     import { useAuthState } from '../store/authStore';
-    import { userIsBlocked } from '@/store/blockStore';
+    import { blocklist, getUnblockedContacts, userIsBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
     import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
@@ -273,6 +275,7 @@
     import Alert from '@/components/Alert.vue';
 
     const { updateContactsInGroup } = usechatsActions();
+    const { user } = useAuthState();
 
     interface IProps {
         chat: Chat;
@@ -306,7 +309,18 @@
         const { groupContacts } = useContactsState();
         return groupContacts
             .filter(con => !props.chat.contacts.some(c => c.id === con.id))
-            .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()));
+            .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()))
+            .filter(c => !blocklist.value.includes(c.id.toString()));
+    });
+
+    const unblockedMembers = ref<GroupContact[]>(filteredMembers.value);
+
+    const loadUnblocked = async () => {
+        unblockedMembers.value = await getUnblockedContacts(filteredMembers.value, user.id.toString());
+    };
+
+    watch(filteredMembers, val => {
+        loadUnblocked();
     });
 
     const showRemoveUserDialog = ref(false);
@@ -350,8 +364,6 @@
         //@ts-ignore
         updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
     };
-
-    const { user } = useAuthState();
 
     const isAdmin = computed(() => {
         //@ts-ignore

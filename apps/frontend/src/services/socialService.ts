@@ -4,7 +4,7 @@ import { uuidv4 } from '@/common';
 import { allSocialPosts, isLoadingSocialPosts, MESSAGE_POST_SHARE_BODY } from '@/store/socialStore';
 import { useAuthState, myYggdrasilAddress } from '@/store/authStore';
 import { Message, MessageTypes } from '@/types';
-import { sendMessageObject } from '@/store/chatStore';
+import { newUnreadChats, sendMessageObject } from '@/store/chatStore';
 import { CommentType, IPostComment, IPostContainerDTO, IPostDTO, PostType } from 'custom-types/post.type';
 import { useSocketActions } from '../store/socketStore';
 import { FileAction } from 'custom-types/file-actions.type';
@@ -49,13 +49,22 @@ export const createSocialPost = async (text?: string, files: File[] = []) => {
             const formData = new FormData();
             formData.append(`file`, file);
             // Upload file to tmp
-            const { data } = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
+            const { data } = await axios.post<{ id: string; filename: string; filetype: string }>(
+                `${config.baseUrl}api/v2/files/upload`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
             if (!data.id) return false;
-            post.images ? post.images.push(data.filename) : (post.images = [data.filename]);
+            data.filetype.includes('video')
+                ? (post.video = data.filename)
+                : post.images
+                ? post.images.push(data.filename)
+                : (post.images = [data.filename]);
+
             const { sendHandleUploadedFile } = useSocketActions();
             sendHandleUploadedFile({
                 fileId: String(data.id),
@@ -231,6 +240,7 @@ export const createMessage = async (
 export const sendMessageSharePost = async (chatId: string, post: IPostContainerDTO) => {
     const newMessage: Message<MESSAGE_POST_SHARE_BODY> = await createMessage(chatId, post);
     sendMessageObject(chatId, newMessage);
+    newUnreadChats(chatId);
 };
 
 export const deletePost = async (item: IPostContainerDTO) => {

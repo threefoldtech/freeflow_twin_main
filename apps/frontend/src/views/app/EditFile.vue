@@ -56,6 +56,7 @@
     import Spinner from '@/components/Spinner.vue';
     import { useAuthState } from '@/store/authStore';
     import { isUndefined } from 'lodash';
+    import { waitFor } from '@/utils';
 
     const route = useRoute();
     const fileType = ref<FileType>();
@@ -100,49 +101,42 @@
                 fileAccesDetails.path,
                 fileAccesDetails.readToken
             );
-            const encodedEndpoint = encodeURIComponent(apiEndpoint);
-            readUrl.value = calcExternalResourceLink(encodedEndpoint);
-        }
-        if (!shareId) {
+            const encodedEndpoint = calcExternalResourceLink(encodeURIComponent(apiEndpoint));
+            readUrl.value = encodedEndpoint;
+        } else {
+            await waitFor(100);
+            location = user.location;
             fileAccesDetails = (await getFileInfo(path, attachments)).data;
 
             isLoading.value = false;
             readUrl.value = generateFileBrowserUrl(
-                'https',
+                'http',
                 window.location.hostname,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken,
                 attachments
             );
-
-            //todo: fix race condition with (user.location and socket.on('yggdrasil'))
         }
 
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            setTimeout(() => {
-                location = user.location;
-                console.log(`USED ONLYOFFICE LOCATION: ${location}`);
-                documentServerconfig = generateDocumentServerConfig(
-                    location,
-                    fileAccesDetails.path,
-                    fileAccesDetails.key,
-                    fileAccesDetails.readToken,
-                    fileAccesDetails.writeToken,
-                    getExtension(fileAccesDetails.fullName),
-                    fileAccesDetails.extension,
-                    attachments,
-                    isLoading.value
-                );
-                get(
-                    `https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`,
-                    () => {
-                        //@ts-ignore
-                        new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
-                    }
-                );
-            }, 100);
+            console.log(`USED ONLYOFFICE LOCATION: ${location}`);
+            documentServerconfig = generateDocumentServerConfig(
+                location,
+                fileAccesDetails.path,
+                fileAccesDetails.key,
+                fileAccesDetails.readToken,
+                fileAccesDetails.writeToken,
+                getExtension(fileAccesDetails.fullName),
+                fileAccesDetails.extension,
+                attachments,
+                isLoading.value
+            );
+            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+                //@ts-ignore
+                new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
+            });
             return;
         }
 
@@ -153,7 +147,7 @@
                 return;
             }
             readUrl.value = generateFileBrowserUrl(
-                'https',
+                'http',
                 window.location.hostname,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken
@@ -168,7 +162,7 @@
                 return;
             }
             readUrl.value = generateFileBrowserUrl(
-                'https',
+                'http',
                 window.location.hostname,
                 fileAccesDetails.path,
                 fileAccesDetails.readToken

@@ -2,8 +2,20 @@
     <StringContent v-if="message.type === MessageTypes.STRING" :message="message" />
     <SystemContent v-else-if="message.type === MessageTypes.SYSTEM" :message="message" />
     <AudioContent v-else-if="message.type === MessageTypes.FILE && isAudio(message.body.filename)" :message="message" />
-    <ImageContent v-else-if="message.type === MessageTypes.FILE && isImage(message.body.filename)" :message="message" />
-    <VideoContent v-else-if="message.type === MessageTypes.FILE && isVideo(message.body.filename)" :message="message" />
+    <ImageContent
+        v-else-if="
+            (message.type === MessageTypes.FILE && isImage(message.body.filename)) ||
+            (message.type === MessageTypes.FILE_SHARE && isImage(message.body.name))
+        "
+        :message="message"
+    />
+    <VideoContent
+        v-else-if="
+            (message.type === MessageTypes.FILE && isVideo(message.body.filename)) ||
+            (message.type === MessageTypes.FILE_SHARE && isVideo(message.body.name))
+        "
+        :message="message"
+    />
     <FileContent
         v-else-if="message.type === MessageTypes.FILE"
         :message="message"

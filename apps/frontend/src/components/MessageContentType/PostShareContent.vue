@@ -18,7 +18,7 @@
             <XIcon class="w-12 h-12 absolute right-4 top-4 text-white cursor-pointer" />
             <div
                 @click.stop
-                class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[80%] rounded-lg"
+                class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[95%] rounded-lg overflow-y-auto"
             >
                 <Post @click.stop @refreshPost="refreshPost" :item="postData" />
             </div>
@@ -63,6 +63,7 @@
     import Post from '@/components/Dashboard/Post.vue';
     import { XIcon } from '@heroicons/vue/solid';
     import { IPostContainerDTO } from 'custom-types/post.type';
+    import { createErrorNotification } from '@/store/notificiationStore';
 
     const props = defineProps<{ message: Message<MESSAGE_POST_SHARE_BODY> }>();
     const showPost = ref<boolean>(false);
@@ -97,7 +98,10 @@
 
     const goToSocialPost = async () => {
         const post = await getSinglePost(props.message.body.post.id, props.message.body.owner.location);
-        if (!post) return;
+        if (!post) {
+            createErrorNotification('Failed to load post', 'The post has been deleted');
+            return;
+        }
         postData.value = post;
         showPost.value = true;
     };
