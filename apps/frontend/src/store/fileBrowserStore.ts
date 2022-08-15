@@ -125,7 +125,7 @@ export const updateAttachments = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path, true);
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-    currentDirectoryContent.value = result.data.map(createModel);
+    currentDirectoryContent.value = result.data.map(createModel).filter(item => item.name !== user.id);
     savedAttachments.value = true;
     savedAttachmentsIsLoading.value = false;
     return result;
