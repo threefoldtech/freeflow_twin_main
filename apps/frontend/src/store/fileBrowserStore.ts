@@ -125,7 +125,7 @@ export const updateAttachments = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path, true);
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-    currentDirectoryContent.value = result.data.map(createModel);
+    currentDirectoryContent.value = result.data.map(createModel).filter(item => item.name !== user.id);
     savedAttachments.value = true;
     savedAttachmentsIsLoading.value = false;
     return result;
@@ -376,7 +376,10 @@ export const searchDir = async () => {
         searchResults.value = 'None';
         return;
     }
-    searchResults.value = result.data.map(createModel);
+    searchResults.value = result.data.map(createModel).filter(item => {
+        const configPath = `/appdata/storage/${user.id}`;
+        return !item.path.startsWith(configPath);
+    });
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {

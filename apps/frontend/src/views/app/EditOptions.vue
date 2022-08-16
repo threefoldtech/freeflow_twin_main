@@ -4,9 +4,9 @@
             <div class="flex flex-row w-full h-full">
                 <div class="flex flex-col flex-1">
                     <TopBar ref="childRef" />
-                    <FileTable v-if="searchResults.length === 0 && sharedDir === false" />
-                    <ResultsTable v-if="searchResults.length > 0 && sharedDir === false" />
-                    <SharedContent v-if="sharedDir === true" />
+                    <FileTable v-if="searchResults.length === 0" />
+                    <ResultsTable v-if="searchResults.length > 0" />
+                    <!--                    <SharedContent v-if="sharedDir === true" />-->
                 </div>
             </div>
         </template>

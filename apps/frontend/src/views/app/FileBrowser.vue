@@ -5,9 +5,9 @@
             <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
                 <div class="flex flex-col flex-1">
                     <TopBar @click.stop />
-                    <FileTable v-if="searchResults.length === 0 && !sharedDir && !isQuantumChatFiles" />
-                    <ResultsTable v-if="searchResults.length > 0 && !sharedDir && !isQuantumChatFiles" />
-                    <SharedContent v-if="sharedDir === true || isQuantumChatFiles" />
+                    <FileTable v-if="searchResults.length === 0 && !isQuantumChatFiles" />
+                    <ResultsTable v-if="searchResults.length > 0 && !isQuantumChatFiles" />
+                    <!--                    <SharedContent v-if="sharedDir === true || isQuantumChatFiles" />-->
                 </div>
             </div>
         </template>
