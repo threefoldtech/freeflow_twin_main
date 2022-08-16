@@ -471,15 +471,6 @@ export const deselectAll = () => {
 };
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
-    if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
-        await router.push({
-            name: 'savedAttachmentsFromChat',
-            params: {
-                chatId: item.name,
-            },
-        });
-        return;
-    }
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;
