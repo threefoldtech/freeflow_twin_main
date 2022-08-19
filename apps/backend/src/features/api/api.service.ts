@@ -140,8 +140,8 @@ export class ApiService {
      * @param {string} obj.location - IPv6 location to send request to.
      * @param {string} obj.shareId - Share id to delete.
      */
-    async sendRemoveShare({ location, shareId }: { location: string; shareId: string }) {
-        const destinationUrl = `http://[${location}]/api/v2/quantum/share/${shareId}`;
+    async sendRemoveShare({ location, shareId, chatId }: { location: string; shareId: string; chatId: string }) {
+        const destinationUrl = `http://[${location}]/api/v2/quantum/share/${shareId}/${chatId}`;
         try {
             return await axios.delete(destinationUrl);
         } catch (error) {

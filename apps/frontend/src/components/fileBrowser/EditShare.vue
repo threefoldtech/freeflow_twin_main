@@ -26,9 +26,9 @@
                 <span v-else>Read</span>
             </div>
             <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
-                <span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length <=1 }"> Read</span>
-                <span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length > 1}"> Write</span>
-            </div> -->
+<span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length <=1 }"> Read</span>
+<span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length > 1}"> Write</span>
+</div> -->
         </template>
         <template #data-delete="data">
             <span class="my-1 p-2 rounded-md bg-red-500 text-white cursor-pointer" @click="remove(data.row)">
@@ -124,11 +124,12 @@
     const remove = async (data: any) => {
         const chat = chats.value.find(c => c.chatId === data.userId);
         if (!chat) return;
-        const contact = chat.contacts.find(con => con.id === chat.chatId);
-        if ('location' in contact) {
-            await removeFilePermissions(data.userId, props.selectedFile.path, contact.location);
-            await renderPermissionsData();
-        }
+        let contact = chat.contacts.find(con => con.id === chat.chatId);
+        if (chat.isGroup) contact = chat.contacts.find(c => c.id === chat.adminId);
+        if (!contact) return;
+
+        await removeFilePermissions(data.userId, props.selectedFile.path, contact.location);
+        await renderPermissionsData();
     };
 </script>
 

@@ -125,9 +125,24 @@ export class QuantumService {
 
             const contacts = chat.parseContacts().filter(c => c.id !== this.userId || permissions.length === 0);
             for (const c of contacts) {
-                this._apiService.sendRemoveShare({ location: c.location, shareId: share.id });
+                if (!chat.isGroup && c.id === chatId) {
+                    this._apiService.sendRemoveShare({
+                        location: c.location,
+                        shareId: share.id,
+                        chatId: this.userId,
+                    });
+                    continue;
+                }
+
+                this._apiService.sendRemoveShare({ location: c.location, shareId: share.id, chatId });
             }
-            if (permissions.length === 0) return;
+            if (permissions.length === 0) {
+                const myLocation = (await this._locationService.getOwnLocation()) as string;
+                this._apiService.sendRemoveShare({ location: myLocation, shareId: share.id, chatId });
+                return;
+            }
+
+            await this._messageService.deleteShareMessages({ shareId: share.id, chatId });
             await this.updateShare(share, { ...share.toJSON(), permissions });
         } catch (error) {
             throw new BadRequestException(`unable to update share permissions: ${error}`);
@@ -355,9 +370,9 @@ export class QuantumService {
             this._apiService.sendMessageToApi({ location: contact.location, message: signedMsg });
         }
 
-        const userHasPermissions = existingShare?.parsePermissions().some(p => p.userId === shareWith);
+        const userHasPermissions = msg.body.permissions.some(p => p.userId === shareWith);
 
-        if (!existingShare || !userHasPermissions) {
+        if (userHasPermissions) {
             await this._messageService.createMessage(signedMsg);
             this._chatGateway.emitMessageToConnectedClients('message', signedMsg);
         }
@@ -373,27 +388,30 @@ export class QuantumService {
             if (share) {
                 await this.deleteShare({ id: share.entityId });
                 share.parsePermissions().map(async permission => {
-                    const sharedMessage = (
-                        await this._messageService.getAllMessagesFromChat({ chatId: permission.userId })
-                    )
-                        .map(m => m.toJSON())
-                        .filter(m => m.type === MessageType.FILE_SHARE)
-                        .find(m => (m.body as { id: string }).id === share.id);
-                    if (sharedMessage) {
-                        sharedMessage.type = MessageType.STRING;
-                        sharedMessage.body = 'File deleted';
-                        this._chatGateway.emitMessageToConnectedClients('message', sharedMessage);
-                        await this._messageService.deleteMessage({ messageId: sharedMessage.id });
+                    await this._messageService.deleteShareMessages({ chatId: permission.userId, shareId: share.id });
+
+                    const chat = await this._chatService.getChat(permission.userId);
+                    let chatId = chat.chatId;
+                    if (chat.isGroup) {
+                        for (const c of chat.parseContacts()) {
+                            this._apiService.sendRemoveShare({
+                                location: c.location,
+                                shareId: share.id,
+                                chatId: chatId,
+                            });
+                        }
+                        return;
                     }
+
                     const contact = await this._contactService.getContact({ id: permission.userId });
-                    if (!contact) {
-                        const chat = await this._chatService.getChat(permission.userId);
-                        chat.parseContacts()
-                            .filter(c => c.id !== this.userId)
-                            .forEach(c =>
-                                this._apiService.sendRemoveShare({ location: c.location, shareId: share.id })
-                            );
-                    } else this._apiService.sendRemoveShare({ location: contact.location, shareId: share.id });
+                    if (!contact) return;
+
+                    if (chatId === contact.id) chatId = chat.parseContacts().filter(c => c.id !== contact.id)[0].id;
+                    this._apiService.sendRemoveShare({
+                        location: contact.location,
+                        shareId: share.id,
+                        chatId: chatId,
+                    });
                 });
             }
             const stats = await this._fileService.getStats({ path });
@@ -440,19 +458,17 @@ export class QuantumService {
         }
     }
 
-    async handleIncomingDeleteShare({ share }: { share: Share }) {
+    async handleIncomingDeleteShare({ share, chatId }: { share: Share; chatId: string }) {
         try {
-            const sharedMessage = (await this._messageService.getAllMessagesFromChat({ chatId: share.parseOwner().id }))
-                .map(m => m.toJSON())
-                .filter(m => m.type === MessageType.FILE_SHARE)
-                .find(m => (m.body as { id: string }).id === share.id);
-            if (sharedMessage) {
-                sharedMessage.type = MessageType.STRING;
-                sharedMessage.body = 'Share deleted';
-                this._chatGateway.emitMessageToConnectedClients('message', sharedMessage);
-                await this._messageService.deleteMessage({ messageId: sharedMessage.id });
-            }
-            return await this._shareRepository.deleteShare({ entityId: share.entityId });
+            await this._messageService.deleteShareMessages({ chatId, shareId: share.id });
+
+            const chat = await this._chatService.getChat(chatId);
+            let permissions = share.parsePermissions().filter(p => p.userId !== chatId);
+            if (!chat.isGroup) permissions = permissions.filter(p => p.userId !== this.userId);
+            if (permissions.length === 0) return await this._shareRepository.deleteShare({ entityId: share.entityId });
+
+            share.permissions = stringifyPermissions(permissions);
+            return (await this._shareRepository.updateShare({ share })).toJSON();
         } catch (error) {
             throw new BadRequestException(`unable to delete share: ${error}`);
         }
