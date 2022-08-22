@@ -12,7 +12,7 @@ jobs:
         steps:
             - uses: actions/checkout@v2
             - name: Build the Docker image
-              run: docker build . --file ./docker/prod/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+              run: docker build . --file ./docker/prod/Dockerfile --tag threefoldjimber/digitaltwin-beta:${{ github.sha }}
             # - name: Build the spawner
             #   working-directory: ./apps/spawner
             #   run: |
@@ -24,19 +24,18 @@ jobs:
             #       DIGITALTWIN_APPID: 'demo.freeflow.life'
             #       ENVIRONMENT: 'production'
             - name: Log into GitHub Container Registry
-              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry.gitlab.com -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             - name: Push all to gitlab registry
               run: |
-                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin:latest
+                  docker tag threefoldjimber/digitaltwin-beta:${{ github.sha }} threefoldjimber/digitaltwin-beta:latest
                   # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
                   # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
-                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin:latest
+                  docker push threefoldjimber/digitaltwin-beta:latest
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
-                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
+                  docker push threefoldjimber/digitaltwin-beta:${{ github.sha }}
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
                   # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
-
     deploy:
         needs: [build]
         runs-on: beta
@@ -55,8 +54,8 @@ jobs:
             - uses: actions/checkout@v2
             - name: Deploying on beta server
               run: |
-                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
-                  echo "registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
+                  docker pull threefoldjimber/digitaltwin-beta:${{ github.sha }}
+                  echo "threefoldjimber/digitaltwin-beta:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)     
                   echo Completed.
@@ -64,7 +63,7 @@ jobs:
             #   working-directory: ./apps/spawner
             #   run: |
             #       cp .env.sample .env
-            #       docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
+            #       docker pull threefoldjimber/digitaltwin-spawner:${{ github.sha }}
             #       docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
             #       docker-compose down --remove-orphans
             #       docker-compose up -d
