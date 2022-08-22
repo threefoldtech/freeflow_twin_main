@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { IFileShareMessage, MessageType } from '../../types/message-types';
+import { ChatGateway } from '../chat/chat.gateway';
 import { Chat } from '../chat/models/chat.model';
 import { ContactDTO } from '../contact/dtos/contact.dto';
 import { KeyService } from '../key/key.service';
@@ -16,7 +17,9 @@ export class MessageService {
     constructor(
         private readonly _messageRepo: MessageRedisRepository,
         private readonly _configService: ConfigService,
-        private readonly _keyService: KeyService
+        private readonly _keyService: KeyService,
+        @Inject(forwardRef(() => ChatGateway))
+        private readonly _chatGateway: ChatGateway
     ) {
         this.userId = this._configService.get<string>('userId');
     }
@@ -81,6 +84,19 @@ export class MessageService {
             return await this._messageRepo.deleteMessage({ id: messageId });
         } catch (error) {
             throw new BadRequestException(`unable to delete message: ${error}`);
+        }
+    }
+
+    async deleteShareMessages({ chatId, shareId }: { chatId: string; shareId: string }) {
+        const shareMessages = (await this.getAllMessagesFromChat({ chatId }))
+            .filter(msg => msg.type === MessageType.FILE_SHARE)
+            .filter(msg => (JSON.parse(msg.body) as IFileShareMessage).id === shareId);
+
+        for (const msg of shareMessages) {
+            await this.deleteMessage({ messageId: msg.id });
+            msg.type = MessageType.DELETE;
+            msg.body = 'Share has been deleted';
+            this._chatGateway.emitMessageToConnectedClients('message', msg);
         }
     }
 

@@ -279,10 +279,10 @@ export class QuantumController {
         return (await this._quantumService.getShareById({ id }))?.toJSON();
     }
 
-    @Delete('share/:id')
-    async deleteShare(@Param('id') id: string) {
-        const share = await this._quantumService.getShareById({ id });
-        return await this._quantumService.handleIncomingDeleteShare({ share });
+    @Delete('share/:shareId/:chatId')
+    async deleteShare(@Param('shareId') shareId: string, @Param('chatId') chatId: string) {
+        const share = await this._quantumService.getShareById({ id: shareId });
+        return await this._quantumService.handleIncomingDeleteShare({ share, chatId });
     }
 
     @Get('share/path')
