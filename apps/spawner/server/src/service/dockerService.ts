@@ -37,7 +37,7 @@ export const spawnDocker = async (userId: string) => {
 
     console.log('Going to create docker image with: ');
     console.log('volumeName: ', volumeName);
-    console.log('redis volumeName: ', volumeName);
+    console.log('redis volumeName: ', redisVolumeName);
     console.log('containerName: ', containerName);
 
     const containerList = await docker.listContainers();
@@ -52,7 +52,7 @@ export const spawnDocker = async (userId: string) => {
     try {
         console.log('Getting volumes ...');
         const list = await docker.listVolumes();
-        console.log('Got the volumes');
+        console.log('Got the volumes', list);
 
         if (!list.Volumes.find(v => v.Name === volumeName)) {
             console.log('Creating volume');
