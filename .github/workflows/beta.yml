@@ -6,13 +6,54 @@ on:
         tags:
             - 'v[0-9]+.[0-9]+.[0-9]+'
 
+env:
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
+
 jobs:
     build:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+            id-token: write
         steps:
-            - uses: actions/checkout@v2
-            - name: Build the Docker image
-              run: docker build . --file ./docker/prod/Dockerfile --tag threefoldjimber/digitaltwin-beta:${{ github.sha }}
+            - name: Checkout repository
+              uses: actions/checkout@v3
+
+            - name: Install cosign
+              if: github.event_name != 'pull_request'
+              uses: sigstore/cosign-installer@7e0881f8fe90b25e305bbf0309761e9314607e25
+              with:
+                  cosign-release: 'v1.9.0'
+
+            - name: Setup Docker buildx
+              uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+
+            - name: Log into GitHub registry ${{ env.REGISTRY }}
+              if: github.event_name != 'pull_request'
+              uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Extract Docker metadata
+              id: meta
+              uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
+            - name: Build and push Docker image
+              id: build-and-push
+              uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
+              with:
+                  context: .
+                  file: docker/prod/Dockerfile
+                  push: ${{ github.event_name != 'pull_request' }}
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+
             # - name: Build the spawner
             #   working-directory: ./apps/spawner
             #   run: |
@@ -23,19 +64,13 @@ jobs:
             #       digital_twin_frontend_tag: ${{ github.sha }}
             #       DIGITALTWIN_APPID: 'demo.freeflow.life'
             #       ENVIRONMENT: 'production'
-            - name: Log into GitHub Container Registry
-              run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            - name: Push all to gitlab registry
-              run: |
-                  docker tag threefoldjimber/digitaltwin-beta:${{ github.sha }} threefoldjimber/digitaltwin-beta:latest
-                  # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
-                  # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
-                  docker push threefoldjimber/digitaltwin-beta:latest
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
-                  docker push threefoldjimber/digitaltwin-beta:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
+
+            - name: Sign the published Docker image
+              if: ${{ github.event_name != 'pull_request' }}
+              env:
+                  COSIGN_EXPERIMENTAL: 'true'
+              run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+
     deploy:
         needs: [build]
         runs-on: beta
@@ -51,14 +86,23 @@ jobs:
                   echo "-----------"
                   echo ip addr
 
-            - uses: actions/checkout@v2
+            - uses: actions/checkout@v3
+
+            - name: Log into GitHub registry ${{ env.REGISTRY }}
+              uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
             - name: Deploying on beta server
               run: |
-                  docker pull threefoldjimber/digitaltwin-beta:${{ github.sha }}
+                  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
                   echo "threefoldjimber/digitaltwin-beta:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)     
                   echo Completed.
+
             # - name: Running spawner
             #   working-directory: ./apps/spawner
             #   run: |

@@ -8,7 +8,6 @@ on:
 
 env:
     REGISTRY: ghcr.io
-    # github.repository as <account>/<repo>
     IMAGE_NAME: ${{ github.repository }}
 
 jobs:
@@ -43,24 +42,33 @@ jobs:
               id: meta
               uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
               with:
-                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-staging
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
             - name: Build and push Docker image
               id: build-and-push
               uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
               with:
                   context: .
-                  file: ./docker/staging/Dockerfile
+                  file: docker/staging/Dockerfile
                   push: ${{ github.event_name != 'pull_request' }}
                   tags: ${{ steps.meta.outputs.tags }}
                   labels: ${{ steps.meta.outputs.labels }}
+
+            # - name: Build the spawner
+            #   working-directory: ./apps/spawner
+            #   run: |
+            #       cp .env.sample .env
+            #       docker-compose build
+            #   env:
+            #       digital_twin_spawner_tag: ${{ github.sha }}
+            #       digital_twin_frontend_tag: ${{ github.sha }}
+            #       DIGITALTWIN_APPID: 'digitaltwin-test.jimbertesting.be'
+            #       ENVIRONMENT: 'staging'
 
             - name: Sign the published Docker image
               if: ${{ github.event_name != 'pull_request' }}
               env:
                   COSIGN_EXPERIMENTAL: 'true'
-              # This step uses the identity token to provision an ephemeral certificate
-              # against the sigstore community Fulcio instance.
               run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
 
     deploy:
@@ -71,12 +79,21 @@ jobs:
             url: https://digitaltwin-test.jimbertesting.be/
         steps:
             - uses: actions/checkout@v3
+
+            - name: Log into GitHub registry ${{ env.REGISTRY }}
+              uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
             - name: Deploying on staging server
               run: |
-                  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-staging:${{ github.sha }}
+                  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
                   echo "threefoldjimber/digitaltwin-staging:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)
+
             # - name: Running spawner
             #   working-directory: ./apps/spawner
             #   run: |
