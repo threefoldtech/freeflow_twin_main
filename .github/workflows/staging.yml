@@ -14,7 +14,7 @@ jobs:
             # - uses: satackey/action-docker-layer-caching@v0.0.11
             #   continue-on-error: true
             - name: Build the Docker image
-              run: docker build . --file ./docker/staging/Dockerfile --tag threefoldjimber/digitaltwin-staging:latest:${{ github.sha }}
+              run: docker build . --file ./docker/staging/Dockerfile --tag threefoldjimber/digitaltwin-staging:${{ github.sha }}
             # - name: Build the spawner
             #   working-directory: ./apps/spawner
             #   run: |
