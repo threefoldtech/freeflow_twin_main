@@ -32,10 +32,12 @@ const getImage = () => {
 
 export const spawnDocker = async (userId: string) => {
     const volumeName = `chat_storage_${userId}`;
+    const redisVolumeName = `redis_storage_${userId}`;
     const containerName = `${userId}-chat`;
 
     console.log('Going to create docker image with: ');
     console.log('volumeName: ', volumeName);
+    console.log('redis volumeName: ', volumeName);
     console.log('containerName: ', containerName);
 
     const containerList = await docker.listContainers();
@@ -60,6 +62,14 @@ export const spawnDocker = async (userId: string) => {
             });
             console.log('volume created');
         }
+        if (!list.Volumes.find(v => v.Name === redisVolumeName)) {
+            console.log('Creating redis volume');
+            await docker.createVolume({
+                name: redisVolumeName,
+                labels: { redis: 'volume' },
+            });
+            console.log('redis volume created');
+        }
     } catch (e) {
         throw new Error('volumeError');
     }
@@ -80,7 +90,7 @@ export const spawnDocker = async (userId: string) => {
                     CgroupPermissions: 'rwm',
                 },
             ],
-            Binds: [`${volumeName}:/appdata`],
+            Binds: [`${volumeName}:/appdata`, `${redisVolumeName}:/var/lib/redis`],
         },
         Env: [
             `USER_ID=${userId}`,
