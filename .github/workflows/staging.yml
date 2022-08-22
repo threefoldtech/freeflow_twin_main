@@ -89,7 +89,7 @@ jobs:
 
             - name: Deploying on staging server
               run: |
-                  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${{ github.sha }}
+                  docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
                   echo "threefoldjimber/digitaltwin-staging:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)
