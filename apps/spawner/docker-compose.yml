@@ -2,7 +2,7 @@ version: '3'
 
 services:
     digital_twin_spawner:
-        image: registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${digital_twin_spawner_tag}
+        image: threefoldjimber/digitaltwin-spawner:${digital_twin_spawner_tag}
         container_name: digital_twin_spawner
         build: server
         restart: always
@@ -32,7 +32,7 @@ services:
     #         - chatnet
 
     digital_twin_frontend:
-        image: registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${digital_twin_frontend_tag}
+        image: threefoldjimber/digitaltwin-frontend:digital_twin_frontend:${digital_twin_frontend_tag}
         container_name: digital_twin_frontend
         restart: always
         build: frontend
