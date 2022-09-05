@@ -30,7 +30,7 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { useAuthState } from '@/store/authStore';
+    import { getMyName, loginName, useAuthState } from '@/store/authStore';
     import { computed, onBeforeMount } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
@@ -40,13 +40,16 @@
     const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
 
-    onBeforeMount(() => {
+    onBeforeMount(async () => {
         if (user) {
             initializeSocket(user.id.toString());
             initBlocklist();
         }
+
+        loginName.value = await getMyName();
     });
 
+    console.log(loginName.value);
     console.log('Version: ' + version);
 
     document.querySelector('body').classList.add('overflow-y-hidden');

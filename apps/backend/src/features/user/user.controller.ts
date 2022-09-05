@@ -42,9 +42,16 @@ export class UserController {
         return pk.key;
     }
 
+    @Get('me')
+    async getMe(): Promise<Object> {
+        return {
+            username: this._configService.get<string>('userId'),
+        };
+    }
+
     @Get('status')
     async getStatus(): Promise<IStatus> {
-        const isOnline = (await this._userGateway.getConnections()) > 0 ? true : false;
+        const isOnline = (await this._userGateway.getConnections()) > 0;
         const userData = await this._userService.getUserData();
         const avatar = await this._userService.getUserAvatar();
         const user = userData.entityData;

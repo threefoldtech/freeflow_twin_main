@@ -1,6 +1,7 @@
 import { reactive } from '@vue/reactivity';
 import axios from 'axios';
 import { User } from '../types';
+import { ref } from 'vue';
 
 export const getMyStatus = async () => {
     const res = await axios.get(`${window.location.origin}/api/v2/user/status`);
@@ -17,12 +18,16 @@ const authState = reactive<AuthState>({
     },
 });
 
-// @TODO get name from backend not URL
-export const loginName = window.location.host.split('.')[0];
+export const loginName = ref<string>('');
 
 export const myYggdrasilAddress = async () => {
     const res = await axios.get(`${window.location.origin}/api/v2/locations/yggdrasil`);
     return res.data;
+};
+
+export const getMyName = async () => {
+    const res = await axios.get(`${window.location.origin}/api/v2/user/me`);
+    return res.data.username;
 };
 
 export const useAuthState = () => {
