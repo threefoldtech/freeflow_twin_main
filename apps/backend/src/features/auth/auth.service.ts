@@ -54,13 +54,14 @@ export class AuthService {
     }: {
         redirectUrl: URL;
         sessionState: string;
-    }): Promise<{ doubleName: string; derivedSeed: string; userId: string }> {
+    }): Promise<{ doubleName: string; derivedSeed: string; userId: string; email: string }> {
         try {
             const profileData = (await this.tfLogin.parseAndValidateRedirectUrl(redirectUrl, sessionState))?.profile;
 
             const doubleName: string = <string>profileData.doubleName;
             const derivedSeed: string = <string>profileData.derivedSeed;
             const userId = doubleName.replace('.3bot', '');
+            const email: string = <string>profileData.email;
 
             if (userId !== this._configService.get<string>('userId') || !derivedSeed)
                 throw new UnauthorizedException('no user id or derived seed found');
@@ -80,6 +81,7 @@ export class AuthService {
                 doubleName,
                 derivedSeed,
                 userId,
+                email,
             };
         } catch (error) {
             throw new BadRequestException(`${error}`);

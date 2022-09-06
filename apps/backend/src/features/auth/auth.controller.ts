@@ -6,11 +6,13 @@ import { LocationService } from '../location/location.service';
 import { YggdrasilService } from '../yggdrasil/yggdrasil.service';
 import { AuthService } from './auth.service';
 import { SignInQuery } from './query/sign-in.query';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly _authService: AuthService,
+        private readonly _configService: ConfigService,
         private readonly _yggdrasilService: YggdrasilService,
         private readonly _locationService: LocationService
     ) {}
@@ -76,6 +78,7 @@ export class AuthController {
             yggdrasilAddress: <string>yggdrasilAddress,
         });
 
+        req.session.email = profileData.email;
         req.session.userId = profileData.userId;
         req.session.save(err => {
             if (!err) {

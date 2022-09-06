@@ -5,6 +5,7 @@ import {
     Get,
     Post,
     Put,
+    Req,
     StreamableFile,
     UploadedFile,
     UseGuards,
@@ -22,6 +23,7 @@ import { KeyService } from '../key/key.service';
 import { KeyType } from '../key/models/key.model';
 import { UserGateway } from './user.gateway';
 import { UserService } from './user.service';
+import { Request } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -43,9 +45,10 @@ export class UserController {
     }
 
     @Get('me')
-    async getMe(): Promise<Object> {
+    async getMe(@Req() req: Request): Promise<Object> {
         return {
-            username: this._configService.get<string>('userId'),
+            username: req.session.userId,
+            email: req.session.email,
         };
     }
 

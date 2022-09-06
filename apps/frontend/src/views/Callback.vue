@@ -6,7 +6,7 @@
 
 <script lang="ts" setup>
     import { useRoute, useRouter } from 'vue-router';
-    import { useAuthState } from '@/store/authStore';
+    import { getMe, useAuthState } from '@/store/authStore';
 
     const { user } = useAuthState();
 
@@ -14,15 +14,14 @@
     const router = useRouter();
 
     const init = async () => {
-        const email = route.query.email;
-        const username = route.query.username;
+        const profile = await getMe();
 
-        if (!email || !username) {
+        if (!profile.email || !profile.username) {
             await router.push('error');
         }
 
-        user.id = <string>username;
-        user.email = <string>email;
+        user.id = profile.username;
+        user.email = profile.email;
         user.image = `${window.location.origin}/api/v2/user/avatar`;
     };
 

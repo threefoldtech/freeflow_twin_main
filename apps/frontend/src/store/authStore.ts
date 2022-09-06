@@ -22,9 +22,12 @@ export const myYggdrasilAddress = async () => {
     return res.data;
 };
 
-export const getMyName = async () => {
+export const getMe = async (): Promise<{ username: string; email: string }> => {
     const res = await axios.get(`${window.location.origin}/api/v2/user/me`);
-    return res.data.username;
+    return {
+        username: res.data.username,
+        email: res.data.email,
+    };
 };
 
 export const useAuthState = () => {

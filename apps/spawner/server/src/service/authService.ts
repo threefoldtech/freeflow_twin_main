@@ -46,10 +46,9 @@ export const appCallback = async (request: Request): Promise<string> => {
         delete request.session.state;
 
         const doubleName: string = <string>profileData.doubleName;
-        const email: string = <string>profileData.email;
 
         request.session.userId = doubleName.replace('.3bot', '');
-        return `/callback?username=${doubleName}&email=${email}`;
+        return `/callback`;
     } catch (e) {
         throw new Error(e.message);
     }
