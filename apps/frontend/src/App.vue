@@ -46,10 +46,10 @@
             initBlocklist();
         }
 
+        user.id = await getMyName();
         loginName.value = await getMyName();
     });
 
-    console.log(loginName.value);
     console.log('Version: ' + version);
 
     document.querySelector('body').classList.add('overflow-y-hidden');
@@ -59,9 +59,3 @@
     const route = useRoute();
     const path = computed(() => route.path);
 </script>
-
-<style>
-    .v-contextmenu-item--hover {
-        background-color: #2e266f !important;
-    }
-</style>
