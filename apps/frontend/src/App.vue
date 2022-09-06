@@ -30,7 +30,7 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { getMyName, loginName, useAuthState } from '@/store/authStore';
+    import { getMyName, useAuthState } from '@/store/authStore';
     import { computed, onBeforeMount } from 'vue';
     import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
@@ -45,9 +45,6 @@
             initializeSocket(user.id.toString());
             initBlocklist();
         }
-
-        user.id = await getMyName();
-        loginName.value = await getMyName();
     });
 
     console.log('Version: ' + version);

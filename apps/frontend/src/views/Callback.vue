@@ -5,25 +5,28 @@
 </template>
 
 <script lang="ts" setup>
-    import { useRouter } from 'vue-router';
-    import { getMyName, loginName } from '@/store/authStore';
+    import { useRoute, useRouter } from 'vue-router';
+    import { useAuthState } from '@/store/authStore';
 
-    let name = window.location.host.split('.')[0];
+    const { user } = useAuthState();
 
-    const user = {
-        name,
-        image: `${window.location.origin}/api/v2/user/avatar`,
-        email: `${name.replace(/ /g, '')}@domain.com`,
-    };
+    const route = useRoute();
+    const router = useRouter();
 
     const init = async () => {
-        loginName.value = await getMyName();
-    };
+        const email = route.query.email;
+        const username = route.query.username;
 
-    localStorage.setItem('user', JSON.stringify(user));
+        if (!email || !username) {
+            await router.push('error');
+        }
+
+        user.id = <string>username;
+        user.email = <string>email;
+        user.image = `${window.location.origin}/api/v2/user/avatar`;
+    };
 
     init();
 
-    const router = useRouter();
     router.push('/dashboard');
 </script>

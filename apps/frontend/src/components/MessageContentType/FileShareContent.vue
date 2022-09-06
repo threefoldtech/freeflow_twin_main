@@ -20,19 +20,17 @@
 </template>
 
 <script lang="ts" setup>
-    import { loginName } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import {
-        formatBytes,
-        sharedDir,
-        goTo,
         currentDirectory,
-        sharedItem,
-        selectedTab,
+        formatBytes,
+        goTo,
         selectedPaths,
+        selectedTab,
+        sharedDir,
+        sharedItem,
     } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message } from '@/types';
-
-    import { ref } from 'vue';
     import { useRouter } from 'vue-router';
     import { showShareDialog } from '@/services/dialogService';
 
@@ -41,13 +39,13 @@
     }
 
     const props = defineProps<IProp>();
-    const sharedFileOptions = ref<boolean>(true);
+    const { user } = useAuthState();
 
     const router = useRouter();
     const visitFileInMessage = (message: Message<FileShareMessageType>) => {
         sharedItem.value = message.body;
 
-        if (!sharedItem.value.isFolder && message.from === loginName.value) {
+        if (!sharedItem.value.isFolder && message.from === user.id) {
             //Only office
             const url = router.resolve({
                 name: 'editfile',
@@ -65,7 +63,7 @@
             message.body.path.split('/')[0] === '' &&
             message.body.path.split('/').length === 2 &&
             !message.body.isFolder &&
-            message.from === loginName.value
+            message.from === user.id
         ) {
             //File is located in root folder
             router.push({ name: 'quantum' });
@@ -75,7 +73,7 @@
             return;
         }
 
-        if (message.from === loginName.value) {
+        if (message.from === user.id) {
             router.push({
                 name: 'quantumFolder',
                 params: {

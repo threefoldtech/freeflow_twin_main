@@ -1,9 +1,6 @@
 import { reactive } from '@vue/reactivity';
 import axios from 'axios';
 import { User } from '../types';
-import { Ref, ref } from 'vue';
-
-export const loginName: Ref<string> = ref<string>('');
 
 export const getMyStatus = async () => {
     const res = await axios.get(`${window.location.origin}/api/v2/user/status`);
