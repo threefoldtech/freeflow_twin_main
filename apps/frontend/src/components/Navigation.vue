@@ -1,7 +1,7 @@
 <template>
     <div class="h-full flex">
         <!-- Narrow sidebar -->
-        <div class="hidden w-28 bg-accent-700 overflow-y-auto lg:block">
+        <div class="hidden w-[5.5rem] bg-accent-700 overflow-y-auto lg:block">
             <div class="w-full h-full py-6 flex flex-col items-center">
                 <div class="flex-shrink-0 flex items-center cursor-pointer" @click="changePage('dashboard')">
                     <img src="/freeflow_icon_192x192.png" class="w-12" />
@@ -20,7 +20,7 @@
                         class="grid"
                     >
                         <div
-                            class="group w-full p-3 flex flex-col items-center text-xs font-medium"
+                            class="group p-1.5 flex flex-col items-center text-xs font-medium"
                             style="position: relative"
                             @click="changePage(app.name)"
                         >
@@ -35,10 +35,8 @@
                         </div>
                     </div>
                 </div>
-                <div
-                    class="w-20 h-20 mb-5 grid cursor-pointer content-end items-center justify-center justify-items-center"
-                >
-                    <AvatarImg @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="String(user.id)" />
+                <div class="w-20 h-20 grid cursor-pointer items-center justify-items-center">
+                    <AvatarImg small @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="String(user.id)" />
                     <button
                         class="mt-2 py-2 px-4 text-white rounded-md max-w-max hover:bg-primarylight"
                         @click="showLogoutDialog = true"
