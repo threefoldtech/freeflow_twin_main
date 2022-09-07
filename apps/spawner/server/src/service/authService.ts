@@ -14,7 +14,7 @@ export const getAppLoginUrl = async (request: Request, redirectUrl: string, name
 
     const login = new ThreefoldLogin(
         config.appBackend,
-        `${name}.${config.appId}`,
+        `${config.appId}`,
         config.seedPhrase,
         '/api/auth/callback',
         config.kycBackend
@@ -36,7 +36,7 @@ export const appCallback = async (request: Request): Promise<string> => {
         config.kycBackend
     );
     await login.init();
-    const redirectUrl = new URL(request.protocol + '://' + request.get('host') + request.originalUrl);
+    const redirectUrl = new URL(request.protocol + '://' + request.originalUrl);
     try {
         console.log(request.session);
         console.log(request.session.state);
