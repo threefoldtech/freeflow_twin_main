@@ -40,7 +40,7 @@
     <div
         v-if="showFilePreview"
         class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
-        @click="showFilePreview = false"
+        @click.self="showFilePreview = false"
     >
         <XIcon
             class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50"
@@ -55,8 +55,18 @@
                 <source :src="filePreviewSrc" />
             </video>
         </div>
+
+        <div v-else-if="filePreviewType === 'simpleFile'">
+            <MonacoEditor
+                @keydown.esc="fileTableDiv.focus()"
+                theme="vs"
+                :code="fileContent"
+                :options="monacoOptions"
+                class="w-screen h-[750px]"
+            />
+        </div>
     </div>
-    <div class="flex flex-col mx-2">
+    <div class="flex flex-col mx-2" ref="fileTableDiv" @keydown.esc="showFilePreview = false" tabindex="0">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
                 <div class="overflow-hidden sm:rounded-lg">
@@ -318,50 +328,64 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, ref } from 'vue';
+    import { computed, nextTick, ref } from 'vue';
     import { XIcon } from '@heroicons/vue/solid';
 
     import {
         currentDirectory,
         currentDirectoryContent,
         currentSort,
-        itemAction,
-        PathInfoModel,
-        selectItem,
+        currentSortDir,
         deselectAll,
         deselectItem,
-        sortContent,
-        sortAction,
-        currentSortDir,
-        getFileLastModified,
-        getFileExtension,
-        getFileSize,
-        selectedPaths,
-        selectAll,
-        getIconColor,
-        getIcon,
-        uploadFiles,
         equals,
-        moveFiles,
-        isDraggingFiles,
-        goToShared,
         fileBrowserTypeView,
+        getFileExtension,
+        getFileLastModified,
+        getFileSize,
+        getIcon,
+        getIconColor,
+        goToShared,
+        isDraggingFiles,
+        itemAction,
+        moveFiles,
+        PathInfoModel,
         savedAttachments,
         savedAttachmentsIsLoading,
+        selectAll,
+        selectedPaths,
+        selectItem,
+        sortAction,
+        sortContent,
+        uploadFiles,
     } from '@/store/fileBrowserStore';
-    import { useRouter, useRoute } from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import FileDropArea from '@/components/FileDropArea.vue';
     import { useAuthState } from '@/store/authStore';
     import {
         currentRightClickedItem,
-        rightClickItemAction,
-        triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
         RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import Spinner from '@/components/Spinner.vue';
-    import { isImage, isVideo } from '@/services/contentService';
+    import { isImage, isSimpleTextFile, isVideo } from '@/services/contentService';
     import { calcExternalResourceLink } from '@/services/urlService';
+    import MonacoEditor from '@/components/MonacoEditor.vue';
+
+    const fileTableDiv = ref<HTMLDivElement>();
+
+    nextTick(() => {
+        fileTableDiv.value.focus();
+    });
+
+    const monacoOptions = {
+        minimap: {
+            enabled: false,
+        },
+        language: 'javascript',
+    };
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -405,19 +429,25 @@
     const showFilePreview = ref(false);
     const filePreviewSrc = ref('');
     const filePreviewType = ref('');
+    const fileContent = ref('');
 
-    const handleItemClick = (item: PathInfoModel) => {
-        if (isVideo(item.fullName) || isImage(item.fullName)) {
+    const handleItemClick = async (item: PathInfoModel) => {
+        if (isVideo(item.fullName) || isImage(item.fullName) || isSimpleTextFile(item.fullName)) {
             const ownerLocation = user.location;
             let path = item.path;
             path = path.replace('/appdata/storage/', '');
-            showFilePreview.value = true;
             const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
             filePreviewSrc.value = calcExternalResourceLink(src);
-            filePreviewType.value = isVideo(item.fullName) ? 'video' : 'image';
+
+            showFilePreview.value = true;
+            filePreviewType.value = isVideo(item.fullName) ? 'video' : isImage(item.fullName) ? 'image' : 'simpleFile';
+
+            if (filePreviewType.value !== 'simpleFile') return;
+
+            fileContent.value = await (await fetch(filePreviewSrc.value)).text();
             return;
         }
-        itemAction(item, router);
+        await itemAction(item, router);
     };
 
     const onDragStart = (event, item) => {

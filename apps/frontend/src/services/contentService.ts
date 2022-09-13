@@ -4,12 +4,32 @@ export const isImage = filename => {
         filename.indexOf('.gif') !== -1 ||
         filename.indexOf('.png') !== -1 ||
         filename.indexOf('.jpg') !== -1 ||
+        filename.indexOf('.JPG') !== -1 ||
         filename.indexOf('.jpeg') !== -1
     );
 };
 
 export const isAudio = filename => {
     return filename?.indexOf('.mp3') !== -1 || filename.indexOf('.WebM') !== -1;
+};
+
+export const isSimpleTextFile = fileName => {
+    if (!fileName) return false;
+    return (
+        fileName.indexOf('txt') !== -1 ||
+        fileName.indexOf('json') !== -1 ||
+        fileName.indexOf('html') !== -1 ||
+        fileName.indexOf('js') !== -1 ||
+        fileName.indexOf('ts') !== -1 ||
+        fileName.indexOf('css') !== -1 ||
+        fileName.indexOf('scss') !== -1 ||
+        fileName.indexOf('xml') !== -1 ||
+        fileName.indexOf('yml') !== -1 ||
+        fileName.indexOf('yaml') !== -1 ||
+        fileName.indexOf('md') !== -1 ||
+        fileName.indexOf('markdown') !== -1 ||
+        fileName.indexOf('python') !== -1
+    );
 };
 
 export const isVideo = filename => {
