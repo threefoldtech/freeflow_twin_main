@@ -227,7 +227,6 @@ export class QuantumController {
 
     //route for editing simple text files
     @Post('file/internal/simple')
-    @HttpCode(200)
     async editQuantumFileSimple(@Query('path') path: string, @Body() { content }: { content: string }) {
         if (!path) throw new NotFoundException('no path provided');
         path = Buffer.from(path, 'base64').toString('binary');
