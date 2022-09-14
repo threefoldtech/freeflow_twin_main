@@ -52,16 +52,16 @@
                                                         class="w-5 text-gray-400 fas fa-map-marker-alt mr-2"
                                                         aria-hidden="true"
                                                     />
-                                                    <p class="md:hidden">{{ trimStringMidway(item.location) }}</p>
-                                                    <p class="hidden md:block">{{ item.location }}</p>
+                                                    <!--                                                    <p class="md:hidden">{{ trimStringMidway(item.location) }}</p>-->
+                                                    <p>{{ item.location }}</p>
                                                 </div>
                                                 <div class="flex align-center text-sm text-gray-500">
                                                     <em
                                                         class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center"
                                                         aria-hidden="true"
                                                     />
-                                                    <p class="md:hidden">{{ trimStringMidway(item.app_id) }}</p>
-                                                    <p class="hidden md:block">{{ item.app_id }}</p>
+                                                    <!--                                                    <p class="md:hidden">{{ trimStringMidway(item.app_id) }}</p>-->
+                                                    <p>{{ item.app_id }}</p>
                                                 </div>
                                             </div>
                                         </div>
