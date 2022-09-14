@@ -179,6 +179,12 @@ export const moveFiles = async (paths: string[], pathToPaste: string) => {
     });
 };
 
+export const updateFile = async (path: string, content: string) => {
+    return await axios.post<PathInfo>(`${config.baseUrl}api/v2/quantum/file/internal/simple?path=${btoa(path)}`, {
+        content,
+    });
+};
+
 export const renameFile = async (oldPath: string, newPath: string) => {
     return await axios.put<PathInfo>(`${config.baseUrl}api/v2/quantum/rename`, { from: oldPath, to: newPath });
 };

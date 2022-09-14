@@ -190,6 +190,7 @@ export class QuantumController {
         });
     }
 
+    //route for editing in onlyOffice
     @Post('file/internal')
     @HttpCode(200)
     async editQuantumFile(
@@ -222,6 +223,18 @@ export class QuantumController {
         return {
             error: 0,
         };
+    }
+
+    //route for editing simple text files
+    @Post('file/internal/simple')
+    @HttpCode(200)
+    async editQuantumFileSimple(@Query('path') path: string, @Body() { content }: { content: string }) {
+        if (!path) throw new NotFoundException('no path provided');
+        path = Buffer.from(path, 'base64').toString('binary');
+
+        if (!this._fileService.exists({ path })) return;
+
+        return this._fileService.writeFile({ path, content });
     }
 
     @Delete('file/internal')
