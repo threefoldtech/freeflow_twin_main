@@ -32,6 +32,33 @@ export const isSimpleTextFile = fileName => {
     );
 };
 
+export const extensionToLanguage = (extension: string) => {
+    switch (extension) {
+        case 'js':
+            return 'javascript';
+        case 'ts':
+            return 'typescript';
+        case 'html':
+            return 'html';
+        case 'css':
+            return 'css';
+        case 'scss':
+            return 'scss';
+        case 'yml':
+            return 'yaml';
+        case 'yaml':
+            return 'yaml';
+        case 'md':
+            return 'markdown';
+        case 'markdown':
+            return 'markdown';
+        case 'python':
+            return 'python';
+        default:
+            return 'text';
+    }
+};
+
 export const isVideo = filename => {
     if (!filename) return false;
     return (

@@ -58,6 +58,7 @@
                 @keydown.esc="fileTableDiv.focus()"
                 theme="vs"
                 v-model="editedFileContent"
+                :item="clickedItem"
                 :options="monacoOptions"
                 class="w-screen h-[750px]"
             />
