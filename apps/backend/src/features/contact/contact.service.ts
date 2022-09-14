@@ -38,7 +38,7 @@ export class ContactService {
      */
     async getContacts(): Promise<Contact[]> {
         try {
-            return await this._contactRepo.getContacts();
+            return (await this._contactRepo.getContacts()).filter(c => c.accepted);
         } catch {
             return [];
         }
