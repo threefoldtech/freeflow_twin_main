@@ -2,14 +2,16 @@
     <SomethingWentWrongModal />
     <appLayout>
         <template v-slot:default>
-            <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
-                <div class="flex flex-col flex-1">
-                    <TopBar @click.stop />
-                    <FileTable v-if="searchResults.length === 0 && !isQuantumChatFiles" />
-                    <ResultsTable v-if="searchResults.length > 0 && !isQuantumChatFiles" />
-                    <!--                    <SharedContent v-if="sharedDir === true || isQuantumChatFiles" />-->
+            <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
+                <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
+                    <div class="flex flex-col flex-1">
+                        <TopBar @click.stop />
+                        <FileTable v-if="searchResults.length === 0 && !isQuantumChatFiles" />
+                        <ResultsTable v-if="searchResults.length > 0 && !isQuantumChatFiles" />
+                        <!--                    <SharedContent v-if="sharedDir === true || isQuantumChatFiles" />-->
+                    </div>
                 </div>
-            </div>
+            </FileDropArea>
         </template>
     </appLayout>
 </template>
@@ -19,6 +21,7 @@
     import { onBeforeMount } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
+    import FileDropArea from '@/components/FileDropArea.vue';
     import {
         currentDirectory,
         isQuantumChatFiles,
@@ -31,6 +34,7 @@
         sharedItem,
         fileBrowserTypeView,
         updateContent,
+        uploadFiles,
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import SharedContent from '@/components/fileBrowser/SharedContent.vue';
