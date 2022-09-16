@@ -58,7 +58,7 @@
                 @keydown.esc="fileTableDiv.focus()"
                 theme="vs"
                 v-model="editedFileContent"
-                :item="clickedItem"
+                :extension="clickedItem?.extension"
                 :options="monacoOptions"
                 class="w-screen h-[750px]"
             />
@@ -497,7 +497,7 @@
     };
 
     const saveChanges = () => {
-        updateFile(clickedItem.value.path, editedFileContent.value);
+        updateFile(clickedItem.value.path, editedFileContent.value, user.location);
         showConfirmDialog.value = false;
         clickedItem.value = undefined;
     };

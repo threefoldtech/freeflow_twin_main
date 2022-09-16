@@ -27,6 +27,7 @@
     import { Message, MessageBodyType } from '@/types';
     import { ref } from 'vue';
     import Spinner from '@/components/Spinner.vue';
+    import { isSimpleTextFile } from '@/services/contentService';
 
     interface IProp {
         message: Object;
@@ -37,6 +38,7 @@
     const isLoadingFile = ref<boolean>(false);
     const updatedAttachments = ref<any>([]);
     const loadingFileMessage = ref<string>('Downloading');
+    const emit = defineEmits(['showFile']);
 
     const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) => {
         await downloadAttachment(message);
@@ -47,6 +49,10 @@
     }
 
     const openSharedFile = async (message: Message<MessageBodyType>, count: number = 0) => {
+        if (isSimpleTextFile(message.body.filename)) {
+            emit('showFile', { name: message.body.filename, url: message.body.url });
+            return;
+        }
         //todo: save downloaded file in attachments folder
         const url = calcExternalResourceLink((message.body as { url: string }).url);
         window.open(url, '_blank');

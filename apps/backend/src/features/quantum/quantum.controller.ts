@@ -32,6 +32,7 @@ import { SharePermissionType } from './enums/share-permission-type.enum';
 import { IFileShare } from './interfaces/file-share.interface';
 import { IOnlyOfficeResponse } from './interfaces/only-office-reponse.interface';
 import { QuantumService } from './quantum.service';
+import { LocationService } from '../location/location.service';
 
 @Controller('quantum')
 export class QuantumController {
@@ -42,7 +43,8 @@ export class QuantumController {
         private readonly _quantumService: QuantumService,
         private readonly _fileService: FileService,
         private readonly _keyService: KeyService,
-        private readonly _apiService: ApiService
+        private readonly _apiService: ApiService,
+        private readonly _locationService: LocationService
     ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
@@ -210,7 +212,7 @@ export class QuantumController {
         // const payload = await this._quantumService.verifyQuantumJWT({ token });
 
         // if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
-        //     throw new UnauthorizedException(`you do not have the premission to edit this file`);
+        //     throw new UnauthorizedException(`you do not have the permission to edit this file`);
 
         if (!path || !onlyOfficeResponse?.url) throw new NotFoundException('no file or url provided');
 
@@ -227,9 +229,21 @@ export class QuantumController {
 
     //route for editing simple text files
     @Post('file/internal/simple')
-    async editQuantumFileSimple(@Query('path') path: string, @Body() { content }: { content: string }) {
+    async editQuantumFileSimple(
+        @Query('path') path: string,
+        @Body() { content, location }: { content: string; location: string }
+    ) {
         if (!path) throw new NotFoundException('no path provided');
+
         path = Buffer.from(path, 'base64').toString('binary');
+
+        //todo handle tokens (see route file/internal)... Need to add token parameter for security
+
+        const myLocation = await this._locationService.getOwnLocation();
+        if (location !== myLocation) {
+            await this._apiService.editFile({ path, content, location });
+            return;
+        }
 
         if (!this._fileService.exists({ path })) return;
 

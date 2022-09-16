@@ -15,7 +15,7 @@
     interface IProps {
         options?: any;
         modelValue?: string;
-        item?: PathInfoModel;
+        extension?: string;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -26,14 +26,14 @@
 
     onMounted(async () => {
         const monaco = await loader.init();
-        const extension = getExtension(props.item?.path);
-        const lang = extensionToLanguage(extension);
+        const lang = extensionToLanguage(props.extension);
 
         const editor = monaco.editor.create(document.getElementById('editor'), {
             value: props.modelValue ?? '',
             theme: 'vs',
             padding: { top: 20, bottom: 20 },
             scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
+            minimap: { enabled: false },
             ...props.options,
         });
         monaco.editor.setModelLanguage(editor.getModel(), lang);

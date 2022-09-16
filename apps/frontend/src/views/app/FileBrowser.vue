@@ -33,7 +33,6 @@
         updateContent,
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
-    import SharedContent from '@/components/fileBrowser/SharedContent.vue';
     import { useRoute, useRouter } from 'vue-router';
     import { isUndefined } from 'lodash';
     import { showShareDialog } from '@/services/dialogService';
