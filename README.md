@@ -1,5 +1,45 @@
 # twin_aydo
 
+# Current stack
+
+FreeFlow currently has 5 different components:
+
+- Dashboard (posts) 
+- Whisper (messaging)
+- Quantum (file sharing)
+- Glass (secure browsing)
+- Kutana (meetings)
+
+## Dashboard
+
+Flow is a social section where you can keep in touch with all your contacts.
+
+Codebase for Dasbhoard: https://github.com/threefoldtech/twin_aydo/
+
+## Whisper
+
+Whisper is a fully fledged chat service with all the features you'd expect from an advanced chat service like telegram or whatsapp.
+
+Codebase for Whisper: https://github.com/threefoldtech/twin_aydo/
+
+## Quantum
+
+Quantum is a full file management system, including an open-source office files editor.
+
+Codebase for Quantum: https://github.com/threefoldtech/twin_aydo/
+
+## Glass
+
+Glass is a safe browsing experience using browser isolation technology. You can read more about browser isolation at https://jimber.io/en/what-is-browser-isolation-jimber/
+
+Codebase for Glass:  https://github.com/JimberSoftware/browser
+
+### Kutana
+
+Kutana is a meetings tool like zoom, which allows anyone to do safe video meetings without having to entrust your data to third-party services like zoom or google.
+
+Codebase for Kutana:  https://github.com/freeflowuniverse/freeflow_kutana_ui
+
 # Development setup
 
 ## Network
