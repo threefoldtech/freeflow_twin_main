@@ -371,7 +371,6 @@
         currentSortDir,
         deselectAll,
         deselectItem,
-        equals,
         fileBrowserTypeView,
         getFileExtension,
         getFileLastModified,
@@ -379,10 +378,8 @@
         getIcon,
         getIconColor,
         equals,
-        moveFiles,
         isDraggingFiles,
         goToShared,
-        isDraggingFiles,
         itemAction,
         moveFiles,
         PathInfoModel,
@@ -393,11 +390,8 @@
         selectItem,
         sortAction,
         sortContent,
-        uploadFiles,
     } from '@/store/fileBrowserStore';
-    import { useRouter, useRoute } from 'vue-router';
     import { useRoute, useRouter } from 'vue-router';
-    import FileDropArea from '@/components/FileDropArea.vue';
     import { useAuthState } from '@/store/authStore';
     import Dialog from '@/components/Dialog.vue';
     import {
