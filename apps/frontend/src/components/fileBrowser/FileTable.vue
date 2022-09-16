@@ -54,6 +54,13 @@
         </div>
 
         <div v-else-if="filePreviewType === 'simpleFile'">
+            <button
+                @click="saveChanges()"
+                class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
+            >
+                <SaveIcon class="w-6 h-6 inline-block mr-2" />
+                Save changes
+            </button>
             <MonacoEditor
                 @keydown.esc="fileTableDiv.focus()"
                 theme="vs"
@@ -357,7 +364,7 @@
 
 <script lang="ts" setup>
     import { computed, nextTick, ref } from 'vue';
-    import { XIcon } from '@heroicons/vue/solid';
+    import { XIcon, SaveIcon } from '@heroicons/vue/solid';
 
     import {
         currentDirectory,
@@ -497,7 +504,10 @@
     };
 
     const saveChanges = () => {
-        updateFile(clickedItem.value.path, editedFileContent.value, user.location);
+        if (editedFileContent.value !== fileContent.value) {
+            updateFile(clickedItem.value.path, editedFileContent.value, user.location);
+        }
+        showFilePreview.value = false;
         showConfirmDialog.value = false;
         clickedItem.value = undefined;
     };

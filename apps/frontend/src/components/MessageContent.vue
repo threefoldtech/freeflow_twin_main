@@ -39,6 +39,15 @@
     >
         <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
 
+        <button
+            v-if="!readOnly"
+            @click="saveChanges()"
+            class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
+        >
+            <SaveIcon class="w-6 h-6 inline-block mr-2" />
+            Save changes
+        </button>
+
         <MonacoEditor
             theme="vs"
             v-model="editedFileContent"
@@ -90,7 +99,7 @@
     import PostShareContent from '@/components/MessageContentType/PostShareContent.vue';
     import VideoContent from '@/components/MessageContentType/VideoContent.vue';
     import MonacoEditor from '@/components/MonacoEditor.vue';
-    import { XIcon } from '@heroicons/vue/solid';
+    import { XIcon, SaveIcon } from '@heroicons/vue/solid';
     import Dialog from '@/components/Dialog.vue';
 
     import { isAudio, isImage, isVideo } from '@/services/contentService';
@@ -125,7 +134,9 @@
 
         fileContent.value = await (await fetch(filePreviewSrc.value)).text();
         const canWrite = item.permission?.sharePermissionTypes?.includes(SharePermission.Write);
-        if (canWrite || sharedItem.value.owner.id === user.id) readOnly.value = false;
+        console.log('canWrite', canWrite);
+        console.log('sharedItem.value', sharedItem.value?.owner.id === user.id);
+        if (canWrite || sharedItem.value?.owner.id === user.id) readOnly.value = false;
         editedFileContent.value = fileContent.value;
         showFilePreview.value = true;
     };
@@ -137,7 +148,10 @@
     };
 
     const saveChanges = () => {
-        updateFile(sharedItem.value.path, editedFileContent.value, sharedItem.value.owner.location);
+        if (editedFileContent.value !== fileContent.value) {
+            updateFile(sharedItem.value.path, editedFileContent.value, sharedItem.value.owner.location);
+        }
+        showFilePreview.value = false;
         showConfirmDialog.value = false;
         extension.value = undefined;
     };

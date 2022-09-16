@@ -8,7 +8,6 @@
     import { onMounted } from 'vue';
     import loader from '@monaco-editor/loader';
     import { debounce } from 'lodash';
-    import { getExtension, PathInfoModel } from '@/store/fileBrowserStore';
     import { extensionToLanguage } from '@/services/contentService';
 
     // add language to MonacoWebpackPlugin in vue.config.js if not already there
