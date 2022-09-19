@@ -119,8 +119,9 @@ export const likeComment = async (
     replyTo: string
 ) => {
     return (
-        await axios.put(`${endpoint}/comments/like`, {
+        await axios.put(`${endpoint}/comment/like`, {
             likerId: user.id,
+            likerLocation: await myYggdrasilAddress(),
             postId,
             owner: location,
             commentId,
@@ -175,7 +176,7 @@ export const commentOnPost = async (
         replyTo: isReplyToComment ? comment_id : '',
         isReplyToComment: isReplyToComment,
     };
-    return (await axios.put<any>(`${endpoint}/comment/${item.post.id}`, data)).data;
+    return (await axios.put<any>(`${endpoint}/comment/react/${item.post.id}`, data)).data;
 };
 
 export const updateSomeoneIsTyping = (postId: string, userId: string) => {
