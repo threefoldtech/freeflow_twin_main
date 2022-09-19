@@ -84,7 +84,7 @@
 </template>
 <script setup lang="ts">
     import { Contact, GroupContact } from '@/types';
-    import { ref } from 'vue';
+    import { nextTick, ref, watch } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
     import { debounce } from 'lodash';
@@ -162,6 +162,17 @@
 
         return str1.substr(0, str1.length / 2) + '...' + str2.substr(str2.length / 2, str2.length);
     };
+
+    watch(searchResults, () => {
+        for (let user of searchResults()) {
+            const index = searchResults().findIndex(c => c.id == user.id);
+            if (userIsInGroup(user)) {
+                nextTick(() => (checkBoxes.value[index].checked = true));
+                continue;
+            }
+            nextTick(() => (checkBoxes.value[index].checked = false));
+        }
+    });
 </script>
 
 <style scoped>
