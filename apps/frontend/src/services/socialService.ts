@@ -131,6 +131,17 @@ export const likeComment = async (
     ).data;
 };
 
+export const deleteComment = async (postId: string, commentId: string) => {
+    return (
+        await axios.delete(`${endpoint}/comment/delete`, {
+            data: {
+                postId,
+                commentId,
+            },
+        })
+    ).data;
+};
+
 export const getSinglePost = async (postId: string, location: string) => {
     const response = (await axios.get<IPostContainerDTO>(`${endpoint}/${location}/${postId}`)).data;
     allSocialPosts.value = allSocialPosts.value.map(item => (item.post.id === postId ? response : { ...item }));

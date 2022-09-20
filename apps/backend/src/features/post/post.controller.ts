@@ -9,6 +9,7 @@ import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { PostService } from './post.service';
 import { LikeCommentDTO } from './dtos/request/like-comment.dto';
+import { DeleteCommentDTO } from './dtos/delete-comment.dto';
 
 @Controller('posts')
 export class PostController {
@@ -70,5 +71,10 @@ export class PostController {
     @Put('comment/like')
     async likeComment(@Body() likeCommentDTO: LikeCommentDTO) {
         return await this._postService.likeComment(likeCommentDTO);
+    }
+
+    @Delete('comment/delete')
+    async deleteComment(@Body() deleteCommentDTO: DeleteCommentDTO) {
+        return await this._postService.deleteComment(deleteCommentDTO);
     }
 }

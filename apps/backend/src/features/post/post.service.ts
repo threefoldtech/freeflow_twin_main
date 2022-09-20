@@ -15,6 +15,7 @@ import { stringifyLikes, stringifyReplies } from './models/post.model';
 import { PostGateway } from './post.gateway';
 import { PostRedisRepository } from './repositories/post-redis.repository';
 import { LikeCommentDTO } from './dtos/request/like-comment.dto';
+import { DeleteCommentDTO } from './dtos/delete-comment.dto';
 
 @Injectable()
 export class PostService {
@@ -306,6 +307,23 @@ export class PostService {
         }
     }
 
+    async deleteComment(deleteCommentDTO: DeleteCommentDTO): Promise<{ status: string }> {
+        try {
+            const post = await this._postRepo.getPost({ id: deleteCommentDTO.postId });
+            const comment = this.findComment(post.parseReplies(), deleteCommentDTO.commentId);
+            if (!comment) throw new BadRequestException('comment not found');
+
+            if (comment.owner.id !== this.user) throw new ForbiddenException('cannot delete comment as someone else');
+
+            const changedComments = this.removeComment(post.parseReplies(), comment);
+            post.replies = stringifyReplies(changedComments);
+            await this._postRepo.updatePost(post);
+            return { status: 'deleted' };
+        } catch (error) {
+            throw new BadRequestException(`unable to delete comment: ${error}`);
+        }
+    }
+
     private findComment(comments: IPostComment[], commentId: string): IPostComment | undefined {
         for (const comment of comments) {
             if (comment.id === commentId) return comment;
@@ -322,7 +340,19 @@ export class PostService {
             }
             if (comment.replies.length === 0) continue;
             comment.replies = this.replaceComment(comment.replies, newComment);
-            console.log('replaced', comment.replies);
+            return comments;
+        }
+    }
+
+    private removeComment(comments: IPostComment[], commentToRemove: IPostComment): IPostComment[] {
+        for (const [i, comment] of comments.entries()) {
+            const hasReplies = comment.replies.length > 0;
+            if (comment.id === commentToRemove.id) {
+                hasReplies ? comments.splice(i, 1, ...comment.replies) : comments.splice(i, 1);
+                return comments;
+            }
+            if (!hasReplies) continue;
+            comment.replies = this.removeComment(comment.replies, commentToRemove);
             return comments;
         }
     }
