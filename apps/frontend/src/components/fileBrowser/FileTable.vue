@@ -405,7 +405,7 @@
     import { isImage, isSimpleTextFile, isVideo } from '@/services/contentService';
     import { calcExternalResourceLink } from '@/services/urlService';
     import MonacoEditor from '@/components/MonacoEditor.vue';
-    import { updateFile } from '@/services/fileBrowserService';
+    import { getFileInfo, updateFile } from '@/services/fileBrowserService';
 
     const fileTableDiv = ref<HTMLDivElement>();
 
@@ -499,9 +499,11 @@
         showConfirmDialog.value = true;
     };
 
-    const saveChanges = () => {
+    const saveChanges = async () => {
         if (editedFileContent.value !== fileContent.value) {
-            updateFile(clickedItem.value.path, editedFileContent.value, user.location);
+            const fileAccessDetails = (await getFileInfo(clickedItem.value.path, false)).data;
+            const { readToken, key } = fileAccessDetails;
+            await updateFile(clickedItem.value.path, editedFileContent.value, user.location, readToken, key);
         }
         showFilePreview.value = false;
         showConfirmDialog.value = false;

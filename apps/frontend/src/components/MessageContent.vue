@@ -107,7 +107,7 @@
     import { ref } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { updateFile } from '@/services/fileBrowserService';
-    import { sharedItem } from '@/store/fileBrowserStore';
+    import { fetchFileAccessDetails, sharedItem } from '@/store/fileBrowserStore';
     import { useAuthState } from '@/store/authStore';
 
     interface Props {
@@ -147,9 +147,13 @@
         showConfirmDialog.value = true;
     };
 
-    const saveChanges = () => {
+    const saveChanges = async () => {
         if (editedFileContent.value !== fileContent.value) {
-            updateFile(sharedItem.value.path, editedFileContent.value, sharedItem.value.owner.location);
+            const { owner, path, id } = sharedItem.value;
+            const fileAccessDetails = await fetchFileAccessDetails(owner, id, path, false);
+
+            const { readToken, key } = fileAccessDetails;
+            await updateFile(sharedItem.value.path, editedFileContent.value, owner.location, readToken, key);
         }
         showFilePreview.value = false;
         showConfirmDialog.value = false;

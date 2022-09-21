@@ -179,10 +179,12 @@ export const moveFiles = async (paths: string[], pathToPaste: string) => {
     });
 };
 
-export const updateFile = async (path: string, content: string, location: string) => {
-    return await axios.post<PathInfo>(`${endpoint}/file/internal/simple?path=${btoa(path)}`, {
+export const updateFile = async (path: string, content: string, location: string, token: string, key: string) => {
+    return await axios.post<PathInfo>(`${endpoint}/file/internal?path=${btoa(path)}&token=${token}`, {
         content,
         location,
+        status: 2,
+        key,
     });
 };
 
