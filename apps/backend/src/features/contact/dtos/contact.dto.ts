@@ -28,6 +28,10 @@ export class UpdateContactDTO extends DeleteContactDTO {
     @IsOptional()
     @IsBooleanString()
     accepted?: boolean;
+
+    @IsOptional()
+    @IsBooleanString()
+    offline?: boolean;
 }
 
 export class CreateContactDTO<T> extends UpdateContactDTO {

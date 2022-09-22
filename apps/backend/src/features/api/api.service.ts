@@ -457,6 +457,15 @@ export class ApiService {
         }
     }
 
+    async isUserAlive(location: string): Promise<boolean> {
+        const url = `http://[${location}]/api/v2/user/isAlive`;
+        try {
+            return (await axios.get(url)).data;
+        } catch {
+            return false;
+        }
+    }
+
     /**
      * Clears the failed requests array.
      */

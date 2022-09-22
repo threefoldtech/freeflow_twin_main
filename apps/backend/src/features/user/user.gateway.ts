@@ -56,6 +56,7 @@ export class UserGateway implements OnGatewayInit {
         this.emitMessageToConnectedClients('yggdrasil', location);
         this.emitMessageToConnectedClients('appID', process.env.DIGITALTWIN_APPID);
         this.contacts = await this._contactService.getContacts();
+        await this._contactService.setOfflineContacts(this.contacts);
         const status: IStatusUpdate = {
             id: this._configService.get<string>('userId'),
             isOnline: true,

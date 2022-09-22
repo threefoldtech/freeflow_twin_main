@@ -56,8 +56,14 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
      * @param {boolean} obj.accepted - Contact accepted.
      * @return {Contact} - Created entity.
      */
-    async addNewContact({ id, location, contactRequest, accepted }: CreateContactDTO<MessageBody>): Promise<Contact> {
-        return await this.save({ id, location, contactRequest, accepted });
+    async addNewContact({
+        id,
+        location,
+        contactRequest,
+        accepted,
+        offline,
+    }: CreateContactDTO<MessageBody>): Promise<Contact> {
+        return await this.save({ id, location, contactRequest, accepted, offline });
     }
 
     /**

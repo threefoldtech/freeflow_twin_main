@@ -29,6 +29,7 @@ export class ContactController {
             id: userId,
             contactRequest: false,
             accepted: true,
+            offline: false,
         });
     }
 
@@ -38,6 +39,7 @@ export class ContactController {
             id: userId,
             contactRequest: false,
             accepted: false,
+            offline: false,
         });
     }
 }
