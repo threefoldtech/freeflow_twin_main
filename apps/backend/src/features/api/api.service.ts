@@ -213,7 +213,7 @@ export class ApiService {
     async getExternalPost({ location, postId }: { location: string; postId: string }): Promise<IPostContainerDTO> {
         const destinationUrl = `http://[${location}]/api/v2/posts/${location}/${postId}`;
         try {
-            return (await axios.get<IPostContainerDTO>(destinationUrl)).data;
+            return (await axios.get<IPostContainerDTO>(destinationUrl, { timeout: 2000 })).data;
         } catch (error) {
             throw new BadRequestException(`unable to get external post: ${error}`);
         }
