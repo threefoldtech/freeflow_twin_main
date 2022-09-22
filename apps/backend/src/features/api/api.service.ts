@@ -228,9 +228,9 @@ export class ApiService {
     async getExternalPosts({ location, userId }: { location: string; userId: string }): Promise<IPostContainerDTO[]> {
         const destinationUrl = `http://[${location}]/api/v2/posts/${userId}?external=true`;
         try {
-            return (await axios.get<IPostContainerDTO[]>(destinationUrl)).data;
+            return (await axios.get<IPostContainerDTO[]>(destinationUrl, { timeout: 2000 })).data;
         } catch (error) {
-            throw new BadRequestException(`unable to get external posts: ${error}`);
+            return undefined;
         }
     }
 
@@ -457,12 +457,12 @@ export class ApiService {
         }
     }
 
-    async isUserAlive(location: string): Promise<boolean> {
-        const url = `http://[${location}]/api/v2/user/isAlive`;
+    async containerIsOffline(location: string): Promise<boolean> {
+        const url = `http://[${location}]/api/v2/user/containerOffline`;
         try {
-            return (await axios.get(url)).data;
+            return (await axios.get(url, { timeout: 1000 })).data;
         } catch {
-            return false;
+            return true;
         }
     }
 

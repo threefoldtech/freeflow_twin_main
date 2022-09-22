@@ -33,9 +33,9 @@ export class UserController {
         private readonly _fileService: FileService
     ) {}
 
-    @Get('isAlive')
-    async isAlive(): Promise<boolean> {
-        return true;
+    @Get('containerOffline')
+    async containerOffline(): Promise<boolean> {
+        return false;
     }
 
     @Get('publickey')

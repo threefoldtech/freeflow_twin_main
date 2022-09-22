@@ -61,9 +61,9 @@ export class ContactRedisRepository extends EntityRepository<Contact> {
         location,
         contactRequest,
         accepted,
-        offline,
+        containerOffline,
     }: CreateContactDTO<MessageBody>): Promise<Contact> {
-        return await this.save({ id, location, contactRequest, accepted, offline });
+        return await this.save({ id, location, contactRequest, accepted, containerOffline });
     }
 
     /**

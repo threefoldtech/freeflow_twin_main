@@ -5,7 +5,7 @@ export interface Contact {
     location: string;
     contactRequest: boolean;
     accepted: boolean;
-    offline: boolean;
+    containerOffline: boolean;
 }
 
 export class Contact extends Entity {}
@@ -15,5 +15,5 @@ export const contactSchema = new Schema(Contact, {
     location: { type: 'string' },
     contactRequest: { type: 'boolean' },
     accepted: { type: 'boolean' },
-    offline: { type: 'boolean' },
+    containerOffline: { type: 'boolean' },
 });

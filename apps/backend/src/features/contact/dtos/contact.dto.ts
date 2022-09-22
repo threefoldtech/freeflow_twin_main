@@ -31,7 +31,7 @@ export class UpdateContactDTO extends DeleteContactDTO {
 
     @IsOptional()
     @IsBooleanString()
-    offline?: boolean;
+    containerOffline?: boolean;
 }
 
 export class CreateContactDTO<T> extends UpdateContactDTO {

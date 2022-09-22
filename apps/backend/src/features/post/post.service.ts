@@ -106,7 +106,9 @@ export class PostService {
         try {
             // get contacts posts
             if (!external) {
-                const contacts = (await this._contactService.getUnblockedContacts()).filter(c => c.accepted);
+                const contacts = (await this._contactService.getUnblockedContacts())
+                    .filter(c => c.accepted)
+                    .filter(c => !c.containerOffline);
 
                 await Promise.all(
                     contacts.map(async contact => {
@@ -114,6 +116,10 @@ export class PostService {
                             location: contact.location,
                             userId: contact.id,
                         });
+                        if (!data) {
+                            contact.containerOffline = true;
+                            return await this._contactService.updateContact(contact);
+                        }
                         posts.push(...data);
                     })
                 );
