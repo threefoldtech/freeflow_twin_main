@@ -28,6 +28,9 @@ export class ApiService {
      * @param {string} obj.signedAddress - Signed Yggdrasil address.
      */
     async registerDigitalTwin({ doubleName, signedAddress }: { doubleName: string; signedAddress: string }) {
+        console.log('Registering digitaltwin');
+        console.log('double name: ', doubleName);
+        console.log('signed address: ', signedAddress);
         try {
             return await axios.put(
                 `${this._configService.get<string>('appBackend')}/api/users/digitaltwin/${doubleName}`,

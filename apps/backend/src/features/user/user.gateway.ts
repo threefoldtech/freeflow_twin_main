@@ -45,6 +45,8 @@ export class UserGateway implements OnGatewayInit {
      */
     async getConnections(): Promise<number> {
         const sockets = await this.server.allSockets();
+        console.log('All sockets');
+        console.log(sockets);
         return sockets.size;
     }
 
@@ -60,6 +62,7 @@ export class UserGateway implements OnGatewayInit {
             id: this._configService.get<string>('userId'),
             isOnline: true,
         };
+
         this.handleStatusEmit({ status });
     }
 

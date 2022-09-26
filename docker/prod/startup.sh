@@ -1,4 +1,15 @@
-#/bin/bash
+#!/bin/bash
+
+mkdir -p ~/.ssh
+mkdir -p /var/run/sshd
+echo $SSH_KEY >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+
+tee -a /etc/resolv.conf << END
+nameserver 2001:4860:4860::8888
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+END
 
 FILE=/appdata/yggdrasil.conf
 if test -f "$FILE"; then
@@ -9,24 +20,15 @@ fi
 redis-server /etc/redis/redis.conf &
 cd /app/apps/backend/dist
 node migrator/migrator.js
-if [ $? -eq 0 ]
-then
-  pm2 start src/server.js &
-else
-  echo "Migrations failed"
-  mv /var/tmp/error-nginx.conf /etc/nginx/conf.d/default.conf
-fi
 
-if [ "$ENVIRONMENT" = 'production' ]
-then
-  echo "Copying production config"
-  cp /usr/share/nginx/html/config/production.js /usr/share/nginx/html/config/config-def.js
-fi
-if [ "$ENVIRONMENT" = 'staging' ]
-then
-  echo "Copying staging config"
-  cp /usr/share/nginx/html/config/staging.js /usr/share/nginx/html/config/config-def.js
-fi
+echo "Copying production config"
+cp /usr/share/nginx/html/config/production.js /usr/share/nginx/html/config/config-def.js
+cd /app
+
+pm2 start apps/backend/dist/src/server.js &
 
 nginx
-tail -f /dev/null
+
+service nginx restart
+
+exec /usr/sbin/sshd -D

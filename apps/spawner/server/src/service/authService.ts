@@ -14,7 +14,7 @@ export const getAppLoginUrl = async (request: Request, redirectUrl: string, name
 
     const login = new ThreefoldLogin(
         config.appBackend,
-        `${config.appId}`,
+        `pepermolen`,
         config.seedPhrase,
         '/api/auth/callback',
         config.kycBackend
@@ -30,13 +30,13 @@ export const appCallback = async (request: Request): Promise<string> => {
     const config = process.env.VUE_APP_ENVIRONMENT === 'production' ? productionConfig : stagingConfig;
     const login = new ThreefoldLogin(
         config.appBackend,
-        config.appId,
+        'zoutmolen',
         config.seedPhrase,
-        '', // No callback needed
+        'zoutjemolen', // No callback needed
         config.kycBackend
     );
     await login.init();
-    const redirectUrl = new URL(request.protocol + '://' + request.originalUrl);
+    const redirectUrl = new URL('provencaalsekruidenmolen');
     try {
         console.log(request.session);
         console.log(request.session.state);

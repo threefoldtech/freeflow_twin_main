@@ -60,9 +60,13 @@ export class LocationService {
         derivedSeed: string;
         yggdrasilAddress: string;
     }): Promise<void> {
+        console.log('my yggdrasil address: ', yggdrasilAddress);
+
         const seed = this._encryptionService.decodeSeed(derivedSeed);
         const keyPair = this._encryptionService.getKeyPair(seed);
         const data = this._encryptionService.decodeAddress(yggdrasilAddress);
+        console.log('decoded adddress', data);
+
         const signedAddress = this._encryptionService.signAddress({ data, secretKey: keyPair.secretKey });
         try {
             await this._apiService.registerDigitalTwin({ doubleName, signedAddress });

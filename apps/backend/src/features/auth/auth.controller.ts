@@ -71,12 +71,19 @@ export class AuthController {
         if (!this._yggdrasilService.isInitialised())
             await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
 
-        const yggdrasilAddress = await this._locationService.getOwnLocation();
-        await this._locationService.registerDigitalTwin({
-            doubleName: profileData.doubleName,
-            derivedSeed: profileData.derivedSeed,
-            yggdrasilAddress: <string>yggdrasilAddress,
-        });
+        // Is a timeout the fix?
+        setTimeout(async () => {
+            const yggdrasilAddress = await this._locationService.getOwnLocation();
+
+            console.log('This is my location');
+            console.log(yggdrasilAddress);
+
+            await this._locationService.registerDigitalTwin({
+                doubleName: profileData.doubleName,
+                derivedSeed: profileData.derivedSeed,
+                yggdrasilAddress: <string>yggdrasilAddress,
+            });
+        }, 1000);
 
         req.session.email = profileData.email;
         req.session.userId = profileData.userId;
