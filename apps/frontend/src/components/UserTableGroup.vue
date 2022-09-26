@@ -62,7 +62,7 @@
                                                     {{ item.id }}
                                                 </div>
                                                 <div class="text-sm text-gray-500 md:hidden">
-                                                    {{ trimStringMidway(item.location) }}
+                                                    {{ item.location }}
                                                 </div>
                                                 <div class="text-sm text-gray-500 hidden md:block">
                                                     {{ item.location }}
