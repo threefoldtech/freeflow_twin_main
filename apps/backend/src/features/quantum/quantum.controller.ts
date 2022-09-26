@@ -30,8 +30,9 @@ import { RenameFileDTO } from './dtos/rename-file.dto';
 import { ShareFileRequesDTO } from './dtos/share-file.dto';
 import { SharePermissionType } from './enums/share-permission-type.enum';
 import { IFileShare } from './interfaces/file-share.interface';
-import { IOnlyOfficeResponse } from './interfaces/only-office-reponse.interface';
+import { IEditFileResponse } from './interfaces/only-office-reponse.interface';
 import { QuantumService } from './quantum.service';
+import { LocationService } from '../location/location.service';
 
 @Controller('quantum')
 export class QuantumController {
@@ -42,7 +43,8 @@ export class QuantumController {
         private readonly _quantumService: QuantumService,
         private readonly _fileService: FileService,
         private readonly _keyService: KeyService,
-        private readonly _apiService: ApiService
+        private readonly _apiService: ApiService,
+        private readonly _locationService: LocationService
     ) {
         this.storageDir = `${this._configService.get<string>('baseDir')}storage`;
     }
@@ -190,16 +192,17 @@ export class QuantumController {
         });
     }
 
+    //route for editing in onlyOffice
     @Post('file/internal')
     @HttpCode(200)
     async editQuantumFile(
-        @Body() onlyOfficeResponse: IOnlyOfficeResponse,
+        @Body() editFileResponse: IEditFileResponse,
         @Query('token') token: string,
         @Query('path') path: string
     ) {
         if (!token) throw new UnauthorizedException('no token provided');
 
-        if (onlyOfficeResponse.status !== 2 && onlyOfficeResponse.status !== 6)
+        if (editFileResponse.status !== 2 && editFileResponse.status !== 6)
             return {
                 error: 0,
             };
@@ -209,11 +212,28 @@ export class QuantumController {
         // const payload = await this._quantumService.verifyQuantumJWT({ token });
 
         // if (payload.permissions.indexOf(SharePermissionType.WRITE) < 0)
-        //     throw new UnauthorizedException(`you do not have the premission to edit this file`);
+        //     throw new UnauthorizedException(`you do not have the permission to edit this file`);
 
-        if (!path || !onlyOfficeResponse?.url) throw new NotFoundException('no file or url provided');
+        if (!path) throw new NotFoundException('no path provided');
 
-        const url = new URL(onlyOfficeResponse.url);
+        if (editFileResponse.content) {
+            const { location, content } = editFileResponse;
+            path = Buffer.from(path, 'base64').toString('binary');
+
+            const myLocation = await this._locationService.getOwnLocation();
+            if (location !== myLocation) {
+                await this._apiService.editFile({ path, content, location });
+                return;
+            }
+
+            if (!this._fileService.exists({ path })) return;
+
+            return this._fileService.writeFile({ path, content });
+        }
+
+        if (!editFileResponse?.url) throw new NotFoundException('no url provided');
+
+        const url = new URL(editFileResponse.url);
         url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
         url.protocol = 'https:';
         const fileResponse = syncRequest('GET', url);

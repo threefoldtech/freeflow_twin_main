@@ -174,6 +174,17 @@ export class ApiService {
         }
     }
 
+    async editFile({ location, path, content }: { location: string; path: string; content: string }) {
+        try {
+            return await axios.post(`http://[${location}]/api/v2/quantum/file/internal/simple?path=${btoa(path)}`, {
+                content,
+                location,
+            });
+        } catch {
+            return;
+        }
+    }
+
     /**
      * Sends a message to another digital twin.
      * @param {string} location - IPv6 location to get public key from.

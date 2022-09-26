@@ -7,7 +7,7 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, MessageTypes, SharedFileInterface } from '@/types';
+import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -80,7 +80,7 @@ export const accessDenied = ref(false);
 export const chatFilesBreadcrumbs = ref([]);
 export const savedAttachmentsBreadcrumbs = ref([]);
 
-export const sharedItem = ref<PathInfoModel>();
+export const sharedItem = ref<FileShareMessageType>();
 export const isQuantumChatFiles = ref<boolean>(false);
 
 export const currentShare = ref<SharedFileInterface>(undefined);

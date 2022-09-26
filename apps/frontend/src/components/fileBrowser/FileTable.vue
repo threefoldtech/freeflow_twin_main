@@ -40,12 +40,9 @@
     <div
         v-if="showFilePreview"
         class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
-        @click="showFilePreview = false"
+        @click.self="closeEditor()"
     >
-        <XIcon
-            class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50"
-            @click="showFilePreview = false"
-        />
+        <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
         <div v-if="filePreviewType === 'image'">
             <img :src="filePreviewSrc" class="pointer-events-none z-50 max-h-full" @click.stop alt="filePreview" />
         </div>
@@ -55,8 +52,56 @@
                 <source :src="filePreviewSrc" />
             </video>
         </div>
+
+        <div v-else-if="filePreviewType === 'simpleFile'">
+            <button
+                @click="saveChanges()"
+                class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
+            >
+                <SaveIcon class="w-6 h-6 inline-block mr-2" />
+                Save changes
+            </button>
+            <MonacoEditor
+                @keydown.esc="fileTableDiv.focus()"
+                theme="vs"
+                v-model="editedFileContent"
+                :extension="clickedItem?.extension"
+                :options="monacoOptions"
+                class="w-screen h-[750px]"
+            />
+        </div>
     </div>
-    <div class="flex flex-col mx-2">
+
+    <Dialog
+        :modelValue="showConfirmDialog"
+        @updateModelValue="
+            showConfirmDialog = false;
+            clickedItem = undefined;
+            showFilePreview = false;
+        "
+        :noActions="true"
+    >
+        <template v-slot:title class="center">
+            <h1 class="font-medium">File has been modified</h1>
+        </template>
+        <div class="flex justify-end mt-2 px-4">
+            <button
+                @click="
+                    showConfirmDialog = false;
+                    clickedItem = undefined;
+                    showFilePreview = false;
+                "
+                class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+            >
+                Discard changes
+            </button>
+            <button @click="saveChanges()" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">
+                Save changes
+            </button>
+        </div>
+    </Dialog>
+
+    <div class="flex flex-col mx-2" ref="fileTableDiv" @keydown.esc="closeEditor()" tabindex="0">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
                 <div class="overflow-hidden sm:rounded-lg">
@@ -316,48 +361,64 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, ref } from 'vue';
-    import { XIcon } from '@heroicons/vue/solid';
+    import { computed, nextTick, ref } from 'vue';
+    import { XIcon, SaveIcon } from '@heroicons/vue/solid';
 
     import {
         currentDirectory,
         currentDirectoryContent,
         currentSort,
-        itemAction,
-        PathInfoModel,
-        selectItem,
+        currentSortDir,
         deselectAll,
         deselectItem,
-        sortContent,
-        sortAction,
-        currentSortDir,
-        getFileLastModified,
+        fileBrowserTypeView,
         getFileExtension,
+        getFileLastModified,
         getFileSize,
-        selectedPaths,
-        selectAll,
-        getIconColor,
         getIcon,
+        getIconColor,
         equals,
-        moveFiles,
         isDraggingFiles,
         goToShared,
-        fileBrowserTypeView,
+        itemAction,
+        moveFiles,
+        PathInfoModel,
         savedAttachments,
         savedAttachmentsIsLoading,
+        selectAll,
+        selectedPaths,
+        selectItem,
+        sortAction,
+        sortContent,
     } from '@/store/fileBrowserStore';
-    import { useRouter, useRoute } from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import { useAuthState } from '@/store/authStore';
+    import Dialog from '@/components/Dialog.vue';
     import {
         currentRightClickedItem,
-        rightClickItemAction,
-        triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
         RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import Spinner from '@/components/Spinner.vue';
-    import { isImage, isVideo } from '@/services/contentService';
+    import { isImage, isSimpleTextFile, isVideo } from '@/services/contentService';
     import { calcExternalResourceLink } from '@/services/urlService';
+    import MonacoEditor from '@/components/MonacoEditor.vue';
+    import { getFileInfo, updateFile } from '@/services/fileBrowserService';
+
+    const fileTableDiv = ref<HTMLDivElement>();
+
+    nextTick(() => {
+        fileTableDiv.value.focus();
+    });
+
+    const monacoOptions = {
+        minimap: {
+            enabled: false,
+        },
+        language: 'javascript',
+    };
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -399,21 +460,54 @@
     };
 
     const showFilePreview = ref(false);
+    const showConfirmDialog = ref(false);
     const filePreviewSrc = ref('');
     const filePreviewType = ref('');
+    const fileContent = ref('');
+    const editedFileContent = ref('');
+    const clickedItem = ref<PathInfoModel>();
 
-    const handleItemClick = (item: PathInfoModel) => {
-        if (isVideo(item.fullName) || isImage(item.fullName)) {
+    const handleItemClick = async (item: PathInfoModel) => {
+        if (isVideo(item.fullName) || isImage(item.fullName) || isSimpleTextFile(item.fullName)) {
+            clickedItem.value = item;
             const ownerLocation = user.location;
             let path = item.path;
             path = path.replace('/appdata/storage/', '');
-            showFilePreview.value = true;
             const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
             filePreviewSrc.value = calcExternalResourceLink(src);
-            filePreviewType.value = isVideo(item.fullName) ? 'video' : 'image';
+
+            filePreviewType.value = isVideo(item.fullName) ? 'video' : isImage(item.fullName) ? 'image' : 'simpleFile';
+
+            if (filePreviewType.value !== 'simpleFile') {
+                showFilePreview.value = true;
+                return;
+            }
+
+            fileContent.value = await (await fetch(filePreviewSrc.value)).text();
+            editedFileContent.value = fileContent.value;
+            showFilePreview.value = true;
             return;
         }
-        itemAction(item, router);
+        await itemAction(item, router);
+    };
+
+    const closeEditor = () => {
+        showFilePreview.value = false;
+        if (filePreviewType.value !== 'simpleFile' || editedFileContent.value === fileContent.value) {
+            return;
+        }
+        showConfirmDialog.value = true;
+    };
+
+    const saveChanges = async () => {
+        if (editedFileContent.value !== fileContent.value) {
+            const fileAccessDetails = (await getFileInfo(clickedItem.value.path, false)).data;
+            const { readToken, key } = fileAccessDetails;
+            await updateFile(clickedItem.value.path, editedFileContent.value, user.location, readToken, key);
+        }
+        showFilePreview.value = false;
+        showConfirmDialog.value = false;
+        clickedItem.value = undefined;
     };
 
     const onDragStart = (event, item) => {
