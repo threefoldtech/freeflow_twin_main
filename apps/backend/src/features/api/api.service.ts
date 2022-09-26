@@ -213,7 +213,11 @@ export class ApiService {
     async getExternalPost({ location, postId }: { location: string; postId: string }): Promise<IPostContainerDTO> {
         const destinationUrl = `http://[${location}]/api/v2/posts/${location}/${postId}`;
         try {
-            return (await axios.get<IPostContainerDTO>(destinationUrl, { timeout: 2000 })).data;
+            return (
+                await axios.get<IPostContainerDTO>(destinationUrl, {
+                    timeout: parseInt(this._configService.get<string>('bigTimout')),
+                })
+            ).data;
         } catch (error) {
             throw new BadRequestException(`unable to get external post: ${error}`);
         }
@@ -228,9 +232,13 @@ export class ApiService {
     async getExternalPosts({ location, userId }: { location: string; userId: string }): Promise<IPostContainerDTO[]> {
         const destinationUrl = `http://[${location}]/api/v2/posts/${userId}?external=true`;
         try {
-            return (await axios.get<IPostContainerDTO[]>(destinationUrl, { timeout: 2000 })).data;
+            return (
+                await axios.get<IPostContainerDTO[]>(destinationUrl, {
+                    timeout: parseInt(this._configService.get<string>('bigTimout')),
+                })
+            ).data;
         } catch (error) {
-            return undefined;
+            return;
         }
     }
 
@@ -460,7 +468,7 @@ export class ApiService {
     async containerIsOffline(location: string): Promise<boolean> {
         const url = `http://[${location}]/api/v2/user/containerOffline`;
         try {
-            return (await axios.get(url, { timeout: 1000 })).data;
+            return (await axios.get(url, { timeout: parseInt(this._configService.get<string>('smallTimout')) })).data;
         } catch {
             return true;
         }
