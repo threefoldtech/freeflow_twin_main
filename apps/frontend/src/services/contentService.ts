@@ -26,14 +26,14 @@ export const isVideo = filename => {
 
 export const extensionToLanguage = (extension: string) => {
     switch (extension) {
-        case ISimpleFileExtension.TXT:
+        case ISimpleFileExtension.JS:
             return 'javascript';
+        case ISimpleFileExtension.TXT:
+            return 'text';
         case ISimpleFileExtension.JSON:
             return 'json';
         case ISimpleFileExtension.HTML:
             return 'html';
-        case ISimpleFileExtension.JS:
-            return 'javascript';
         case ISimpleFileExtension.TS:
             return 'typescript';
         case ISimpleFileExtension.CSS:
