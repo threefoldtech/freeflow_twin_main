@@ -106,6 +106,7 @@ export class ContactService {
                     location,
                     contactRequest: false,
                     accepted: false,
+                    containerOffline: false,
                 });
             } catch (error) {
                 throw new BadRequestException(`unable to create contact: ${error}`);
@@ -181,6 +182,7 @@ export class ContactService {
                     location,
                     contactRequest: true,
                     accepted: false,
+                    containerOffline: false,
                 }));
         } catch (error) {
             throw new BadRequestException(`unable to create contact: ${error}`);
@@ -244,6 +246,7 @@ export class ContactService {
                 location,
                 contactRequest: false,
                 accepted: false,
+                containerOffline: false,
             });
         } catch (error) {
             throw new BadRequestException(`unable to add contact: ${error}`);
@@ -276,15 +279,30 @@ export class ContactService {
      * @param {boolean} obj.contactRequest - Contact request.
      * @param {boolean} obj.accepted - Chat accepted.
      */
-    async updateContact({ id, contactRequest, accepted }: UpdateContactDTO): Promise<Contact> {
+    async updateContact({ id, contactRequest, accepted, containerOffline }: UpdateContactDTO): Promise<Contact> {
         const contact = await this.getContact({ id });
         if (!contact) return;
         contact.contactRequest = contactRequest;
         contact.accepted = accepted;
+        contact.containerOffline = containerOffline;
         try {
             return await this._contactRepo.updateContact({ contact });
         } catch (error) {
             throw new BadRequestException(`unable to update contact: ${error}`);
+        }
+    }
+
+    async setOfflineContacts(contacts: Contact[]): Promise<void> {
+        try {
+            for (const contact of contacts) {
+                const alreadyOffline = contact.containerOffline;
+                contact.containerOffline = await this._apiService.containerIsOffline(contact.location);
+
+                if (contact.containerOffline === alreadyOffline) continue;
+                await this._contactRepo.updateContact({ contact });
+            }
+        } catch (error) {
+            throw new BadRequestException(error);
         }
     }
 }
