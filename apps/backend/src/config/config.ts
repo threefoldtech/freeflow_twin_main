@@ -11,6 +11,6 @@ export default () => ({
         'calm science teach foil burst until next mango hole sponsor fold bottom cousin push focus track truly tornado turtle over tornado teach large fiscal',
     baseDir: process.env.BASE_DIR || '/appdata/',
     sessionSecret: process.env.SESSION_SECRET || 'secret',
-    smallTimeout: 1000,
-    bigTimout: 2000,
+    smallPingTimeoutAxiosRequest: 1000,
+    bigPingTimeoutAxiosRequest: 2000,
 });

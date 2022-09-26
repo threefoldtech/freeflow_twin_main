@@ -215,7 +215,7 @@ export class ApiService {
         try {
             return (
                 await axios.get<IPostContainerDTO>(destinationUrl, {
-                    timeout: parseInt(this._configService.get<string>('bigTimout')),
+                    timeout: parseInt(this._configService.get<string>('bigPingTimeoutAxiosRequest')),
                 })
             ).data;
         } catch (error) {
@@ -234,7 +234,7 @@ export class ApiService {
         try {
             return (
                 await axios.get<IPostContainerDTO[]>(destinationUrl, {
-                    timeout: parseInt(this._configService.get<string>('bigTimout')),
+                    timeout: parseInt(this._configService.get<string>('bigPingTimeoutAxiosRequest')),
                 })
             ).data;
         } catch (error) {
@@ -468,7 +468,11 @@ export class ApiService {
     async containerIsOffline(location: string): Promise<boolean> {
         const url = `http://[${location}]/api/v2/user/containerOffline`;
         try {
-            return (await axios.get(url, { timeout: parseInt(this._configService.get<string>('smallTimout')) })).data;
+            return (
+                await axios.get(url, {
+                    timeout: parseInt(this._configService.get<string>('smallPingTimeoutAxiosRequest')),
+                })
+            ).data;
         } catch {
             return true;
         }
