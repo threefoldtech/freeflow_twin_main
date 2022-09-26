@@ -15,6 +15,8 @@ import PageNotFound from '@/views/PageNotFound.vue';
 import { AppType } from '@/types/apps';
 import { disableSidebar } from '@/services/sidebarService';
 import Dashboard from '@/views/app/Dashboard.vue';
+import UserProfile from '@/views/app/UserProfile.vue';
+
 import {
     loadSharedItems,
     currentDirectory,
@@ -45,6 +47,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Home',
         component: Home,
         meta: { requiresUnAuth: true },
+    },
+    {
+        path: '/profile/:id',
+        name: 'profile',
+        component: UserProfile,
+        meta: { requiresAuth: true },
     },
     {
         path: '/callback',

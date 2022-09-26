@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="w-20 h-20 grid cursor-pointer items-center justify-items-center">
-                    <AvatarImg small @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="String(user.id)" />
+                    <AvatarImg small @click="goToProfile" class="cursor-pointer" :id="String(user.id)" />
                     <button
                         class="mt-2 py-2 px-4 text-white rounded-md max-w-max hover:bg-primarylight"
                         @click="showLogoutDialog = true"
@@ -289,6 +289,10 @@
         }
         return total > 99 ? '99+' : total;
     });
+
+    const goToProfile = () => {
+        router.push({ name: 'profile', params: { id: user.id } });
+    };
 
     const mobileMenuOpen = ref(false);
 </script>
