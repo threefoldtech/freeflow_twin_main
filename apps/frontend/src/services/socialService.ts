@@ -93,9 +93,11 @@ export const sortPosts = (posts: IPostContainerDTO[]) => {
     });
 };
 
-export const getAllPosts = async (external: boolean = false) => {
+export const getAllPosts = async (userName?: string) => {
+    let url = `${endpoint}`;
+    if (userName) url += `?userName=${userName}`;
     isLoadingSocialPosts.value = true;
-    const posts = (await axios.get<any>(`${endpoint}/${user.id}?external=${external}`)).data;
+    const posts = (await axios.get<any>(url)).data;
     isLoadingSocialPosts.value = false;
     allSocialPosts.value = sortPosts(posts);
 };

@@ -36,22 +36,24 @@
     import Spinner from '@/components/Spinner.vue';
     import { ref } from 'vue';
     import { Contact } from '@/types';
-    import { useContactsActions, useContactsState } from '@/store/contactStore';
+    import { useContactsActions } from '@/store/contactStore';
     import { useRoute } from 'vue-router';
+    import { statusList } from '@/store/statusStore';
 
     const { user } = useAuthState();
     const { retrieveContacts } = useContactsActions();
-    const { contacts } = useContactsState();
+
+    const contacts = ref<Contact[]>([]);
 
     const contact = ref<Contact>();
     const route = useRoute();
 
     (async () => {
-        await retrieveContacts();
-        console.log('contacts', contacts);
-        console.log('route params', route.params);
-        // contact.value = await getContact(props.id);
-        await getAllPosts(true);
+        contacts.value = await retrieveContacts();
+        await getAllPosts();
+        if (user.id !== route.params.id) {
+            contact.value = contacts.value.find(c => c.id === route.params.id);
+        }
     })();
 </script>
 

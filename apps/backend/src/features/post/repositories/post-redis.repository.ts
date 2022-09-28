@@ -40,8 +40,8 @@ export class PostRedisRepository extends EntityRepository<Post> {
      * @param {string} obj.count - Pagination count.
      * @return {Post[]} - Found posts.
      */
-    async getPosts({ offset, count, username }: { offset: number; count: number; username: string }): Promise<Post[]> {
-        return await this.findAllWhereEqPaginated({ offset, count, where: 'ownerId', eq: username });
+    async getPosts({ offset, count }: { offset: number; count: number }): Promise<Post[]> {
+        return await this.findAllPaginated({ offset, count });
     }
 
     /**

@@ -225,8 +225,8 @@ export class ApiService {
      * @param {string} obj.location - IPv6 location to get the post from.
      * @return {IPostContainerDTO[]} - Found posts.
      */
-    async getExternalPosts({ location, userId }: { location: string; userId: string }): Promise<IPostContainerDTO[]> {
-        const destinationUrl = `http://[${location}]/api/v2/posts/${userId}?external=true`;
+    async getExternalPosts({ location }: { location: string }): Promise<IPostContainerDTO[]> {
+        const destinationUrl = `http://[${location}]/api/v2/posts?external=true`;
         try {
             return (await axios.get<IPostContainerDTO[]>(destinationUrl)).data;
         } catch (error) {

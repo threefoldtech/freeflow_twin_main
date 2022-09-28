@@ -13,9 +13,9 @@ import { PostService } from './post.service';
 export class PostController {
     constructor(private readonly _postService: PostService) {}
 
-    @Get(':username')
+    @Get()
     async getPosts(
-        @Param() { username }: GetPostsQueryDto,
+        @Query('username') username?: string,
         @Query('offset') offset = 0,
         @Query('count') count = 50,
         @Query('external') external = false

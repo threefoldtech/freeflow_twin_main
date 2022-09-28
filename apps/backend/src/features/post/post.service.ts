@@ -102,23 +102,27 @@ export class PostService {
     }): Promise<IPostContainerDTO[]> {
         const posts: IPostContainerDTO[] = [];
         try {
+            // get own posts
+            if (!username || username === this.user) {
+                const data = (await this._postRepo.getPosts({ offset, count })).map(post => post.toJSON());
+                posts.push(...data);
+            }
+
             // get contacts posts
             if (!external) {
-                const contacts = (await this._contactService.getUnblockedContacts()).filter(c => c.accepted);
+                const contacts = (await this._contactService.getUnblockedContacts())
+                    .filter(c => c.accepted)
+                    .filter(c => !username || c.id === username);
 
                 await Promise.all(
                     contacts.map(async contact => {
                         const data = await this._apiService.getExternalPosts({
                             location: contact.location,
-                            userId: contact.id,
                         });
                         posts.push(...data);
                     })
                 );
             }
-            // get own posts
-            const data = (await this._postRepo.getPosts({ offset, count, username })).map(post => post.toJSON());
-            posts.push(...data);
         } catch (error) {
             return [];
         }
