@@ -488,7 +488,7 @@
             showFilePreview.value = true;
             return;
         }
-        await itemAction(item, router);
+        itemAction(item, router);
     };
 
     const closeEditor = () => {
