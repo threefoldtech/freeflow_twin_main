@@ -8,6 +8,15 @@
 <p class="text-xs text-gray-500">Block user</p>
 </div>-->
             <div
+                v-if="!chat.isGroup"
+                class="delete flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
+                @click="$emit('visit-profile')"
+            >
+                <span class="material-symbols-rounded"> person </span>
+                <p class="text-xs mt-1">Visit profile</p>
+            </div>
+
+            <div
                 v-if="!blocked"
                 class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
                 @click="$emit('app-call')"
@@ -300,6 +309,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
         'app-leave',
         'app-delete-user',
         'clickedProfile',
+        'visit-profile',
     ]);
 
     const searchInput = ref<string>('');

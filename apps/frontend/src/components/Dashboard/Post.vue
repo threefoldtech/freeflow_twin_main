@@ -72,6 +72,7 @@
                         <div class="flex">
                             <div
                                 class="relative mr-4 cursor-pointer"
+                                @click="visitProfile"
                                 @mouseover="
                                     mouseFocussed = true;
                                     panelTimer();
@@ -386,6 +387,7 @@
     import { IPostContainerDTO } from 'custom-types/post.type';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
     import { useScrollActions } from '@/store/scrollStore';
+    import router from '@/plugins/Router';
 
     const { isScrollToNewComment } = useScrollActions();
 
@@ -527,6 +529,10 @@
         localLike.value = false;
 
         return;
+    };
+
+    const visitProfile = () => {
+        router.push({ name: 'profile', params: { id: props.item.ownerId } });
     };
 
     const actions = ref([

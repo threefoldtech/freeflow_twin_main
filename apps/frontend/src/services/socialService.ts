@@ -95,7 +95,7 @@ export const sortPosts = (posts: IPostContainerDTO[]) => {
 
 export const getAllPosts = async (userName?: string) => {
     let url = `${endpoint}`;
-    if (userName) url += `?userName=${userName}`;
+    if (userName) url += `?username=${userName}`;
     isLoadingSocialPosts.value = true;
     const posts = (await axios.get<any>(url)).data;
     isLoadingSocialPosts.value = false;

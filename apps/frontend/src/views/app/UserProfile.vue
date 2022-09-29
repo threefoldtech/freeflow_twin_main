@@ -50,10 +50,11 @@
 
     (async () => {
         contacts.value = await retrieveContacts();
-        await getAllPosts();
         if (user.id !== route.params.id) {
             contact.value = contacts.value.find(c => c.id === route.params.id);
         }
+        const userId = contact.value ? contact.value.id : user.id;
+        await getAllPosts(userId.toString());
     })();
 </script>
 

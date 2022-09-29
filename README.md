@@ -4,11 +4,11 @@
 
 FreeFlow currently has 5 different components:
 
-- Dashboard (posts) 
-- Whisper (messaging)
-- Quantum (file sharing)
-- Glass (secure browsing)
-- Kutana (meetings)
+-   Dashboard (posts)
+-   Whisper (messaging)
+-   Quantum (file sharing)
+-   Glass (secure browsing)
+-   Kutana (meetings)
 
 ## Dashboard
 
@@ -32,13 +32,13 @@ Codebase for Quantum: https://github.com/threefoldtech/twin_aydo/
 
 Glass is a safe browsing experience using browser isolation technology. You can read more about browser isolation at https://jimber.io/en/what-is-browser-isolation-jimber/
 
-Codebase for Glass:  https://github.com/JimberSoftware/browser
+Codebase for Glass: https://github.com/JimberSoftware/browser
 
 ### Kutana
 
 Kutana is a meetings tool like zoom, which allows anyone to do safe video meetings without having to entrust your data to third-party services like zoom or google.
 
-Codebase for Kutana:  https://github.com/freeflowuniverse/freeflow_kutana_ui
+Codebase for Kutana: https://github.com/freeflowuniverse/freeflow_kutana_ui
 
 # Development setup
 

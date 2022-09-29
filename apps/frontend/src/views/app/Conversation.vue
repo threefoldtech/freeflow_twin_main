@@ -175,6 +175,7 @@
                                 @app-delete="deleteChat"
                                 @app-delete-user="deleteUser"
                                 @clickedProfile="popupProfile"
+                                @visit-profile="visitProfile"
                             >
                             </group-management>
                         </div>
@@ -347,7 +348,6 @@
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
-    import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendRemoveUser } from '@/store/socketStore';
@@ -582,6 +582,10 @@
     };
 
     const blockChat = () => (showDialog.value = true);
+
+    const visitProfile = () => {
+        router.push({ name: 'profile', params: { id: chat.value.chatId } });
+    };
 
     const doBlockChat = () => {
         showDialog.value = false;

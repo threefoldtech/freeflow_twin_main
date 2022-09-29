@@ -103,6 +103,17 @@
                 >
                     <v-contextmenu ref="contextmenu-chat-card">
                         <v-contextmenu-item
+                            v-if="!currentRightClickedItem?.data?.isGroup"
+                            @click="
+                                () => {
+                                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
+                                    rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.VISIT_PROFILE;
+                                }
+                            "
+                            >Visit profile
+                        </v-contextmenu-item>
+
+                        <v-contextmenu-item
                             @click="
                                 () => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
@@ -262,6 +273,9 @@
                             conversationComponentRerender.value = conversationComponentRerender.value++;
                         }
                         await router.push({ name: 'single', params: { id: chatId } });
+                        break;
+                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.VISIT_PROFILE:
+                        await router.push({ name: 'profile', params: { id: chatId } });
                         break;
                     default:
                         break;
