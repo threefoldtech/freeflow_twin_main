@@ -10,10 +10,11 @@
                 <button>Edit profile</button>
             </div>
         </header>
-        <aside>
+        <div>
+            <p class="bg-primarylight">{{ statusList[contact?.id ?? user.id].status }}</p>
             <!--    about me    -->
             <!--     contact list     -->
-        </aside>
+        </div>
         <main>
             <!--    create post (if own profile)      -->
             <div v-if="isLoadingSocialPosts" class="fixed right-5 bottom-5 flex items-center">
