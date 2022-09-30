@@ -354,7 +354,7 @@ export class PostService {
         for (const [i, comment] of comments.entries()) {
             const hasReplies = comment.replies.length > 0;
             if (comment.id === commentToRemove.id) {
-                hasReplies ? comments.splice(i, 1, ...comment.replies) : comments.splice(i, 1);
+                comments.splice(i, 1);
                 return comments;
             }
             if (!hasReplies) continue;
