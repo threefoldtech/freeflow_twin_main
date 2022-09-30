@@ -228,7 +228,7 @@
                                 }"
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 draggable="true"
-                                @click="handleSelect(item)"
+                                @click.stop="handleSelect(item)"
                                 @dblclick="handleItemClick(item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
@@ -324,7 +324,7 @@
                             :title="item.fullName"
                             class="relative"
                             draggable="true"
-                            @click="handleSelect(item)"
+                            @click.stop="handleSelect(item)"
                             @dblclick="handleItemClick(item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
@@ -488,7 +488,7 @@
             showFilePreview.value = true;
             return;
         }
-        itemAction(item, router);
+        await itemAction(item, router);
     };
 
     const closeEditor = () => {
