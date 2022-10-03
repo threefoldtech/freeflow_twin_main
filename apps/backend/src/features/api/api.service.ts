@@ -476,8 +476,8 @@ export class ApiService {
         }
     }
 
-    async containerHealth(location: string): Promise<boolean> {
-        const url = `http://[${location}]/api/v2/container/health`;
+    async containerIsOffline(location: string): Promise<boolean> {
+        const url = `http://[${location}]/api/v2/user/containerOffline`;
         try {
             return (
                 await axios.get(url, {
@@ -485,7 +485,7 @@ export class ApiService {
                 })
             ).data;
         } catch {
-            return false;
+            return true;
         }
     }
 
