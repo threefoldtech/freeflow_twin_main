@@ -29,9 +29,18 @@
 
 <script lang="ts" setup>
     import { login } from '@/services/authService';
+    import { containerOffline, spawn } from '@/services/socialService';
+    import config from '@/config';
 
     const loginAndPush = async () => {
         console.log('Attempting to login ...');
+        const offline = await containerOffline(1000);
+        console.log('offline', offline);
+        console.log('config appId', config.getAppId());
+        if (offline) {
+            await spawn(name);
+            return;
+        }
         await login();
     };
 
