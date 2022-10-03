@@ -29,14 +29,14 @@ export interface socialPostModel extends socialMeta {
     signatures: string;
 }
 
-export const containerOffline = async (timeout: number) => {
+export const containerHealth = async (timeout: number) => {
     try {
-        const { data } = await axios.get(`${config.baseUrl}api/v2/user/containerOffline`, {
+        const { data } = await axios.get(`${config.baseUrl}api/v2/container/health`, {
             timeout,
         });
         return data;
     } catch (e) {
-        return true;
+        return false;
     }
 };
 

@@ -296,7 +296,7 @@ export class ContactService {
         try {
             for (const contact of contacts) {
                 const alreadyOffline = contact.containerOffline;
-                contact.containerOffline = await this._apiService.containerIsOffline(contact.location);
+                contact.containerOffline = !(await this._apiService.containerHealth(contact.location));
 
                 if (contact.containerOffline === alreadyOffline) continue;
                 await this._contactRepo.updateContact({ contact });
