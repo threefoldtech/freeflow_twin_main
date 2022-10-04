@@ -29,6 +29,33 @@ export interface socialPostModel extends socialMeta {
     signatures: string;
 }
 
+export const containerHealth = async (timeout: number) => {
+    try {
+        const { data } = await axios.get(`${config.baseUrl}api/v2/container/health`, {
+            timeout,
+        });
+        return data;
+    } catch (e) {
+        return false;
+    }
+};
+
+export const spawn = async (name: string) => {
+    console.log('name', name);
+    const response = await axios.post(`${config.getAppId()}/api/v1/spawn`, {
+        name,
+    });
+
+    if (response.status === 200) {
+        setTimeout(function () {
+            window.location.href = response.data?.redirectUrl;
+        }, 500);
+
+        window.location.href = response.data?.redirectUrl;
+        return;
+    }
+};
+
 export const createSocialPost = async (text?: string, files: File[] = []) => {
     if (files?.length > 10) return;
 
