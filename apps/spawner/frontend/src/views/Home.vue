@@ -75,36 +75,27 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent, ref } from 'vue';
+<script lang="ts" setup>
+    import { ref } from 'vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
     import { spawn } from '@/service/spawnService';
     import { ChevronUpIcon } from '@heroicons/vue/solid';
+    import { useRoute } from 'vue-router';
 
-    export default defineComponent({
-        components: {
-            Disclosure,
-            DisclosureButton,
-            DisclosurePanel,
-            ChevronUpIcon,
-        },
-        setup() {
-            const name = ref('');
-            const USERNAME = '{{ USERNAME }}';
-            const loginAndSpawn = () => {
-                const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
-                console.log('Username', actualName);
-                console.log('Going to login with username: ', actualName);
-                spawn(actualName);
-            };
+    const route = useRoute();
+    const name = ref((route.query.name as string) ?? '');
+    const USERNAME = '{{ USERNAME }}';
 
-            return {
-                USERNAME,
-                name,
-                loginAndSpawn,
-            };
-        },
-    });
+    const loginAndSpawn = () => {
+        const actualName = name.value.toLowerCase().trim().split('.3bot')[0];
+        console.log('Username', actualName);
+        console.log('Going to login with username: ', actualName);
+        spawn(actualName);
+    };
+
+    if (name.value !== '') {
+        loginAndSpawn();
+    }
 </script>
 
 <style type="text/css"></style>
