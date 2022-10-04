@@ -83,7 +83,7 @@
     import { useRoute } from 'vue-router';
 
     const route = useRoute();
-    const name = ref((route.query.name as string) ?? '');
+    const name = ref((route.query.username as string) ?? '');
     const USERNAME = '{{ USERNAME }}';
 
     const loginAndSpawn = () => {
