@@ -2,7 +2,7 @@ version: '3'
 
 services:
     digital_twin_spawner:
-        image: threefoldjimber/digitaltwin-spawner:${digital_twin_spawner_tag}
+        image: registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${digital_twin_spawner_tag}
         container_name: digital_twin_spawner
         build: server
         restart: always
@@ -18,21 +18,21 @@ services:
             - ENVIRONMENT=${ENVIRONMENT}
 
     # ONLY ENABLE IN DEVELOPMENT
-    digitaltwin_proxy:
-        image: nginx:alpine
-        container_name: digital_twin_proxy
-        restart: always
-        volumes:
-            - ../../docker/certs:/etc/nginx/certs
-            - ./proxy/nginx.conf:/etc/nginx/nginx.conf
-        ports:
-            - 443:443
-            - 80:80
-        networks:
-            - chatnet
+    #    digitaltwin_proxy:
+    #        image: nginx:alpine
+    #        container_name: digital_twin_proxy
+    #        restart: always
+    #        volumes:
+    #            - ../../docker/certs:/etc/nginx/certs
+    #            - ./proxy/nginx.conf:/etc/nginx/nginx.conf
+    #        ports:
+    #            - 443:443
+    #            - 80:80
+    #        networks:
+    #            - chatnet
 
     digital_twin_frontend:
-        image: threefoldjimber/digitaltwin-frontend:${digital_twin_frontend_tag}
+        image: registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${digital_twin_frontend_tag}
         container_name: digital_twin_frontend
         restart: always
         build: frontend
