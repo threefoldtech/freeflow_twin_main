@@ -12,6 +12,7 @@ import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
+import { uuidv4 } from '../../utils/uuid';
 
 export enum FileAction {
     ADD_TO_CHAT = 'ADD_TO_CHAT',
@@ -46,15 +47,23 @@ export class ChatFileState implements FileState<IChatFile> {
         const userId = this._configService.get<string>('userId');
         const path = `${this.storageDir}/${userId}/chats`;
 
+        const realFileNameIdx = filename.lastIndexOf('.');
+        const realFileName = filename.substring(0, realFileNameIdx);
+
+        const extension = filename.substring(realFileNameIdx, filename.length);
+
+        const uuid = uuidv4();
+        const uniqueFileName = realFileName + '-clipboard-' + uuid + extension;
+
         try {
             this._fileService.makeDirectory({ path });
-            this._fileService.moveFile({ from: fromPath, to: join(path, filename) });
+            this._fileService.moveFile({ from: fromPath, to: join(path, uniqueFileName) });
         } catch (error) {
             return false;
         }
         // create new message and emit to connected sockets
         const yggdrasilAddress = await this._locationService.getOwnLocation();
-        const chatPath = `${userId}/chats/${filename}`;
+        const chatPath = `${userId}/chats/${uniqueFileName}`;
         const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${btoa(chatPath)}`;
         const message: MessageDTO<FileMessage> = {
             id: messageId,
@@ -63,7 +72,7 @@ export class ChatFileState implements FileState<IChatFile> {
             to: chatId,
             body: {
                 type,
-                filename,
+                filename: uniqueFileName,
                 url: destinationUrl,
             },
             timeStamp: new Date(),
