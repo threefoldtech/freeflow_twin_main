@@ -222,7 +222,7 @@ export class QuantumController {
 
             const myLocation = await this._locationService.getOwnLocation();
             if (location !== myLocation) {
-                await this._apiService.editFile({ path, content, location });
+                await this._apiService.editFile({ path, content, location, token });
                 return;
             }
 
