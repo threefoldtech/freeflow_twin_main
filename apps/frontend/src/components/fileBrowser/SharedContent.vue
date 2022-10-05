@@ -152,7 +152,7 @@
         fileBrowserTypeView,
         isQuantumChatFiles,
     } from '@/store/fileBrowserStore';
-    import { watch, computed } from 'vue';
+    import { watch } from 'vue';
     import { useRoute, useRouter } from 'vue-router';
     import Spinner from '@/components/Spinner.vue';
 
@@ -163,22 +163,8 @@
     const router = useRouter();
     const route = useRoute();
 
-    const currentFolderName = computed(() => {
-        //@TODO add current folder
-
-        return '';
-    });
-
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
-    };
-
-    //const truncate = computed(name => (name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`));
-
-    const epochToDate = epoch => {
-        let d = new Date(epoch).toLocaleDateString();
-
-        return d === '1/20/1980' ? 'Never' : d;
     };
 
     const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);

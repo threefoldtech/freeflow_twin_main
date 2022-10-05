@@ -6,9 +6,9 @@
                 <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
                     <div class="flex flex-col flex-1">
                         <TopBar @click.stop />
-                        <FileTable v-if="searchResults.length === 0 && !isQuantumChatFiles" />
-                        <ResultsTable v-if="searchResults.length > 0 && !isQuantumChatFiles" />
-                        <!--                    <SharedContent v-if="sharedDir === true || isQuantumChatFiles" />-->
+                        <FileTable v-if="!sharedDir && searchResults.length === 0 && !isQuantumChatFiles" />
+                        <ResultsTable v-if="!sharedDir && searchResults.length > 0 && !isQuantumChatFiles" />
+                        <SharedContent v-if="sharedDir || isQuantumChatFiles" />
                     </div>
                 </div>
             </FileDropArea>
@@ -21,6 +21,7 @@
     import { onBeforeMount } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
+    import SharedContent from '@/components/fileBrowser/SharedContent.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
     import {
         currentDirectory,
