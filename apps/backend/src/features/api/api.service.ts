@@ -13,6 +13,7 @@ import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
 import { FailedRequestRepository } from './repositories/failed-request.repository';
+import { LikeCommentDTO } from '../post/dtos/request/like-comment.dto';
 
 @Injectable()
 export class ApiService {
@@ -503,4 +504,12 @@ export class ApiService {
     //         })
     //     );
     // }
+    likeExternalComment({ likeCommentDTO, location }: { likeCommentDTO: LikeCommentDTO; location: string }) {
+        const url = `http://[${location}]/api/v2/posts/comment/like`;
+        try {
+            return axios.put(url, likeCommentDTO);
+        } catch {
+            return;
+        }
+    }
 }
