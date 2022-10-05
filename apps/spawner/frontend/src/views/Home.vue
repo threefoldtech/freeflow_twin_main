@@ -1,6 +1,9 @@
 <template>
     <div class="flex flex-col justify-around relative items-center min-h-screen">
-        <div v-if="name" class="loader ease-linear rounded-full border-4 inline-block h-12 w-12 border-4"></div>
+        <div
+            v-if="route.query.username"
+            class="loader ease-linear rounded-full border-4 inline-block h-12 w-12 border-4"
+        ></div>
 
         <div v-else>
             <div class="flex flex-row justify-center items-center mt-10 mb-5">
