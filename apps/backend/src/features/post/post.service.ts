@@ -290,6 +290,14 @@ export class PostService {
 
     async likeComment(likeCommentDTO: LikeCommentDTO): Promise<{ status: string }> {
         try {
+            const myLocation = await this._locationService.getOwnLocation();
+            if (likeCommentDTO.owner !== myLocation) {
+                const res = await this._apiService.likeExternalComment({
+                    location: likeCommentDTO.owner,
+                    likeCommentDTO,
+                });
+                return res.data;
+            }
             const post = await this._postRepo.getPost({ id: likeCommentDTO.postId });
             const comment = this.findComment(post.parseReplies(), likeCommentDTO.commentId);
             if (!comment) throw new BadRequestException('comment not found');
