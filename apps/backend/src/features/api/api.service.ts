@@ -329,7 +329,7 @@ export class ApiService {
         location: string;
         commentDTO: IPostComment;
     }): Promise<{ status: string }> {
-        const destinationUrl = `http://[${location}]/api/v2/posts/comment/${commentDTO.post.id}`;
+        const destinationUrl = `http://[${location}]/api/v2/posts/comment/react/${commentDTO.post.id}`;
         try {
             return (await axios.put<{ status: string }>(destinationUrl, commentDTO)).data;
         } catch (error) {
