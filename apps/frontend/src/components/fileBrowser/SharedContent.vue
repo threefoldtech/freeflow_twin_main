@@ -36,8 +36,8 @@
                                     :class="{
                                         'bg-gray-100': isSelected(item),
                                     }"
-                                    @click="goTo(item)"
-                                    @dblclick="goTo(item)"
+                                    @click="emit('itemClicked', item)"
+                                    @dblclick="emit('itemClicked', item)"
                                     :key="item.name"
                                 >
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -103,7 +103,7 @@
                             >
                                 <div
                                     class="group w-full aspect-w-12 aspect-h-4 bg-white border-2 rounded-md hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-start items-center"
-                                    @click="goTo(item)"
+                                    @click="emit('itemClicked', item)"
                                 >
                                     <div class="flex justify-start items-center cursor-pointer px-4">
                                         <i
@@ -146,7 +146,6 @@
         PathInfoModel,
         selectedPaths,
         sharedContent,
-        goTo,
         sharedBreadcrumbs,
         sharedFolderIsloading,
         fileBrowserTypeView,
@@ -162,6 +161,7 @@
 
     const router = useRouter();
     const route = useRoute();
+    const emit = defineEmits(['itemSelected']);
 
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
