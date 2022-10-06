@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { exec, execSync, spawn } from 'child_process';
 import PATH from 'path';
@@ -6,6 +6,8 @@ import PATH from 'path';
 import { EncryptionService } from '../encryption/encryption.service';
 import { FileService } from '../file/file.service';
 import { YggdrasilConfig } from './models/yggdrasil.model';
+import { LocationService } from '../location/location.service';
+import { UserGateway } from '../user/user.gateway';
 
 @Injectable()
 export class YggdrasilService {
@@ -125,7 +127,10 @@ export class YggdrasilService {
     constructor(
         private readonly _configService: ConfigService,
         private readonly _encryptionService: EncryptionService,
-        private readonly _fileService: FileService
+        private readonly _fileService: FileService,
+        @Inject(forwardRef(() => LocationService))
+        private readonly _locationService: LocationService,
+        private readonly _userGateway: UserGateway
     ) {
         const baseDir = this._configService.get<string>('baseDir');
         this.configPath = PATH.join(baseDir, 'yggdrasil.conf');
@@ -152,6 +157,8 @@ export class YggdrasilService {
         const config = this.replaceConfigValues({ generatedConfig, replaceConfig: keyReplacements as YggdrasilConfig });
         this.saveConfigs({ config, replacements: keyReplacements as YggdrasilConfig });
         this.runYggdrasil();
+        const location = await this._locationService.getOwnLocation();
+        this._userGateway.emitMessageToConnectedClients('yggdrasil', location);
     }
 
     /**
