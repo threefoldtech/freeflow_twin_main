@@ -160,6 +160,11 @@ export class YggdrasilService {
     runYggdrasil() {
         const out = this._fileService.openFile({ path: this.logPath, flags: 'a' });
         const err = this._fileService.openFile({ path: '/var/log/yggdrasil/err.log', flags: 'a' });
+        try {
+            execSync('pkill yggdrasil').toString();
+        } catch (e) {
+            console.error(e);
+        }
         const p = spawn('yggdrasil', ['-useconffile', this.configPath, '-logto', this.logPath], {
             detached: true,
             stdio: ['ignore', out, err],
@@ -231,10 +236,8 @@ export class YggdrasilService {
         replaceConfig: YggdrasilConfig;
     }): string {
         let cfg = generatedConfig;
-        cfg = cfg.replace(/EncryptionPublicKey: .*$/gm, `EncryptionPublicKey: ${replaceConfig.encryptionPublicKey}`);
-        cfg = cfg.replace(/EncryptionPrivateKey: .*$/gm, `EncryptionPrivateKey: ${replaceConfig.encryptionPrivateKey}`);
-        cfg = cfg.replace(/SigningPublicKey: .*$/gm, `SigningPublicKey: ${replaceConfig.signingPublicKey}`);
-        cfg = cfg.replace(/SigningPrivateKey: .*$/gm, `SigningPrivateKey: ${replaceConfig.signingPrivateKey}`);
+        cfg = cfg.replace(/PublicKey: .*$/gm, `PublicKey: ${replaceConfig.signingPublicKey}`);
+        cfg = cfg.replace(/PrivateKey: .*$/gm, `PrivateKey: ${replaceConfig.signingPrivateKey}`);
         cfg = cfg.replace(
             /Peers: \[]/gm,
             `Peers: ${this.yggdrasilPeers.length === 0 ? '[]' : `["${this.yggdrasilPeers.join('","')}"]`}`
