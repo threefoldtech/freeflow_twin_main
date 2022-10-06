@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 
 import { ContactModule } from '../contact/contact.module';
 import { DbModule } from '../db/db.module';
@@ -9,7 +9,7 @@ import { ApiTasks } from './api.tasks';
 import { FailedRequestRepository } from './repositories/failed-request.repository';
 
 @Module({
-    imports: [forwardRef(() => ContactModule), forwardRef(() => LocationModule), DbModule],
+    imports: [ContactModule, LocationModule, DbModule],
     providers: [ApiService, ApiTasks, FailedRequestRepository],
     exports: [ApiService],
     controllers: [ApiController],

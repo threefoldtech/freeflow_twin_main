@@ -40,7 +40,7 @@ export class LocationService {
      * @return {Error} - Error.
      */
     async getOwnLocation(): Promise<string | Error> {
-        this.location = (await this._yggdrasilService.getSelf()) as string;
+        if (this.location === '') this.location = (await this._yggdrasilService.getSelf()) as string;
         if (this.location.length < 1) return null;
         return this.location;
     }

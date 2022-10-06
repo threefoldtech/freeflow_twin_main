@@ -1,11 +1,4 @@
-import {
-    BadRequestException,
-    forwardRef,
-    Inject,
-    Injectable,
-    InternalServerErrorException,
-    NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { uuidv4 } from '../../utils/uuid';
@@ -20,7 +13,6 @@ export class UserService {
     constructor(
         private readonly _userRepo: UserRedisRepository,
         private readonly _configService: ConfigService,
-        @Inject(forwardRef(() => LocationService))
         private readonly _locationService: LocationService
     ) {}
 
