@@ -160,11 +160,9 @@ export class YggdrasilService {
     runYggdrasil() {
         const out = this._fileService.openFile({ path: this.logPath, flags: 'a' });
         const err = this._fileService.openFile({ path: '/var/log/yggdrasil/err.log', flags: 'a' });
-        try {
-            execSync('pkill yggdrasil').toString();
-        } catch (e) {
-            console.error(e);
-        }
+
+        this.cleanAllYggdrasilProcesses();
+
         const p = spawn('yggdrasil', ['-useconffile', this.configPath, '-logto', this.logPath], {
             detached: true,
             stdio: ['ignore', out, err],
@@ -211,6 +209,14 @@ export class YggdrasilService {
             encryptionPublicKey: this._encryptionService.encodeHex(encryptionKeyPair.publicKey),
             encryptionPrivateKey: this._encryptionService.encodeHex(encryptionKeyPair.secretKey),
         } as YggdrasilConfig;
+    }
+
+    private cleanAllYggdrasilProcesses(): string {
+        try {
+            return execSync('pkill yggdrasil').toString();
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     /**
