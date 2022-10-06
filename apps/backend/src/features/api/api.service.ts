@@ -175,12 +175,26 @@ export class ApiService {
         }
     }
 
-    async editFile({ location, path, content }: { location: string; path: string; content: string }) {
+    async editFile({
+        location,
+        path,
+        content,
+        token,
+    }: {
+        location: string;
+        path: string;
+        content: string;
+        token: string;
+    }) {
         try {
-            return await axios.post(`http://[${location}]/api/v2/quantum/file/internal/simple?path=${btoa(path)}`, {
-                content,
-                location,
-            });
+            return await axios.post(
+                `http://[${location}]/api/v2/quantum/file/internal?path=${btoa(path)}&token=${token}`,
+                {
+                    content,
+                    location,
+                    status: 2,
+                }
+            );
         } catch {
             return;
         }
