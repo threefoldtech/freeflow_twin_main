@@ -63,7 +63,7 @@ export class ChatFileState implements FileState<IChatFile> {
             to: chatId,
             body: {
                 type,
-                filename: filename,
+                filename,
                 url: destinationUrl,
             },
             timeStamp: new Date(),
