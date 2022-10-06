@@ -17,11 +17,11 @@ import { UserService } from './user.service';
 
 @Module({
     imports: [
-        DbModule,
         KeyModule,
-        ApiModule,
+        DbModule,
         FileModule,
         EncryptionModule,
+        forwardRef(() => ApiModule),
         forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
         forwardRef(() => ChatModule),

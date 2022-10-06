@@ -1,6 +1,8 @@
 import {
     BadRequestException,
     ForbiddenException,
+    forwardRef,
+    Inject,
     Injectable,
     NotFoundException,
     UnauthorizedException,
@@ -41,6 +43,7 @@ export class QuantumService {
         private readonly _configService: ConfigService,
         private readonly _messageService: MessageService,
         private readonly _fileService: FileService,
+        @Inject(forwardRef(() => LocationService))
         private readonly _locationService: LocationService,
         private readonly _keyService: KeyService,
         private readonly _apiService: ApiService,

@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { forwardRef, Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MessageBody, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { IStatusUpdate } from 'custom-types/status.type';
@@ -28,6 +28,7 @@ export class UserGateway implements OnGatewayInit {
         private readonly _chatService: ChatService,
         private readonly _quantumService: QuantumService,
         private readonly _userService: UserService,
+        @Inject(forwardRef(() => LocationService))
         private readonly _locationService: LocationService
     ) {}
 

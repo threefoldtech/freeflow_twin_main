@@ -21,6 +21,7 @@ export class ContactService {
     constructor(
         private readonly _contactRepo: ContactRedisRepository,
         private readonly _messageService: MessageService,
+        @Inject(forwardRef(() => LocationService))
         private readonly _locationService: LocationService,
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService,
