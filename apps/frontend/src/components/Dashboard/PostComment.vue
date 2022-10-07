@@ -35,7 +35,7 @@
                 <div class="flex justify-start items-center text-sm w-full">
                     <div class="font-semibold text-gray-700 px-2 flex items-center justify-center space-x-1">
                         <a @click="handleLikeComment" class="hover:underline" href="#">
-                            <small>Like</small>
+                            <small>{{ liked ? 'Unlike' : 'Like' }}</small>
                         </a>
                         <small v-if="comment.type === CommentType.COMMENT" class="self-center">.</small>
                         <a v-if="comment.type === CommentType.COMMENT" class="hover:underline" href="#" @click="reply">
@@ -187,6 +187,10 @@ stroke-width="2"
 
     const emit = defineEmits(['replyToComment']);
 
+    const liked = computed(() => {
+        return props.comment.likes.map(l => l.id).includes(user.id.toString());
+    });
+
     onBeforeMount(async () => {
         myLocation.value = await myYggdrasilAddress();
     });
@@ -220,9 +224,9 @@ stroke-width="2"
     };
 
     const handleLikeComment = async () => {
-        const { post, owner, id, isReplyToComment, replyTo } = props.comment;
-        await likeComment(post.id, owner.location, id, isReplyToComment, replyTo);
-        await getSinglePost(post.id, owner.location);
+        const { post, id, isReplyToComment, replyTo } = props.comment;
+        await likeComment(post.id, post.owner.location, id, isReplyToComment, replyTo);
+        await getSinglePost(post.id, post.owner.location);
     };
 
     const inputField = ref<HTMLInputElement>();
