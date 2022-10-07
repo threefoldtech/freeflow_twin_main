@@ -369,6 +369,14 @@ export const clearClipboard = () => {
 };
 
 export const searchDir = async () => {
+    if (sharedDir.value) {
+        await getSharedContent();
+        sharedContent.value = sharedContent.value.filter(
+            x => searchDirValue.value === '' || x.name.includes(searchDirValue.value)
+        );
+        return;
+    }
+
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
