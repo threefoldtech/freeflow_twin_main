@@ -8,6 +8,8 @@ import { GetPostsQueryDto } from './dtos/request/get-posts-query.dto';
 import { LikePostDTO } from './dtos/request/like-post.dto';
 import { TypingDTO } from './dtos/request/typing.dto';
 import { PostService } from './post.service';
+import { LikeCommentDTO } from './dtos/request/like-comment.dto';
+import { DeleteCommentDTO } from './dtos/delete-comment.dto';
 
 @Controller('posts')
 export class PostController {
@@ -58,11 +60,21 @@ export class PostController {
         return await this._postService.handleSendSomeoneIsTyping(typingDTO);
     }
 
-    @Put('comment/:postId')
+    @Put('comment/react/:postId')
     async commentOnPost(
         @Param() { postId }: GetPostQueryDto,
         @Body() commentDTO: IPostComment
     ): Promise<{ status: string }> {
         return await this._postService.commentOnPost({ postId, commentDTO });
+    }
+
+    @Put('comment/like')
+    async likeComment(@Body() likeCommentDTO: LikeCommentDTO) {
+        return await this._postService.likeComment(likeCommentDTO);
+    }
+
+    @Delete('comment/delete')
+    async deleteComment(@Body() deleteCommentDTO: DeleteCommentDTO) {
+        return await this._postService.deleteComment(deleteCommentDTO);
     }
 }

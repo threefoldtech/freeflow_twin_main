@@ -37,25 +37,7 @@
             >Delete
         </v-contextmenu-item>
     </v-contextmenu>
-    <div
-        v-if="showFilePreview"
-        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
-        @click="showFilePreview = false"
-    >
-        <XIcon
-            class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50"
-            @click="showFilePreview = false"
-        />
-        <div v-if="filePreviewType === 'image'">
-            <img :src="filePreviewSrc" class="pointer-events-none z-50 max-h-full" @click.stop alt="filePreview" />
-        </div>
 
-        <div v-else-if="filePreviewType === 'video'">
-            <video controls>
-                <source :src="filePreviewSrc" />
-            </video>
-        </div>
-    </div>
     <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
@@ -183,8 +165,8 @@
                                 }"
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 draggable="true"
-                                @click="handleSelect(item)"
-                                @dblclick="handleItemClick(item)"
+                                @click.stop="handleSelect(item)"
+                                @dblclick="emit('itemClicked', item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
                                 @drop="() => onDrop(item)"
@@ -210,7 +192,7 @@
                                         <div class="mr-3 w-7 text-center">
                                             <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
                                         </div>
-                                        <span class="hover:underline" @click.stop="handleItemClick(item)">
+                                        <span class="hover:underline" @click.stop="emit('itemClicked', item)">
                                             {{ item.name }}
                                         </span>
                                     </div>
@@ -279,8 +261,8 @@
                             :title="item.fullName"
                             class="relative"
                             draggable="true"
-                            @click="handleSelect(item)"
-                            @dblclick="handleItemClick(item)"
+                            @click.stop="handleSelect(item)"
+                            @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
                             @drop="() => onDrop(item)"
@@ -317,47 +299,43 @@
 
 <script lang="ts" setup>
     import { computed, ref } from 'vue';
-    import { XIcon } from '@heroicons/vue/solid';
 
     import {
         currentDirectory,
         currentDirectoryContent,
         currentSort,
-        itemAction,
-        PathInfoModel,
-        selectItem,
+        currentSortDir,
         deselectAll,
         deselectItem,
-        sortContent,
-        sortAction,
-        currentSortDir,
-        getFileLastModified,
+        fileBrowserTypeView,
         getFileExtension,
+        getFileLastModified,
         getFileSize,
-        selectedPaths,
-        selectAll,
-        getIconColor,
         getIcon,
+        getIconColor,
         equals,
-        moveFiles,
         isDraggingFiles,
         goToShared,
-        fileBrowserTypeView,
+        itemAction,
+        moveFiles,
+        PathInfoModel,
         savedAttachments,
         savedAttachmentsIsLoading,
+        selectAll,
+        selectedPaths,
+        selectItem,
+        sortAction,
+        sortContent,
     } from '@/store/fileBrowserStore';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useAuthState } from '@/store/authStore';
+    import { useRoute, useRouter } from 'vue-router';
     import {
         currentRightClickedItem,
-        rightClickItemAction,
-        triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
         RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import Spinner from '@/components/Spinner.vue';
-    import { isImage, isVideo } from '@/services/contentService';
-    import { calcExternalResourceLink } from '@/services/urlService';
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -366,8 +344,7 @@
     let tempCounter = 0;
     const route = useRoute();
     const router = useRouter();
-
-    const { user } = useAuthState();
+    const emit = defineEmits(['itemClicked']);
 
     const setCurrentRightClickedItem = item => {
         currentRightClickedItem.value = {
@@ -382,7 +359,7 @@
             return;
         }
         if (selectedPaths.value.length === 1 && selectedPaths.value[0] === item) {
-            handleItemClick(item);
+            emit('itemClicked', item);
             return;
         }
         deselectItem(item);
@@ -396,24 +373,6 @@
     const handleAllSelect = (val: any) => {
         if (val.target.checked) selectAll();
         else deselectAll();
-    };
-
-    const showFilePreview = ref(false);
-    const filePreviewSrc = ref('');
-    const filePreviewType = ref('');
-
-    const handleItemClick = (item: PathInfoModel) => {
-        if (isVideo(item.fullName) || isImage(item.fullName)) {
-            const ownerLocation = user.location;
-            let path = item.path;
-            path = path.replace('/appdata/storage/', '');
-            showFilePreview.value = true;
-            const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
-            filePreviewSrc.value = calcExternalResourceLink(src);
-            filePreviewType.value = isVideo(item.fullName) ? 'video' : 'image';
-            return;
-        }
-        itemAction(item, router);
     };
 
     const onDragStart = (event, item) => {

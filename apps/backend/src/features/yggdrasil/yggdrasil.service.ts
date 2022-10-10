@@ -16,6 +16,37 @@ export class YggdrasilService {
     private logPath = '';
 
     private yggdrasilPeers = [
+        'tcp://gent01.grid.tf:9943',
+        'tcp://gent02.grid.tf:9943',
+        'tcp://gent03.grid.tf:9943',
+        'tcp://gent04.grid.tf:9943',
+        'tcp://gent01.test.grid.tf:9943',
+        'tcp://gent02.test.grid.tf:9943',
+        'tcp://gent01.dev.grid.tf:9943',
+        'tcp://gent02.dev.grid.tf:9943',
+        'tcp://gw291.vienna1.greenedgecloud.com:9943',
+        'tcp://gw293.vienna1.greenedgecloud.com:9943',
+        'tcp://gw294.vienna1.greenedgecloud.com:9943',
+        'tcp://gw297.vienna1.greenedgecloud.com:9943',
+        'tcp://gw298.vienna1.greenedgecloud.com:9943',
+        'tcp://gw299.vienna2.greenedgecloud.com:9943',
+        'tcp://gw300.vienna2.greenedgecloud.com:9943',
+        'tcp://gw304.vienna2.greenedgecloud.com:9943',
+        'tcp://gw306.vienna2.greenedgecloud.com:9943',
+        'tcp://gw307.vienna2.greenedgecloud.com:9943',
+        'tcp://gw309.vienna2.greenedgecloud.com:9943',
+        'tcp://gw313.vienna2.greenedgecloud.com:9943',
+        'tcp://gw324.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw326.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw327.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw328.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw330.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw331.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw333.salzburg1.greenedgecloud.com:9943',
+        'tcp://gw422.vienna2.greenedgecloud.com:9943',
+        'tcp://gw423.vienna2.greenedgecloud.com:9943',
+        'tcp://gw424.vienna2.greenedgecloud.com:9943',
+        'tcp://gw425.vienna2.greenedgecloud.com:9943',
         'tcp://smithtacticalsolutions.com:9943',
         'tcp://108.242.38.186:9943',
         'tls://ipv4.campina-grande.paraiba.brazil.yggdrasil.iasylum.net:50000',
@@ -89,37 +120,6 @@ export class YggdrasilService {
         'tls://yggdrasil.sticloud.gq:13122',
         'tls://51.81.46.170:5222',
         'tls://01.scv.usa.ygg.yt:443',
-        'tf-tcp://gent01.grid.tf:9943',
-        'tf-tcp://gent02.grid.tf:9943',
-        'tf-tcp://gent03.grid.tf:9943',
-        'tf-tcp://gent04.grid.tf:9943',
-        'tf-tcp://gent01.test.grid.tf:9943',
-        'tf-tcp://gent02.test.grid.tf:9943',
-        'tf-tcp://gent01.dev.grid.tf:9943',
-        'tf-tcp://gent02.dev.grid.tf:9943',
-        'tf-tcp://gw291.vienna1.greenedgecloud.com:9943',
-        'tf-tcp://gw293.vienna1.greenedgecloud.com:9943',
-        'tf-tcp://gw294.vienna1.greenedgecloud.com:9943',
-        'tf-tcp://gw297.vienna1.greenedgecloud.com:9943',
-        'tf-tcp://gw298.vienna1.greenedgecloud.com:9943',
-        'tf-tcp://gw299.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw300.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw304.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw306.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw307.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw309.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw313.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw324.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw326.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw327.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw328.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw330.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw331.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw333.salzburg1.greenedgecloud.com:9943',
-        'tf-tcp://gw422.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw423.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw424.vienna2.greenedgecloud.com:9943',
-        'tf-tcp://gw425.vienna2.greenedgecloud.com:9943',
     ];
 
     constructor(
@@ -160,6 +160,9 @@ export class YggdrasilService {
     runYggdrasil() {
         const out = this._fileService.openFile({ path: this.logPath, flags: 'a' });
         const err = this._fileService.openFile({ path: '/var/log/yggdrasil/err.log', flags: 'a' });
+
+        this.cleanAllYggdrasilProcesses();
+
         const p = spawn('yggdrasil', ['-useconffile', this.configPath, '-logto', this.logPath], {
             detached: true,
             stdio: ['ignore', out, err],
@@ -208,6 +211,14 @@ export class YggdrasilService {
         } as YggdrasilConfig;
     }
 
+    private cleanAllYggdrasilProcesses(): string {
+        try {
+            return execSync('pkill yggdrasil').toString();
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     /**
      * Generates and returns new yggdrasil config.
      * @return {string} - Generated config.
@@ -231,10 +242,8 @@ export class YggdrasilService {
         replaceConfig: YggdrasilConfig;
     }): string {
         let cfg = generatedConfig;
-        cfg = cfg.replace(/EncryptionPublicKey: .*$/gm, `EncryptionPublicKey: ${replaceConfig.encryptionPublicKey}`);
-        cfg = cfg.replace(/EncryptionPrivateKey: .*$/gm, `EncryptionPrivateKey: ${replaceConfig.encryptionPrivateKey}`);
-        cfg = cfg.replace(/SigningPublicKey: .*$/gm, `SigningPublicKey: ${replaceConfig.signingPublicKey}`);
-        cfg = cfg.replace(/SigningPrivateKey: .*$/gm, `SigningPrivateKey: ${replaceConfig.signingPrivateKey}`);
+        cfg = cfg.replace(/PublicKey: .*$/gm, `PublicKey: ${replaceConfig.signingPublicKey}`);
+        cfg = cfg.replace(/PrivateKey: .*$/gm, `PrivateKey: ${replaceConfig.signingPrivateKey}`);
         cfg = cfg.replace(
             /Peers: \[]/gm,
             `Peers: ${this.yggdrasilPeers.length === 0 ? '[]' : `["${this.yggdrasilPeers.join('","')}"]`}`

@@ -66,7 +66,7 @@
                                 }"
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 @click="handleSelect(item)"
-                                @dblclick="handleItemClick(item)"
+                                @dblclick="emit('itemClicked', item)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
                                     <input
@@ -90,7 +90,7 @@
                                         <div class="flex flex-col items-start py-1">
                                             <span
                                                 class="text-md hover:underline cursor-pointer"
-                                                @click="handleItemClick(item)"
+                                                @click="emit('itemClicked', item)"
                                             >
                                                 {{ item.name }}
                                             </span>
@@ -138,7 +138,7 @@
                             class="relative"
                             draggable="true"
                             @click="handleSelect(item)"
-                            @dblclick="handleItemClick(item)"
+                            @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
                             @drop="() => onDrop(item)"
@@ -172,7 +172,6 @@
 </template>
 
 <script setup lang="ts">
-    import { defineComponent, watch } from 'vue';
     import {
         currentDirectory,
         currentDirectoryContent,
@@ -196,20 +195,7 @@
     import { useRouter } from 'vue-router';
 
     const router = useRouter();
-
-    /*
-    const handleItemClick = (item: PathInfoModel) => {
-        if (item.isDirectory) {
-            goToFileDirectory(item);
-            return;
-        }
-        itemAction(item, router);
-    };
-     */
-    const handleItemClick = (item: PathInfoModel) => {
-        itemAction(item, router);
-    };
-
+    const emit = defineEmits(['itemClicked']);
     const isSelected = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) return false;
         else return true;
@@ -237,28 +223,7 @@
 </script>
 
 <style scoped>
-    th.active .arrow {
+    th.active {
         opacity: 1;
-    }
-
-    .arrow {
-        display: inline-block;
-        vertical-align: middle;
-        width: 0;
-        height: 0;
-        margin-left: 5px;
-        opacity: 0;
-    }
-
-    .arrow.asc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 4px solid #1f0f5b;
-    }
-
-    .arrow.desc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid #1f0f5b;
     }
 </style>

@@ -52,25 +52,17 @@
                                                         class="w-5 text-gray-400 fas fa-map-marker-alt mr-2"
                                                         aria-hidden="true"
                                                     />
-                                                    <p class="md:hidden">{{ trimStringMidway(item.location) }}</p>
-                                                    <p class="hidden md:block">{{ item.location }}</p>
+                                                    <p>{{ item.location }}</p>
                                                 </div>
                                                 <div class="flex align-center text-sm text-gray-500">
                                                     <em
                                                         class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center"
                                                         aria-hidden="true"
                                                     />
-                                                    <p class="md:hidden">{{ trimStringMidway(item.app_id) }}</p>
-                                                    <p class="hidden md:block">{{ item.app_id }}</p>
+                                                    <p>{{ item.app_id }}</p>
                                                 </div>
                                             </div>
                                         </div>
-                                        <!--<button
-                                            @click="handleClick(item)"
-                                            class="text-white py-2 px-4 rounded-md justify-self-end bg-primary hover:bg-accent-700 transition duration-300"
-                                        >
-                                            Invite to chat
-                                        </button>-->
                                     </div>
                                 </td>
                             </tr>
@@ -88,7 +80,6 @@
 <script setup lang="ts">
     import { Contact } from '@/types';
     import { ref } from 'vue';
-    import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
 
     interface IProps {
@@ -111,7 +102,6 @@
     };
 
     const handleClick = (item: Contact) => {
-        console.log(item);
         emit('addContact', item);
     };
 
@@ -120,17 +110,6 @@
             return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
         });
     };
-
-    const trimStringMidway = (text: string) => {
-        const str1 = text.substr(0, text.length / 2);
-        const str2 = text.substr(text.length / 2 + 1, text.length);
-
-        return str1.substr(0, str1.length / 2) + '...' + str2.substr(str2.length / 2, str2.length);
-    };
 </script>
 
-<style scoped>
-    .mh-48 {
-        max-height: 10rem;
-    }
-</style>
+<style scoped></style>
