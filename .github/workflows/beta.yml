@@ -28,14 +28,14 @@ jobs:
             - name: Push all to gitlab registry
               run: |
                   docker tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin:latest
-                  # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
-                  # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
+                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
+                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:latest
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
     deploy:
         needs: [build]
         runs-on: beta
