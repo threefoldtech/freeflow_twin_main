@@ -7,7 +7,7 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, MessageTypes, SharedFileInterface } from '@/types';
+import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -80,7 +80,7 @@ export const accessDenied = ref(false);
 export const chatFilesBreadcrumbs = ref([]);
 export const savedAttachmentsBreadcrumbs = ref([]);
 
-export const sharedItem = ref<PathInfoModel>();
+export const sharedItem = ref<FileShareMessageType>();
 export const isQuantumChatFiles = ref<boolean>(false);
 
 export const currentShare = ref<SharedFileInterface>(undefined);
@@ -125,7 +125,7 @@ export const updateAttachments = async (path = currentDirectory.value) => {
     const result = await Api.getDirectoryContent(path, true);
     if (result.status !== 200 || !result.data) throw new Error('Could not get content');
 
-    currentDirectoryContent.value = result.data.map(createModel);
+    currentDirectoryContent.value = result.data.map(createModel).filter(item => item.name !== user.id);
     savedAttachments.value = true;
     savedAttachmentsIsLoading.value = false;
     return result;
@@ -369,6 +369,14 @@ export const clearClipboard = () => {
 };
 
 export const searchDir = async () => {
+    if (sharedDir.value) {
+        await getSharedContent();
+        sharedContent.value = sharedContent.value.filter(
+            x => searchDirValue.value === '' || x.name.includes(searchDirValue.value)
+        );
+        return;
+    }
+
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
@@ -376,7 +384,10 @@ export const searchDir = async () => {
         searchResults.value = 'None';
         return;
     }
-    searchResults.value = result.data.map(createModel);
+    searchResults.value = result.data.map(createModel).filter(item => {
+        const configPath = `/appdata/storage/${user.id}`;
+        return !item.path.startsWith(configPath);
+    });
 };
 
 export const renameFile = async (item: PathInfoModel, name: string) => {
@@ -468,15 +479,6 @@ export const deselectAll = () => {
 };
 
 export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
-    if (savedAttachments && router.currentRoute.value.name === 'savedAttachments') {
-        await router.push({
-            name: 'savedAttachmentsFromChat',
-            params: {
-                chatId: item.name,
-            },
-        });
-        return;
-    }
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;

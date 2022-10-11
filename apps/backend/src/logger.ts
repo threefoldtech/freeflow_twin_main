@@ -1,4 +1,4 @@
-import { italic, underline, white } from 'chalk';
+import chalk from 'chalk';
 import { TransformableInfo } from 'logform';
 import { createLogger, format, transports } from 'winston';
 
@@ -12,11 +12,11 @@ const getDetailsFromFile = (fileDetails: any) => {
     };
 
     // @ts-ignore
-    detailsFromFile.formattedInfos = white(
+    detailsFromFile.formattedInfos = chalk.white(
         Object.keys(detailsFromFile).reduce(
             (previous, key) =>
                 // @ts-ignore
-                `${previous}${underline(key)}: ${italic(detailsFromFile[key])}`,
+                `${previous}${chalk.underline(key)}: ${chalk.italic(detailsFromFile[key])}`,
             `\n`
         )
     );

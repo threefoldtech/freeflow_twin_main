@@ -100,6 +100,7 @@ export class ChatService {
                     id: contact.id,
                     contactRequest: false,
                     accepted: true,
+                    containerOffline: false,
                 });
                 await this._apiService.acceptContactRequest({
                     ownId,

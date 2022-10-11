@@ -13,6 +13,7 @@ import { MessageDTO } from '../message/dtos/message.dto';
 import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
 import { FailedRequestRepository } from './repositories/failed-request.repository';
+import { LikeCommentDTO } from '../post/dtos/request/like-comment.dto';
 
 @Injectable()
 export class ApiService {
@@ -140,8 +141,8 @@ export class ApiService {
      * @param {string} obj.location - IPv6 location to send request to.
      * @param {string} obj.shareId - Share id to delete.
      */
-    async sendRemoveShare({ location, shareId }: { location: string; shareId: string }) {
-        const destinationUrl = `http://[${location}]/api/v2/quantum/share/${shareId}`;
+    async sendRemoveShare({ location, shareId, chatId }: { location: string; shareId: string; chatId: string }) {
+        const destinationUrl = `http://[${location}]/api/v2/quantum/share/${shareId}/${chatId}`;
         try {
             return await axios.delete(destinationUrl);
         } catch (error) {
@@ -169,6 +170,31 @@ export class ApiService {
             return await axios.post(`http://[${location}]/api/v2/chats/group/invite`, chat, {
                 responseType: responseType || 'json',
             });
+        } catch {
+            return;
+        }
+    }
+
+    async editFile({
+        location,
+        path,
+        content,
+        token,
+    }: {
+        location: string;
+        path: string;
+        content: string;
+        token: string;
+    }) {
+        try {
+            return await axios.post(
+                `http://[${location}]/api/v2/quantum/file/internal?path=${btoa(path)}&token=${token}`,
+                {
+                    content,
+                    location,
+                    status: 2,
+                }
+            );
         } catch {
             return;
         }
@@ -213,7 +239,11 @@ export class ApiService {
     async getExternalPost({ location, postId }: { location: string; postId: string }): Promise<IPostContainerDTO> {
         const destinationUrl = `http://[${location}]/api/v2/posts/${location}/${postId}`;
         try {
-            return (await axios.get<IPostContainerDTO>(destinationUrl)).data;
+            return (
+                await axios.get<IPostContainerDTO>(destinationUrl, {
+                    timeout: parseInt(this._configService.get<string>('bigPingTimeoutAxiosRequest')),
+                })
+            ).data;
         } catch (error) {
             throw new BadRequestException(`unable to get external post: ${error}`);
         }
@@ -228,9 +258,13 @@ export class ApiService {
     async getExternalPosts({ location, userId }: { location: string; userId: string }): Promise<IPostContainerDTO[]> {
         const destinationUrl = `http://[${location}]/api/v2/posts/${userId}?external=true`;
         try {
-            return (await axios.get<IPostContainerDTO[]>(destinationUrl)).data;
+            return (
+                await axios.get<IPostContainerDTO[]>(destinationUrl, {
+                    timeout: parseInt(this._configService.get<string>('bigPingTimeoutAxiosRequest')),
+                })
+            ).data;
         } catch (error) {
-            throw new BadRequestException(`unable to get external posts: ${error}`);
+            return;
         }
     }
 
@@ -310,7 +344,7 @@ export class ApiService {
         location: string;
         commentDTO: IPostComment;
     }): Promise<{ status: string }> {
-        const destinationUrl = `http://[${location}]/api/v2/posts/comment/${commentDTO.post.id}`;
+        const destinationUrl = `http://[${location}]/api/v2/posts/comment/react/${commentDTO.post.id}`;
         try {
             return (await axios.put<{ status: string }>(destinationUrl, commentDTO)).data;
         } catch (error) {
@@ -457,6 +491,19 @@ export class ApiService {
         }
     }
 
+    async containerHealth(location: string): Promise<boolean> {
+        const url = `http://[${location}]/api/v2/container/health`;
+        try {
+            return (
+                await axios.get(url, {
+                    timeout: parseInt(this._configService.get<string>('smallPingTimeoutAxiosRequest')),
+                })
+            ).data;
+        } catch {
+            return false;
+        }
+    }
+
     /**
      * Clears the failed requests array.
      */
@@ -471,4 +518,12 @@ export class ApiService {
     //         })
     //     );
     // }
+    likeExternalComment({ likeCommentDTO, location }: { likeCommentDTO: LikeCommentDTO; location: string }) {
+        const url = `http://[${location}]/api/v2/posts/comment/like`;
+        try {
+            return axios.put(url, likeCommentDTO);
+        } catch {
+            return;
+        }
+    }
 }

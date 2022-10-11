@@ -88,33 +88,31 @@
     }
 }
 
-@layer components {
-    @variants responsive {
-        .bigmaingrid {
-            display: grid;
-            grid-template-areas:
-                'top top'
-                'side content'
-                'side content';
-            grid-template-columns: 100px 1fr;
-            grid-template-rows: auto 1fr;
-        }
+@layer utilities {
+    .bigmaingrid {
+        display: grid;
+        grid-template-areas:
+            'top top'
+            'side content'
+            'side content';
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto 1fr;
+    }
 
-        .maingrid {
-            display: grid;
-            grid-template-areas:
-                'top'
-                'content'
-                'content';
-            grid-template-rows: auto 1fr;
-        }
-        .customgrid {
-            grid-template-columns: 350px 1fr;
-        }
-        .topgrid {
-            display: grid !important;
-            grid-template-columns: 500px 2fr 1fr !important;
-        }
+    .maingrid {
+        display: grid;
+        grid-template-areas:
+            'top'
+            'content'
+            'content';
+        grid-template-rows: auto 1fr;
+    }
+    .customgrid {
+        grid-template-columns: 350px 1fr;
+    }
+    .topgrid {
+        display: grid !important;
+        grid-template-columns: 500px 2fr 1fr !important;
     }
 }
 
@@ -148,26 +146,21 @@ unicode-emoji-picker {
     @apply bg-accent-300;
 }
 
-@media (max-width: 768px) { 
+@media (max-width: 768px) {
     .hide-scrollbar::-webkit-scrollbar {
         display: none;
     }
-    
+
     .hide-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;
     }
 
-    ::-webkit-scrollbar{
-        border-left: 1px solid #E5E7EB;
+    ::-webkit-scrollbar {
+        border-left: 1px solid #e5e7eb;
     }
 }
 
 .material-symbols-rounded {
-  font-variation-settings:
-  'FILL' 1,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 48
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }
-

@@ -41,6 +41,7 @@ export class LocationService {
      */
     async getOwnLocation(): Promise<string | Error> {
         if (this.location === '') this.location = (await this._yggdrasilService.getSelf()) as string;
+        if (this.location.length < 1) return null;
         return this.location;
     }
 

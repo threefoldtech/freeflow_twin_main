@@ -14,6 +14,8 @@ import { TypingDTO } from './dtos/request/typing.dto';
 import { stringifyLikes, stringifyReplies } from './models/post.model';
 import { PostGateway } from './post.gateway';
 import { PostRedisRepository } from './repositories/post-redis.repository';
+import { LikeCommentDTO } from './dtos/request/like-comment.dto';
+import { DeleteCommentDTO } from './dtos/delete-comment.dto';
 
 @Injectable()
 export class PostService {
@@ -104,7 +106,9 @@ export class PostService {
         try {
             // get contacts posts
             if (!external) {
-                const contacts = (await this._contactService.getUnblockedContacts()).filter(c => c.accepted);
+                const contacts = (await this._contactService.getUnblockedContacts())
+                    .filter(c => c.accepted)
+                    .filter(c => !c.containerOffline);
 
                 await Promise.all(
                     contacts.map(async contact => {
@@ -112,6 +116,10 @@ export class PostService {
                             location: contact.location,
                             userId: contact.id,
                         });
+                        if (!data) {
+                            contact.containerOffline = true;
+                            return await this._contactService.updateContact(contact);
+                        }
                         posts.push(...data);
                     })
                 );
@@ -278,5 +286,88 @@ export class PostService {
         }
 
         return { status: 'commented' };
+    }
+
+    async likeComment(likeCommentDTO: LikeCommentDTO): Promise<{ status: string }> {
+        try {
+            const myLocation = await this._locationService.getOwnLocation();
+            if (likeCommentDTO.owner !== myLocation) {
+                const res = await this._apiService.likeExternalComment({
+                    location: likeCommentDTO.owner,
+                    likeCommentDTO,
+                });
+                return res.data;
+            }
+            const post = await this._postRepo.getPost({ id: likeCommentDTO.postId });
+            const comment = this.findComment(post.parseReplies(), likeCommentDTO.commentId);
+            if (!comment) throw new BadRequestException('comment not found');
+
+            for (const [i, like] of comment.likes.entries()) {
+                if (like.location !== likeCommentDTO.likerLocation) continue;
+                comment.likes.splice(i, 1);
+                const changedComments = this.replaceComment(post.parseReplies(), comment);
+                post.replies = stringifyReplies(changedComments);
+                await this._postRepo.updatePost(post);
+                return { status: 'unliked' };
+            }
+
+            comment.likes.push({ id: likeCommentDTO.likerId, location: likeCommentDTO.likerLocation });
+            const changedComments = this.replaceComment(post.parseReplies(), comment);
+            post.replies = stringifyReplies(changedComments);
+            await this._postRepo.updatePost(post);
+            return { status: 'liked' };
+        } catch (error) {
+            throw new BadRequestException(`unable to like comment: ${error}`);
+        }
+    }
+
+    async deleteComment(deleteCommentDTO: DeleteCommentDTO): Promise<{ status: string }> {
+        try {
+            const post = await this._postRepo.getPost({ id: deleteCommentDTO.postId });
+            const comment = this.findComment(post.parseReplies(), deleteCommentDTO.commentId);
+            if (!comment) throw new BadRequestException('comment not found');
+
+            if (comment.owner.id !== this.user) throw new ForbiddenException('cannot delete comment as someone else');
+
+            const changedComments = this.removeComment(post.parseReplies(), comment);
+            post.replies = stringifyReplies(changedComments);
+            await this._postRepo.updatePost(post);
+            return { status: 'deleted' };
+        } catch (error) {
+            throw new BadRequestException(`unable to delete comment: ${error}`);
+        }
+    }
+
+    private findComment(comments: IPostComment[], commentId: string): IPostComment | undefined {
+        for (const comment of comments) {
+            if (comment.id === commentId) return comment;
+            if (comment.replies.length === 0) continue;
+            return this.findComment(comment.replies, commentId);
+        }
+    }
+
+    private replaceComment(comments: IPostComment[], newComment: IPostComment): IPostComment[] {
+        for (const [i, comment] of comments.entries()) {
+            if (comment.id === newComment.id) {
+                comments.splice(i, 1, newComment);
+                return comments;
+            }
+            if (comment.replies.length === 0) continue;
+            comment.replies = this.replaceComment(comment.replies, newComment);
+            return comments;
+        }
+    }
+
+    private removeComment(comments: IPostComment[], commentToRemove: IPostComment): IPostComment[] {
+        for (const [i, comment] of comments.entries()) {
+            const hasReplies = comment.replies.length > 0;
+            if (comment.id === commentToRemove.id) {
+                comments.splice(i, 1);
+                return comments;
+            }
+            if (!hasReplies) continue;
+            comment.replies = this.removeComment(comment.replies, commentToRemove);
+            return comments;
+        }
     }
 }

@@ -111,7 +111,7 @@
                             <Popover v-slot="{ open }" class="relative z-30">
                                 <PopoverButton
                                     :class="open ? '' : 'text-opacity-90'"
-                                    class="items-center text-base font-medium text-white bg-orange-700 rounded-md group hover:text-opacity-100 focus:outline-none"
+                                    class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
                                 >
                                     <DotsVerticalIcon
                                         class="text-gray-400 w-5 h-5 cursor-pointer group-hover:text-gray-600"

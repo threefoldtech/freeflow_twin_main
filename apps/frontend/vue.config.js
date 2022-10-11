@@ -1,11 +1,17 @@
 const { IgnorePlugin } = require('webpack');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 module.exports = {
     devServer: {
         disableHostCheck: true,
     },
     publicPath: '/',
     configureWebpack: {
-        plugins: [new IgnorePlugin(/^\.\/locale$/, /moment$/)],
+        plugins: [
+            new IgnorePlugin(/^\.\/locale$/, /moment$/),
+            new MonacoWebpackPlugin({
+                languages: ['json', 'javascript', 'typescript', 'html', 'css', 'markdown', 'csharp', 'java'],
+            }),
+        ],
         optimization: {
             splitChunks: {
                 chunks: 'initial',
@@ -29,5 +35,11 @@ module.exports = {
             },
         },
         devtool: 'source-map',
+    },
+    chainWebpack: config => {
+        config.resolve.alias.set(
+            'vscode',
+            path.resolve('./node_modules/monaco-languageclient/lib/vscode-compatibility')
+        );
     },
 };
