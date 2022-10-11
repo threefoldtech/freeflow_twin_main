@@ -1,29 +1,42 @@
 <template>
     <AppLayout>
-        <header>
+        <div class="w-[80%] mx-auto mt-6">
+            <header>
+                <div>
+                    <!--                <img src="" alt="cover photo" />-->
+                    <div class="bg-gray-300 w-full h-60"></div>
+                </div>
+                <div class="-mt-20 px-5 flex flex-row justify-between items-center">
+                    <AvatarImg
+                        :id="route.params?.id"
+                        :showOnlineStatus="false"
+                        :xlarge="true"
+                        class="w-48 h-48 border-white border-4 rounded-full"
+                    />
+                    <h2 class="bg-blue-100 ml-5 flex-1">{{ contact?.id ?? user.id }}</h2>
+                    <button
+                        class="text-gray-500 py-2 px-4 mr-2 rounded-md bg-gray-100 border-[1px] border-gray-400"
+                        @click=""
+                    >
+                        <i class="fas fa-plus"></i> Edit profile
+                    </button>
+                </div>
+            </header>
             <div>
-                <img src="" alt="cover photo" />
+                <p class="bg-primarylight">{{ statusList[contact?.id ?? user.id]?.status }}</p>
+                <!--    about me    -->
+                <!--     contact list     -->
             </div>
-            <div>
-                <AvatarImg :id="user.id" class="w-12 h-12" />
-                <h2>{{ user.name }}</h2>
-                <button>Edit profile</button>
-            </div>
-        </header>
-        <div>
-            <p class="bg-primarylight">{{ statusList[contact?.id ?? user.id].status }}</p>
-            <!--    about me    -->
-            <!--     contact list     -->
+            <main>
+                <!--    create post (if own profile)      -->
+                <div v-if="isLoadingSocialPosts" class="fixed right-5 bottom-5 flex items-center">
+                    <p class="mr-4">Loading</p>
+                    <Spinner />
+                </div>
+                <Post :item="item" v-for="item in allSocialPosts" :key="item.post.id" />
+                <!--    posts    -->
+            </main>
         </div>
-        <main>
-            <!--    create post (if own profile)      -->
-            <div v-if="isLoadingSocialPosts" class="fixed right-5 bottom-5 flex items-center">
-                <p class="mr-4">Loading</p>
-                <Spinner />
-            </div>
-            <Post :item="item" v-for="item in allSocialPosts" :key="item.post.id" />
-            <!--    posts    -->
-        </main>
     </AppLayout>
 </template>
 

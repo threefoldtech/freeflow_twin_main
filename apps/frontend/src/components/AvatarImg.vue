@@ -1,8 +1,9 @@
 <template>
     <div
         :class="{
+            'w-25 h-25': xlarge,
             'h-16 w-16': large,
-            'h-12 w-12': !small && !xsmall && !large,
+            'h-12 w-12': !small && !xsmall && !large && !xlarge,
             'h-10 w-10': small,
             'h-8 w-8': xsmall,
         }"
@@ -10,8 +11,9 @@
     >
         <img
             :class="{
+                'w-25 h-25': xlarge,
                 'h-16 w-16': large,
-                'h-12 w-12': !small && !xsmall && !large,
+                'h-12 w-12': !small && !xsmall && !large && !xlarge,
                 'h-10 w-10': small,
                 'h-8 w-8': xsmall,
             }"
@@ -50,6 +52,7 @@
         contact?: Contact | GroupContact;
         showOnlineStatus?: boolean;
         unreadMessagesAmount?: number;
+        xlarge?: boolean;
         large?: boolean;
         small?: boolean;
         xsmall?: boolean;
@@ -57,6 +60,7 @@
 
     const props = withDefaults(defineProps<IProps>(), {
         showOnlineStatus: true,
+        xlarge: false,
         large: false,
         small: false,
         xsmall: false,
