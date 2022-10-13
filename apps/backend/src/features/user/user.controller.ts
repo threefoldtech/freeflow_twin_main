@@ -35,6 +35,11 @@ export class UserController {
         private readonly _fileService: FileService
     ) {}
 
+    @Get('containerOffline')
+    async containerOffline(): Promise<boolean> {
+        return false;
+    }
+
     @Get('publickey')
     async getPublicKey(): Promise<string> {
         const pk = await this._keyService.getKey({

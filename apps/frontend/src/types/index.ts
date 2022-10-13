@@ -39,7 +39,10 @@ export interface Message<T> {
     action?: MessageAction;
 }
 
-export interface MessageBodyType {}
+export interface MessageBodyType {
+    filename?: string;
+    url?: string;
+}
 
 export interface StringMessageType extends String, MessageBodyType {}
 
@@ -170,7 +173,7 @@ export enum SharePermission {
 
 export interface SharePermissionInterface {
     userId: string | undefined;
-    types: SharePermission[];
+    sharePermissionTypes: SharePermission[];
     name?: string;
 }
 

@@ -279,7 +279,7 @@ router.beforeEach(async (to, _from, next) => {
         next({ name: 'dashboard' });
     }
     //Starts the browser if the user navigates to /glass as first page
-    if (to.name === 'glass') {
+    if (window.innerWidth >= 768 && to.name === 'glass') {
         setHasBrowserBeenStartedOnce();
     }
     if (to.name === 'sharedWithMe') {

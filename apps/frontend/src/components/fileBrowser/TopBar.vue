@@ -15,7 +15,7 @@
                 <div
                     v-if="searchDirValue !== ''"
                     class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-                    @click="clearInput"
+                    @click="clearInput()"
                 >
                     <i aria-hidden="true" class="fa fa-window-close h-5 w-5 text-gray-400" />
                 </div>
@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onBeforeMount, ref } from 'vue';
+    import { computed, onBeforeMount, watch } from 'vue';
     import {
         selectedPaths,
         currentDirectory,
@@ -82,7 +82,7 @@
         (e.target as HTMLElement).classList.add('text-white');
     };
 
-    function clearInput(event) {
+    function clearInput() {
         searchDirValue.value = '';
         searchResults.value = [];
     }
@@ -106,6 +106,10 @@
         moveFiles(path);
         selectedPaths.value = [];
     };
+
+    watch(selectedPaths, () => {
+        clearInput();
+    });
 </script>
 
 <style scoped>

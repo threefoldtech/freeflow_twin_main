@@ -8,7 +8,11 @@
         <router-view v-show="path !== '/glass'" />
 
         <app-layout>
-            <div v-show="path === '/glass' && hasBrowserBeenStartedOnce" class="h-full">
+            <div
+                v-if="route.name !== 'editfile'"
+                v-show="path === '/glass' && hasBrowserBeenStartedOnce"
+                class="h-full"
+            >
                 <iframe
                     class="relative h-full w-full"
                     title="forum"
