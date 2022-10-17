@@ -192,8 +192,9 @@
         getFileLastModified,
         getFileExtension,
         getFileSize,
-        selectAll,
-        deselectAll,
+        handleAllSelect,
+        truncatePath,
+        isSelected,
         selectItem,
         deselectItem,
         getIconColor,
@@ -210,22 +211,11 @@
 
     const router = useRouter();
     const emit = defineEmits(['itemClicked']);
+
     let tempCounter = 0;
     const ghostImage = ref<HTMLDivElement>();
     const hiddenItems = ref<HTMLDivElement>();
     const dragOverItem = ref<PathInfoModel>();
-
-    const isSelected = (item: PathInfoModel) => {
-        return selectedPaths.value.includes(item);
-    };
-
-    const handleAllSelect = (val: any) => {
-        if (val.target.checked) {
-            selectAll();
-            return;
-        }
-        deselectAll();
-    };
 
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) {
@@ -237,13 +227,6 @@
             return;
         }
         deselectItem(item);
-    };
-
-    const truncatePath = str => {
-        if (str.length > 30) {
-            return str.substr(0, 20) + '...' + str.substr(-30);
-        }
-        return str;
     };
 
     const onDragStart = (event, item) => {

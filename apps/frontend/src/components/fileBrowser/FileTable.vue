@@ -314,6 +314,8 @@
         getIcon,
         getIconColor,
         equals,
+        handleAllSelect,
+        isSelected,
         isDraggingFiles,
         goToShared,
         moveFiles,
@@ -362,15 +364,6 @@
             return;
         }
         deselectItem(item);
-    };
-
-    const isSelected = (item: PathInfoModel) => {
-        return selectedPaths.value.includes(item);
-    };
-
-    const handleAllSelect = (val: any) => {
-        if (val.target.checked) selectAll();
-        else deselectAll();
     };
 
     const onDragStart = (event, item) => {
