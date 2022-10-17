@@ -2,99 +2,100 @@
     <SomethingWentWrongModal />
     <appLayout>
         <template v-slot:default>
-            <div ref="fileTableDiv" @keydown.esc="closeEditor()" tabindex="0">
-                <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
-                    <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
-                        <div class="flex flex-col flex-1">
-                            <TopBar @click.stop />
-                            <FileTable
-                                v-if="!sharedDir && searchResults.length === 0 && !isQuantumChatFiles"
-                                @itemClicked="handleItemClick"
-                            />
-                            <ResultsTable
-                                v-if="!sharedDir && searchResults.length > 0 && !isQuantumChatFiles"
-                                @itemClicked="handleItemClick"
-                            />
-                            <SharedContent v-if="sharedDir || isQuantumChatFiles" @itemClicked="handleItemClick" />
-                        </div>
-                    </div>
-                </FileDropArea>
-
+            <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
                 <div
-                    v-if="showFilePreview"
-                    class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
-                    @click.self="closeEditor()"
+                    @click="selectedPaths = []"
+                    ref="fileTableDiv"
+                    @keydown.esc="closeEditor()"
+                    tabindex="0"
+                    class="flex flex-row w-full h-full"
                 >
-                    <XIcon
-                        class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50"
-                        @click="closeEditor()"
-                    />
-                    <div v-if="filePreviewType === 'image'">
-                        <img
-                            :src="filePreviewSrc"
-                            class="pointer-events-none z-50 max-h-full"
-                            @click.stop
-                            alt="filePreview"
+                    <div class="flex flex-col flex-1">
+                        <TopBar @click.stop />
+                        <FileTable
+                            v-if="!sharedDir && searchResults.length === 0 && !isQuantumChatFiles"
+                            @itemClicked="handleItemClick"
                         />
-                    </div>
-
-                    <div v-else-if="filePreviewType === 'video'">
-                        <video controls>
-                            <source :src="filePreviewSrc" />
-                        </video>
-                    </div>
-
-                    <div v-else-if="filePreviewType === 'simpleFile'">
-                        <button
-                            @click="saveChanges()"
-                            class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
-                        >
-                            <SaveIcon class="w-6 h-6 inline-block mr-2" />
-                            Save changes
-                        </button>
-                        <MonacoEditor
-                            @keydown.esc="fileTableDiv.focus()"
-                            theme="vs"
-                            v-model="editedFileContent"
-                            :extension="clickedItem?.extension"
-                            :options="monacoOptions"
-                            class="w-screen h-[750px]"
+                        <ResultsTable
+                            v-if="!sharedDir && searchResults.length > 0 && !isQuantumChatFiles"
+                            @itemClicked="handleItemClick"
                         />
+                        <SharedContent v-if="sharedDir || isQuantumChatFiles" @itemClicked="handleItemClick" />
                     </div>
                 </div>
+            </FileDropArea>
 
-                <Dialog
-                    :modelValue="showConfirmDialog"
-                    @updateModelValue="
-                        showConfirmDialog = false;
-                        clickedItem = undefined;
-                        showFilePreview = false;
-                    "
-                    :noActions="true"
-                >
-                    <template v-slot:title class="center">
-                        <h1 class="font-medium">File has been modified</h1>
-                    </template>
-                    <div class="flex justify-end mt-2 px-4">
-                        <button
-                            @click="
-                                showConfirmDialog = false;
-                                clickedItem = undefined;
-                                showFilePreview = false;
-                            "
-                            class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
-                        >
-                            Discard changes
-                        </button>
-                        <button
-                            @click="saveChanges()"
-                            class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
-                        >
-                            Save changes
-                        </button>
-                    </div>
-                </Dialog>
+            <div
+                v-if="showFilePreview"
+                class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
+                @click.self="closeEditor()"
+            >
+                <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
+                <div v-if="filePreviewType === 'image'">
+                    <img
+                        :src="filePreviewSrc"
+                        class="pointer-events-none z-50 max-h-full"
+                        @click.stop
+                        alt="filePreview"
+                    />
+                </div>
+
+                <div v-else-if="filePreviewType === 'video'">
+                    <video controls>
+                        <source :src="filePreviewSrc" />
+                    </video>
+                </div>
+
+                <div v-else-if="filePreviewType === 'simpleFile'">
+                    <button
+                        @click="saveChanges()"
+                        class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
+                    >
+                        <SaveIcon class="w-6 h-6 inline-block mr-2" />
+                        Save changes
+                    </button>
+                    <MonacoEditor
+                        @keydown.esc="fileTableDiv.focus()"
+                        theme="vs"
+                        v-model="editedFileContent"
+                        :extension="clickedItem?.extension"
+                        :options="monacoOptions"
+                        class="w-screen h-[750px]"
+                    />
+                </div>
             </div>
+
+            <Dialog
+                :modelValue="showConfirmDialog"
+                @updateModelValue="
+                    showConfirmDialog = false;
+                    clickedItem = undefined;
+                    showFilePreview = false;
+                "
+                :noActions="true"
+            >
+                <template v-slot:title class="center">
+                    <h1 class="font-medium">File has been modified</h1>
+                </template>
+                <div class="flex justify-end mt-2 px-4">
+                    <button
+                        @click="
+                            showConfirmDialog = false;
+                            clickedItem = undefined;
+                            showFilePreview = false;
+                        "
+                        class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    >
+                        Discard changes
+                    </button>
+                    <button
+                        @click="saveChanges()"
+                        class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
+                    >
+                        Save changes
+                    </button>
+                </div>
+            </Dialog>
         </template>
     </appLayout>
 </template>
