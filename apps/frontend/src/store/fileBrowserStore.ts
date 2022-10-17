@@ -478,7 +478,7 @@ export const deselectAll = () => {
     selectedPaths.value = [];
 };
 
-export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
+export const itemAction = async (item: PathInfoModel) => {
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;

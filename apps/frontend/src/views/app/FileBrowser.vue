@@ -221,7 +221,7 @@
             showFilePreview.value = true;
             return;
         }
-        await itemAction(item, router);
+        await itemAction(item);
     };
 
     const showConfirmDialog = ref(false);

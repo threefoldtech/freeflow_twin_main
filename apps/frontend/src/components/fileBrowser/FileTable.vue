@@ -316,7 +316,6 @@
         equals,
         isDraggingFiles,
         goToShared,
-        itemAction,
         moveFiles,
         PathInfoModel,
         savedAttachments,
@@ -366,8 +365,7 @@
     };
 
     const isSelected = (item: PathInfoModel) => {
-        if (!selectedPaths.value.includes(item)) return false;
-        else return true;
+        return selectedPaths.value.includes(item);
     };
 
     const handleAllSelect = (val: any) => {
@@ -398,10 +396,6 @@
         tempCounter++;
     };
 
-    const highlight = (item: PathInfoModel) => {
-        return equals(item, dragOverItem.value) && canBeDropped(item);
-    };
-
     const onDrop = (item: PathInfoModel) => {
         tempCounter = 0;
         if (!canBeDropped(item)) return;
@@ -411,10 +405,6 @@
             selectedPaths.value.map(x => x.path)
         );
         selectedPaths.value = [];
-    };
-
-    const onDragEnd = () => {
-        isDraggingFiles.value = false;
     };
 
     const goBack = () => {
