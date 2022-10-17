@@ -1,8 +1,7 @@
 export default () => ({
     port: parseInt(process.env.PORT, 10) || 3000,
     node_env: process.env.NODE_ENV || 'development',
-    appBackend:
-        process.env.NODE_ENV === 'production' ? 'https://login.threefold.me' : 'https://login.staging.jimber.io/',
+    appBackend: process.env.NODE_ENV === 'production' ? 'https://login.threefold.me' : 'https://login.threefold.me',
     kycBackend: process.env.NODE_ENV === 'production' ? 'https://openkyc.live' : 'https://openkyc.staging.jimber.org',
     userId: process.env.USER_ID || 'patatje3',
     appId: `${process.env.DIGITALTWIN_APPID}` || 'patatje3.digitaltwin.jimbertesting.be',

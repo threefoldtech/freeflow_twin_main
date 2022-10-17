@@ -28,14 +28,5 @@ node migrator/migrator.js
 
 echo "Copying production config"
 cp /usr/share/nginx/html/config/production.js /usr/share/nginx/html/config/config-def.js
-cd /app
 
-pm2 start apps/backend/dist/src/server.js &
-
-
-
-nginx
-
-service nginx restart
-
-exec /usr/sbin/sshd -D
+echo "DONE"

@@ -1,0 +1,7 @@
+exec: bash -c |
+ "
+ cd /app
+ pm2 start apps/backend/dist/src/server.js &
+ "
+after:
+ - sshkey

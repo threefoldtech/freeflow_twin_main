@@ -8,7 +8,7 @@ export class DbService {
 
     private passwordUuid = process.env.REDIS_PASSWORD;
 
-    private redisURL = `redis://default:${this.passwordUuid}@localhost:6379`;
+    private redisURL = `redis://default:jimber321123@localhost:6379`;
 
     constructor() {
         this.client = new Client();
