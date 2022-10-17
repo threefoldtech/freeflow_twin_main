@@ -77,6 +77,7 @@
                                 @dblclick="emit('itemClicked', item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
+                                @dragleave="event => onDragLeave(event)"
                                 @drop="() => onDrop(item)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
@@ -152,6 +153,7 @@
                             @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
+                            @dragleave="event => onDragLeave(event)"
                             @drop="() => onDrop(item)"
                         >
                             <div
@@ -237,6 +239,11 @@
 
     const onDragOver = (event: Event, item: PathInfoModel) => {
         dragOverItem.value = item;
+        (event.target as Element).classList.add('bg-gray-200');
+    };
+
+    const onDragLeave = (event: Event) => {
+        (event.target as Element).classList.remove('bg-gray-200');
     };
 
     const canBeDropped = (item: PathInfoModel) => {

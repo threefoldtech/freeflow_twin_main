@@ -169,6 +169,7 @@
                                 @dblclick="emit('itemClicked', item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
+                                @dragleave="event => onDragLeave(event)"
                                 @drop="() => onDrop(item)"
                                 @mousedown.right="setCurrentRightClickedItem(item)"
                                 v-contextmenu:contextmenu-filebrowser-item-local
@@ -265,6 +266,7 @@
                             @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
+                            @dragleave="event => onDragLeave(event)"
                             @drop="() => onDrop(item)"
                             @mousedown.right="setCurrentRightClickedItem(item)"
                         >
@@ -305,7 +307,6 @@
         currentDirectoryContent,
         currentSort,
         currentSortDir,
-        deselectAll,
         deselectItem,
         fileBrowserTypeView,
         getFileExtension,
@@ -374,6 +375,11 @@
 
     const onDragOver = (event: Event, item: PathInfoModel) => {
         dragOverItem.value = item;
+        (event.currentTarget as Element).classList.add('bg-gray-200');
+    };
+
+    const onDragLeave = (event: Event) => {
+        (event.currentTarget as Element).classList.remove('bg-gray-200');
     };
 
     const canBeDropped = (item: PathInfoModel) => {
