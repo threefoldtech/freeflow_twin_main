@@ -925,12 +925,11 @@ export const fetchBasedOnRoute = async () => {
 export const sharedWithMeCurrentFolder = ref<string>('');
 
 export const loadSharedItems = () => {
-    sharedBreadcrumbs.value = [];
+    sharedBreadcrumbs.value = [{ name: 'Shared with me' }];
 
     const params = router.currentRoute.value.params;
 
     if (params.sharedId) {
-        sharedBreadcrumbs.value.push({ name: 'Shared with me' });
         const firstNode = allSharedContent.value.find(item => item.id === params.sharedId);
         sharedBreadcrumbs.value.push(firstNode);
 

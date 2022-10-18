@@ -1,9 +1,6 @@
 <template>
     <div @click.stop class="flex justify-between items-center mb-2">
         <div>
-            <p v-if="sharedDir" class="pl-2">
-                Shared with me: <span>{{ sharedWithMeCurrentFolder?.name }}</span>
-            </p>
             <p v-if="searchDirValue?.split('')?.length > 0" class="pl-2">Search results for {{ searchDirValue }}</p>
         </div>
         <button

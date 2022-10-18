@@ -48,6 +48,7 @@
                 <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
 
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
+                    <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     <span v-if="idx !== 0 && breadcrumb">
                         <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </span>
