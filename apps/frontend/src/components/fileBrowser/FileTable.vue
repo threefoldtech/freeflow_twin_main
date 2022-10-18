@@ -1,6 +1,7 @@
 <template>
     <v-contextmenu ref="contextmenu-filebrowser-item-local">
         <v-contextmenu-item
+            v-if="!currentRightClickedItem.data?.isDirectory"
             @click="
                 () => {
                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
