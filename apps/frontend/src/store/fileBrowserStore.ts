@@ -478,8 +478,8 @@ export const deselectAll = () => {
     selectedPaths.value = [];
 };
 
-export const handleAllSelect = (val: any) => {
-    if (val.target.checked) {
+export const handleAllSelect = (checked: boolean) => {
+    if (checked) {
         selectAll();
         return;
     }

@@ -59,6 +59,7 @@
                     >
                         <thead class="bg-gray-50">
                             <tr>
+                                <!--Checkbox to select all files, hidden for now. Can be used in the future-->
                                 <th
                                     class="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
@@ -70,7 +71,7 @@
                                         "
                                         class="h-auto w-auto"
                                         type="checkbox"
-                                        @change="handleAllSelect"
+                                        @change="el => handleAllSelect(el.target.checked)"
                                     />
                                 </th>
                                 <th

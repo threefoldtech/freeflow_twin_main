@@ -28,7 +28,7 @@
                                         "
                                         class="h-auto w-auto"
                                         type="checkbox"
-                                        @change="handleAllSelect"
+                                        @change="el => handleAllSelect(el.target.checked)"
                                     />
                                 </th>
                                 <th
