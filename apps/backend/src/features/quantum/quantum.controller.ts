@@ -316,7 +316,7 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async updateSharePermissions(@Body() { chatId, path }: { chatId: string; path: string }) {
         path = Buffer.from(path, 'base64').toString('binary');
-        await this._quantumService.updateSharePermissions({ chatId, path });
+        await this._quantumService.filterSharePermissions({ chatId, path });
     }
 
     @Post('dir')
