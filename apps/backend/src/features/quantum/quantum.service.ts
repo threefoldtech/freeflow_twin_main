@@ -415,7 +415,13 @@ export class QuantumService {
                 });
             }
             const stats = await this._fileService.getStats({ path });
-            if (stats.isDirectory()) return this._fileService.deleteDirectory({ path });
+            if (stats.isDirectory()) {
+                const files = await this._fileService.readDirectory({ path, options: { withFileTypes: true } });
+                for (const file of files) {
+                    await this.deleteFile({ path: join(path, file.name) });
+                }
+                return this._fileService.deleteDirectory({ path });
+            }
             return this._fileService.deleteFile({ path });
         } catch (error) {
             throw new BadRequestException(`unable to delete file or folder: ${error}`);
