@@ -85,7 +85,7 @@ export const getFileInfo = async (
     const params = new URLSearchParams();
     params.append('path', path);
     params.append('attachments', String(attachments));
-    params.append('location', location);
+    if (location) params.append('location', location);
     return await axios.get(`${config.baseUrl}api/v2/quantum/file/info`, { params: params });
 };
 
