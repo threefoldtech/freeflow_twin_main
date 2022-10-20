@@ -526,4 +526,25 @@ export class ApiService {
             return;
         }
     }
+
+    async getExternalFileInfo({
+        path,
+        attachments,
+        location,
+    }: {
+        path: string;
+        attachments: boolean;
+        location: string;
+    }) {
+        const url = `http://[${location}]/api/v2/quantum/file/info`;
+        const params = new URLSearchParams();
+        params.append('path', path);
+        params.append('attachments', attachments.toString());
+        params.append('location', location);
+        try {
+            return (await axios.get(url, { params })).data;
+        } catch {
+            return;
+        }
+    }
 }

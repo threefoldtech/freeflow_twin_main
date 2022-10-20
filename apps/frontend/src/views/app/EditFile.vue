@@ -103,7 +103,7 @@
             const encodedEndpoint = calcExternalResourceLink(encodeURIComponent(apiEndpoint));
             readUrl.value = encodedEndpoint;
         } else {
-            fileAccesDetails = (await getFileInfo(path, attachments)).data;
+            fileAccesDetails = (await getFileInfo(path, undefined, attachments)).data;
 
             isLoading.value = false;
             readUrl.value = generateFileBrowserUrl(

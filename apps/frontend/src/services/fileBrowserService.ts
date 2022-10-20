@@ -46,7 +46,7 @@ export interface GetShareToken {
     token: string;
 }
 
-export interface EditPathInfo extends PathInfo {
+export interface EditPathInfo extends PathInfoModel {
     key: string;
     readToken: string;
     writeToken: string;
@@ -77,10 +77,15 @@ export const createDirectory = async (path: string, name: string): Promise<Axios
     return await axios.post<PathInfo>(`${config.baseUrl}api/v2/quantum/dir`, body);
 };
 
-export const getFileInfo = async (path: string, attachments: boolean = false): Promise<AxiosResponse<EditPathInfo>> => {
+export const getFileInfo = async (
+    path: string,
+    location?: string,
+    attachments: boolean = false
+): Promise<AxiosResponse<EditPathInfo>> => {
     const params = new URLSearchParams();
     params.append('path', path);
     params.append('attachments', String(attachments));
+    params.append('location', location);
     return await axios.get(`${config.baseUrl}api/v2/quantum/file/info`, { params: params });
 };
 

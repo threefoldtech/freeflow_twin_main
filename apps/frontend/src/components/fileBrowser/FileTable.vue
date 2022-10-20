@@ -317,7 +317,6 @@
         equals,
         isDraggingFiles,
         goToShared,
-        itemAction,
         moveFiles,
         PathInfoModel,
         savedAttachments,
