@@ -32,7 +32,8 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
 };
 
 export const startFetchStatusLoop = async (contact: Contact) => {
-    if (watchingUsers.find(wu => wu === contact.id)) {
+    if (watchingUsers.find(wu => wu === contact.id) && !statusList[<string>contact.id]) {
+        await fetchStatus(contact.id);
         return;
     }
     watchingUsers.push(contact.id);
