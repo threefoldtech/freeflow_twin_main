@@ -22,13 +22,9 @@
     <Table v-if="searchResults?.length > 0" :data="searchResults" :headers="headers">
         <template #data-types="data">
             <div class="my-1 p-2 rounded-md border border-gray-200 w-20">
-                <span v-if="canWrite">Write</span>
+                <span v-if="canWrite(data.row)">Write</span>
                 <span v-else>Read</span>
             </div>
-            <!-- <div class="cursor-pointer rounded-xl bg-gray-50 border border-gray-200 w-28 justify-between flex content-center items-center ">
-<span @click="item.canWrite = false" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length <=1 }"> Read</span>
-<span @click="item.canWrite = true" class="p-2 rounded-xl" :class="{ 'bg-primary text-white': data.data.length > 1}"> Write</span>
-</div> -->
         </template>
         <template #data-delete="data">
             <span class="my-1 p-2 rounded-md bg-red-500 text-white cursor-pointer" @click="remove(data.row)">
@@ -39,7 +35,7 @@
     <div v-else class="flex justify-center itemns-center mt-2">This file isn't shared with anyone yet.</div>
 </template>
 <script lang="ts" setup>
-    import { SharedFileInterface } from '@/types';
+    import { SharedFileInterface, SharePermissionInterface } from '@/types';
     import { PathInfoModel } from '@/store/fileBrowserStore';
     import { ref, computed, onBeforeMount } from 'vue';
     import { useChatsState } from '@/store/chatStore';
@@ -109,15 +105,13 @@
         emit('update:modelValue', evt.target.value);
     };
 
+    const canWrite = (data: SharePermissionInterface) => {
+        return data.sharePermissionTypes.includes(SharePermission.Write);
+    };
+
     const searchResults = computed(() => {
         return currentShare?.value?.permissions?.filter(item => {
             return item?.name?.toLowerCase().includes(searchTerm.value.toLowerCase());
-        });
-    });
-
-    const canWrite = computed(() => {
-        return currentShare?.value?.permissions?.some(item => {
-            return item?.sharePermissionTypes?.includes(SharePermission.Write);
         });
     });
 
