@@ -60,6 +60,7 @@
                     >
                         <thead class="bg-gray-50">
                             <tr>
+                                <!--Checkbox to select all files, hidden for now. Can be used in the future-->
                                 <th
                                     class="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
@@ -71,7 +72,7 @@
                                         "
                                         class="h-auto w-auto"
                                         type="checkbox"
-                                        @change="handleAllSelect"
+                                        @change="el => handleAllSelect(el.target.checked)"
                                     />
                                 </th>
                                 <th
@@ -170,6 +171,7 @@
                                 @dblclick="emit('itemClicked', item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
+                                @dragleave="event => onDragLeave(event)"
                                 @drop="() => onDrop(item)"
                                 @mousedown.right="setCurrentRightClickedItem(item)"
                                 v-contextmenu:contextmenu-filebrowser-item-local
@@ -266,6 +268,7 @@
                             @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
+                            @dragleave="event => onDragLeave(event)"
                             @drop="() => onDrop(item)"
                             @mousedown.right="setCurrentRightClickedItem(item)"
                         >
@@ -306,7 +309,6 @@
         currentDirectoryContent,
         currentSort,
         currentSortDir,
-        deselectAll,
         deselectItem,
         fileBrowserTypeView,
         getFileExtension,
@@ -315,9 +317,10 @@
         getIcon,
         getIconColor,
         equals,
+        handleAllSelect,
+        isSelected,
         isDraggingFiles,
         goToShared,
-        itemAction,
         moveFiles,
         PathInfoModel,
         savedAttachments,
@@ -366,16 +369,6 @@
         deselectItem(item);
     };
 
-    const isSelected = (item: PathInfoModel) => {
-        if (!selectedPaths.value.includes(item)) return false;
-        else return true;
-    };
-
-    const handleAllSelect = (val: any) => {
-        if (val.target.checked) selectAll();
-        else deselectAll();
-    };
-
     const onDragStart = (event, item) => {
         isDraggingFiles.value = true;
         if (!selectedPaths.value.includes(item)) selectItem(item);
@@ -384,6 +377,11 @@
 
     const onDragOver = (event: Event, item: PathInfoModel) => {
         dragOverItem.value = item;
+        (event.currentTarget as Element).classList.add('bg-gray-200');
+    };
+
+    const onDragLeave = (event: Event) => {
+        (event.currentTarget as Element).classList.remove('bg-gray-200');
     };
 
     const canBeDropped = (item: PathInfoModel) => {
@@ -399,10 +397,6 @@
         tempCounter++;
     };
 
-    const highlight = (item: PathInfoModel) => {
-        return equals(item, dragOverItem.value) && canBeDropped(item);
-    };
-
     const onDrop = (item: PathInfoModel) => {
         tempCounter = 0;
         if (!canBeDropped(item)) return;
@@ -412,10 +406,6 @@
             selectedPaths.value.map(x => x.path)
         );
         selectedPaths.value = [];
-    };
-
-    const onDragEnd = () => {
-        isDraggingFiles.value = false;
     };
 
     const goBack = () => {
