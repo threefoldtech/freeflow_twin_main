@@ -3,10 +3,17 @@
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
                 <div class="shadow overflow-hidden sm:rounded-lg">
+                    <div ref="hiddenItems" class="absolute hiddenItems">
+                        <div ref="ghostImage" class="bg-white p-2">
+                            Moving {{ selectedPaths.length }} selected File(s)
+                        </div>
+                    </div>
                     <table
                         v-if="fileBrowserTypeView === 'LIST'"
                         :key="currentDirectory"
                         class="min-w-full divide-y divide-gray-200"
+                        @dragenter="onDragEnterParent"
+                        @dragleave="onDragLeaveParent"
                     >
                         <thead class="bg-gray-50">
                             <tr>
@@ -21,7 +28,7 @@
                                         "
                                         class="h-auto w-auto"
                                         type="checkbox"
-                                        @change="handleAllSelect"
+                                        @change="el => handleAllSelect(el.target.checked)"
                                     />
                                 </th>
                                 <th
@@ -62,11 +69,16 @@
                                 v-if="searchResults !== 'None'"
                                 :key="item.fullName"
                                 :class="{
-                                    'bg-gray-100': isSelected(item),
+                                    'bg-gray-300': isSelected(item),
                                 }"
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                                @click="handleSelect(item)"
+                                draggable="true"
+                                @click.stop="handleSelect(item)"
                                 @dblclick="emit('itemClicked', item)"
+                                @dragover="event => onDragOver(event, item)"
+                                @dragstart="event => onDragStart(event, item)"
+                                @dragleave="event => onDragLeave(event)"
+                                @drop="() => onDrop(item)"
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
                                     <input
@@ -90,7 +102,7 @@
                                         <div class="flex flex-col items-start py-1">
                                             <span
                                                 class="text-md hover:underline cursor-pointer"
-                                                @click="emit('itemClicked', item)"
+                                                @click.stop="emit('itemClicked', item)"
                                             >
                                                 {{ item.name }}
                                             </span>
@@ -137,10 +149,11 @@
                             :title="item.fullName"
                             class="relative"
                             draggable="true"
-                            @click="handleSelect(item)"
+                            @click.stop="handleSelect(item)"
                             @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
+                            @dragleave="event => onDragLeave(event)"
                             @drop="() => onDrop(item)"
                         >
                             <div
@@ -181,49 +194,93 @@
         getFileLastModified,
         getFileExtension,
         getFileSize,
-        selectAll,
-        deselectAll,
+        handleAllSelect,
+        truncatePath,
+        isSelected,
         selectItem,
         deselectItem,
         getIconColor,
         getIcon,
         PathInfoModel,
-        itemAction,
         goToFileDirectory,
         fileBrowserTypeView,
+        isDraggingFiles,
+        equals,
+        moveFiles,
     } from '@/store/fileBrowserStore';
     import { useRouter } from 'vue-router';
+    import { ref } from 'vue';
 
     const router = useRouter();
     const emit = defineEmits(['itemClicked']);
-    const isSelected = (item: PathInfoModel) => {
-        if (!selectedPaths.value.includes(item)) return false;
-        else return true;
-    };
-    const handleAllSelect = (val: any) => {
-        if (val.target.checked) {
-            selectAll();
-            return;
-        }
-        deselectAll();
-    };
+
+    let tempCounter = 0;
+    const ghostImage = ref<HTMLDivElement>();
+    const hiddenItems = ref<HTMLDivElement>();
+    const dragOverItem = ref<PathInfoModel>();
+
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) {
             selectItem(item);
             return;
         }
+        if (selectedPaths.value.length === 1 && selectedPaths.value[0] === item) {
+            emit('itemClicked', item);
+            return;
+        }
         deselectItem(item);
     };
-    const truncatePath = str => {
-        if (str.length > 30) {
-            return str.substr(0, 20) + '...' + str.substr(-30);
-        }
-        return str;
+
+    const onDragStart = (event, item) => {
+        isDraggingFiles.value = true;
+        if (!selectedPaths.value.includes(item)) selectItem(item);
+        event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
+    };
+
+    const onDragOver = (event: Event, item: PathInfoModel) => {
+        dragOverItem.value = item;
+        (event.target as Element).classList.add('bg-gray-200');
+    };
+
+    const onDragLeave = (event: Event) => {
+        (event.target as Element).classList.remove('bg-gray-200');
+    };
+
+    const canBeDropped = (item: PathInfoModel) => {
+        return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
+    };
+
+    const onDragLeaveParent = () => {
+        tempCounter--;
+        if (tempCounter === 0) dragOverItem.value = undefined;
+    };
+
+    const onDragEnterParent = () => {
+        tempCounter++;
+    };
+
+    const onDrop = (item: PathInfoModel) => {
+        tempCounter = 0;
+        if (!canBeDropped(item)) return;
+        dragOverItem.value = undefined;
+        moveFiles(
+            item.path,
+            selectedPaths.value.map(x => x.path)
+        );
+        selectedPaths.value = [];
+    };
+
+    const goBack = () => {
+        router.go(-1);
     };
 </script>
 
 <style scoped>
     th.active {
         opacity: 1;
+    }
+
+    .hiddenItems {
+        z-index: -20;
     }
 </style>

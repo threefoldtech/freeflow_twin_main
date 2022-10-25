@@ -478,7 +478,26 @@ export const deselectAll = () => {
     selectedPaths.value = [];
 };
 
-export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
+export const handleAllSelect = (checked: boolean) => {
+    if (checked) {
+        selectAll();
+        return;
+    }
+    deselectAll();
+};
+
+export const truncatePath = str => {
+    if (str.length > 30) {
+        return str.substr(0, 20) + '...' + str.substr(-30);
+    }
+    return str;
+};
+
+export const isSelected = (item: PathInfoModel) => {
+    return selectedPaths.value.includes(item);
+};
+
+export const itemAction = async (item: PathInfoModel) => {
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;
