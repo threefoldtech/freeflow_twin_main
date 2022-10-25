@@ -47,23 +47,15 @@ export class ChatFileState implements FileState<IChatFile> {
         const userId = this._configService.get<string>('userId');
         const path = `${this.storageDir}/${userId}/chats`;
 
-        const realFileNameIdx = filename.lastIndexOf('.');
-        const realFileName = filename.substring(0, realFileNameIdx);
-
-        const extension = filename.substring(realFileNameIdx, filename.length);
-
-        const uuid = uuidv4();
-        const uniqueFileName = realFileName + '-clipboard-' + uuid + extension;
-
         try {
             this._fileService.makeDirectory({ path });
-            this._fileService.moveFile({ from: fromPath, to: join(path, uniqueFileName) });
+            this._fileService.moveFile({ from: fromPath, to: join(path, filename) });
         } catch (error) {
             return false;
         }
         // create new message and emit to connected sockets
         const yggdrasilAddress = await this._locationService.getOwnLocation();
-        const chatPath = `${userId}/chats/${uniqueFileName}`;
+        const chatPath = `${userId}/chats/${filename}`;
         const destinationUrl = `http://[${yggdrasilAddress}]/api/v2/files/${btoa(chatPath)}`;
         const message: MessageDTO<FileMessage> = {
             id: messageId,
@@ -72,7 +64,7 @@ export class ChatFileState implements FileState<IChatFile> {
             to: chatId,
             body: {
                 type,
-                filename: uniqueFileName,
+                filename,
                 url: destinationUrl,
             },
             timeStamp: new Date(),
