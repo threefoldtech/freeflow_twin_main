@@ -161,7 +161,7 @@
 
     const router = useRouter();
     const route = useRoute();
-    const emit = defineEmits(['itemSelected']);
+    const emit = defineEmits(['itemClicked']);
 
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;

@@ -20,7 +20,7 @@
                             v-if="!sharedDir && searchResults.length > 0 && !isQuantumChatFiles"
                             @itemClicked="handleItemClick"
                         />
-                        <SharedContent v-if="sharedDir || isQuantumChatFiles" @itemClicked="handleItemClick" />
+                        <SharedContent v-if="sharedDir || isQuantumChatFiles" @itemClicked="handleShareClick" />
                     </div>
                 </div>
             </FileDropArea>
@@ -136,6 +136,7 @@
     import { calcExternalResourceLink } from '@/services/urlService';
     import { getFileInfo, updateFile } from '@/services/fileBrowserService';
     import { useAuthState } from '@/store/authStore';
+    import { SharedFileInterface } from '@/types';
     import { IFileTypes } from 'custom-types/file-actions.type';
 
     const { user } = useAuthState();
@@ -199,15 +200,14 @@
     const filePreviewType = ref('');
     const fileContent = ref('');
     const editedFileContent = ref('');
-    const clickedItem = ref<PathInfoModel>();
+    const clickedItem = ref<PathInfoModel | SharedFileInterface>();
 
-    const handleItemClick = async (item: PathInfoModel) => {
+    const handleItemClick = async (item: PathInfoModel, location = user?.location) => {
         if (isVideo(item.path) || isImage(item.path) || isSimpleTextFile(item.path)) {
             clickedItem.value = item;
-            const ownerLocation = user.location;
             let path = item.path;
             path = path.replace('/appdata/storage/', '');
-            const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
+            const src = `http://[${location}]/api/v2/files/${btoa(path)}`;
             filePreviewSrc.value = calcExternalResourceLink(src);
 
             filePreviewType.value = isVideo(item.path)
@@ -229,6 +229,11 @@
         await itemAction(item);
     };
 
+    const handleShareClick = async (item: SharedFileInterface) => {
+        const res = (await getFileInfo(item.path, item.owner.location)).data;
+        await handleItemClick(res, item.owner.location);
+    };
+
     const showConfirmDialog = ref(false);
 
     const closeEditor = () => {
@@ -241,7 +246,7 @@
 
     const saveChanges = async () => {
         if (editedFileContent.value !== fileContent.value) {
-            const fileAccessDetails = (await getFileInfo(clickedItem.value.path, false)).data;
+            const fileAccessDetails = (await getFileInfo(clickedItem.value.path, undefined, false)).data;
             const { readToken, key } = fileAccessDetails;
             await updateFile(clickedItem.value.path, editedFileContent.value, user.location, readToken, key);
         }
