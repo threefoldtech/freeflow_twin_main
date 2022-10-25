@@ -54,14 +54,16 @@
         getShareWithId,
     } from '@/services/fileBrowserService';
     import Spinner from '@/components/Spinner.vue';
-    import { useAuthState } from '@/store/authStore';
     import { isUndefined } from 'lodash';
-    import { waitFor } from '@/utils';
+    import { getOwnLocation } from '@/services/userService';
 
     const route = useRoute();
     const fileType = ref<FileType>();
     const readUrl = ref<string>();
     const isLoading = ref<boolean>(true);
+    const location = ref<string>('');
+    const path = atob(<string>route.params.path);
+    const shareId = <string>route.params.shareId;
 
     const isSupported = computed(() => {
         return [
@@ -75,14 +77,11 @@
     });
 
     onMounted(async () => {
-        const { user } = useAuthState();
+        if (!shareId) location.value = await getOwnLocation();
 
-        const path = atob(<string>route.params.path);
-        const shareId = <string>route.params.shareId;
         const attachments = route.params.attachments === 'true';
         let fileAccesDetails: EditPathInfo;
         let documentServerconfig;
-        let location = '';
 
         if (shareId) {
             const shareDetails = await getShareWithId(shareId);
@@ -91,7 +90,7 @@
             if (showUserOfflineMessage.value || accessDenied.value) {
                 isLoading.value = false;
             }
-            location = shareDetails.owner.location;
+            location.value = shareDetails.owner.location;
             fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
             isLoading.value = false;
 
@@ -104,9 +103,7 @@
             const encodedEndpoint = calcExternalResourceLink(encodeURIComponent(apiEndpoint));
             readUrl.value = encodedEndpoint;
         } else {
-            await waitFor(100);
-            location = user.location;
-            fileAccesDetails = (await getFileInfo(path, attachments)).data;
+            fileAccesDetails = (await getFileInfo(path, undefined, attachments)).data;
 
             isLoading.value = false;
             readUrl.value = generateFileBrowserUrl(
@@ -121,9 +118,9 @@
         fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
 
         if (isSupported.value) {
-            console.log(`USED ONLYOFFICE LOCATION: ${location}`);
+            console.log(`USED ONLYOFFICE LOCATION: ${location.value}`);
             documentServerconfig = generateDocumentServerConfig(
-                location,
+                location.value,
                 fileAccesDetails.path,
                 fileAccesDetails.key,
                 fileAccesDetails.readToken,

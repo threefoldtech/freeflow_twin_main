@@ -115,7 +115,7 @@ export class QuantumService {
         }
     }
 
-    async updateSharePermissions({ path, chatId }: { path: string; chatId: string }) {
+    async filterSharePermissions({ path, chatId }: { path: string; chatId: string }) {
         const share = await this.getShareByPath({ path });
         if (!share) return;
         const permissions = share.parsePermissions().filter(p => p.userId !== chatId);
@@ -415,7 +415,13 @@ export class QuantumService {
                 });
             }
             const stats = await this._fileService.getStats({ path });
-            if (stats.isDirectory()) return this._fileService.deleteDirectory({ path });
+            if (stats.isDirectory()) {
+                const files = await this._fileService.readDirectory({ path, options: { withFileTypes: true } });
+                for (const file of files) {
+                    await this.deleteFile({ path: join(path, file.name) });
+                }
+                return this._fileService.deleteDirectory({ path });
+            }
             return this._fileService.deleteFile({ path });
         } catch (error) {
             throw new BadRequestException(`unable to delete file or folder: ${error}`);
@@ -461,14 +467,7 @@ export class QuantumService {
     async handleIncomingDeleteShare({ share, chatId }: { share: Share; chatId: string }) {
         try {
             await this._messageService.deleteShareMessages({ chatId, shareId: share.id });
-
-            const chat = await this._chatService.getChat(chatId);
-            let permissions = share.parsePermissions().filter(p => p.userId !== chatId);
-            if (!chat.isGroup) permissions = permissions.filter(p => p.userId !== this.userId);
-            if (permissions.length === 0) return await this._shareRepository.deleteShare({ entityId: share.entityId });
-
-            share.permissions = stringifyPermissions(permissions);
-            return (await this._shareRepository.updateShare({ share })).toJSON();
+            return await this._shareRepository.deleteShare({ entityId: share.entityId });
         } catch (error) {
             throw new BadRequestException(`unable to delete share: ${error}`);
         }

@@ -3,28 +3,116 @@
     <appLayout>
         <template v-slot:default>
             <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
-                <div @click="selectedPaths = []" class="flex flex-row w-full h-full">
+                <div
+                    @click="selectedPaths = []"
+                    ref="fileTableDiv"
+                    @keydown.esc="closeEditor()"
+                    tabindex="0"
+                    class="flex flex-row w-full h-full"
+                >
                     <div class="flex flex-col flex-1">
                         <TopBar @click.stop />
-                        <FileTable v-if="searchResults.length === 0 && !isQuantumChatFiles" />
-                        <ResultsTable v-if="searchResults.length > 0 && !isQuantumChatFiles" />
-                        <!--                    <SharedContent v-if="sharedDir === true || isQuantumChatFiles" />-->
+                        <FileTable
+                            v-if="!sharedDir && searchResults.length === 0 && !isQuantumChatFiles"
+                            @itemClicked="handleItemClick"
+                        />
+                        <ResultsTable
+                            v-if="!sharedDir && searchResults.length > 0 && !isQuantumChatFiles"
+                            @itemClicked="handleItemClick"
+                        />
+                        <SharedContent v-if="sharedDir || isQuantumChatFiles" @itemClicked="handleShareClick" />
                     </div>
                 </div>
             </FileDropArea>
+
+            <div
+                v-if="showFilePreview"
+                class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
+                @click.self="closeEditor()"
+            >
+                <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
+                <div v-if="filePreviewType === IFileTypes.IMAGE">
+                    <img
+                        :src="filePreviewSrc"
+                        class="pointer-events-none z-50 max-h-full"
+                        @click.stop
+                        alt="filePreview"
+                    />
+                </div>
+
+                <div v-else-if="filePreviewType === IFileTypes.VIDEO">
+                    <video controls>
+                        <source :src="filePreviewSrc" />
+                    </video>
+                </div>
+
+                <div v-else-if="filePreviewType === IFileTypes.SIMPLE">
+                    <button
+                        @click="saveChanges()"
+                        class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
+                    >
+                        <SaveIcon class="w-6 h-6 inline-block mr-2" />
+                        Save changes
+                    </button>
+                    <MonacoEditor
+                        @keydown.esc="fileTableDiv.focus()"
+                        theme="vs"
+                        v-model="editedFileContent"
+                        :extension="clickedItem?.extension"
+                        :options="monacoOptions"
+                        class="w-screen h-[750px]"
+                    />
+                </div>
+            </div>
+
+            <Dialog
+                :modelValue="showConfirmDialog"
+                @updateModelValue="
+                    showConfirmDialog = false;
+                    clickedItem = undefined;
+                    showFilePreview = false;
+                "
+                :noActions="true"
+            >
+                <template v-slot:title class="center">
+                    <h1 class="font-medium">File has been modified</h1>
+                </template>
+                <div class="flex justify-end mt-2 px-4">
+                    <button
+                        @click="
+                            showConfirmDialog = false;
+                            clickedItem = undefined;
+                            showFilePreview = false;
+                        "
+                        class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
+                    >
+                        Discard changes
+                    </button>
+                    <button
+                        @click="saveChanges()"
+                        class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
+                    >
+                        Save changes
+                    </button>
+                </div>
+            </Dialog>
         </template>
     </appLayout>
 </template>
 
 <script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
-    import { onBeforeMount } from 'vue';
+    import { nextTick, onBeforeMount, ref } from 'vue';
     import FileTable from '@/components/fileBrowser/FileTable.vue';
     import ResultsTable from '@/components/fileBrowser/ResultsTable.vue';
+    import SharedContent from '@/components/fileBrowser/SharedContent.vue';
     import FileDropArea from '@/components/FileDropArea.vue';
     import {
         currentDirectory,
+        fileBrowserTypeView,
         isQuantumChatFiles,
+        itemAction,
+        PathInfoModel,
         searchDirValue,
         searchResults,
         selectedPaths,
@@ -32,7 +120,6 @@
         selectItem,
         sharedDir,
         sharedItem,
-        fileBrowserTypeView,
         updateContent,
         uploadFiles,
     } from '@/store/fileBrowserStore';
@@ -42,6 +129,30 @@
     import { showShareDialog } from '@/services/dialogService';
     import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
     import { decodeString } from '@/utils/files';
+    import Dialog from '@/components/Dialog.vue';
+    import MonacoEditor from '@/components/MonacoEditor.vue';
+    import { SaveIcon, XIcon } from '@heroicons/vue/solid';
+    import { isImage, isSimpleTextFile, isVideo } from '@/services/contentService';
+    import { calcExternalResourceLink } from '@/services/urlService';
+    import { getFileInfo, updateFile } from '@/services/fileBrowserService';
+    import { useAuthState } from '@/store/authStore';
+    import { SharedFileInterface } from '@/types';
+    import { IFileTypes } from 'custom-types/file-actions.type';
+
+    const { user } = useAuthState();
+
+    const fileTableDiv = ref<HTMLDivElement>();
+
+    nextTick(() => {
+        fileTableDiv.value?.focus();
+    });
+
+    const monacoOptions = {
+        minimap: {
+            enabled: false,
+        },
+        language: 'javascript',
+    };
 
     const route = useRoute();
     const router = useRouter();
@@ -83,6 +194,66 @@
             return;
         }
     });
+
+    const showFilePreview = ref(false);
+    const filePreviewSrc = ref('');
+    const filePreviewType = ref('');
+    const fileContent = ref('');
+    const editedFileContent = ref('');
+    const clickedItem = ref<PathInfoModel | SharedFileInterface>();
+
+    const handleItemClick = async (item: PathInfoModel, location = user?.location) => {
+        if (isVideo(item.path) || isImage(item.path) || isSimpleTextFile(item.path)) {
+            clickedItem.value = item;
+            let path = item.path;
+            path = path.replace('/appdata/storage/', '');
+            const src = `http://[${location}]/api/v2/files/${btoa(path)}`;
+            filePreviewSrc.value = calcExternalResourceLink(src);
+
+            filePreviewType.value = isVideo(item.path)
+                ? IFileTypes.VIDEO
+                : isImage(item.path)
+                ? IFileTypes.IMAGE
+                : IFileTypes.SIMPLE;
+
+            if (filePreviewType.value !== 'simpleFile') {
+                showFilePreview.value = true;
+                return;
+            }
+
+            fileContent.value = await (await fetch(filePreviewSrc.value)).text();
+            editedFileContent.value = fileContent.value;
+            showFilePreview.value = true;
+            return;
+        }
+        await itemAction(item);
+    };
+
+    const handleShareClick = async (item: SharedFileInterface) => {
+        const res = (await getFileInfo(item.path, item.owner.location)).data;
+        await handleItemClick(res, item.owner.location);
+    };
+
+    const showConfirmDialog = ref(false);
+
+    const closeEditor = () => {
+        showFilePreview.value = false;
+        if (filePreviewType.value !== IFileTypes.SIMPLE || editedFileContent.value === fileContent.value) {
+            return;
+        }
+        showConfirmDialog.value = true;
+    };
+
+    const saveChanges = async () => {
+        if (editedFileContent.value !== fileContent.value) {
+            const fileAccessDetails = (await getFileInfo(clickedItem.value.path, undefined, false)).data;
+            const { readToken, key } = fileAccessDetails;
+            await updateFile(clickedItem.value.path, editedFileContent.value, user.location, readToken, key);
+        }
+        showFilePreview.value = false;
+        showConfirmDialog.value = false;
+        clickedItem.value = undefined;
+    };
 </script>
 
 <style scoped type="text/css"></style>

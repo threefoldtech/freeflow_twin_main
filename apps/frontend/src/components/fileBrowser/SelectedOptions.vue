@@ -4,7 +4,7 @@
             <div v-if="selectedPaths.length > 0" class="mx-2">
                 <p>{{ selectedPaths.length }} File(s) selected</p>
             </div>
-            <Tooltip v-if="selectedPaths.length === 1" textItem="Share">
+            <Tooltip v-if="selectedPaths.length === 1 && !selectedPaths[0]?.isDirectory" textItem="Share">
                 <template #source>
                     <div v-if="selectedPaths.length === 1" class="mx-2 cursor-pointer" @click="showShareDialog = true">
                         <span class="text-gray-400 hover:text-gray-500">
@@ -107,7 +107,7 @@
                 </div>
                 <div class="text-left space-y-6 py-4">
                     <div
-                        v-if="selectedPaths.length === 1"
+                        v-if="selectedPaths.length === 1 && !selectedPaths[0]?.isDirectory"
                         class="mx-4 cursor-pointer flex"
                         @click="
                             () => {

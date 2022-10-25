@@ -49,6 +49,12 @@ export enum ISimpleFileExtension {
     PYTHON = 'python',
 }
 
+export enum IFileTypes {
+    IMAGE = 'image',
+    VIDEO = 'video',
+    SIMPLE = 'simpleFile',
+}
+
 export enum IImageFileExtension {
     GIF = 'gif',
     PNG = 'png',

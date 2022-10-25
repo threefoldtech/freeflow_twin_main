@@ -1,6 +1,7 @@
 <template>
     <v-contextmenu ref="contextmenu-filebrowser-item-local">
         <v-contextmenu-item
+            v-if="!currentRightClickedItem?.data?.isDirectory"
             @click="
                 () => {
                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
@@ -37,71 +38,8 @@
             >Delete
         </v-contextmenu-item>
     </v-contextmenu>
-    <div
-        v-if="showFilePreview"
-        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
-        @click.self="closeEditor()"
-    >
-        <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
-        <div v-if="filePreviewType === 'image'">
-            <img :src="filePreviewSrc" class="pointer-events-none z-50 max-h-full" @click.stop alt="filePreview" />
-        </div>
 
-        <div v-else-if="filePreviewType === 'video'">
-            <video controls>
-                <source :src="filePreviewSrc" />
-            </video>
-        </div>
-
-        <div v-else-if="filePreviewType === 'simpleFile'">
-            <button
-                @click="saveChanges()"
-                class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
-            >
-                <SaveIcon class="w-6 h-6 inline-block mr-2" />
-                Save changes
-            </button>
-            <MonacoEditor
-                @keydown.esc="fileTableDiv.focus()"
-                theme="vs"
-                v-model="editedFileContent"
-                :extension="clickedItem?.extension"
-                :options="monacoOptions"
-                class="w-screen h-[750px]"
-            />
-        </div>
-    </div>
-
-    <Dialog
-        :modelValue="showConfirmDialog"
-        @updateModelValue="
-            showConfirmDialog = false;
-            clickedItem = undefined;
-            showFilePreview = false;
-        "
-        :noActions="true"
-    >
-        <template v-slot:title class="center">
-            <h1 class="font-medium">File has been modified</h1>
-        </template>
-        <div class="flex justify-end mt-2 px-4">
-            <button
-                @click="
-                    showConfirmDialog = false;
-                    clickedItem = undefined;
-                    showFilePreview = false;
-                "
-                class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
-            >
-                Discard changes
-            </button>
-            <button @click="saveChanges()" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">
-                Save changes
-            </button>
-        </div>
-    </Dialog>
-
-    <div class="flex flex-col mx-2" ref="fileTableDiv" @keydown.esc="closeEditor()" tabindex="0">
+    <div class="flex flex-col mx-2">
         <div class="overflow-x-auto">
             <div class="align-middle inline-block min-w-full">
                 <div class="overflow-hidden sm:rounded-lg">
@@ -122,6 +60,7 @@
                     >
                         <thead class="bg-gray-50">
                             <tr>
+                                <!--Checkbox to select all files, hidden for now. Can be used in the future-->
                                 <th
                                     class="hidden px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                                     scope="col"
@@ -133,7 +72,7 @@
                                         "
                                         class="h-auto w-auto"
                                         type="checkbox"
-                                        @change="handleAllSelect"
+                                        @change="el => handleAllSelect(el.target.checked)"
                                     />
                                 </th>
                                 <th
@@ -229,9 +168,10 @@
                                 class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
                                 draggable="true"
                                 @click.stop="handleSelect(item)"
-                                @dblclick="handleItemClick(item)"
+                                @dblclick="emit('itemClicked', item)"
                                 @dragover="event => onDragOver(event, item)"
                                 @dragstart="event => onDragStart(event, item)"
+                                @dragleave="event => onDragLeave(event)"
                                 @drop="() => onDrop(item)"
                                 @mousedown.right="setCurrentRightClickedItem(item)"
                                 v-contextmenu:contextmenu-filebrowser-item-local
@@ -255,7 +195,7 @@
                                         <div class="mr-3 w-7 text-center">
                                             <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
                                         </div>
-                                        <span class="hover:underline" @click.stop="handleItemClick(item)">
+                                        <span class="hover:underline" @click.stop="emit('itemClicked', item)">
                                             {{ item.name }}
                                         </span>
                                     </div>
@@ -325,9 +265,10 @@
                             class="relative"
                             draggable="true"
                             @click.stop="handleSelect(item)"
-                            @dblclick="handleItemClick(item)"
+                            @dblclick="emit('itemClicked', item)"
                             @dragover="event => onDragOver(event, item)"
                             @dragstart="event => onDragStart(event, item)"
+                            @dragleave="event => onDragLeave(event)"
                             @drop="() => onDrop(item)"
                             @mousedown.right="setCurrentRightClickedItem(item)"
                         >
@@ -361,15 +302,13 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, nextTick, ref } from 'vue';
-    import { XIcon, SaveIcon } from '@heroicons/vue/solid';
+    import { computed, ref } from 'vue';
 
     import {
         currentDirectory,
         currentDirectoryContent,
         currentSort,
         currentSortDir,
-        deselectAll,
         deselectItem,
         fileBrowserTypeView,
         getFileExtension,
@@ -378,9 +317,10 @@
         getIcon,
         getIconColor,
         equals,
+        handleAllSelect,
+        isSelected,
         isDraggingFiles,
         goToShared,
-        itemAction,
         moveFiles,
         PathInfoModel,
         savedAttachments,
@@ -392,8 +332,6 @@
         sortContent,
     } from '@/store/fileBrowserStore';
     import { useRoute, useRouter } from 'vue-router';
-    import { useAuthState } from '@/store/authStore';
-    import Dialog from '@/components/Dialog.vue';
     import {
         currentRightClickedItem,
         RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
@@ -402,23 +340,6 @@
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import Spinner from '@/components/Spinner.vue';
-    import { isImage, isSimpleTextFile, isVideo } from '@/services/contentService';
-    import { calcExternalResourceLink } from '@/services/urlService';
-    import MonacoEditor from '@/components/MonacoEditor.vue';
-    import { getFileInfo, updateFile } from '@/services/fileBrowserService';
-
-    const fileTableDiv = ref<HTMLDivElement>();
-
-    nextTick(() => {
-        fileTableDiv.value.focus();
-    });
-
-    const monacoOptions = {
-        minimap: {
-            enabled: false,
-        },
-        language: 'javascript',
-    };
 
     const orderClass = computed(() => (currentSortDir.value === 'asc' ? 'arrow asc' : 'arrow desc'));
     const hiddenItems = ref<HTMLDivElement>();
@@ -427,8 +348,7 @@
     let tempCounter = 0;
     const route = useRoute();
     const router = useRouter();
-
-    const { user } = useAuthState();
+    const emit = defineEmits(['itemClicked']);
 
     const setCurrentRightClickedItem = item => {
         currentRightClickedItem.value = {
@@ -443,71 +363,10 @@
             return;
         }
         if (selectedPaths.value.length === 1 && selectedPaths.value[0] === item) {
-            handleItemClick(item);
+            emit('itemClicked', item);
             return;
         }
         deselectItem(item);
-    };
-
-    const isSelected = (item: PathInfoModel) => {
-        if (!selectedPaths.value.includes(item)) return false;
-        else return true;
-    };
-
-    const handleAllSelect = (val: any) => {
-        if (val.target.checked) selectAll();
-        else deselectAll();
-    };
-
-    const showFilePreview = ref(false);
-    const showConfirmDialog = ref(false);
-    const filePreviewSrc = ref('');
-    const filePreviewType = ref('');
-    const fileContent = ref('');
-    const editedFileContent = ref('');
-    const clickedItem = ref<PathInfoModel>();
-
-    const handleItemClick = async (item: PathInfoModel) => {
-        if (isVideo(item.fullName) || isImage(item.fullName) || isSimpleTextFile(item.fullName)) {
-            clickedItem.value = item;
-            const ownerLocation = user.location;
-            let path = item.path;
-            path = path.replace('/appdata/storage/', '');
-            const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
-            filePreviewSrc.value = calcExternalResourceLink(src);
-
-            filePreviewType.value = isVideo(item.fullName) ? 'video' : isImage(item.fullName) ? 'image' : 'simpleFile';
-
-            if (filePreviewType.value !== 'simpleFile') {
-                showFilePreview.value = true;
-                return;
-            }
-
-            fileContent.value = await (await fetch(filePreviewSrc.value)).text();
-            editedFileContent.value = fileContent.value;
-            showFilePreview.value = true;
-            return;
-        }
-        await itemAction(item, router);
-    };
-
-    const closeEditor = () => {
-        showFilePreview.value = false;
-        if (filePreviewType.value !== 'simpleFile' || editedFileContent.value === fileContent.value) {
-            return;
-        }
-        showConfirmDialog.value = true;
-    };
-
-    const saveChanges = async () => {
-        if (editedFileContent.value !== fileContent.value) {
-            const fileAccessDetails = (await getFileInfo(clickedItem.value.path, false)).data;
-            const { readToken, key } = fileAccessDetails;
-            await updateFile(clickedItem.value.path, editedFileContent.value, user.location, readToken, key);
-        }
-        showFilePreview.value = false;
-        showConfirmDialog.value = false;
-        clickedItem.value = undefined;
     };
 
     const onDragStart = (event, item) => {
@@ -518,6 +377,11 @@
 
     const onDragOver = (event: Event, item: PathInfoModel) => {
         dragOverItem.value = item;
+        (event.currentTarget as Element).classList.add('bg-gray-200');
+    };
+
+    const onDragLeave = (event: Event) => {
+        (event.currentTarget as Element).classList.remove('bg-gray-200');
     };
 
     const canBeDropped = (item: PathInfoModel) => {
@@ -533,10 +397,6 @@
         tempCounter++;
     };
 
-    const highlight = (item: PathInfoModel) => {
-        return equals(item, dragOverItem.value) && canBeDropped(item);
-    };
-
     const onDrop = (item: PathInfoModel) => {
         tempCounter = 0;
         if (!canBeDropped(item)) return;
@@ -546,10 +406,6 @@
             selectedPaths.value.map(x => x.path)
         );
         selectedPaths.value = [];
-    };
-
-    const onDragEnd = () => {
-        isDraggingFiles.value = false;
     };
 
     const goBack = () => {

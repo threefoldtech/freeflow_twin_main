@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { onMounted } from 'vue';
+    import { onMounted, onUnmounted } from 'vue';
     import loader from '@monaco-editor/loader';
     import { debounce } from 'lodash';
     import { extensionToLanguage } from '@/services/contentService';
@@ -42,6 +42,13 @@
                 emit('update:modelValue', editor.getValue());
             }, 500)
         );
+    });
+
+    onUnmounted(async () => {
+        const monaco = await loader.init();
+        monaco.editor.getModels().forEach(model => {
+            model.dispose();
+        });
     });
 </script>
 

@@ -133,8 +133,13 @@ export class QuantumController {
 
     @Get('file/info')
     @UseGuards(AuthGuard)
-    async getFileInfo(@Query() params: { path: string; attachments: boolean }) {
-        const { path } = params;
+    async getFileInfo(@Query() params: { path: string; attachments: boolean; location?: string }) {
+        const { path, attachments, location } = params;
+
+        const myLocation = await this._locationService.getOwnLocation();
+        if (location && location !== myLocation) {
+            return await this._apiService.getExternalFileInfo({ path, attachments, location });
+        }
         // const parsedParams = Buffer.from(JSON.stringify(params), 'base64').toString('utf8');
         // const paramsObj = JSON.parse(parsedParams);
 
@@ -316,7 +321,7 @@ export class QuantumController {
     @UseGuards(AuthGuard)
     async updateSharePermissions(@Body() { chatId, path }: { chatId: string; path: string }) {
         path = Buffer.from(path, 'base64').toString('binary');
-        await this._quantumService.updateSharePermissions({ chatId, path });
+        await this._quantumService.filterSharePermissions({ chatId, path });
     }
 
     @Post('dir')

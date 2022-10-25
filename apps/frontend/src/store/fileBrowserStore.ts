@@ -369,6 +369,14 @@ export const clearClipboard = () => {
 };
 
 export const searchDir = async () => {
+    if (sharedDir.value) {
+        await getSharedContent();
+        sharedContent.value = sharedContent.value.filter(
+            x => searchDirValue.value === '' || x.name.includes(searchDirValue.value)
+        );
+        return;
+    }
+
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
@@ -470,7 +478,26 @@ export const deselectAll = () => {
     selectedPaths.value = [];
 };
 
-export const itemAction = async (item: PathInfoModel, path = currentDirectory.value) => {
+export const handleAllSelect = (checked: boolean) => {
+    if (checked) {
+        selectAll();
+        return;
+    }
+    deselectAll();
+};
+
+export const truncatePath = str => {
+    if (str.length > 30) {
+        return str.substr(0, 20) + '...' + str.substr(-30);
+    }
+    return str;
+};
+
+export const isSelected = (item: PathInfoModel) => {
+    return selectedPaths.value.includes(item);
+};
+
+export const itemAction = async (item: PathInfoModel) => {
     if (item.isDirectory) {
         goToFolderInCurrentDirectory(item);
         return;
@@ -917,12 +944,11 @@ export const fetchBasedOnRoute = async () => {
 export const sharedWithMeCurrentFolder = ref<string>('');
 
 export const loadSharedItems = () => {
-    sharedBreadcrumbs.value = [];
+    sharedBreadcrumbs.value = [{ name: 'Shared with me' }];
 
     const params = router.currentRoute.value.params;
 
     if (params.sharedId) {
-        sharedBreadcrumbs.value.push({ name: 'Shared with me' });
         const firstNode = allSharedContent.value.find(item => item.id === params.sharedId);
         sharedBreadcrumbs.value.push(firstNode);
 

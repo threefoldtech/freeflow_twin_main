@@ -161,6 +161,5 @@ export class UserLeftGroupMessageState implements SubSystemMessageState {
             ...updatedChat.toJSON(),
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         });
-        await this._apiService.sendMessageToGroup({ contacts: updatedChat.parseContacts(), message });
     }
 }
