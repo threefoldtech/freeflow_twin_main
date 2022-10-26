@@ -60,7 +60,7 @@
 
             const shareDetails = await getShareWithId(sharedItem.value.id);
             const permission = shareDetails.permissions.find(p => {
-                if (chat.isGroup) return p.userId === chat.chatId;
+                if (chat?.isGroup) return p.userId === chat.chatId;
                 return p.userId === user.id;
             });
             if (!permission && owner.id !== user.id) return;
