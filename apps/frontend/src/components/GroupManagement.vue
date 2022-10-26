@@ -273,6 +273,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
     import moment from 'moment';
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
+    import { debounce } from 'lodash';
 
     const { updateContactsInGroup } = usechatsActions();
     const { user } = useAuthState();
@@ -360,10 +361,12 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
         showRemoveUserDialog.value = false;
         selectedUser.value = null;
     };
-    const addToGroup = contact => {
-        //@ts-ignore
-        updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
-    };
+    const addToGroup = debounce(async contact => {
+        if (selectedUser.value?.id === contact.id) return;
+        selectedUser.value = contact;
+        await updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
+        selectedUser.value = null;
+    }, 20);
 
     const isAdmin = computed(() => {
         //@ts-ignore
