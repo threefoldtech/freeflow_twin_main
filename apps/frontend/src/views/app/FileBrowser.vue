@@ -2,16 +2,16 @@
     <SomethingWentWrongModal />
     <appLayout>
         <template v-slot:default>
-            <FileDropArea class="h-full" @click.stop @send-file="uploadFiles">
-                <div
-                    @click="selectedPaths = []"
-                    ref="fileTableDiv"
-                    @keydown.esc="closeEditor()"
-                    tabindex="0"
-                    class="flex flex-row w-full h-full"
-                >
-                    <div class="flex flex-col flex-1">
-                        <TopBar @click.stop />
+            <div
+                @click="selectedPaths = []"
+                ref="fileTableDiv"
+                @keydown.esc="closeEditor()"
+                tabindex="0"
+                class="flex flex-row w-full h-full"
+            >
+                <div class="flex flex-col flex-1">
+                    <TopBar @click.stop />
+                    <FileDropArea class="h-full" @send-file="uploadFiles">
                         <FileTable
                             v-if="!sharedDir && searchResults.length === 0 && !isQuantumChatFiles"
                             @itemClicked="handleItemClick"
@@ -21,9 +21,9 @@
                             @itemClicked="handleItemClick"
                         />
                         <SharedContent v-if="sharedDir || isQuantumChatFiles" @itemClicked="handleShareClick" />
-                    </div>
+                    </FileDropArea>
                 </div>
-            </FileDropArea>
+            </div>
 
             <div
                 v-if="showFilePreview"
