@@ -41,7 +41,7 @@
         @click="goToSocialPost"
         class="bg-black rounded-lg cursor-pointer relative bg-gradient-to-t from-black via-black to-transparent"
     >
-        <img class="object-contain opacity-[75%] max-h-[16rem]" :src="thumbnailImage" />
+        <img class="object-contain opacity-[75%] max-h-[16rem] min-h-[8rem]" :src="thumbnailImage" />
         <div class="p-4 z-40 absolute bottom-0 left-0 text-white">
             <p class="text-lg font-semibold mb-2">Shared a post</p>
             <div class="flex items-center space-x-2">
