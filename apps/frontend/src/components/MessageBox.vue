@@ -3,11 +3,11 @@
         <Dialog :modelValue="showShareDialog" @update-model-value="showShareDialog = false" :noActions="true">
             <template v-slot:title>
                 <h1 class="font-medium">
-                    Edit permissions for <span>{{ selectedEditFile.body.isFolder ? 'folder ' : 'file ' }}</span>
-                    <span class="text-accent-800 font-semibold">{{ selectedEditFile.body.name }}</span>
+                    Edit permissions for <span>{{ selectedEditFile.body.isFolder ? 'folder: ' : 'file: ' }}</span>
+                    <span class="font-semibold">{{ selectedEditFile.body.name }}</span>
                 </h1>
             </template>
-            <div class="flex w-full items-center rounded-xl bg-gray-100 mb-2 mt-4" :key="selectedTab">
+            <div class="flex items-center rounded-xl bg-gray-100 mb-2 mt-4 mx-4" :key="selectedTab">
                 <div class="flex-grow" v-for="(tab, index) in tabs" :key="`${tab}-${index}`">
                     <button
                         @click="selectedTab = index"
