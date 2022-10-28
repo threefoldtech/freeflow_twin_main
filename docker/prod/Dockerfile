@@ -85,4 +85,12 @@ RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
-ENTRYPOINT ['/init.sh']
+RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download/v0.2.5/zinit && \
+    chmod +x /sbin/zinit
+
+RUN mkdir -p /etc/zinit
+COPY ./docker/prod/zinit /etc/zinit
+
+RUN ./init.sh
+
+ENTRYPOINT [ "/sbin/zinit", "init" ]

@@ -22,28 +22,49 @@
 <script lang="ts" setup>
     import { useAuthState } from '@/store/authStore';
     import {
-        currentDirectory,
         formatBytes,
-        goTo,
-        selectedPaths,
-        selectedTab,
         sharedDir,
+        goTo,
+        currentDirectory,
         sharedItem,
+        selectedTab,
+        selectedPaths,
     } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message } from '@/types';
+
     import { useRouter } from 'vue-router';
     import { showShareDialog } from '@/services/dialogService';
+    import { isSimpleTextFile } from '@/services/contentService';
+    import { getShareWithId } from '@/services/fileBrowserService';
 
     interface IProp {
         message: Object;
     }
 
     const props = defineProps<IProp>();
+    const emit = defineEmits(['showFile']);
+
     const { user } = useAuthState();
 
     const router = useRouter();
-    const visitFileInMessage = (message: Message<FileShareMessageType>) => {
+    const visitFileInMessage = async (message: Message<FileShareMessageType>) => {
         sharedItem.value = message.body;
+
+        if (isSimpleTextFile(sharedItem.value.name)) {
+            const { user } = useAuthState();
+            let path = sharedItem.value.path;
+            path = path.replace('/appdata/storage/', '');
+            const owner = sharedItem.value.owner;
+            const ownerLocation = owner?.location;
+            const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
+
+            const shareDetails = await getShareWithId(sharedItem.value.id);
+            const permission = shareDetails.permissions.find(p => p.userId === user.id);
+            if (!permission && owner.id !== user.id) return;
+
+            emit('showFile', { name: sharedItem.value.name, url: src, permission });
+            return;
+        }
 
         if (!sharedItem.value.isFolder && message.from === user.id) {
             //Only office

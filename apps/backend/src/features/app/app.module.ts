@@ -19,6 +19,7 @@ import { PostModule } from '../post/post.module';
 import { QuantumModule } from '../quantum/quantum.module';
 import { UserModule } from '../user/user.module';
 import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
+import { ContainerModule } from '../container/container.module';
 
 @Module({
     imports: [
@@ -53,6 +54,7 @@ import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
         MessageModule,
         PostModule,
         QuantumModule,
+        ContainerModule,
     ],
 })
 export class AppModule {

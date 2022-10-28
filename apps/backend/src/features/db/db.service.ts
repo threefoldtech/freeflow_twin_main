@@ -5,7 +5,10 @@ import { Client, Entity, Repository, Schema } from 'redis-om';
 @Injectable()
 export class DbService {
     private client: Client;
-    private redisURL = 'redis://default:jimber321123@localhost:6379';
+
+    private passwordUuid = process.env.REDIS_PASSWORD;
+
+    private redisURL = `redis://default:jimber321123@localhost:6379`;
 
     constructor() {
         console.log("LOGGING ENVIRONMENT VARS");
@@ -20,6 +23,8 @@ export class DbService {
      * Connects redis-om client to Redis.
      */
     async connect(): Promise<void> {
+        console.log('LOGGING ENVIRONMENT VARS');
+        console.log(process.env);
         if (!this.client.isOpen()) {
             await this.client.open(this.redisURL);
         }

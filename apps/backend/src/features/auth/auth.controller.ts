@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Query, Redirect, Req, Res, Session, UseGuards } from '@nestjs/common';
+import {
+    BadRequestException,
+    Controller,
+    Get,
+    Post,
+    Query,
+    Redirect,
+    Req,
+    Res,
+    Session,
+    UseGuards,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 
 import { AuthGuard } from '../../guards/auth.guard';
@@ -6,13 +17,11 @@ import { LocationService } from '../location/location.service';
 import { YggdrasilService } from '../yggdrasil/yggdrasil.service';
 import { AuthService } from './auth.service';
 import { SignInQuery } from './query/sign-in.query';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
     constructor(
         private readonly _authService: AuthService,
-        private readonly _configService: ConfigService,
         private readonly _yggdrasilService: YggdrasilService,
         private readonly _locationService: LocationService
     ) {}
@@ -71,12 +80,10 @@ export class AuthController {
         if (!this._yggdrasilService.isInitialised())
             await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
 
-        // Is a timeout the fix?
         setTimeout(async () => {
             const yggdrasilAddress = await this._locationService.getOwnLocation();
 
-            console.log('This is my location');
-            console.log(yggdrasilAddress);
+            if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
 
             await this._locationService.registerDigitalTwin({
                 doubleName: profileData.doubleName,
@@ -85,7 +92,6 @@ export class AuthController {
             });
         }, 1000);
 
-        req.session.email = profileData.email;
         req.session.userId = profileData.userId;
         req.session.save(err => {
             if (!err) {
