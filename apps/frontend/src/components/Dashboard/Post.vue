@@ -184,6 +184,7 @@
                         v-for="(image, idx) in item.images.slice(0, showAllImages ? item.images.length : 4)"
                         :key="idx"
                         class="relative overflow-hidden cursor-pointer max-h-96 rounded"
+                        @click="openImagePreview(image)"
                     >
                         <div
                             v-if="!showAllImages && idx === 3 && item.images.length >= 5"
@@ -192,11 +193,7 @@
                         >
                             <p class="text-white text-2xl">+{{ item.images.length - 4 }}</p>
                         </div>
-                        <img
-                            :src="fetchPostAttachment(image)"
-                            class="object-cover rounded"
-                            @click="openImagePreview(image)"
-                        />
+                        <img :src="fetchPostAttachment(image)" class="object-cover rounded" />
                     </div>
                 </div>
                 <p
