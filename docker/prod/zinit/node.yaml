@@ -1,0 +1,8 @@
+exec: |
+ bash -c '
+ cd /app
+ service nginx restart
+ pm2 start apps/backend/dist/src/server.js &
+ 
+ '
+oneshot: true
