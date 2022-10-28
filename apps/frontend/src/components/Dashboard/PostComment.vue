@@ -53,13 +53,13 @@
                 </div>
             </div>
 
-            <Popover v-if="showDots" v-slot="{ open }" class="relative z-30">
+            <Popover v-if="showDots && comment?.owner.id === user.id" v-slot="{ open }" class="relative z-30">
                 <PopoverButton
                     :class="open ? '' : 'text-opacity-90'"
                     class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
                 >
                     <DotsHorizontalIcon
-                        v-if="showDots"
+                        v-if="showDots && comment?.owner.id === user.id"
                         class="text-gray-400 mb-5 w-5 h-5 cursor-pointer hover:text-gray-600"
                     />
                 </PopoverButton>
