@@ -85,7 +85,4 @@ RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
-COPY ./ssl/lennertapp2.crt /etc/ssl/certs/lennertapp2.crt
-COPY ./ssl/lennertapp2.key /etc/ssl/private/lennertapp2.key
-
 ENTRYPOINT ['/init.sh']
