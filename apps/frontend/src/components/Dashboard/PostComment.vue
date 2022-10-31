@@ -121,6 +121,7 @@ stroke-width="2"
         v-if="commentsSorted.length > 0 && CommentType.COMMENT"
         :key="reply.id"
         :comment="reply"
+        @updateComments="e => $emit('updateComments', e)"
     />
     <form
         v-if="showReplyInput"
