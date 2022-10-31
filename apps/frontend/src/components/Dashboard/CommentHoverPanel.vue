@@ -56,27 +56,19 @@
                     <img class="w-6 h-6" src="/kutanabold.svg" alt="kutana" />
                 </a>
             </div>
-            <!--      <div class="w-auto">-->
-            <!--        <a class="text-xs text-gray-800 hover:bg-gray-300 font-semibold flex items-center justify-center w-10 h-10 flex items-center justify-center bg-gray-200 rounded-lg"-->
-            <!--           href="#">-->
-            <!--          <DotsHorizontalIcon class="w-4 h-4"/>-->
-            <!--        </a>-->
-            <!--      </div>-->
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-    // import {DotsHorizontalIcon} from "@heroicons/vue/solid";
     import { useRouter } from 'vue-router';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
     import { usechatsActions } from '@/store/chatStore';
     import { myYggdrasilAddress } from '@/store/authStore';
-    import { computed, nextTick, ref } from 'vue';
+    import { computed, nextTick, onBeforeMount, ref } from 'vue';
     import { fetchStatus } from '@/store/statusStore';
     import { IPostContainerDTO } from 'custom-types/post.type';
 
-    const { contacts } = useContactsState();
     const { addContact, retrieveContacts } = useContactsActions();
     const { getChat, retrieveChats } = usechatsActions();
 
@@ -89,7 +81,7 @@
     const router = useRouter();
     const userLocation = ref('');
 
-    const init = async () => {
+    onBeforeMount(async () => {
         await retrieveContacts();
         userLocation.value = await myYggdrasilAddress();
         const userId = props.comment.owner.id;
@@ -105,20 +97,19 @@
             const formattedDate = new Date(chat.createdAt).toLocaleDateString('nl-BE', options);
             friendsSince.value = formattedDate;
         }
-    };
-    init();
+    });
 
     const isPersonFriend = computed(() => {
         if (userLocation.value === props.comment.owner.location) return null;
-        return contacts.some(item => item.id === props.comment.owner.id);
+        return useContactsState().contacts.some(item => item.id === props.comment.owner.id);
     });
 
     const goToChat = async e => {
         e.preventDefault();
         if (userLocation.value === props.comment.owner.location) return;
-        if (!contacts.some(item => item.id === props.comment.owner.id)) {
+        if (!useContactsState().contacts.some(item => item.id === props.comment.owner.id)) {
             await retrieveChats();
-            addContact(props.comment.owner.id, props.comment.owner.location);
+            await addContact(props.comment.owner.id, props.comment.owner.location);
         }
         await nextTick(async () => {
             localStorage.setItem('lastOpenedChat', props.comment.owner.id);
