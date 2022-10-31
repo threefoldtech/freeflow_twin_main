@@ -172,7 +172,7 @@ stroke-width="2"
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { CommentType, IPostComment } from 'custom-types/post.type';
+    import { CommentType, IPostComment, IPostContainerDTO } from 'custom-types/post.type';
     import { deleteComment, getSinglePost, likeComment } from '@/services/socialService';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
     import Alert from '@/components/Alert.vue';
@@ -185,7 +185,10 @@ stroke-width="2"
     const showDots = ref<boolean>(false);
     const showDeleteCommentDialog = ref<boolean>(false);
 
-    const emit = defineEmits(['replyToComment']);
+    const emit = defineEmits<{
+        (e: 'updateComments', post: IPostContainerDTO): void;
+        (e: 'replyToComment', { input, comment_id }: { input: string; comment_id: string }): void;
+    }>();
 
     const liked = computed(() => {
         return props.comment.likes.map(l => l.id).includes(user.id.toString());
@@ -226,7 +229,8 @@ stroke-width="2"
     const handleLikeComment = async () => {
         const { post, id, isReplyToComment, replyTo } = props.comment;
         await likeComment(post.id, post.owner.location, id, isReplyToComment, replyTo);
-        await getSinglePost(post.id, post.owner.location);
+        const res = await getSinglePost(post.id, post.owner.location);
+        emit('updateComments', res);
     };
 
     const inputField = ref<HTMLInputElement>();
