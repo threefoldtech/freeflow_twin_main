@@ -202,10 +202,10 @@ stroke-width="2"
     });
 
     const handleDeleteComment = async () => {
-        const { post, owner } = props.comment;
+        const { post } = props.comment;
 
-        await deleteComment(post.id, props.comment.id);
-        await getSinglePost(post.id, owner.location);
+        await deleteComment(post.id, props.comment.id, post.owner.location);
+        await getSinglePost(post.id, post.owner.location);
         showDeleteCommentDialog.value = false;
     };
 

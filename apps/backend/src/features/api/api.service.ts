@@ -14,6 +14,7 @@ import { LikePostDTO } from '../post/dtos/request/like-post.dto';
 import { TypingDTO } from '../post/dtos/request/typing.dto';
 import { FailedRequestRepository } from './repositories/failed-request.repository';
 import { LikeCommentDTO } from '../post/dtos/request/like-comment.dto';
+import { DeleteCommentDTO } from '../post/dtos/delete-comment.dto';
 
 @Injectable()
 export class ApiService {
@@ -522,6 +523,24 @@ export class ApiService {
         const url = `http://[${location}]/api/v2/posts/comment/like`;
         try {
             return axios.put(url, likeCommentDTO);
+        } catch {
+            return;
+        }
+    }
+
+    async deleteExternalComment({ deleteCommentDTO }: { deleteCommentDTO: DeleteCommentDTO }) {
+        const location = deleteCommentDTO.ownerLocation;
+        const url = `http://[${location}]/api/v2/posts/comment/delete`;
+        try {
+            return (
+                await axios.delete(url, {
+                    data: {
+                        postId: deleteCommentDTO.postId,
+                        commentId: deleteCommentDTO.commentId,
+                        ownerLocation: deleteCommentDTO.ownerLocation,
+                    },
+                })
+            ).data;
         } catch {
             return;
         }

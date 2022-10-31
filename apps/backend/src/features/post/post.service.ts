@@ -150,7 +150,6 @@ export class PostService {
             } catch (error) {
                 throw new BadRequestException(`unable to get post: ${error}`);
             }
-
         return await this._apiService.getExternalPost({ location: ownerLocation, postId });
     }
 
@@ -323,11 +322,19 @@ export class PostService {
 
     async deleteComment(deleteCommentDTO: DeleteCommentDTO): Promise<{ status: string }> {
         try {
+            const myLocation = await this._locationService.getOwnLocation();
+            if (deleteCommentDTO.ownerLocation !== myLocation) {
+                return await this._apiService.deleteExternalComment({ deleteCommentDTO });
+            }
+
             const post = await this._postRepo.getPost({ id: deleteCommentDTO.postId });
             const comment = this.findComment(post.parseReplies(), deleteCommentDTO.commentId);
             if (!comment) throw new BadRequestException('comment not found');
+            const owner = post.parsePostOwner();
 
-            if (comment.owner.id !== this.user) throw new ForbiddenException('cannot delete comment as someone else');
+            if (comment.owner.id !== this.user && this.user !== owner.id) {
+                throw new ForbiddenException('cannot delete comment as someone else if you are not the owner.');
+            }
 
             const changedComments = this.removeComment(post.parseReplies(), comment);
             post.replies = stringifyReplies(changedComments);
