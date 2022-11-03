@@ -161,7 +161,7 @@ export class YggdrasilService {
         const out = this._fileService.openFile({ path: this.logPath, flags: 'a' });
         const err = this._fileService.openFile({ path: '/var/log/yggdrasil/err.log', flags: 'a' });
 
-        this.cleanAllYggdrasilProcesses();
+        // this.cleanAllYggdrasilProcesses();
 
         const p = spawn('yggdrasil', ['-useconffile', this.configPath, '-logto', this.logPath], {
             detached: true,
