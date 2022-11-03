@@ -91,6 +91,6 @@ RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download
 RUN mkdir -p /etc/zinit
 COPY ./docker/prod/zinit /etc/zinit
 
-RUN /init.sh
+RUN ./init.sh
 
 ENTRYPOINT [ "/sbin/zinit", "init" ]
