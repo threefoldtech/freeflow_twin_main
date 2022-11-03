@@ -76,7 +76,7 @@ export class AuthController {
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
         console.log('Coming here 11');
         const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
-
+        console.log('dfdfa');
         delete req.session.state;
 
         console.log('Coming here 2');
