@@ -6,9 +6,9 @@ if test -f "$FILE"; then
     exec yggdrasil -useconffile $FILE -logto /var/log/yggdrasil/yggdrasil.log >> /var/log/yggdrasil/yggdrasil.log &
 fi
 
-REDIS_PASSWORD = jimber321123
+REDIS_PASSWORD=jimber321123
 
-sed -i `s/requirepass default/requirepass ${REDIS_PASSWORD}/g` /etc/redis/redis.conf
+sed -i 's/requirepass default/requirepass ${REDIS_PASSWORD}/g' /etc/redis/redis.conf
 cat /etc/redis/redis.conf | grep requirepass | cut -d ' ' -f2 > /home/redis.password
 
 redis-server /etc/redis/redis.conf &
