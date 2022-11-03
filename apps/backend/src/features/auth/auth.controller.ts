@@ -72,13 +72,15 @@ export class AuthController {
 
     @Get('callback')
     async authCallback(@Req() req: Request, @Res() res: Response) {
+        console.log('Coming here 1');
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+        console.log('Coming here 11');
         const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
 
         delete req.session.state;
 
-        if (!this._yggdrasilService.isInitialised())
-            await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
+        console.log('Coming here 2');
+        await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
 
         setTimeout(async () => {
             const yggdrasilAddress = await this._locationService.getOwnLocation();

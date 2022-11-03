@@ -147,11 +147,21 @@ export class YggdrasilService {
      */
     async setupYggdrasil(seed: string): Promise<void> {
         const chatSeed = `${seed}-chat`;
+        console.log('chatseed');
+        console.log(chatSeed);
         const keyReplacements = this.getReplacements(chatSeed);
+        console.log('key replacements');
+        console.log(keyReplacements);
         const generatedConfig = this.generateConfig();
+        console.log('generated config');
+        console.log(generatedConfig);
         const config = this.replaceConfigValues({ generatedConfig, replaceConfig: keyReplacements as YggdrasilConfig });
+        console.log('config');
+        console.log(config);
         this.saveConfigs({ config, replacements: keyReplacements as YggdrasilConfig });
+        console.log('saving');
         this.runYggdrasil();
+        console.log('running');
     }
 
     /**
