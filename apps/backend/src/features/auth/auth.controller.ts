@@ -76,8 +76,9 @@ export class AuthController {
         const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
         delete req.session.state;
 
+        console.log('a');
         await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
-
+        console.log('b');
         setTimeout(async () => {
             const yggdrasilAddress = await this._locationService.getOwnLocation();
 

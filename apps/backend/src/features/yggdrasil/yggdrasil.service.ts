@@ -147,10 +147,20 @@ export class YggdrasilService {
      */
     async setupYggdrasil(seed: string): Promise<void> {
         const chatSeed = `${seed}-chat`;
+        console.log('seed');
+        console.log(chatSeed);
         const keyReplacements = this.getReplacements(chatSeed);
+        console.log('keyReplacements');
+        console.log(keyReplacements);
         const generatedConfig = this.generateConfig();
+        console.log('generatedconfig');
+        console.log(generatedConfig);
         const config = this.replaceConfigValues({ generatedConfig, replaceConfig: keyReplacements as YggdrasilConfig });
+        console.log('config');
+        console.log(config);
         this.saveConfigs({ config, replacements: keyReplacements as YggdrasilConfig });
+        console.log('saved config');
+        console.log('going to run');
         this.runYggdrasil();
     }
 
@@ -161,12 +171,18 @@ export class YggdrasilService {
         const out = this._fileService.openFile({ path: this.logPath, flags: 'a' });
         const err = this._fileService.openFile({ path: '/var/log/yggdrasil/err.log', flags: 'a' });
 
+        console.log('out');
+        console.log(out);
+        console.log('err');
+        console.log(err);
         // this.cleanAllYggdrasilProcesses();
 
+        console.log('going to spawn');
         const p = spawn('yggdrasil', ['-useconffile', this.configPath, '-logto', this.logPath], {
             detached: true,
             stdio: ['ignore', out, err],
         });
+        console.log(p);
         p.unref();
     }
 
