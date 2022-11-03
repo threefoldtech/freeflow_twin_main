@@ -24,6 +24,7 @@ import { KeyType } from '../key/models/key.model';
 import { UserGateway } from './user.gateway';
 import { UserService } from './user.service';
 import { Request } from 'express';
+import { LocationService } from '../location/location.service';
 
 @Controller('user')
 export class UserController {
@@ -32,12 +33,18 @@ export class UserController {
         private readonly _keyService: KeyService,
         private readonly _userService: UserService,
         private readonly _userGateway: UserGateway,
-        private readonly _fileService: FileService
+        private readonly _fileService: FileService,
+        private readonly _locationService: LocationService
     ) {}
 
     @Get('containerOffline')
     async containerOffline(): Promise<boolean> {
         return false;
+    }
+
+    @Get('location')
+    async getOwnLocation() {
+        return await this._locationService.getOwnLocation();
     }
 
     @Get('publickey')
