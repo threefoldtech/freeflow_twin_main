@@ -76,20 +76,17 @@ export class AuthController {
         const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
         delete req.session.state;
 
-        console.log('a');
         await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
-        console.log('b');
-        setTimeout(async () => {
-            const yggdrasilAddress = await this._locationService.getOwnLocation();
 
-            if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
+        const yggdrasilAddress = await this._locationService.getOwnLocation();
 
-            await this._locationService.registerDigitalTwin({
-                doubleName: profileData.doubleName,
-                derivedSeed: profileData.derivedSeed,
-                yggdrasilAddress: <string>yggdrasilAddress,
-            });
-        }, 1000);
+        if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
+
+        await this._locationService.registerDigitalTwin({
+            doubleName: profileData.doubleName,
+            derivedSeed: profileData.derivedSeed,
+            yggdrasilAddress: <string>yggdrasilAddress,
+        });
 
         req.session.userId = profileData.userId;
         req.session.save(err => {
