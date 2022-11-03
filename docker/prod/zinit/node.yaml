@@ -2,6 +2,7 @@ exec: |
  bash -c '
  cd /app
  redis-server /etc/redis/redis.conf &
+ sleep 10
  pm2 start /app/apps/backend/dist/src/server.js --name="api" &
  '
 oneshot: true
