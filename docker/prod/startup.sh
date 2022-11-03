@@ -6,7 +6,6 @@ if test -f "$FILE"; then
     exec yggdrasil -useconffile $FILE -logto /var/log/yggdrasil/yggdrasil.log >> /var/log/yggdrasil/yggdrasil.log &
 fi
 
-redis-server /etc/redis/redis.conf &
 cd /app/apps/backend/dist
 node migrator/migrator.js
 

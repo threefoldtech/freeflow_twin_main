@@ -1,8 +1,7 @@
 exec: |
  bash -c '
  cd /app
- service nginx restart
- pm2 start apps/backend/dist/src/server.js &
- 
+ redis-server /etc/redis/redis.conf &
+ pm2 start /app/apps/backend/dist/src/server.js --name="api" &
  '
 oneshot: true
