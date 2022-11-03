@@ -19,8 +19,6 @@ export class DbService {
      * Connects redis-om client to Redis.
      */
     async connect(): Promise<void> {
-        console.log('LOGGING ENVIRONMENT VARS');
-        console.log(process.env);
         if (!this.client.isOpen()) {
             await this.client.open(this.redisURL);
         }
