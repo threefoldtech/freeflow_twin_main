@@ -58,19 +58,27 @@ export class AuthService {
         try {
             console.log('a');
             const profileData = (await this.tfLogin.parseAndValidateRedirectUrl(redirectUrl, sessionState))?.profile;
+            console.log(profileData);
             console.log('b');
             const doubleName: string = <string>profileData.doubleName;
+            console.log(doubleName);
             const derivedSeed: string = <string>profileData.derivedSeed;
+            console.log(derivedSeed);
             console.log('c');
             const userId = doubleName.replace('.3bot', '');
+            console.log(userId);
             const email: string = <string>profileData.email;
+            console.log(email);
             console.log('d');
             if (userId !== this._configService.get<string>('userId') || !derivedSeed)
                 throw new UnauthorizedException('no user id or derived seed found');
             console.log('e');
             const seed = this._encryptionService.decodeSeed(derivedSeed);
+            console.log(seed);
             console.log('f');
             const { publicKey, secretKey } = this._encryptionService.getKeyPair(seed);
+            console.log(publicKey);
+            console.log(secretKey);
             if (!publicKey || !secretKey) throw new UnauthorizedException('invalid key pair');
             console.log('g');
             try {
