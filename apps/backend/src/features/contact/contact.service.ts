@@ -144,7 +144,7 @@ export class ContactService {
             message: contactRequest as unknown as Message,
         });
 
-        this._apiService.sendMessageToApi({ location: newContact.location, message: signedContactRequest });
+        await this._apiService.sendMessageToApi({ location: newContact.location, message: signedContactRequest });
 
         this._chatGateway.emitMessageToConnectedClients('connection_request', {
             ...chat.toJSON(),
