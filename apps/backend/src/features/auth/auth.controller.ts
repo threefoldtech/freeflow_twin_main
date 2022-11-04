@@ -78,8 +78,11 @@ export class AuthController {
 
         await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
 
-        const yggdrasilAddress = await this._locationService.getOwnLocation();
+        await new Promise(resolve => {
+            setTimeout(resolve, 2000);
+        });
 
+        const yggdrasilAddress = await this._locationService.getOwnLocation();
         if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
 
         await this._locationService.registerDigitalTwin({
