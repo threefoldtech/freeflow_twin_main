@@ -200,6 +200,7 @@ export class ChatService {
             try {
                 await this._messageService.deleteMessagesFromChat({ chatId });
                 await this._chatRepository.deleteChat(chatToDelete.entityId);
+                this._chatGateway.emitMessageToConnectedClients('chat_removed', chatToDelete.chatId);
             } catch (error) {
                 return;
             }
