@@ -1,12 +1,6 @@
 <template>
     <div class="px-2 py-2 w-full flex justify-start">
-        <!--<h3 class="mt-2 ml-2 text-base text-left mb-4">Actions</h3>-->
         <div class="flex xl:grid xl:grid-cols-2 w-full gap-y-2 items-center justify-around xl:justify-items-center">
-            <!--<div v-if="!chat.isGroup" class="flex flex-col px-2 py-4 w-full cursor-pointer">
-<i class="fas fa-minus-circle m-3"></i>
-<p class="text-xs text-gray-300">Bio</p>
-<p class="text-xs text-gray-500">Block user</p>
-</div>-->
             <div
                 v-if="!blocked"
                 class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
@@ -15,14 +9,6 @@
                 <span class="material-symbols-rounded"> videocam </span>
                 <p class="text-xs mt-1">Video</p>
             </div>
-            <!--<div 
-v-if="!blocked"
-class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
-@click="$emit('app-mute')"
->
-<span class="material-symbols-rounded"> notifications_off </span>
-<p class="text-xs mt-1">{{ chat.isMute ? 'Unmute' : 'Mute' }}</p>
-</div>-->
             <div
                 v-if="!chat.isGroup && !blocked"
                 class="flex flex-col bg-white text-red-500 items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
@@ -80,7 +66,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
             <li
                 v-for="(contact, idx) in chat.contacts"
                 :key="contact.id + chat.contacts.length"
-                class="py-3 px-4 sm:px-6 grid grid-cols-2 items-center"
+                class="py-3 px-3 sm:px-4 grid grid-cols-2 items-center"
             >
                 <div
                     @click="$emit('clickedProfile', contact)"

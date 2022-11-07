@@ -1,5 +1,10 @@
 <template>
-    <div :class="{ 'ml-10': comment.type === CommentType.COMMENT_REPLY }" class="flex items-center space-x-2 relative">
+    <div
+        :class="{ 'ml-10': comment.type === CommentType.COMMENT_REPLY }"
+        class="flex items-center space-x-2 relative"
+        @mouseover="showDots = true"
+        @mouseleave="showDots = false"
+    >
         <VMenu placement="top">
             <AvatarImg
                 :id="comment.owner.id"
@@ -16,11 +21,7 @@
             </template>
         </VMenu>
 
-        <div
-            class="flex items-center justify-center space-x-2 relative"
-            @mouseover="showDots = true"
-            @mouseleave="showDots = false"
-        >
+        <div class="flex items-center justify-center space-x-2 relative">
             <div class="block">
                 <div class="bg-gray-100 w-auto rounded-lg px-2 py-2">
                     <div class="font-semibold">
@@ -46,51 +47,51 @@
                     </div>
                 </div>
             </div>
-            <div v-if="comment.likes.length >= 1" class="absolute -bottom-1 -right-5 flex items-center">
+            <div v-if="comment.likes.length >= 1" class="absolute -bottom-1 -right-14 flex items-center">
                 <div class="w-14 h-7 bg-white shadow flex items-center justify-center rounded-full cursor-pointer">
                     <ThumbUpIcon class="text-primary w-4 h-4" />
                     <span class="text-xs ml-2 font-medium">{{ comment.likes.length }}</span>
                 </div>
             </div>
+        </div>
 
-            <Popover v-if="showDots" v-slot="{ open }" class="relative z-30">
-                <PopoverButton
-                    :class="open ? '' : 'text-opacity-90'"
-                    class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
-                >
-                    <DotsHorizontalIcon
-                        v-if="showDots"
-                        class="text-gray-400 mb-5 w-5 h-5 cursor-pointer hover:text-gray-600"
-                    />
-                </PopoverButton>
-                <transition
-                    enter-active-class="transition duration-200 ease-out"
-                    enter-from-class="translate-y-1 opacity-0"
-                    enter-to-class="translate-y-0 opacity-100"
-                    leave-active-class="transition duration-150 ease-in"
-                    leave-from-class="translate-y-0 opacity-100"
-                    leave-to-class="translate-y-1 opacity-0"
-                >
-                    <PopoverPanel v-slot="{ close }" class="absolute z-50 top-0 left-5">
-                        <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                            <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
-                                <div
-                                    v-if="comment.owner.id === user.id"
-                                    class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
-                                    @click="
-                                        showDeleteCommentDialog = true;
-                                        close();
-                                    "
-                                >
-                                    <TrashIcon class="w-6 mr-4" />
-                                    <p class="w-12">Delete</p>
-                                </div>
+        <Popover v-if="showDots && comment?.owner.id === user.id" v-slot="{ open }" class="relative z-30">
+            <PopoverButton
+                :class="open ? '' : 'text-opacity-90'"
+                class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
+            >
+                <DotsHorizontalIcon
+                    v-if="showDots && comment?.owner.id === user.id"
+                    class="text-gray-400 mb-5 w-5 h-5 cursor-pointer hover:text-gray-600"
+                />
+            </PopoverButton>
+            <transition
+                enter-active-class="transition duration-200 ease-out"
+                enter-from-class="translate-y-1 opacity-0"
+                enter-to-class="translate-y-0 opacity-100"
+                leave-active-class="transition duration-150 ease-in"
+                leave-from-class="translate-y-0 opacity-100"
+                leave-to-class="translate-y-1 opacity-0"
+            >
+                <PopoverPanel v-slot="{ close }" class="absolute z-50 top-0 left-5">
+                    <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                        <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
+                            <div
+                                v-if="comment.owner.id === user.id"
+                                class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
+                                @click="
+                                    showDeleteCommentDialog = true;
+                                    close();
+                                "
+                            >
+                                <TrashIcon class="w-6 mr-4" />
+                                <p class="w-12">Delete</p>
                             </div>
                         </div>
-                    </PopoverPanel>
-                </transition>
-            </Popover>
-        </div>
+                    </div>
+                </PopoverPanel>
+            </transition>
+        </Popover>
         <!--<div
 class="self-stretch flex justify-center items-center transform transition-opacity duration-200 opacity-0 translate -translate-y-2 hover:opacity-100"
 >
