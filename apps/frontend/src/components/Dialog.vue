@@ -10,9 +10,6 @@
             @keydown.esc="$emit('update-model-value', false)"
             @keydown.enter="$emit('update-model-value', true)"
         >
-            <!--todo: check @updateModelValue/update-model-value of every dialog and use method that checks if passed boolean is true
-            if true do the actions and exit the dialog
-            if false discard everything and exit the dialog-->
             <div
                 class="bg-white w-full h-full lg:h-auto lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto hide-scrollbar lg:overflow-hidden"
                 @mousedown.stop
