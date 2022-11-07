@@ -109,11 +109,11 @@ export class ChatService {
             }
             chat.acceptedChat = true;
             await this._chatRepository.updateChat(chat);
+            const messages = (await this._apiService.getAdminChat({ location: contact.location, chatId: ownId }))
+                ?.messages;
             this._chatGateway.emitMessageToConnectedClients('new_chat', {
                 ...chat.toJSON(),
-                messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
-                    m.toJSON()
-                ),
+                messages,
             });
             return chat.toJSON();
         } catch (error) {
