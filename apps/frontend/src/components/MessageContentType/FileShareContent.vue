@@ -36,6 +36,7 @@
     import { showShareDialog } from '@/services/dialogService';
     import { isSimpleTextFile } from '@/services/contentService';
     import { getShareWithId } from '@/services/fileBrowserService';
+    import { getChat } from '@/store/chatStore';
 
     interface IProp {
         message: Object;
@@ -50,6 +51,7 @@
 
         if (isSimpleTextFile(sharedItem.value.name)) {
             const { user } = useAuthState();
+            const chat = getChat(message.chatId);
             let path = sharedItem.value.path;
             path = path.replace('/appdata/storage/', '');
             const owner = sharedItem.value.owner;
@@ -57,7 +59,10 @@
             const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
 
             const shareDetails = await getShareWithId(sharedItem.value.id);
-            const permission = shareDetails.permissions.find(p => p.userId === user.id);
+            const permission = shareDetails.permissions.find(p => {
+                if (chat?.isGroup) return p.userId === chat.chatId;
+                return p.userId === user.id;
+            });
             if (!permission && owner.id !== user.id) return;
 
             emit('showFile', { name: sharedItem.value.name, url: src, permission });

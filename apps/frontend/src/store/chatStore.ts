@@ -111,7 +111,7 @@ export const replyMessage = (chatId: string, message: any) => {
     });
 };
 
-const getChat = (chatId: string) => state.chats.find(x => x.chatId === chatId);
+export const getChat = (chatId: string) => state.chats.find(x => x.chatId === chatId);
 const setChatHasMoreMessages = (chatId: string, hasMore: boolean): void => {
     state.chatInfo[chatId] = {
         ...(state.chatInfo[chatId] ?? { isLoading: false }),
