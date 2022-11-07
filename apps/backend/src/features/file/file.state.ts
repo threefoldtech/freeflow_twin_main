@@ -12,6 +12,7 @@ import { MessageDTO } from '../message/dtos/message.dto';
 import { MessageService } from '../message/message.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { FileService } from './file.service';
+import { uuidv4 } from '../../utils/uuid';
 
 export enum FileAction {
     ADD_TO_CHAT = 'ADD_TO_CHAT',

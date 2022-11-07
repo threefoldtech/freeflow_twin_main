@@ -499,19 +499,21 @@
             return;
         }
 
-        var items = e.clipboardData.items;
+        let items = e.clipboardData.items;
 
         if (!items) {
             return;
         }
 
-        for (var i = 0; i < items.length; i++) {
+        for (let i = 0; i < items.length; i++) {
             if (items[i].type.indexOf('image') == -1) {
                 continue;
             }
 
-            var pastedImage: File = items[i].getAsFile();
-            attachment.value = pastedImage;
+            const pastedImage: File = items[i].getAsFile();
+            const uniqueName = `${pastedImage.name.split('.')[0]}-${uuidv4()}.${pastedImage.name.split('.').pop()}`;
+            const copyOfFile = new File([pastedImage], uniqueName, { type: pastedImage.type });
+            attachment.value = copyOfFile;
             message.value.focus();
         }
     };
