@@ -9,7 +9,7 @@ export const getMyStatus = async () => {
 
 const authState = reactive<AuthState>({
     user: {
-        id: 'test.3bot',
+        id: window.location.host.split('.')[0].replace('localhost:8080', 'localhost:3000'),
         image: `${window.location.origin}/api/v2/user/avatar/default`,
         email: 'testemail',
         status: '',
