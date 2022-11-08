@@ -17,12 +17,17 @@ const authState = reactive<AuthState>({
     },
 });
 
-// @TODO get name from backend not URL
-export const loginName = window.location.host.split('.')[0];
-
 export const myYggdrasilAddress = async () => {
     const res = await axios.get(`${window.location.origin}/api/v2/locations/yggdrasil`);
     return res.data;
+};
+
+export const getMe = async (): Promise<{ username: string; email: string }> => {
+    const res = await axios.get(`${window.location.origin}/api/v2/user/me`);
+    return {
+        username: res.data.username,
+        email: res.data.email,
+    };
 };
 
 export const useAuthState = () => {

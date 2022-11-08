@@ -34,9 +34,9 @@
 <script lang="ts" setup>
     import AppLayout from './layout/AppLayout.vue';
     import version from '../public/config/version';
-    import { useAuthState } from '@/store/authStore';
+    import { getMe, useAuthState } from '@/store/authStore';
     import { computed, onBeforeMount } from 'vue';
-    import { useRoute } from 'vue-router';
+    import { useRoute, useRouter } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
     import { useSocketActions } from '@/store/socketStore';
     import { initBlocklist } from '@/store/blockStore';
@@ -44,10 +44,22 @@
     const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
 
-    onBeforeMount(() => {
+    const router = useRouter();
+    onBeforeMount(async () => {
         if (user) {
             initializeSocket(user.id.toString());
-            initBlocklist();
+            await initBlocklist();
+        }
+
+        const profile = await getMe();
+
+        console.log('This is the users profile');
+        console.log(profile);
+
+        if (profile.username) {
+            user.id = profile.username;
+            user.email = profile.email;
+            user.image = `${window.location.origin}/api/v2/user/avatar`;
         }
     });
 
@@ -60,9 +72,3 @@
     const route = useRoute();
     const path = computed(() => route.path);
 </script>
-
-<style>
-    .v-contextmenu-item--hover {
-        background-color: #2e266f !important;
-    }
-</style>

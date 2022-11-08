@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { loginName, useAuthState } from '@/store/authStore';
+    import { useAuthState } from '@/store/authStore';
     import {
         formatBytes,
         sharedDir,
@@ -44,6 +44,8 @@
 
     const props = defineProps<IProp>();
     const emit = defineEmits(['showFile']);
+
+    const { user } = useAuthState();
 
     const router = useRouter();
     const visitFileInMessage = async (message: Message<FileShareMessageType>) => {
@@ -69,7 +71,7 @@
             return;
         }
 
-        if (!sharedItem.value.isFolder && message.from === loginName) {
+        if (!sharedItem.value.isFolder && message.from === user.id) {
             //Only office
             const url = router.resolve({
                 name: 'editfile',
@@ -87,7 +89,7 @@
             message.body.path.split('/')[0] === '' &&
             message.body.path.split('/').length === 2 &&
             !message.body.isFolder &&
-            message.from === loginName
+            message.from === user.id
         ) {
             //File is located in root folder
             router.push({ name: 'quantum' });
@@ -97,7 +99,7 @@
             return;
         }
 
-        if (message.from === loginName) {
+        if (message.from === user.id) {
             router.push({
                 name: 'quantumFolder',
                 params: {

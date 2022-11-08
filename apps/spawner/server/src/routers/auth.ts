@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { appCallback, getAppLoginUrl } from '../service/authService';
-import { logger } from '../logger';
 
 export const router = Router();
 

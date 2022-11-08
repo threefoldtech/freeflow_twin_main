@@ -1,1 +1,0 @@
-cd ../.. && docker build -f docker/prod/Dockerfile -t testuhuru .

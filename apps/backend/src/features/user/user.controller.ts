@@ -5,6 +5,7 @@ import {
     Get,
     Post,
     Put,
+    Req,
     StreamableFile,
     UploadedFile,
     UseGuards,
@@ -22,6 +23,7 @@ import { KeyService } from '../key/key.service';
 import { KeyType } from '../key/models/key.model';
 import { UserGateway } from './user.gateway';
 import { UserService } from './user.service';
+import { Request } from 'express';
 import { LocationService } from '../location/location.service';
 
 @Controller('user')
@@ -54,9 +56,17 @@ export class UserController {
         return pk.key;
     }
 
+    @Get('me')
+    async getMe(@Req() req: Request): Promise<Object> {
+        return {
+            username: req.session.userId,
+            email: req.session.email,
+        };
+    }
+
     @Get('status')
     async getStatus(): Promise<IStatus> {
-        const isOnline = (await this._userGateway.getConnections()) > 0 ? true : false;
+        const isOnline = (await this._userGateway.getConnections()) > 0;
         const userData = await this._userService.getUserData();
         const avatar = await this._userService.getUserAvatar();
         const user = userData.entityData;
