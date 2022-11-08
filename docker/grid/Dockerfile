@@ -68,7 +68,7 @@ RUN mkdir /var/log/yggdrasil
 COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
 COPY ./docker/error/public /usr/share/nginx/error
 COPY ./docker/error/error-nginx.conf /var/tmp/error-nginx.conf
-COPY ./docker/prod/nginx.conf /etc/nginx/conf.d/default.conf
+COPY ./docker/grid/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app /app
 COPY --from=redis_builder /redis-json /redis-json
 COPY --from=redis_builder /redis-search /redis-search
@@ -77,7 +77,7 @@ RUN curl -sL "https://deb.nodesource.com/setup_${NODEJS_VERSION}.x" | bash -
 RUN apt-get install -y nodejs
 RUN npm install pm2 -g
 
-COPY ./docker/prod/startup.sh /init.sh
+COPY ./docker/grid/startup.sh /init.sh
 RUN chmod +x /init.sh
 
 RUN mkdir /appdata
@@ -89,7 +89,7 @@ RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download
     chmod +x /sbin/zinit
 
 RUN mkdir -p /etc/zinit
-COPY ./docker/prod/zinit /etc/zinit
+COPY ./docker/grid/zinit /etc/zinit
 
 RUN ./init.sh
 
