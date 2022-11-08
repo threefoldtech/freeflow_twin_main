@@ -125,8 +125,8 @@
                 fileAccesDetails.key,
                 fileAccesDetails.readToken,
                 fileAccesDetails.writeToken,
-                getExtension(fileAccesDetails.fullName),
                 fileAccesDetails.extension,
+                fileAccesDetails.name,
                 attachments,
                 isLoading.value
             );

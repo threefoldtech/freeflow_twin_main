@@ -197,7 +197,7 @@
                 </button>
             </template>
         </Alert>
-        <Dialog :modelValue="showRenameDialog" @updateModelValue="showRenameDialog = false" :noActions="true">
+        <Dialog :modelValue="showRenameDialog" @updateModelValue="doRenameFile" :noActions="true">
             <template v-slot:title class="center">
                 <h1 class="font-medium">Renaming {{ selectedPaths[0].name }}</h1>
             </template>
@@ -222,20 +222,13 @@
             </div>
             <div class="flex justify-end mt-2 px-4">
                 <button
-                    @click="
-                        showRenameDialog = false;
-                        newName = '';
-                    "
+                    @click="doRenameFile(false)"
                     class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
                 >
                     Cancel
                 </button>
                 <button
-                    @click="
-                        renameFile(selectedPaths[0], newName);
-                        newName = '';
-                        showRenameDialog = false;
-                    "
+                    @click="doRenameFile(true)"
                     class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary"
                 >
                     Rename
@@ -272,7 +265,7 @@
 </template>
 
 <script setup lang="ts">
-    import { nextTick, onBeforeMount, onMounted, ref, watch } from 'vue';
+    import { nextTick, onBeforeMount, ref, watch } from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -281,9 +274,6 @@
         copiedFiles,
         clearClipboard,
         renameFile,
-        searchDir,
-        searchDirValue,
-        searchResults,
         selectedAction,
         Action,
         selectedTab,
@@ -310,8 +300,13 @@
     const { chats } = useChatsState();
     const { retrieveChats } = usechatsActions();
 
+    let debounce;
     const tabs = ['Create shares', 'Edit shares'];
     const newNameInput = ref<HTMLInputElement>();
+    const showDeleteDialog = ref(false);
+    const showRenameDialog = ref(false);
+    const newName = ref<string>('');
+    const showSelectedActions = ref(false);
 
     const makeRenameDialogVisible = () => {
         showRenameDialog.value = true;
@@ -320,6 +315,33 @@
         nextTick(() => {
             newNameInput.value.focus();
         });
+    };
+
+    onBeforeMount(() => {
+        retrieveChats();
+    });
+
+    const doRenameFile = (rename: boolean) => {
+        if (rename) renameFile(selectedPaths.value[0], newName.value);
+
+        newName.value = '';
+        showRenameDialog.value = false;
+    };
+
+    const cutFiles = async () => {
+        selectedAction.value = Action.CUT;
+        await copyPasteSelected();
+    };
+
+    const copyFiles = async () => {
+        selectedAction.value = Action.COPY;
+        await copyPasteSelected();
+    };
+
+    const resetShareDialog = () => {
+        showShareDialog.value = false;
+        selectedPaths.value = [];
+        selectedTab.value = 0;
     };
 
     watch(
@@ -354,46 +376,6 @@
         },
         { deep: true }
     );
-
-    onMounted(() => {});
-
-    let debounce;
-    const showDeleteDialog = ref(false);
-    const showRenameDialog = ref(false);
-    const newName = ref<string>('');
-    const showSelectedActions = ref(false);
-
-    const writeRights = ref(false);
-
-    onBeforeMount(() => {
-        retrieveChats();
-    });
-    const debounceSearch = event => {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => {
-            if (searchDirValue.value === '') {
-                searchResults.value = [];
-                return;
-            }
-            searchDir();
-        }, 600);
-    };
-
-    const cutFiles = async () => {
-        selectedAction.value = Action.CUT;
-        await copyPasteSelected();
-    };
-
-    const copyFiles = async () => {
-        selectedAction.value = Action.COPY;
-        await copyPasteSelected();
-    };
-
-    const resetShareDialog = () => {
-        showShareDialog.value = false;
-        selectedPaths.value = [];
-        selectedTab.value = 0;
-    };
 </script>
 
 <style scoped>

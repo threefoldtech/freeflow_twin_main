@@ -15,6 +15,7 @@ import { TypingDTO } from '../post/dtos/request/typing.dto';
 import { FailedRequestRepository } from './repositories/failed-request.repository';
 import { LikeCommentDTO } from '../post/dtos/request/like-comment.dto';
 import { DeleteCommentDTO } from '../post/dtos/delete-comment.dto';
+import { Contact } from '../contact/models/contact.model';
 
 @Injectable()
 export class ApiService {

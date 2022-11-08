@@ -20,7 +20,10 @@
     </div>
     <div class="flex flex-col mt-4 relative pt-10">
         <div class="overflow-y-auto overflow-x-hidden border-b">
-            <div class="align-middle inline-block min-w-full max-h-[50vh] sm:max-h-[40vh]">
+            <div
+                class="align-middle inline-block min-w-full"
+                :class="[isDevelopment ? 'max-h-[40vh]' : 'lg:max-h-[60vh]']"
+            >
                 <div class="overflow-hidden border-b border-gray-200">
                     <table class="min-w-full divide-y divide-gray-200 block">
                         <thead class="w-full block absolute top-0 z-10 bg-gray-100">
@@ -79,7 +82,7 @@
 
 <script setup lang="ts">
     import { Contact } from '@/types';
-    import { ref } from 'vue';
+    import { onBeforeMount, ref } from 'vue';
     import { SearchIcon } from '@heroicons/vue/solid';
 
     interface IProps {
@@ -92,6 +95,12 @@
     });
 
     const emit = defineEmits(['addContact']);
+
+    const isDevelopment = ref<boolean>(false);
+
+    onBeforeMount(async () => {
+        isDevelopment.value = process.env.NODE_ENV === 'development';
+    });
 
     const chosenOption = ref('');
     const searchTerm = ref('');

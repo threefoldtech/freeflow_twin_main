@@ -41,7 +41,7 @@
 
         <button
             v-if="!readOnly"
-            @click="saveChanges()"
+            @click="saveChanges(true)"
             class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
         >
             <SaveIcon class="w-6 h-6 inline-block mr-2" />
@@ -57,30 +57,15 @@
         />
     </div>
 
-    <Dialog
-        :modelValue="showConfirmDialog"
-        @updateModelValue="
-            showConfirmDialog = false;
-            extension = undefined;
-            showFilePreview = false;
-        "
-        :noActions="true"
-    >
+    <Dialog :modelValue="showConfirmDialog" @updateModelValue="saveChanges" :noActions="true">
         <template v-slot:title class="center">
             <h1 class="font-medium">File has been modified</h1>
         </template>
         <div class="flex justify-end mt-2 px-4">
-            <button
-                @click="
-                    showConfirmDialog = false;
-                    extension = undefined;
-                    showFilePreview = false;
-                "
-                class="rounded-md border border-gray-400 px-4 py-2 justify-self-end"
-            >
+            <button @click="saveChanges(false)" class="rounded-md border border-gray-400 px-4 py-2 justify-self-end">
                 Discard changes
             </button>
-            <button @click="saveChanges()" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">
+            <button @click="saveChanges(true)" class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary">
                 Save changes
             </button>
         </div>
@@ -134,8 +119,6 @@
 
         fileContent.value = await (await fetch(filePreviewSrc.value)).text();
         const canWrite = item.permission?.sharePermissionTypes?.includes(SharePermission.Write);
-        console.log('canWrite', canWrite);
-        console.log('sharedItem.value', sharedItem.value?.owner.id === user.id);
         if (canWrite || sharedItem.value?.owner.id === user.id) readOnly.value = false;
         editedFileContent.value = fileContent.value;
         showFilePreview.value = true;
@@ -147,7 +130,13 @@
         showConfirmDialog.value = true;
     };
 
-    const saveChanges = async () => {
+    const saveChanges = async (save: boolean) => {
+        showFilePreview.value = false;
+        showConfirmDialog.value = false;
+        extension.value = undefined;
+
+        if (!save) return;
+
         if (editedFileContent.value !== fileContent.value) {
             const { owner, path, id } = sharedItem.value;
             const fileAccessDetails = await fetchFileAccessDetails(owner, id, path, false);
@@ -155,8 +144,5 @@
             const { readToken, key } = fileAccessDetails;
             await updateFile(sharedItem.value.path, editedFileContent.value, owner.location, readToken, key);
         }
-        showFilePreview.value = false;
-        showConfirmDialog.value = false;
-        extension.value = undefined;
     };
 </script>
