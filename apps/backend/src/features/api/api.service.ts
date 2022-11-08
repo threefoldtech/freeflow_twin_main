@@ -534,11 +534,7 @@ export class ApiService {
         try {
             return (
                 await axios.delete(url, {
-                    data: {
-                        postId: deleteCommentDTO.postId,
-                        commentId: deleteCommentDTO.commentId,
-                        ownerLocation: deleteCommentDTO.ownerLocation,
-                    },
+                    data: deleteCommentDTO,
                 })
             ).data;
         } catch {
