@@ -16,7 +16,7 @@
     const init = async () => {
         const profile = await getMe();
 
-        if (!profile.email || !profile.username) {
+        if (!profile.username) {
             await router.push('error');
         }
 
