@@ -14,7 +14,7 @@ export const getAppLoginUrl = async (request: Request, redirectUrl: string, name
 
     const login = new ThreefoldLogin(
         config.appBackend,
-        `pepermolen`,
+        `${name}.${config.appId}`,
         config.seedPhrase,
         '/api/auth/callback',
         config.kycBackend
