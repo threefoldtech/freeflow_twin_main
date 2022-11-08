@@ -1,1 +1,0 @@
-exec: bash -c "/usr/sbin/sshd -D"

@@ -48,6 +48,13 @@ ENV NODEJS_VERSION=16
 RUN apt-get update -y && apt-get upgrade -y \
  && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y nginx curl musl-tools nano iputils-ping procps iproute2 imagemagick software-properties-common wget gnupg
 
+RUN apt install openssh-server -y &&\
+    mkdir -p /root/.ssh/ &&\
+    chmod 700 /root/.ssh &&\
+    touch /root/.ssh/authorized_keys &&\
+    chmod 600 /root/.ssh/authorized_keys
+
+
 RUN curl https://packages.redis.io/gpg | apt-key add - \
  && echo "deb https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
  && apt-get update -y \
@@ -70,14 +77,20 @@ RUN curl -sL "https://deb.nodesource.com/setup_${NODEJS_VERSION}.x" | bash -
 RUN apt-get install -y nodejs
 RUN npm install pm2 -g
 
-COPY ./docker/prod/startup.sh /startup.sh
-RUN chmod +x /startup.sh
+COPY ./docker/prod/startup.sh /init.sh
+RUN chmod +x /init.sh
 
 RUN mkdir /appdata
 RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
-ENV NODE_ENV=production
+RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download/v0.2.5/zinit && \
+    chmod +x /sbin/zinit
 
-CMD /startup.sh
+RUN mkdir -p /etc/zinit
+COPY ./docker/prod/zinit /etc/zinit
+
+RUN ./init.sh
+
+ENTRYPOINT [ "/sbin/zinit", "init" ]

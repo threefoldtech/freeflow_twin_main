@@ -224,8 +224,6 @@ export class YggdrasilService {
      * @return {string} - Generated config.
      */
     private generateConfig(): string {
-        console.log('going to run this');
-        console.log('yggdrasil -genconf');
         return execSync('yggdrasil -genconf').toString();
     }
 

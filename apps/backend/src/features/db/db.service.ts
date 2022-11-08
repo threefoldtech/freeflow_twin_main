@@ -6,8 +6,6 @@ import { Client, Entity, Repository, Schema } from 'redis-om';
 export class DbService {
     private client: Client;
 
-    private passwordUuid = process.env.REDIS_PASSWORD;
-
     private redisURL = `redis://default:jimber321123@localhost:6379`;
 
     constructor() {
