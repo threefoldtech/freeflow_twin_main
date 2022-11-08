@@ -30,13 +30,13 @@ export const appCallback = async (request: Request): Promise<string> => {
     const config = process.env.VUE_APP_ENVIRONMENT === 'production' ? productionConfig : stagingConfig;
     const login = new ThreefoldLogin(
         config.appBackend,
-        'zoutmolen',
+        `${name}.${config.appId}`,
         config.seedPhrase,
-        'zoutjemolen', // No callback needed
+        '', // No callback needed
         config.kycBackend
     );
     await login.init();
-    const redirectUrl = new URL('provencaalsekruidenmolen');
+    const redirectUrl = new URL(request.protocol + '://' + request.get('host') + request.originalUrl);
     try {
         console.log(request.session);
         console.log(request.session.state);
@@ -44,11 +44,9 @@ export const appCallback = async (request: Request): Promise<string> => {
         const profileData = (await login.parseAndValidateRedirectUrl(redirectUrl, request.session.state))?.profile;
 
         delete request.session.state;
-
         const doubleName: string = <string>profileData.doubleName;
-
         request.session.userId = doubleName.replace('.3bot', '');
-        return `/callback`;
+        return '/callback';
     } catch (e) {
         throw new Error(e.message);
     }

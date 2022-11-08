@@ -14,7 +14,6 @@ export class ContactController {
     @Get()
     @UseGuards(AuthGuard)
     async getContacts(): Promise<EntityData[]> {
-        console.log((await this._contactService.getContacts()).map(c => c.entityData));
         return (await this._contactService.getContacts()).map(c => c.entityData);
     }
 

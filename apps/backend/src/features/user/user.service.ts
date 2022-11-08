@@ -25,8 +25,6 @@ export class UserService {
         try {
             return await this._userRepo.addUserData(userData);
         } catch (error) {
-            console.log('erro bad request');
-            console.log(error);
             throw new BadRequestException(error);
         }
     }
@@ -39,14 +37,14 @@ export class UserService {
         const userId = this._configService.get<string>('userId');
         try {
             const user = await this._userRepo.getUserData({ id: userId });
-            if (!user) {
+            if (!user)
                 return await this.addUserData({
                     userId,
                     status: 'Exploring the new DigitalTwin',
                     avatar: 'default',
                     lastSeen: new Date().getTime(),
                 });
-            }
+
             return user;
         } catch (error) {
             throw new InternalServerErrorException(error);

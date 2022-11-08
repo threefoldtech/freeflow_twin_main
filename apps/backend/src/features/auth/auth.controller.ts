@@ -74,22 +74,23 @@ export class AuthController {
     async authCallback(@Req() req: Request, @Res() res: Response) {
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
         const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
+
         delete req.session.state;
 
-        await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
+        if (!this._yggdrasilService.isInitialised())
+            await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
 
-        await new Promise(resolve => {
-            setTimeout(resolve, 2000);
-        });
+        setTimeout(async () => {
+            const yggdrasilAddress = await this._locationService.getOwnLocation();
 
-        const yggdrasilAddress = await this._locationService.getOwnLocation();
-        if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
+            if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
 
-        await this._locationService.registerDigitalTwin({
-            doubleName: profileData.doubleName,
-            derivedSeed: profileData.derivedSeed,
-            yggdrasilAddress: <string>yggdrasilAddress,
-        });
+            await this._locationService.registerDigitalTwin({
+                doubleName: profileData.doubleName,
+                derivedSeed: profileData.derivedSeed,
+                yggdrasilAddress: <string>yggdrasilAddress,
+            });
+        }, 1000);
 
         req.session.userId = profileData.userId;
         req.session.save(err => {

@@ -61,7 +61,6 @@ export class UserGateway implements OnGatewayInit {
             id: this._configService.get<string>('userId'),
             isOnline: true,
         };
-
         this.handleStatusEmit({ status });
     }
 
