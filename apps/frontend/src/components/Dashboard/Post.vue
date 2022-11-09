@@ -310,6 +310,7 @@
                     class="border-t-2 rounded-b-lg"
                     :class="{ 'max-h-[35rem]': $route.name === 'single' }"
                     @replyToComment="e => handleAddComment(true, e.comment_id, e.input)"
+                    @updateComments="e => $emit('refreshPost', e)"
                 />
                 <form
                     v-if="showComments"
@@ -402,7 +403,9 @@
     const readMore = ref<boolean>(false);
     const amount_lines = ref<number>(0);
     const { user } = useAuthState();
-    const emit = defineEmits(['refreshPost']);
+    const emit = defineEmits<{
+        (e: 'refreshPost', data: IPostContainerDTO): void;
+    }>();
 
     const smallScreen = ref(window.innerWidth < 640);
 
@@ -509,7 +512,7 @@
         if (!isReplyToComment) {
             isScrollToNewComment(true);
         }
-        emit('refreshPost', response);
+        emit('refreshPost', comment);
     };
 
     const like = async () => {
