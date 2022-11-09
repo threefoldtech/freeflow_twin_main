@@ -273,7 +273,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
     import moment from 'moment';
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
-    import { debounce } from 'lodash';
+    import { useDebounceFn } from '@vueuse/core';
 
     const { updateContactsInGroup } = usechatsActions();
     const { user } = useAuthState();
@@ -361,7 +361,7 @@ class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24
         showRemoveUserDialog.value = false;
         selectedUser.value = null;
     };
-    const addToGroup = debounce(async contact => {
+    const addToGroup = useDebounceFn(async contact => {
         if (selectedUser.value?.id === contact.id) return;
         selectedUser.value = contact;
         await updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
