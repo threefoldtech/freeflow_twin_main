@@ -259,6 +259,7 @@
     import moment from 'moment';
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
+    import { useDebounceFn } from '@vueuse/core';
 
     const { updateContactsInGroup } = usechatsActions();
     const { user } = useAuthState();
@@ -346,10 +347,12 @@
         showRemoveUserDialog.value = false;
         selectedUser.value = null;
     };
-    const addToGroup = contact => {
-        //@ts-ignore
-        updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
-    };
+    const addToGroup = useDebounceFn(async contact => {
+        if (selectedUser.value?.id === contact.id) return;
+        selectedUser.value = contact;
+        await updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
+        selectedUser.value = null;
+    }, 20);
 
     const isAdmin = computed(() => {
         //@ts-ignore

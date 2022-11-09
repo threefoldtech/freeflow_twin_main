@@ -65,7 +65,7 @@
 <script setup lang="ts">
     import { fetchGif } from '@/services/gifService';
     import { ref, watch } from 'vue';
-    import { debounce } from 'lodash';
+    import { useDebounceFn } from '@vueuse/core';
 
     defineEmits(['close']);
 
@@ -75,7 +75,7 @@
     const searchTerm = ref('');
     const searching = ref(true);
 
-    const debouncedFetch = debounce(st => {
+    const debouncedFetch = useDebounceFn(st => {
         searching.value = true;
         gifs.value = [];
         fetchGif(st).then(gs => {

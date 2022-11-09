@@ -7,7 +7,7 @@
 <script lang="ts" setup>
     import { onMounted, onUnmounted } from 'vue';
     import loader from '@monaco-editor/loader';
-    import { debounce } from 'lodash';
+    import { useDebounceFn } from '@vueuse/core';
     import { extensionToLanguage } from '@/services/contentService';
 
     // add language to MonacoWebpackPlugin in vue.config.js if not already there
@@ -38,7 +38,7 @@
         monaco.editor.setModelLanguage(editor.getModel(), lang);
 
         editor.getModel().onDidChangeContent(
-            debounce(() => {
+            useDebounceFn(() => {
                 emit('update:modelValue', editor.getValue());
             }, 500)
         );

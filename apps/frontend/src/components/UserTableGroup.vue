@@ -87,7 +87,7 @@
     import { nextTick, ref, watch } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { SearchIcon } from '@heroicons/vue/solid';
-    import { debounce } from 'lodash';
+    import { useDebounceFn } from '@vueuse/core';
 
     interface IProps {
         modelValue?: string;
@@ -108,7 +108,7 @@
 
     const checkBoxes = ref([]);
 
-    const clickCheckBox = debounce((item: Contact, index: number) => {
+    const clickCheckBox = useDebounceFn((item: Contact, index: number) => {
         const checkbox = checkBoxes.value[index] as HTMLInputElement;
         if (userIsInGroup(item)) {
             removeUserFromGroup(item);
