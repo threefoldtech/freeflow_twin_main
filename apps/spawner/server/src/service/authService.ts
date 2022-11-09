@@ -30,7 +30,7 @@ export const appCallback = async (request: Request): Promise<string> => {
     const config = process.env.VUE_APP_ENVIRONMENT === 'production' ? productionConfig : stagingConfig;
     const login = new ThreefoldLogin(
         config.appBackend,
-        config.appId,
+        `${process.env.USER_ID}.${config.appId}`,
         config.seedPhrase,
         '', // No callback needed
         config.kycBackend
