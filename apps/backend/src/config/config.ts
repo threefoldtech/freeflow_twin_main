@@ -5,7 +5,7 @@ export default () => ({
         process.env.NODE_ENV === 'production' ? 'https://login.threefold.me' : 'https://login.staging.jimber.io/',
     kycBackend: process.env.NODE_ENV === 'production' ? 'https://openkyc.live' : 'https://openkyc.staging.jimber.org',
     userId: process.env.USER_ID || 'patatje3',
-    appId: `${process.env.DIGITALTWIN_APPID}` || 'patatje3.digitaltwin.jimbertesting.be',
+    appId: `${process.env.USER_ID}.${process.env.DIGITALTWIN_APPID}` || 'patatje3.digitaltwin.jimbertesting.be',
     seedPhrase:
         process.env.SEED_PHRASE ||
         'calm science teach foil burst until next mango hole sponsor fold bottom cousin push focus track truly tornado turtle over tornado teach large fiscal',
