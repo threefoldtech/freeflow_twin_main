@@ -1,9 +1,7 @@
 FROM onlyoffice/documentserver
 
 COPY startup.sh /startup.sh
-COPY local.json /local.json
-
-RUN mv -f /local.json /etc/onlyoffice/documentserver/local.json
+COPY local.json /etc/onlyoffice/documentserver/local.json
 
 RUN chmod +x /startup.sh
 
