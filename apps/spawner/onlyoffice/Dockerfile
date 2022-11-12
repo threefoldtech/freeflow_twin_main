@@ -1,8 +1,6 @@
 FROM onlyoffice/documentserver
 
 COPY startup.sh /startup.sh
-COPY local.json /etc/onlyoffice/documentserver/local.json
-
 RUN chmod +x /startup.sh
 
 RUN apt-get install dirmngr
