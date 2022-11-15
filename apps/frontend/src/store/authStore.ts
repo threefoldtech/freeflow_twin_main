@@ -1,8 +1,11 @@
 import { reactive } from '@vue/reactivity';
 import axios from 'axios';
 import { User } from '../types';
+import { statusList } from '@/store/statusStore';
 
 export const getMyStatus = async () => {
+    const { user } = useAuthState();
+    if (statusList[user.id.toString()]) return statusList[user.id.toString()].status;
     const res = await axios.get(`${window.location.origin}/api/v2/user/status`);
     return res.data.status;
 };

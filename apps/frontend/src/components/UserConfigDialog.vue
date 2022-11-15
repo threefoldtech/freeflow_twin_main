@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, nextTick, onBeforeMount, ref, watch, watchEffect } from 'vue';
+    import { computed, ref, watch, watchEffect } from 'vue';
     import { useAuthState, getMyStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
