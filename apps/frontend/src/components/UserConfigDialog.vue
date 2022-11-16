@@ -54,7 +54,7 @@
                             style="resize: none"
                             class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
                             :disabled="!isEditingStatus"
-                            :placeholder="myStatus"
+                            :placeholder="statusList[user.id.toString()]?.status ?? 'No status set'"
                             maxlength="150"
                         >
                         </textarea>
@@ -121,7 +121,7 @@
 
 <script setup lang="ts">
     import { computed, ref, watch, watchEffect } from 'vue';
-    import { useAuthState, getMyStatus } from '../store/authStore';
+    import { useAuthState } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -145,7 +145,6 @@
     const isEditingStatus = ref(false);
     const router = useRouter();
     const route = useRoute();
-    const myStatus = await getMyStatus();
     const cropper = ref(null);
     const isHoveringAvatar = ref(false);
     const showEditAvatar = ref(false);
