@@ -75,19 +75,17 @@ export const clearMessageAction = (chatId: string) => {
 };
 
 const retrieveChats = async () => {
+    if (state.chats.length > 0) return state.chats;
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
-    await axios.get(`${config.baseUrl}api/v2/chats`, { params: params }).then(response => {
-        const incomingchats = response.data;
+    const res = await axios.get(`${config.baseUrl}api/v2/chats`, { params: params });
+    const incomingChats = res.data;
 
-        // debugger
-        incomingchats.forEach((chat: Chat) => {
-            addChat(chat);
-        });
-        sortChats();
-        isLoading.value = false;
-    });
+    incomingChats.forEach((chat: Chat) => addChat(chat));
+    sortChats();
+    isLoading.value = false;
+    return incomingChats;
 };
 
 export const editMessage = (chatId: string, message: any, messageId?: string) => {

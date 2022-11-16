@@ -298,7 +298,6 @@
     import Tooltip from '@/components/Tooltip.vue';
 
     const { chats } = useChatsState();
-    const { retrieveChats } = usechatsActions();
 
     let debounce;
     const tabs = ['Create shares', 'Edit shares'];
@@ -316,10 +315,6 @@
             newNameInput.value.focus();
         });
     };
-
-    onBeforeMount(() => {
-        retrieveChats();
-    });
 
     const doRenameFile = (rename: boolean) => {
         if (rename) renameFile(selectedPaths.value[0], newName.value);

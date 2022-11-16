@@ -177,7 +177,7 @@
     import moment from 'moment';
     import { ref, computed, watch } from 'vue';
 
-    import { usechatsActions, useChatsState } from '@/store/chatStore';
+    import { useChatsState } from '@/store/chatStore';
     import { useAuthState } from '@/store/authStore';
     import AddContact from '@/components/ContactAdd.vue';
     import ChatRequestList from '@/components/ChatRequestList.vue';
@@ -208,11 +208,8 @@
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
     const { chats, chatRequests } = useChatsState();
-    const { retrieveChats } = usechatsActions();
     const collapsed = ref(false);
     let selectedId = ref('');
-
-    retrieveChats();
 
     const status = computed(() => {
         return statusList[selectedId.value];

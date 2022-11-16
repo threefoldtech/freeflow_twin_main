@@ -347,7 +347,6 @@
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
-    import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendRemoveUser } from '@/store/socketStore';
@@ -397,7 +396,7 @@
     const showDeleteDialog = ref(false);
     const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
-    const { retrieveChats, sendFile, sendMessage } = usechatsActions();
+    const { sendFile, sendMessage } = usechatsActions();
     const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
     const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
 
@@ -409,7 +408,6 @@
     );
 
     onBeforeMount(async () => {
-        await retrieveChats();
         await retrieveDTContacts();
         await retrieveContacts();
     });
@@ -428,7 +426,6 @@
         if (!('location' in selectedUser.value)) return;
 
         if (!isPersonFriend.value) {
-            await retrieveChats();
             addContact(selectedUser.value.id, selectedUser.value.location);
         }
         await nextTick(async () => {

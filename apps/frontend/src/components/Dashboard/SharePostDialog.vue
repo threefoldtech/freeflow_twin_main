@@ -137,7 +137,6 @@
 
     const emit = defineEmits(['close', 'image_clicked']);
 
-    const { retrieveChats } = usechatsActions();
     const { chats } = useChatsState();
 
     const queue = ref<string[]>([]);
@@ -199,8 +198,6 @@
     });
 
     onBeforeMount(async () => {
-        await retrieveChats();
-
         escListener = (e: KeyboardEvent) => {
             if (e.key !== 'Escape') {
                 return;

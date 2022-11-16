@@ -56,14 +56,9 @@
     const route = useRoute();
 
     const { chats } = useChatsState();
-    const { retrieveChats, sendMessage } = usechatsActions();
 
     let debounce;
     const parts = computed(() => currentDirectory.value.split('/'));
-
-    onBeforeMount(() => {
-        retrieveChats();
-    });
 
     function debounceSearch(event) {
         clearTimeout(debounce);

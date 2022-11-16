@@ -202,34 +202,6 @@ export const goToFilesInChat = async (chat?: Chat) => {
     chatsWithFiles.value = getchatsWithFiles(received);
 };
 
-export const loadFilesReceivedNested = async () => {
-    const { retrieveChats } = usechatsActions();
-    const { chats } = useChatsState();
-    const chatId = router.currentRoute.value.params?.chatId;
-    const received = router.currentRoute.value.meta.received as boolean;
-    if (!chatId) {
-        router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
-        sharedFolderIsloading.value = false;
-        return;
-    }
-
-    await retrieveChats();
-    const chat = chats.value.find(item => item.chatId === chatId);
-    if (!chat) {
-        router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
-        sharedFolderIsloading.value = false;
-        return;
-    }
-    chatFilesBreadcrumbs.value.push({
-        name: received ? 'Received files in chat' : 'Sent files in chat',
-        path: received ? '/quantum/received' : '/quantum/sent',
-    });
-    chatFilesBreadcrumbs.value.push({ name: chatId, path: router.currentRoute.value.path });
-
-    chatFiles.value = chatFilesReceived(chat, received);
-    sharedFolderIsloading.value = false;
-};
-
 export const fetchSharedInChatFiles = received => {
     resetForFilesReceivedInChat();
     sharedDir.value = true;
