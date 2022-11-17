@@ -39,11 +39,10 @@
 
 <script lang="ts" setup>
     import { computed, onBeforeMount } from 'vue';
-    import { fetchStatus, statusList, startFetchStatusLoop } from '@/store/statusStore';
+    import { statusList, startFetchStatusLoop, watchingUsers, fetchStatus } from '@/store/statusStore';
     import { calcExternalResourceLink } from '../services/urlService';
-    import { useAuthState } from '@/store/authStore';
     import { Contact, GroupContact } from '@/types';
-    import axios from 'axios';
+    import { useAuthState } from '@/store/authStore';
 
     interface IProps {
         id: string;
@@ -65,11 +64,17 @@
     onBeforeMount(async () => {
         const { user } = useAuthState();
         await fetchStatus(user.id);
-        if (!statusList[<string>props.id] && props.contact?.location) await startFetchStatusLoop(props.contact);
+        const contact: Contact = {
+            id: props.id,
+            location: watchingUsers[props.id]?.location,
+        };
+        if (!statusList[props.id] && contact.location) {
+            await startFetchStatusLoop(contact);
+        }
     });
 
     const status = computed(() => {
-        return statusList[<string>props.id];
+        return statusList[props.id];
     });
 
     const src = computed(() => {
