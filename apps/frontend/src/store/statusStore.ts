@@ -13,6 +13,7 @@ export const watchingUsers = [];
 export const showUserOfflineMessage = ref<boolean>(false);
 
 export const fetchStatus = useDebounceFn(async (digitalTwinId: DtId) => {
+    if (statusList[digitalTwinId.toString()]) return statusList[<string>digitalTwinId];
     const { user } = useAuthState();
     const locationApiEndpoint = '/api/v2/user/status';
     let location = '';
@@ -24,7 +25,6 @@ export const fetchStatus = useDebounceFn(async (digitalTwinId: DtId) => {
         );
     }
     try {
-        if (statusList[digitalTwinId.toString()]) return statusList[<string>digitalTwinId];
         const { data } = await axios.get(location, { timeout: 5000 });
         statusList[<string>digitalTwinId] = data;
         return data;
@@ -46,19 +46,4 @@ export const startFetchStatusLoop = async (contact: Contact) => {
 
     await fetchStatus(contact.id);
     fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    // setInterval(async () => {
-    //     try {
-    //         if (fetching.indexOf(<string>contact.id) !== -1) {
-    //             return;
-    //         }
-    //         fetching.push(<string>contact.id);
-    //         await fetchStatus(contact.id);
-
-    //         fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    //     } catch (e) {
-    //         setTimeout(() => {
-    //             fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    //         }, 10000);
-    //     }
-    // }, 5000);
 };
