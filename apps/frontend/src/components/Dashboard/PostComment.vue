@@ -92,30 +92,6 @@
                 </PopoverPanel>
             </transition>
         </Popover>
-        <!--<div
-class="self-stretch flex justify-center items-center transform transition-opacity duration-200 opacity-0 translate -translate-y-2 hover:opacity-100"
->
-<a class="" href="#">
-<div
-class="text-xs cursor-pointer flex h-6 w-6 transform transition-colors duration-200 hover:bg-gray-100 rounded-full items-center justify-center"
->
-<svg
-class="w-4 h-6"
-fill="none"
-stroke="currentColor"
-viewBox="0 0 24 24"
-xmlns="http://www.w3.org/2000/svg"
->
-<path
-d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-stroke-linecap="round"
-stroke-linejoin="round"
-stroke-width="2"
-></path>
-</svg>
-</div>
-</a>
-</div>-->
     </div>
     <ReplyComment
         v-for="reply in commentsSorted"
@@ -220,6 +196,7 @@ stroke-width="2"
 
     const handleReplyForm = () => {
         if (replyInput.value === '') return;
+
         emit('replyToComment', {
             input: replyInput.value,
             comment_id: props.comment.id,
@@ -232,6 +209,7 @@ stroke-width="2"
         const { post, id, isReplyToComment, replyTo } = props.comment;
         await likeComment(post.id, post.owner.location, id, isReplyToComment, replyTo);
         const res = await getSinglePost(post.id, post.owner.location);
+
         emit('updateComments', res);
     };
 
@@ -249,9 +227,5 @@ stroke-width="2"
     .v-popper--theme-menu .v-popper__inner {
         background-color: transparent !important;
         border-color: transparent !important;
-    }
-
-    .v-popper__arrow-container {
-        opacity: 0;
     }
 </style>
