@@ -31,7 +31,7 @@
                 @click.self="closeEditor()"
             >
                 <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
-                <div v-if="filePreviewType === IFileTypes.IMAGE">
+                <div v-if="filePreviewType === FileTypes.IMAGE">
                     <img
                         :src="filePreviewSrc"
                         class="pointer-events-none z-50 max-h-full"
@@ -40,13 +40,13 @@
                     />
                 </div>
 
-                <div v-else-if="filePreviewType === IFileTypes.VIDEO">
+                <div v-else-if="filePreviewType === FileTypes.VIDEO">
                     <video controls>
                         <source :src="filePreviewSrc" />
                     </video>
                 </div>
 
-                <div v-else-if="filePreviewType === IFileTypes.SIMPLE">
+                <div v-else-if="filePreviewType === FileTypes.SIMPLE">
                     <button
                         @click="saveChanges()"
                         class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
@@ -137,7 +137,7 @@
     import { getFileInfo, updateFile } from '@/services/fileBrowserService';
     import { useAuthState } from '@/store/authStore';
     import { SharedFileInterface } from '@/types';
-    import { IFileTypes } from 'custom-types/file-actions.type';
+    import { FileTypes } from 'custom-types/file-actions.type';
 
     const { user } = useAuthState();
 
@@ -211,10 +211,10 @@
             filePreviewSrc.value = calcExternalResourceLink(src);
 
             filePreviewType.value = isVideo(item.path)
-                ? IFileTypes.VIDEO
+                ? FileTypes.VIDEO
                 : isImage(item.path)
-                ? IFileTypes.IMAGE
-                : IFileTypes.SIMPLE;
+                ? FileTypes.IMAGE
+                : FileTypes.SIMPLE;
 
             if (filePreviewType.value !== 'simpleFile') {
                 showFilePreview.value = true;
@@ -238,7 +238,7 @@
 
     const closeEditor = () => {
         showFilePreview.value = false;
-        if (filePreviewType.value !== IFileTypes.SIMPLE || editedFileContent.value === fileContent.value) {
+        if (filePreviewType.value !== FileTypes.SIMPLE || editedFileContent.value === fileContent.value) {
             return;
         }
         showConfirmDialog.value = true;
