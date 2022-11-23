@@ -71,7 +71,7 @@ export const spawnDocker = async (userId: string) => {
         HostConfig: {
             AutoRemove: true,
             NetworkMode: 'chatnet',
-            // Sysctls: { 'net.ipv6.conf.all.disable_ipv6': '0' },
+            Sysctls: { 'net.ipv6.conf.all.disable_ipv6': '0' },
             CapAdd: 'NET_ADMIN',
             Devices: <DeviceMapping[]>[
                 {
