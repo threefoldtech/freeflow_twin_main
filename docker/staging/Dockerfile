@@ -1,7 +1,7 @@
 FROM golang:alpine as yggdrasil_builder
 
 ENV DUMB_INIT_VERSION=1.2.2 \
-    YGGDRASIL_VERSION=0.4.4
+    YGGDRASIL_VERSION=0.4.0
 
 RUN set -ex \
     && apk --no-cache add \
@@ -74,7 +74,7 @@ COPY ./docker/prod/startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
 RUN mkdir /appdata
-RUN mkdir /appdata/user 
+RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
