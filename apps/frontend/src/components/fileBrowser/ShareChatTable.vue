@@ -101,27 +101,24 @@
 <script lang="ts" setup>
     import { Chat } from '@/types';
     import Spinner from '@/components/Spinner.vue';
-    import { addShare, PathInfoModel, selectedPaths } from '@/store/fileBrowserStore';
+    import { addShare, IFileShare, selectedPaths } from '@/store/fileBrowserStore';
     import { computed, onBeforeMount, ref } from 'vue';
     import { SearchIcon } from '@heroicons/vue/solid';
-    import { usechatsActions } from '@/store/chatStore';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { createNotification } from '@/store/notificiationStore';
     import { Status } from '@/types/notifications';
+    import { IShareChat } from '@/store/chatStore';
 
     interface IProps {
         data: any[];
-        selectedFile?: PathInfoModel;
+        selectedFile?: IFileShare;
     }
 
     const props = defineProps<IProps>();
     const emit = defineEmits(['update:modelValue', 'clicked']);
 
-    const { sendMessage } = usechatsActions();
-
     const searchTerm = ref('');
-    const chats = ref([]);
-    const alreadySentChatIds = ref(<String[]>[]);
+    const chats = ref<IShareChat[]>([]);
 
     onBeforeMount(() => {
         chats.value = props.data.map((item: Chat) => ({
@@ -133,33 +130,26 @@
         }));
     });
 
-    const reset = () => {
-        emit('update:modelValue', '');
-        searchTerm.value = '';
-    };
-
     const handleInput = evt => {
         emit('update:modelValue', evt.target.value);
     };
 
     const searchResults = computed(() =>
-        chats.value.filter((item: Chat) => {
-            return item.name.toLowerCase().includes(searchTerm.value.toLowerCase());
+        chats.value.filter(chat => {
+            return chat.name.toLowerCase().includes(searchTerm.value.toLowerCase());
         })
     );
 
     async function shareFile(chatId) {
-        const size = selectedPaths?.value[0]?.size ? selectedPaths?.value[0]?.size : props?.selectedFile?.size;
-        const filename = selectedPaths?.value[0]?.fullName
-            ? selectedPaths?.value[0]?.fullName
-            : props?.selectedFile?.name;
-        const chat = chats?.value.find(chat => chat?.chatId == chatId)
-            ? chats?.value.find(chat => chat?.chatId == chatId)
-            : chats?.value.find(chat => chat?.chatId == props.selectedFile?.id);
-        const path = selectedPaths.value[0]?.path ? selectedPaths.value[0]?.path : props.selectedFile.path;
-        chat.loading = true;
-        const success = await addShare(chatId, path, filename, size, chat.canWrite);
+        const file = selectedPaths.value[0] ?? props.selectedFile;
 
+        const path = file.path;
+        const size = file.size;
+        const filename = 'fullName' in file ? file.fullName : file.name;
+        const chat = chats?.value.find(chat => chat?.chatId == chatId);
+        chat.loading = true;
+
+        const success = await addShare(chatId, path, filename, size, chat.canWrite);
         chat.isAlreadySent = true;
         chat.loading = false;
         if (success) {

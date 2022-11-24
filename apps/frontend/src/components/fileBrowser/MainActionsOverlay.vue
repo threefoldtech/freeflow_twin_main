@@ -17,21 +17,20 @@
     </transition>
 </template>
 <script lang="ts" setup>
-    import { nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
-
-    defineEmits(['update-model-value']);
-
-    const dialogRef = ref<HTMLElement>(null);
-
-    onUpdated(() => {
-        if (dialogRef.value) dialogRef.value.focus();
-    });
+    import { onUpdated, ref } from 'vue';
 
     interface IProps {
         modelValue?: boolean;
     }
 
+    const emits = defineEmits(['update-model-value']);
     const props = withDefaults(defineProps<IProps>(), {
         modelValue: false,
+    });
+
+    const dialogRef = ref<HTMLElement>(null);
+
+    onUpdated(() => {
+        if (dialogRef.value) dialogRef.value.focus();
     });
 </script>

@@ -558,7 +558,12 @@ export class ApiService {
         params.append('attachments', attachments.toString());
         params.append('location', location);
         try {
-            return (await axios.get(url, { params })).data;
+            return (
+                await axios.get(url, {
+                    params,
+                    timeout: parseInt(this._configService.get<string>('bigPingTimeoutAxiosRequest')),
+                })
+            ).data;
         } catch {
             return;
         }

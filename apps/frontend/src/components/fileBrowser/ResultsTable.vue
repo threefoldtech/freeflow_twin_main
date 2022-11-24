@@ -97,7 +97,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-row items-center text-md">
                                         <div class="mr-3 w-7 text-center">
-                                            <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
+                                            <i
+                                                :class="
+                                                    getIcon(item.isDirectory, item.fileType) +
+                                                    ' ' +
+                                                    getIconColor(item.isDirectory, item.fileType)
+                                                "
+                                                class="fa-2x"
+                                            ></i>
                                         </div>
                                         <div class="flex flex-col items-start py-1">
                                             <span
@@ -163,7 +170,11 @@
                                 <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i
                                         :key="item.name"
-                                        :class="getIcon(item) + ' ' + getIconColor(item)"
+                                        :class="
+                                            getIcon(item.isDirectory, item.fileType) +
+                                            ' ' +
+                                            getIconColor(item.isDirectory, item.fileType)
+                                        "
                                         class="fa-lg"
                                     ></i>
                                     <p class="ml-4 text-sm font-medium text-gray-900 truncate pointer-events-none">
@@ -213,11 +224,7 @@
 
     const router = useRouter();
     const emit = defineEmits(['itemClicked']);
-
-    let tempCounter = 0;
-    const ghostImage = ref<HTMLDivElement>();
     const hiddenItems = ref<HTMLDivElement>();
-    const dragOverItem = ref<PathInfoModel>();
 
     const handleSelect = (item: PathInfoModel) => {
         if (!selectedPaths.value.includes(item)) {
@@ -231,11 +238,15 @@
         deselectItem(item);
     };
 
+    const ghostImage = ref<HTMLDivElement>();
+
     const onDragStart = (event, item) => {
         isDraggingFiles.value = true;
         if (!selectedPaths.value.includes(item)) selectItem(item);
         event.dataTransfer.setDragImage(ghostImage.value, 0, 0);
     };
+
+    const dragOverItem = ref<PathInfoModel>();
 
     const onDragOver = (event: Event, item: PathInfoModel) => {
         dragOverItem.value = item;
@@ -249,6 +260,8 @@
     const canBeDropped = (item: PathInfoModel) => {
         return item.isDirectory && selectedPaths.value.findIndex(x => equals(x, item)) === -1;
     };
+
+    let tempCounter = 0;
 
     const onDragLeaveParent = () => {
         tempCounter--;

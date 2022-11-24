@@ -111,7 +111,7 @@
                 v-for="file in sidebarFileList"
             >
                 <a :href="calcExternalResourceLink(file.body.url)" class="block outline-none border-none"
-                    ><i :class="getIconDirty(false, getFileType(file.fileType))" class="fa-lg"></i>
+                    ><i :class="getIcon(false, getFileType(file.fileType))" class="fa-lg"></i>
                     <span class="ml-2 font-normal text-gray-800" :title="moment(file.timeStamp).fromNow()">{{
                         truncate(file)
                     }}</span>
@@ -254,7 +254,7 @@
     import { blocklist, getUnblockedContacts, userIsBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
-    import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
+    import { getFileType, getIcon } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';

@@ -7,7 +7,15 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
+import {
+    Chat,
+    ContactInterface,
+    DtId,
+    FileShareMessageType,
+    MessageTypes,
+    SharedFileInterface,
+    SharePermissionInterface,
+} from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -20,18 +28,18 @@ import { decodeString } from '@/utils/files';
 declare const Buffer;
 
 export enum FileType {
-    Unknown,
-    Word,
-    Video,
-    Pdf,
-    Csv,
-    Audio,
-    Archive,
-    Excel,
-    Powerpoint,
-    Image,
-    Text,
-    Html,
+    Unknown = 'unknown',
+    Word = 'word',
+    Video = 'video',
+    Pdf = 'pdf',
+    Csv = 'csv',
+    Audio = 'audio',
+    Archive = 'archive',
+    Excel = 'excel',
+    Powerpoint = 'powerpoint',
+    Image = 'image',
+    Text = 'text',
+    Html = 'html',
 }
 
 export enum Action {
@@ -50,6 +58,18 @@ export interface PathInfoModel extends Api.PathInfo {
 
 export interface FullPathInfoModel extends Api.EditPathInfo {
     fileType: FileType;
+}
+
+export interface IFileShare {
+    id?: string;
+    path: string;
+    owner: ContactInterface;
+    name?: string | undefined;
+    isFolder: boolean;
+    isSharedWithMe: boolean;
+    size?: number | undefined;
+    lastModified?: number | undefined;
+    permissions: SharePermissionInterface[];
 }
 
 export interface ShareContent extends PathInfoModel {
@@ -352,6 +372,10 @@ export const searchDir = async () => {
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
+    if (searchDirValue.value === '') {
+        searchResults.value = [];
+        return;
+    }
     if (result.data.length <= 0) {
         searchResults.value = 'None';
         return;
@@ -505,56 +529,15 @@ export const sortAction = function (s) {
     currentSort.value = s;
 };
 
-export const getIcon = (item: PathInfoModel) => {
-    if (item.isDirectory) return 'fas fa-folder';
-    switch (item.fileType) {
-        case FileType.Video:
-            return 'far fa-file-video';
-        case FileType.Word:
-            return 'far fa-file-word';
-        case FileType.Image:
-            return 'far fa-file-image';
-        case FileType.Pdf:
-            return 'far fa-file-pdf';
-        case FileType.Csv:
-            return 'far fa-file-csv';
-        case FileType.Audio:
-            return 'far fa-file-audio';
-        case FileType.Archive:
-            return 'far fa-file-archive';
-        case FileType.Excel:
-            return 'far fa-file-excel';
-        case FileType.Powerpoint:
-            return 'far fa-file-powerpoint';
-        default:
-            return 'far fa-file';
-    }
-};
-export const getIconDirty = (isFolder: boolean, fileType: FileType) => {
-    if (isFolder) return 'fas fa-folder';
+export const getIcon = (isDirectory: boolean, fileType: FileType) => {
+    if (isDirectory) return 'fas fa-folder';
 
-    switch (fileType) {
-        case FileType.Video:
-            return 'far fa-file-video';
-        case FileType.Word:
-            return 'far fa-file-word';
-        case FileType.Image:
-            return 'far fa-file-image';
-        case FileType.Pdf:
-            return 'far fa-file-pdf';
-        case FileType.Csv:
-            return 'far fa-file-csv';
-        case FileType.Audio:
-            return 'far fa-file-audio';
-        case FileType.Archive:
-            return 'far fa-file-archive';
-        case FileType.Excel:
-            return 'far fa-file-excel';
-        case FileType.Powerpoint:
-            return 'far fa-file-powerpoint';
-        default:
-            return 'far fa-file';
-    }
+    const fileIcons = Object.values(FileType);
+    const toBeFiltered = [FileType.Text, FileType.Html, FileType.Unknown];
+    const filteredFileIcons = fileIcons.filter(f => !toBeFiltered.includes(f));
+
+    if (filteredFileIcons.includes(fileType)) return `far fa-file-${fileType}`;
+    return 'far fa-file';
 };
 
 export const createModel = <T extends Api.PathInfo>(pathInfo: T): PathInfoModel => {
@@ -637,14 +620,13 @@ export const getFileType = (extension: string): FileType => {
         case 'pps':
         case 'ppsm':
         case 'ppsx':
-        case 'ppt':
         case 'pptm':
         case 'ods':
             return FileType.Excel;
         case 'odt':
             return FileType.Word;
         case 'odp':
-            return FileType.Powerpoint;
+        case 'ppt':
         case 'pptx':
             return FileType.Powerpoint;
         case 'html':
@@ -685,22 +667,9 @@ export const getFileLastModified = (val: any) => {
     return moment(dateObj).fromNow();
 };
 
-export const getIconColor = (item: PathInfoModel) => {
-    if (item.isDirectory) return 'text-primary';
-    switch (item.fileType) {
-        case FileType.Excel:
-            return 'text-primarylight';
-        case FileType.Word:
-            return 'text-primarylight';
-        case FileType.Powerpoint:
-            return 'text-primarylight';
-        default:
-            return 'text-primarylight';
-    }
-};
-export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
-    if (isFolder) return 'text-primary';
-    switch (filetype) {
+export const getIconColor = (isDirectory: boolean, fileType: FileType) => {
+    if (isDirectory) return 'text-primary';
+    switch (fileType) {
         case FileType.Excel:
             return 'text-green-400';
         case FileType.Word:
@@ -708,7 +677,7 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
         case FileType.Powerpoint:
             return 'text-red-400';
         default:
-            return 'text-gray-600';
+            return 'text-primarylight';
     }
 };
 

@@ -693,6 +693,14 @@ interface ChatState {
     unreadChats: string[];
 }
 
+export interface IShareChat {
+    name: string;
+    chatId: string;
+    canWrite: boolean;
+    isAlreadySent: boolean;
+    loading: boolean;
+}
+
 export const handleRead = (message: Message<string>) => {
     const { user } = useAuthState();
 

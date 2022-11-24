@@ -33,15 +33,12 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onBeforeMount, watch } from 'vue';
+    import { watch } from 'vue';
     import {
         selectedPaths,
-        currentDirectory,
         searchDir,
         searchDirValue,
         searchResults,
-        isDraggingFiles,
-        moveFiles,
         sharedDir,
         savedAttachments,
     } from '@/store/fileBrowserStore';
@@ -49,57 +46,26 @@
     import Breadcrumbs from '@/components/fileBrowser/Breadcrumbs.vue';
     import ViewSelect from '@/components/fileBrowser/ViewSelect.vue';
     import SelectedOptions from '@/components/fileBrowser/SelectedOptions.vue';
-    import { usechatsActions, useChatsState } from '@/store/chatStore';
+    import { useChatsState } from '@/store/chatStore';
     import { SearchIcon } from '@heroicons/vue/solid';
     import { useRoute } from 'vue-router';
+    import { useDebounceFn } from '@vueuse/core';
 
     const route = useRoute();
 
     const { chats } = useChatsState();
 
-    let debounce;
-    const parts = computed(() => currentDirectory.value.split('/'));
+    const debounceSearch = useDebounceFn(async () => {
+        if (searchDirValue.value === '') {
+            searchResults.value = [];
+            return;
+        }
+        await searchDir();
+    }, 1);
 
-    function debounceSearch(event) {
-        clearTimeout(debounce);
-        debounce = setTimeout(() => {
-            if (searchDirValue.value === '') {
-                searchResults.value = [];
-                return;
-            }
-            searchDir();
-        }, 1);
-    }
-
-    const onDragEnter = (e: Event, i: number) => {
-        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
-        (e.target as HTMLElement).classList.add('bg-accent-300');
-        (e.target as HTMLElement).classList.add('text-white');
-    };
-
-    function clearInput() {
+    const clearInput = () => {
         searchDirValue.value = '';
         searchResults.value = [];
-    }
-
-    const onDragLeave = (e: Event, i: number) => {
-        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
-        (e.target as HTMLElement).classList.remove('bg-accent-300');
-        (e.target as HTMLElement).classList.remove('text-white');
-    };
-
-    const onDrop = (e: Event, i: number) => {
-        if (!isDraggingFiles.value || !e || !e.target || i === parts.value?.length - 1) return;
-        let path = '/';
-        if (i > 0) {
-            const parts = currentDirectory.value.split('/');
-            parts.splice(i + 1);
-            path = parts.join('/');
-        }
-        (e.target as HTMLElement).classList.remove('bg-accent-300');
-        (e.target as HTMLElement).classList.remove('text-white');
-        moveFiles(path);
-        selectedPaths.value = [];
     };
 
     watch(selectedPaths, () => {

@@ -193,7 +193,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-row items-center text-md">
                                         <div class="mr-3 w-7 text-center">
-                                            <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
+                                            <i
+                                                :class="
+                                                    getIcon(item.isDirectory, item.fileType) +
+                                                    ' ' +
+                                                    getIconColor(item.isDirectory, item.fileType)
+                                                "
+                                                class="fa-2x"
+                                            ></i>
                                         </div>
                                         <span class="hover:underline" @click.stop="emit('itemClicked', item)">
                                             {{ item.name }}
@@ -279,7 +286,11 @@
                                 <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i
                                         :key="item.name"
-                                        :class="getIcon(item) + ' ' + getIconColor(item)"
+                                        :class="
+                                            getIcon(item.isDirectory, item.fileType) +
+                                            ' ' +
+                                            getIconColor(item.isDirectory, item.fileType)
+                                        "
                                         class="fa-lg"
                                     ></i>
                                     <p
@@ -325,7 +336,6 @@
         PathInfoModel,
         savedAttachments,
         savedAttachmentsIsLoading,
-        selectAll,
         selectedPaths,
         selectItem,
         sortAction,
@@ -416,27 +426,6 @@
 <style scoped>
     th.active .arrow {
         opacity: 1;
-    }
-
-    .arrow {
-        display: inline-block;
-        vertical-align: middle;
-        width: 0;
-        height: 0;
-        margin-left: 5px;
-        opacity: 0;
-    }
-
-    .arrow.asc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 4px solid #1f0f5b;
-    }
-
-    .arrow.desc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid #1f0f5b;
     }
 
     .hiddenItems {

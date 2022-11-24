@@ -265,7 +265,7 @@
 </template>
 
 <script setup lang="ts">
-    import { nextTick, onBeforeMount, ref, watch } from 'vue';
+    import { nextTick, ref, watch } from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -282,7 +282,7 @@
     import Button from '@/components/Button.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
-    import { usechatsActions, useChatsState } from '@/store/chatStore';
+    import { useChatsState } from '@/store/chatStore';
 
     import { showShareDialog } from '@/services/dialogService';
     import {
@@ -299,10 +299,8 @@
 
     const { chats } = useChatsState();
 
-    let debounce;
     const tabs = ['Create shares', 'Edit shares'];
     const newNameInput = ref<HTMLInputElement>();
-    const showDeleteDialog = ref(false);
     const showRenameDialog = ref(false);
     const newName = ref<string>('');
     const showSelectedActions = ref(false);
@@ -338,6 +336,8 @@
         selectedPaths.value = [];
         selectedTab.value = 0;
     };
+
+    const showDeleteDialog = ref(false);
 
     watch(
         triggerWatchOnRightClickItem,

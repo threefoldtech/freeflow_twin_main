@@ -65,9 +65,8 @@
         selectedFile: PathInfoModel;
     }
 
-    const emit = defineEmits(['update:modelValue', 'clicked']);
     const props = defineProps<IProps>();
-    const searchTerm = ref('');
+    const emit = defineEmits(['update:modelValue', 'clicked']);
     const currentShare = ref<SharedFileInterface>();
 
     onBeforeMount(async () => {
@@ -81,7 +80,6 @@
             const chat = chats.value.find(chat => {
                 return chat.chatId === item.userId;
             });
-            console.log(chat);
             if (chat.isGroup) {
                 //Groups chatId's are UUID
                 return {
@@ -96,11 +94,6 @@
         });
     };
 
-    const reset = () => {
-        emit('update:modelValue', '');
-        searchTerm.value = '';
-    };
-
     const handleInput = evt => {
         emit('update:modelValue', evt.target.value);
     };
@@ -108,6 +101,8 @@
     const canWrite = (data: SharePermissionInterface) => {
         return data.sharePermissionTypes.includes(SharePermission.Write);
     };
+
+    const searchTerm = ref('');
 
     const searchResults = computed(() => {
         return currentShare?.value?.permissions?.filter(item => {
@@ -127,8 +122,4 @@
     };
 </script>
 
-<style scoped>
-    .mh-48 {
-        max-height: 10rem;
-    }
-</style>
+<style scoped></style>

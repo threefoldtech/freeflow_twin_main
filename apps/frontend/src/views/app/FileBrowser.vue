@@ -138,6 +138,8 @@
     import { useAuthState } from '@/store/authStore';
     import { SharedFileInterface } from '@/types';
     import { FileTypes } from 'custom-types/file-actions.type';
+    import { createNotification } from '@/store/notificiationStore';
+    import { Status } from '@/types/notifications';
 
     const { user } = useAuthState();
 
@@ -230,7 +232,16 @@
     };
 
     const handleShareClick = async (item: SharedFileInterface) => {
+        createNotification('Getting file information', 'This may take some time.');
         const res = (await getFileInfo(item.path, item.owner.location)).data;
+        if (!res) {
+            createNotification(
+                'Failed to open file',
+                'The file you are trying to open is no longer available.',
+                Status.Error
+            );
+            return;
+        }
         await handleItemClick(res, item.owner.location);
     };
 
