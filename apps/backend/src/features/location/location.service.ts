@@ -65,9 +65,13 @@ export class LocationService {
         const keyPair = this._encryptionService.getKeyPair(seed);
         const data = this._encryptionService.decodeAddress(yggdrasilAddress);
         const signedAddress = this._encryptionService.signAddress({ data, secretKey: keyPair.secretKey });
+
+        console.log(doubleName);
+        console.log(yggdrasilAddress);
         try {
             await this._apiService.registerDigitalTwin({ doubleName, signedAddress });
         } catch (error) {
+            console.log('custom error', error);
             throw new BadRequestException(error);
         }
     }

@@ -146,6 +146,7 @@ export class YggdrasilService {
      * @param {string} seed - Chat seed.
      */
     async setupYggdrasil(seed: string): Promise<void> {
+        console.log('Setting up ygg');
         const chatSeed = `${seed}-chat`;
         const keyReplacements = this.getReplacements(chatSeed);
         const generatedConfig = this.generateConfig();
