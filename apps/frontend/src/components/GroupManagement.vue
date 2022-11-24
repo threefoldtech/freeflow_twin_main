@@ -351,7 +351,6 @@
         if (selectedUser.value?.id === contact.id) return;
         selectedUser.value = contact;
         await updateContactsInGroup(props.chat.chatId, contact, SystemMessageTypes.ADD_USER);
-        selectedUser.value = null;
     }, 20);
 
     const isAdmin = computed(() => {
