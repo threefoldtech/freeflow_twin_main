@@ -83,6 +83,7 @@ export class AuthService {
                 email,
             };
         } catch (error) {
+            console.log('This is the error', error);
             throw new BadRequestException(`${error}`);
         }
     }

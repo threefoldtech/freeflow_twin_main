@@ -48,7 +48,7 @@
                                         <div class="flex">
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ item.id }}
+                                                    {{ item.username }}
                                                 </div>
                                                 <div class="flex align-center text-sm text-gray-500">
                                                     <em
@@ -62,7 +62,7 @@
                                                         class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center"
                                                         aria-hidden="true"
                                                     />
-                                                    <p>{{ item.app_id }}</p>
+                                                    <p>{{ item.appId }}</p>
                                                 </div>
                                             </div>
                                         </div>

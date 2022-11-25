@@ -72,19 +72,24 @@ export class AuthController {
 
     @Get('callback')
     async authCallback(@Req() req: Request, @Res() res: Response) {
+        console.log('A');
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+        console.log('redirectUrl', redirectUrl);
         const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
+        console.log('profileData', profileData);
 
         delete req.session.state;
 
-        if (!this._yggdrasilService.isInitialised())
-            await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
+        if (!this._yggdrasilService.isInitialised()) console.log('Setting up Ygg');
+        await this._yggdrasilService.setupYggdrasil(profileData.derivedSeed);
 
         setTimeout(async () => {
+            console.log('Setting timeout');
             const yggdrasilAddress = await this._locationService.getOwnLocation();
-
+            console.log('This is my location', yggdrasilAddress);
             if (!yggdrasilAddress) throw new BadRequestException('Could not get own Yggdrasil address.');
 
+            console.log('Registering digital twin');
             await this._locationService.registerDigitalTwin({
                 doubleName: profileData.doubleName,
                 derivedSeed: profileData.derivedSeed,
