@@ -57,7 +57,7 @@
             </v-contextmenu-item>
         </v-contextmenu>
         <div class="relative w-full mt-8 px-4">
-            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
+            <div v-if="chatInfo?.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
                 <span>Loading more messages</span>
             </div>

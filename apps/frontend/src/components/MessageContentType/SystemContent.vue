@@ -1,6 +1,6 @@
 <template>
     <div
-        v-if="message.body.type === 'JOINED_VIDEOROOM'"
+        v-if="message.body.type === SystemMessageTypes.JOINED_VIDEOROOM"
         class="cursor-pointer flex justify-center items-center mb-4"
         @click="joinVideo"
     >
@@ -27,49 +27,50 @@
     import { popupCenter } from '@/services/popupService';
     import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { useRoute } from 'vue-router';
-    import { computed, defineComponent, ref } from 'vue';
+    import { computed, ref } from 'vue';
     import { useAuthState } from '@/store/authStore';
-    import { MessageTypes, SystemMessageTypes } from '@/types';
+    import { Message, MessageTypes, SystemBody, SystemMessageTypes } from '@/types';
     import * as crypto from 'crypto-js';
 
     interface IProp {
-        message: Object;
+        message: Message<SystemBody>;
     }
 
-    const props = defineProps<IProp>();
-    const route = useRoute();
-    let selectedId = ref(<string>route.params.id);
     const { chats } = useChatsState();
     const { sendMessage } = usechatsActions();
     const { user } = useAuthState();
+
+    const props = defineProps<IProp>();
+    const route = useRoute();
+    const selectedId = ref(<string>route.params.id);
+
     const chat = computed(() => {
         return chats.value.find(c => c.chatId == selectedId.value);
     });
+
     const joinVideo = () => {
-        // @ts-ignore
-        const videoRoomId =
-            <string>props.message.body.id ??
-            crypto
-                .SHA1(
-                    chat.value.isGroup
-                        ? <string>chat.value.chatId
-                        : chat.value.contacts
-                              .map(c => c.id)
-                              .sort()
-                              .join('-')
-                )
-                .toString();
+        const id = getVideoRoomId();
+        const msg = {
+            type: SystemMessageTypes.JOINED_VIDEOROOM,
+            message: `${user.id} joined the video chat`,
+            id,
+        };
 
-        sendMessage(
-            chat.value.chatId,
-            {
-                type: SystemMessageTypes.JOINED_VIDEOROOM,
-                message: `${user.id} joined the video chat`,
-                id: videoRoomId,
-            },
-            MessageTypes.SYSTEM
-        );
+        sendMessage(chat.value.chatId, msg, MessageTypes.SYSTEM);
+        popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
+    };
 
-        const videoRoomPopup = popupCenter(`/videoroom/${videoRoomId}`, 'video room', 800, 550);
+    const getVideoRoomId = () => {
+        if (props.message.body.id) return props.message.body.id;
+        return crypto
+            .SHA1(
+                chat.value.isGroup
+                    ? chat.value.chatId
+                    : chat.value.contacts
+                          .map(c => c.id)
+                          .sort()
+                          .join('-')
+            )
+            .toString();
     };
 </script>

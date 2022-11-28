@@ -12,6 +12,7 @@ import {
     ContactInterface,
     DtId,
     FileShareMessageType,
+    MessageBodyType,
     MessageTypes,
     SharedFileInterface,
     SharePermissionInterface,
@@ -939,7 +940,7 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
     }
 };
 
-export const goTo = async (item: SharedFileInterface) => {
+export const goToExternalOnlyOffice = (item: SharedFileInterface) => {
     if (item.isFolder) {
         goIntoSharedFolder(item);
         return;
@@ -949,6 +950,18 @@ export const goTo = async (item: SharedFileInterface) => {
         params: {
             path: btoa(item.path),
             shareId: item.id,
+            attachments: 'false',
+        },
+    });
+    window.open(url.href, '_blank');
+};
+
+export const goToOwnOnlyOffice = () => {
+    const url = router.resolve({
+        name: 'editfile',
+        params: {
+            path: btoa(sharedItem.value.path),
+            shareId: '',
             attachments: 'false',
         },
     });
@@ -1004,4 +1017,16 @@ export const getSharedFolderContent = async (owner, shareId, path: string = '/')
     const { user } = useAuthState();
 
     return await Api.getSharedFolderContent(owner, shareId, <string>user.id, path);
+};
+
+export const getMsgUrl = (body: MessageBodyType | SharedFileInterface) => {
+    if (isMessageBodyType(body)) return body.url;
+
+    const ownerLocation = body.owner.location;
+    let path = body.path.replace('/appdata/storage/', '');
+    return `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
+};
+
+const isMessageBodyType = (body: MessageBodyType | SharedFileInterface): body is MessageBodyType => {
+    return !!(body as MessageBodyType).url;
 };

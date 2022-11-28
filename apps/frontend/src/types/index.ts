@@ -6,25 +6,6 @@ export interface User extends Contact {
     status: string;
 }
 
-export interface App {
-    id: string;
-    name: string;
-    url: string;
-    iconUrl: string;
-    sharedWith: User[];
-    accessHistory: User[];
-}
-
-export interface Tab {
-    name: string;
-    icon: string;
-}
-
-export interface userMessagesContainer {
-    id: DtId;
-    messages: Message<MessageBodyType>[];
-}
-
 export interface Message<T> {
     id: Id;
     chatId: string;
@@ -51,13 +32,6 @@ export interface QuoteBodyType extends MessageBodyType {
     quotedMessage: Message<MessageBodyType>;
 }
 
-export interface GroupUpdate extends MessageBodyType {
-    type: string;
-    contact: Contact;
-    chat: Chat;
-    adminLocation: string;
-}
-
 interface IRead {
     userId: Id;
     messageId: Id;
@@ -73,8 +47,6 @@ export interface Chat {
     adminId: string;
     draft: Message<MessageBodyType>;
 }
-
-export interface PersonChat extends Chat {}
 
 export interface Contact extends AnonymousContact {
     location: string;
@@ -95,10 +67,6 @@ export interface DtId extends Id {}
 export interface Id extends String {}
 
 export interface GroupChat extends Chat {}
-
-export interface Workspace extends GroupChat {
-    subGroups: GroupChat[];
-}
 
 export enum Roles {
     USER = 'USER',
@@ -132,6 +100,7 @@ export interface JoinedVideoRoomBody extends SystemBody {
 
 export interface SystemBody {
     type?: SystemMessageTypes;
+    id?: string;
     message: string;
 }
 

@@ -88,7 +88,7 @@
     import Dialog from '@/components/Dialog.vue';
 
     import { isAudio, isImage, isVideo } from '@/services/contentService';
-    import { Message, MessageBodyType, MessageTypes, SharePermission, SharePermissionInterface } from '@/types';
+    import { Message, MessageTypes, SharePermission, SharePermissionInterface } from '@/types';
     import { ref } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { updateFile } from '@/services/fileBrowserService';
@@ -96,7 +96,7 @@
     import { useAuthState } from '@/store/authStore';
 
     interface Props {
-        message: Message<MessageBodyType>;
+        message: Message<any>;
         preventRecursion?: boolean;
         isDownloadingAttachment?: boolean;
     }
