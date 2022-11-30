@@ -2,12 +2,6 @@
     <div
         class="w-full md:w-72 lg:w-96 h-96 relative md:mx-4 bg-white rounded-t-xl flex flex-col rounded-md shadow-xl divide-y divide-gray-200"
     >
-        <!--        <div class="sticky top-0 flex p-4 flex-0">-->
-        <!--            <input v-model="searchTerm" placeholder="Search for gif..." type="text" />-->
-        <!--            <button @click="$emit('close')">-->
-        <!--                <i class="fas fa-times"></i>-->
-        <!--            </button>-->
-        <!--        </div>-->
         <div class="p-4 flex">
             <div class="mt-1 relative rounded-md shadow-sm flex-grow">
                 <input
@@ -21,19 +15,10 @@
                 />
             </div>
             <div class="px-3 flex items-center cursor-pointer" @click="$emit('close')">
-                <!-- Heroicon name: solid/question-mark-circle -->
                 <i class="fas fa-times"></i>
             </div>
         </div>
         <div class="p-4 overflow-y-auto flex flex-col h-full">
-            <!--            <img-->
-            <!--                class="h-40 object-contain"-->
-            <!--                v-for="gif in gifs"-->
-            <!--                :src="gif"-->
-            <!--                :key="gif"-->
-            <!--                alt=""-->
-            <!--                @click="$emit('sendgif', gif)"-->
-            <!--            />-->
             <ul class="grid grid-cols-2 gap-2 gap-2 sm:gap-x-4 xl:gap-x-6" role="list">
                 <li v-for="gif in gifs" class="relative" @click="$emit('sendgif', gif)">
                     <div
@@ -64,30 +49,31 @@
 </template>
 <script setup lang="ts">
     import { fetchGif } from '@/services/gifService';
-    import { ref, watch } from 'vue';
+    import { onBeforeMount, ref, watch } from 'vue';
     import { useDebounceFn } from '@vueuse/core';
 
-    defineEmits(['close']);
-
+    const emit = defineEmits(['close']);
     const props = defineProps();
 
     const gifs = ref([]);
     const searchTerm = ref('');
     const searching = ref(true);
 
-    const debouncedFetch = useDebounceFn(st => {
-        searching.value = true;
-        gifs.value = [];
-        fetchGif(st).then(gs => {
-            gifs.value = gs.data.map(g => g.images.original.url);
-            searching.value = false;
-        });
-    }, 150);
-
-    fetchGif().then(gs => {
-        gifs.value = gs.data.map(g => g.images.original.url);
+    onBeforeMount(async () => {
+        const res = await fetchGif(searchTerm.value);
+        gifs.value = res.data.map(g => g.images.original.url);
         searching.value = false;
     });
+
+    const debouncedFetch = useDebounceFn(async st => {
+        searching.value = true;
+        gifs.value = [];
+
+        const res = await fetchGif(st);
+        gifs.value = res.data.map(g => g.images.original.url);
+        searching.value = false;
+    }, 150);
+
     watch(searchTerm, st => {
         debouncedFetch(st);
     });

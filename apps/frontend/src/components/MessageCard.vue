@@ -15,7 +15,7 @@
             :class="{
                 'opacity-0': !isLastMessage,
             }"
-            :id="String(message.from)"
+            :id="message.from"
             :showOnlineStatus="false"
         />
         <div class="flex-1">
@@ -38,7 +38,7 @@
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
                         <MessageContent
                             :message="message"
-                            :key="String(message.id) + message.body"
+                            :key="message.id + message.body"
                             :isDownloadingAttachment="isDownloadingAttachment"
                         ></MessageContent>
                     </main>
@@ -101,8 +101,8 @@
             </div>
             <div class="flex flex-col mb-4 ml-4 border-l-2 pl-2" v-if="message.replies?.length > 0">
                 <div class="text-gray-400 self-start">Replies:</div>
-                <div v-for="reply in message.replies" :key="String(reply.id)" class="card flex mb-1">
-                    <AvatarImg class="mr-2" small :id="String(reply.from)" :showOnlineStatus="false" />
+                <div v-for="reply in message.replies" :key="reply.id" class="card flex mb-1">
+                    <AvatarImg class="mr-2" small :id="reply.from" :showOnlineStatus="false" />
                     <div
                         class="flex rounded-xl overflow-hidden"
                         :class="{
@@ -160,7 +160,7 @@
     import {
         currentRightClickedItem,
         RIGHT_CLICK_ACTIONS_MESSAGE,
-        RIGHT_CLICK_TYPE,
+        rightClickedItemIsMessage,
         rightClickItemAction,
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
@@ -187,26 +187,23 @@
     watch(
         triggerWatchOnRightClickItem,
         async () => {
-            if (
-                currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE &&
-                (currentRightClickedItem.value.data as unknown as { id: string }).id === props.message.id
-            ) {
-                switch (rightClickItemAction.value) {
-                    case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
-                        replyMessage(props.chatId, props.message);
-                        break;
-                    case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
-                        editMessage(props.chatId, props.message);
-                        break;
-                    case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
-                        deleteMessage(props.message);
-                        break;
-                    default:
-                        break;
-                }
-                rightClickItemAction.value = null;
+            if (!rightClickedItemIsMessage(currentRightClickedItem.value)) return;
+            if (currentRightClickedItem.value.data.id !== props.message.id) return;
+
+            switch (rightClickItemAction.value) {
+                case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
+                    replyMessage(props.chatId, props.message);
+                    break;
+                case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
+                    editMessage(props.chatId, props.message);
+                    break;
+                case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
+                    deleteMessage(props.message);
+                    break;
+                default:
+                    break;
             }
-            return;
+            rightClickItemAction.value = null;
         },
         { deep: true }
     );

@@ -2,18 +2,18 @@
     <div
         :class="{
             'h-16 w-16': large,
-            'h-12 w-12': !small && !xsmall && !large,
+            'h-12 w-12': !small && !xSmall && !large,
             'h-10 w-10': small,
-            'h-8 w-8': xsmall,
+            'h-8 w-8': xSmall,
         }"
         class="grid relative"
     >
         <img
             :class="{
                 'h-16 w-16': large,
-                'h-12 w-12': !small && !xsmall && !large,
+                'h-12 w-12': !small && !xSmall && !large,
                 'h-10 w-10': small,
-                'h-8 w-8': xsmall,
+                'h-8 w-8': xSmall,
             }"
             class="bg-icon rounded-full focus:outline-none focus-visible:outline-none"
             alt="avatar"
@@ -39,8 +39,8 @@
 
 <script lang="ts" setup>
     import { computed, onBeforeMount } from 'vue';
-    import { statusList, startFetchStatusLoop, watchingUsers, fetchStatus } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '../services/urlService';
+    import { statusList, startFetchStatus, watchingUsers, fetchStatus } from '@/store/statusStore';
+    import { calcExternalResourceLink } from '@/services/urlService';
     import { Contact, GroupContact } from '@/types';
     import { useAuthState } from '@/store/authStore';
 
@@ -51,14 +51,14 @@
         unreadMessagesAmount?: number;
         large?: boolean;
         small?: boolean;
-        xsmall?: boolean;
+        xSmall?: boolean;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
         showOnlineStatus: true,
         large: false,
         small: false,
-        xsmall: false,
+        xSmall: false,
     });
 
     onBeforeMount(async () => {
@@ -69,7 +69,7 @@
             location: watchingUsers[props.id]?.location,
         };
         if (!statusList[props.id] && contact.location) {
-            await startFetchStatusLoop(contact);
+            await startFetchStatus(contact);
         }
     });
 

@@ -1,4 +1,4 @@
-import { Chat, Contact, Id, Message } from '@/types';
+import { Chat, Contact, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { inject, toRefs } from 'vue';
 import { handleRead, newUnreadChats, removeChat, usechatsActions } from './chatStore';
@@ -69,7 +69,7 @@ const initializeSocket = (username: string) => {
         }
         const { addMessage } = usechatsActions();
 
-        addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
+        addMessage(message.to === user.id ? message.from : message.to, message);
     });
     state.socket.on('connection_request', (newContactRequest: Chat) => {
         const { addChat } = usechatsActions();
@@ -123,17 +123,17 @@ const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate
     await state.socket.emit(messageType, data);
 };
 
-export const sendRemoveChat = async (id: Id) => {
+export const sendRemoveChat = async (id: string) => {
     state.socket.emit('remove_chat', id);
 };
-export const sendRemoveUser = async (id: Id) => {
+export const sendRemoveUser = async (id: string) => {
     state.socket.emit('remove_user', id);
 };
-export const sendBlockChat = async (id: Id) => {
+export const sendBlockChat = async (id: string) => {
     state.socket.emit('block_chat', id);
 };
 
-const sendUnBlockedChat = async (id: Id) => {
+const sendUnBlockedChat = async (id: string) => {
     state.socket.emit('unblock_chat', id);
     blocklist.value = blocklist.value.filter(x => x !== id);
 };

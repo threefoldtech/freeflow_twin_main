@@ -44,7 +44,7 @@
         getFileType,
     } from '@/store/fileBrowserStore';
     import { get } from 'scriptjs';
-    import { showUserOfflineMessage, startFetchStatusLoop } from '@/store/statusStore';
+    import { showUserOfflineMessage, startFetchStatus } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import {
         EditPathInfo,
@@ -86,7 +86,7 @@
         if (shareId) {
             const shareDetails = await getShareWithId(shareId);
             if (isUndefined(shareDetails)) isLoading.value = false;
-            await startFetchStatusLoop(shareDetails.owner);
+            await startFetchStatus(shareDetails.owner);
             if (showUserOfflineMessage.value || accessDenied.value) {
                 isLoading.value = false;
             }

@@ -106,7 +106,7 @@
         @submit.prevent="handleReplyForm"
     >
         <div class="pr-1">
-            <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :xsmall="true" />
+            <AvatarImg :id="user.id" :showOnlineStatus="false" :xSmall="true" />
         </div>
         <input
             v-model="replyInput"

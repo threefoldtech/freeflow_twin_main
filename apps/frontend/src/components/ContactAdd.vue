@@ -55,7 +55,9 @@
                                 >
                                     <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
                                 </div>
-                                <span class="text-red-600" v-if="usernameAddError != ''"> {{ usernameAddError }} </span>
+                                <span class="text-red-600" v-if="usernameAddError !== ''">
+                                    {{ usernameAddError }}
+                                </span>
                             </div>
                             <label class="block text-sm font-medium text-gray-700" for="manualContactAddLocation"
                                 >Location</label
@@ -95,24 +97,24 @@
             <div class="flex place-items-center px-4 mb-4">
                 <div class="w-full">
                     <br />
-                    <span v-if="groupnameAddError !== ''" class="text-red-600">
-                        {{ groupnameAddError }}
+                    <span v-if="groupNameAddError !== ''" class="text-red-600">
+                        {{ groupNameAddError }}
                     </span>
                     <div>
-                        <label for="groupname" class="block text-sm font-medium text-gray-700">Group name</label>
+                        <label for="groupName" class="block text-sm font-medium text-gray-700">Group name</label>
                         <div class="relative">
                             <input
-                                id="groupname"
-                                v-model="groupnameAdd"
+                                id="groupName"
+                                v-model="groupNameAdd"
                                 v-focus
                                 class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border-gray-300 rounded-md mt-1"
-                                name="groupname"
+                                name="groupName"
                                 placeholder="Group name"
                                 type="text"
                             />
                             <div
-                                v-if="!!groupnameAdd"
-                                @click="groupnameAdd = ''"
+                                v-if="!!groupNameAdd"
+                                @click="groupNameAdd = ''"
                                 class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
                             >
                                 <i class="fa fa-window-close h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -150,11 +152,11 @@
 </template>
 
 <script lang="ts" setup>
-    import { selectedId, usechatsActions, useChatsState } from '@/store/chatStore';
+    import { usechatsActions, useChatsState } from '@/store/chatStore';
     import { ref, onBeforeMount } from 'vue';
-    import { useContactsActions, useContactsState } from '../store/contactStore';
-    import { useAuthState } from '../store/authStore';
-    import { Contact, GroupContact, Roles } from '../types/index';
+    import { useContactsActions, useContactsState } from '@/store/contactStore';
+    import { useAuthState } from '@/store/authStore';
+    import { Contact, GroupContact, Roles } from '@/types';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';
@@ -164,29 +166,18 @@
 
     const emit = defineEmits(['closeDialog']);
     const { groupContacts, contacts } = useContactsState();
-    const { retrieveContacts } = useContactsActions();
+    const { retrieveContacts, addContact } = useContactsActions();
     const { user } = useAuthState();
 
-    const userAddLocation = ref('');
-    const usernameAddError = ref('');
-    const groupnameAdd = ref('');
-    const groupnameAddError = ref('');
     const usernameInGroupAdd = ref('');
-    const usersInGroup = ref<GroupContact[]>([]);
-    const possibleUsers = ref<Contact[]>([]);
-    const contactAddError = ref('');
-
-    const manualContactAddUsername = ref<string>('');
-    const manualContactAddLocation = ref('');
-
-    const isDevelopment = ref<boolean>(false);
-
     const navigation = ref([
         { name: 'user', text: 'Add a user' },
         { name: 'group', text: 'Create a group' },
     ]);
 
     const filteredContacts = ref<GroupContact[]>(groupContacts.filter(c => !blocklist.value.includes(c.id.toString())));
+    const possibleUsers = ref<Contact[]>([]);
+    const isDevelopment = ref(false);
 
     onBeforeMount(async () => {
         isDevelopment.value = process.env.NODE_ENV === 'development';
@@ -196,36 +187,34 @@
         filteredContacts.value = await getUnblockedContacts(filteredContacts.value, user.id.toString());
     });
 
+    const usernameAddError = ref('');
+    const contactAddError = ref('');
+    const manualContactAddUsername = ref<string>('');
+    const manualContactAddLocation = ref('');
+
     const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
-            id: contact?.id ? contact.id : manualContactAddUsername.value,
-            location: contact?.location ? contact.location : manualContactAddLocation.value,
+            id: contact?.id ?? manualContactAddUsername.value,
+            location: contact?.location ?? manualContactAddLocation.value,
         };
         const { chats } = useChatsState();
+
         try {
-            if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == contactToAdd.id)) {
+            const contactFound = chats.value
+                .filter(chat => !chat.isGroup)
+                .some(chat => chat.chatId === contactToAdd.id);
+            if (contactFound) {
                 usernameAddError.value = 'Already added this user';
                 return;
             }
-            const { addContact } = useContactsActions();
+
             addContact(contactToAdd.id, contactToAdd.location);
             manualContactAddUsername.value = undefined;
             contactAddError.value = '';
             emit('closeDialog');
-
-            //@todo: setTimeout is dirty should be removed
-            // next tick was not possible reason: chat was not loaded yet
-            setTimeout(() => {
-                selectedId.value = <string>contactToAdd.id;
-            }, 1000);
         } catch (err) {
-            console.log('adding contact failed');
             contactAddError.value = err;
         }
-    };
-
-    const handleClicked = (item: { location: string }) => {
-        userAddLocation.value = item.location;
     };
 
     const activeItem = ref('user');
@@ -234,39 +223,40 @@
         return activeItem.value === menuItem;
     };
 
+    const groupNameAddError = ref('');
+
     const setActive = (menuItem: string) => {
         activeItem.value = menuItem;
-        groupnameAddError.value = '';
+        groupNameAddError.value = '';
         usernameAddError.value = '';
     };
 
-    const groupAdd = async () => {
-        const { addGroupchat } = usechatsActions();
+    const groupNameAdd = ref('');
+    const usersInGroup = ref<GroupContact[]>([]);
 
-        if (groupnameAdd.value == '') {
-            groupnameAddError.value = 'Please enter a group name';
+    const groupAdd = async () => {
+        const { addGroupChat } = usechatsActions();
+
+        if (groupNameAdd.value == '') {
+            groupNameAddError.value = 'Please enter a group name';
             return;
         }
-        if (hasSpecialCharacters(groupnameAdd.value)) {
-            groupnameAddError.value = 'No special characters allowed in group names.';
+        if (hasSpecialCharacters(groupNameAdd.value)) {
+            groupNameAddError.value = 'No special characters allowed in group names.';
             return;
         }
-        if (groupnameAdd.value.length > 50) {
-            groupnameAddError.value = "The name can't contain more than 50 characters";
+        if (groupNameAdd.value.length > 50) {
+            groupNameAddError.value = "The name can't contain more than 50 characters";
             return;
         }
+
         usersInGroup.value.push({
             id: user.id,
             location: user.location,
             roles: [Roles.USER, Roles.MODERATOR, Roles.ADMIN],
         });
 
-        addGroupchat(groupnameAdd.value, usersInGroup.value);
-        //@todo: setTimeout is dirty should be removed
-        // next tick was not possible reason: chat was not loaded yet
-        setTimeout(() => {
-            selectedId.value = groupnameAdd.value;
-        }, 1000);
+        addGroupChat(groupNameAdd.value, usersInGroup.value);
         usersInGroup.value = [];
         emit('closeDialog');
     };

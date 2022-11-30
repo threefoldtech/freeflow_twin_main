@@ -19,7 +19,7 @@
                             <i class="fas fa-pen text-icon"></i>
                         </div>
                         <AvatarImg
-                            :id="String(user.id)"
+                            :id="user.id"
                             large
                             class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden"
                         />
@@ -54,7 +54,7 @@
                             style="resize: none"
                             class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
                             :disabled="!isEditingStatus"
-                            :placeholder="statusList[user.id.toString()]?.status ?? 'No status set'"
+                            :placeholder="statusList[user.id]?.status ?? 'No status set'"
                             maxlength="150"
                         >
                         </textarea>

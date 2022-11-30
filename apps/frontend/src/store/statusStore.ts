@@ -1,4 +1,3 @@
-import { DtId } from './../types/index';
 import axios from 'axios';
 import { ref } from 'vue';
 import { reactive } from '@vue/reactivity';
@@ -12,8 +11,8 @@ export const fetching: string[] = [];
 export const watchingUsers = [];
 export const showUserOfflineMessage = ref<boolean>(false);
 
-export const fetchStatus = useDebounceFn(async (digitalTwinId: DtId) => {
-    if (statusList[digitalTwinId.toString()]) return statusList[<string>digitalTwinId];
+export const fetchStatus = useDebounceFn(async (digitalTwinId: string) => {
+    if (statusList[digitalTwinId]) return statusList[<string>digitalTwinId];
     const { user } = useAuthState();
     const locationApiEndpoint = '/api/v2/user/status';
     let location = '';
@@ -33,11 +32,12 @@ export const fetchStatus = useDebounceFn(async (digitalTwinId: DtId) => {
     }
 }, 50);
 
-export const startFetchStatusLoop = async (contact: Contact) => {
+export const startFetchStatus = async (contact: Contact) => {
     if (watchingUsers.find(wu => wu === contact.id) && !statusList[<string>contact.id]) {
         await fetchStatus(contact.id);
         return;
     }
+
     watchingUsers.push(contact.id);
     watchingUsers[<string>contact.id] = {
         location: contact.location,

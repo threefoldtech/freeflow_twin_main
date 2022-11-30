@@ -62,7 +62,7 @@
     ];
 
     interface IProps {
-        selectedFile: PathInfoModel;
+        selectedFile: SharedFileInterface;
     }
 
     const props = defineProps<IProps>();

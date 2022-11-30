@@ -112,7 +112,7 @@
                             >Open chat
                         </v-contextmenu-item>
                         <v-contextmenu-item
-                            v-if="!currentRightClickedItem?.data?.isGroup"
+                            v-if="!rightClickedItem?.data?.isGroup"
                             @click="
                                 () => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
@@ -120,7 +120,7 @@
                                 }
                             "
                         >
-                            {{ userIsBlocked(currentRightClickedItem?.data?.chatId) ? 'Unblock' : 'Block' }} User
+                            {{ userIsBlocked(rightClickedItem?.data?.chatId) ? 'Unblock' : 'Block' }} User
                         </v-contextmenu-item>
                         <v-contextmenu-item
                             @click="
@@ -129,11 +129,11 @@
                                     rightClickItemAction = RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE;
                                 }
                             "
-                            >{{ currentRightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete chat' }}
+                            >{{ rightClickedItem?.data?.isGroup ? 'Leave group' : 'Delete chat' }}
                         </v-contextmenu-item>
 
                         <v-contextmenu-item
-                            v-if="!currentRightClickedItem?.data?.isGroup"
+                            v-if="!rightClickedItem?.data?.isGroup"
                             @click="
                                 () => {
                                     triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
@@ -174,7 +174,6 @@
 </template>
 
 <script setup lang="ts">
-    import moment from 'moment';
     import { ref, computed, watch } from 'vue';
 
     import { useChatsState } from '@/store/chatStore';
@@ -183,7 +182,7 @@
     import ChatRequestList from '@/components/ChatRequestList.vue';
     import Dialog from '@/components/Dialog.vue';
     import ChatCard from '@/components/ChatCard.vue';
-    import { startFetchStatusLoop } from '@/store/statusStore';
+    import { startFetchStatus } from '@/store/statusStore';
     import { statusList } from '@/store/statusStore';
     import { uniqBy } from 'lodash';
     import { useRouter } from 'vue-router';
@@ -193,21 +192,30 @@
     import {
         conversationComponentRerender,
         currentRightClickedItem,
+        ICurrentRightClickItem,
         openBlockDialogFromOtherFile,
         openDeleteDialogFromOtherFile,
         openDeleteUserDialogFromOtherFile,
         RIGHT_CLICK_ACTIONS_CHAT_CARD,
         RIGHT_CLICK_TYPE,
+        rightClickedItemIsChat,
         rightClickItemAction,
         setCurrentRightClickedItem,
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import { userIsBlocked } from '@/store/blockStore';
     import { useSocketActions } from '@/store/socketStore';
+    import { Chat } from '@/types';
+
+    const { chats, chatRequests } = useChatsState();
+    const { user } = useAuthState();
+
+    const rightClickedItem = computed(() => {
+        return currentRightClickedItem.value as ICurrentRightClickItem<Chat>;
+    });
 
     const props = defineProps<{ modelValue?: boolean }>();
     const emits = defineEmits(['closeDialog']);
-    const { chats, chatRequests } = useChatsState();
     const collapsed = ref(false);
     let selectedId = ref('');
 
@@ -215,65 +223,14 @@
         return statusList[selectedId.value];
     });
 
-    const { user } = useAuthState();
-
-    const m = val => moment(val);
-    const searchValue = ref('');
-    let showContacts = ref(false);
-
     const router = useRouter();
-
-    watch(
-        triggerWatchOnRightClickItem,
-        async () => {
-            if (currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.CHAT_CARD) {
-                const chatId = currentRightClickedItem?.value?.data?.chatId;
-
-                switch (rightClickItemAction.value) {
-                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
-                        localStorage.setItem('lastOpenedChat', chatId);
-                        await router.push({ name: 'single', params: { id: chatId } });
-                        break;
-                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
-                        if (router.currentRoute.value.name === 'single') {
-                            conversationComponentRerender.value = conversationComponentRerender.value++;
-                        }
-                        if (userIsBlocked(chatId)) {
-                            const { sendUnBlockedChat } = useSocketActions();
-                            await sendUnBlockedChat(chatId);
-                            break;
-                        }
-                        openBlockDialogFromOtherFile.value = true;
-                        await router.push({ name: 'single', params: { id: chatId } });
-                        break;
-                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
-                        openDeleteDialogFromOtherFile.value = true;
-                        if (router.currentRoute.value.name === 'single') {
-                            conversationComponentRerender.value = conversationComponentRerender.value++;
-                        }
-                        await router.push({ name: 'single', params: { id: chatId } });
-                        break;
-                    case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE_USER:
-                        openDeleteUserDialogFromOtherFile.value = true;
-                        if (router.currentRoute.value.name === 'single') {
-                            conversationComponentRerender.value = conversationComponentRerender.value++;
-                        }
-                        await router.push({ name: 'single', params: { id: chatId } });
-                        break;
-                    default:
-                        break;
-                }
-                rightClickItemAction.value = null;
-            }
-            return;
-        },
-        { deep: true }
-    );
 
     const setSelected = id => {
         localStorage.setItem('lastOpenedChat', id);
         router.push({ name: 'single', params: { id } });
     };
+
+    const searchValue = ref('');
 
     const filteredChats = computed(() => {
         if (!searchValue.value) {
@@ -282,9 +239,7 @@
         return chats.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
     });
 
-    const selectedChat = computed(() => chats.value.find(chat => chat.chatId == selectedId.value));
-
-    startFetchStatusLoop(user);
+    startFetchStatus(user);
 
     const filteredChatRequests = computed(() => {
         const filteredChats = chatRequests.value
@@ -296,6 +251,56 @@
     const sendUpdate = newVal => {
         showAddUserDialog.value = newVal;
     };
+
+    watch(
+        triggerWatchOnRightClickItem,
+        async () => {
+            if (!rightClickedItemIsChat(currentRightClickedItem.value)) return;
+
+            const chatId = currentRightClickedItem?.value?.data?.chatId;
+
+            switch (rightClickItemAction.value) {
+                case RIGHT_CLICK_ACTIONS_CHAT_CARD.OPEN_CHAT:
+                    localStorage.setItem('lastOpenedChat', chatId);
+                    await router.push({ name: 'single', params: { id: chatId } });
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_CHAT_CARD.BLOCK:
+                    if (router.currentRoute.value.name === 'single') {
+                        conversationComponentRerender.value = conversationComponentRerender.value++;
+                    }
+                    if (userIsBlocked(chatId)) {
+                        const { sendUnBlockedChat } = useSocketActions();
+                        await sendUnBlockedChat(chatId);
+                        break;
+                    }
+                    openBlockDialogFromOtherFile.value = true;
+                    await router.push({ name: 'single', params: { id: chatId } });
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE:
+                    openDeleteDialogFromOtherFile.value = true;
+                    if (router.currentRoute.value.name === 'single') {
+                        conversationComponentRerender.value = conversationComponentRerender.value++;
+                    }
+                    await router.push({ name: 'single', params: { id: chatId } });
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_CHAT_CARD.DELETE_USER:
+                    openDeleteUserDialogFromOtherFile.value = true;
+                    if (router.currentRoute.value.name === 'single') {
+                        conversationComponentRerender.value = conversationComponentRerender.value++;
+                    }
+                    await router.push({ name: 'single', params: { id: chatId } });
+                    break;
+
+                default:
+                    break;
+            }
+            rightClickItemAction.value = null;
+        },
+        { deep: true }
+    );
 </script>
 
 <style scoped type="text/css"></style>

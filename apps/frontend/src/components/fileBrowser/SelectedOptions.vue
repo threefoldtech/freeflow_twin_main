@@ -287,8 +287,8 @@
     import { showShareDialog } from '@/services/dialogService';
     import {
         currentRightClickedItem,
-        RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
-        RIGHT_CLICK_TYPE,
+        RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM,
+        rightClickedItemIsFile,
         rightClickItemAction,
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
@@ -342,32 +342,32 @@
     watch(
         triggerWatchOnRightClickItem,
         async () => {
-            if (currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE) {
-                selectedPaths.value.length = 0;
-                //@ts-ignore
-                selectedPaths.value[0] = currentRightClickedItem.value.data;
-                switch (rightClickItemAction.value) {
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
-                        showDeleteDialog.value = true;
-                        break;
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
-                        showRenameDialog.value = true;
-                        newName.value = currentRightClickedItem.value.data.name;
-                        nextTick(() => {
-                            newNameInput.value.focus();
-                        });
-                        break;
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
-                        await downloadFiles();
-                        break;
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
-                        showShareDialog.value = true;
-                        break;
-                    default:
-                        break;
-                }
+            if (!rightClickedItemIsFile(currentRightClickedItem.value)) return;
+
+            selectedPaths.value.length = 0;
+            selectedPaths.value[0] = currentRightClickedItem.value.data;
+            switch (rightClickItemAction.value) {
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.DELETE:
+                    showDeleteDialog.value = true;
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.RENAME:
+                    showRenameDialog.value = true;
+                    newName.value = currentRightClickedItem.value.data.name;
+                    await nextTick(() => newNameInput.value.focus());
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.DOWNLOAD:
+                    await downloadFiles();
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.SHARE:
+                    showShareDialog.value = true;
+                    break;
+
+                default:
+                    break;
             }
-            return;
         },
         { deep: true }
     );

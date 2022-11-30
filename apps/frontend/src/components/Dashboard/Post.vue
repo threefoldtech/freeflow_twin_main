@@ -107,7 +107,7 @@
                                 <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                             </div>
                         </div>
-                        <div class="group" v-if="smallScreen || props.item.owner.id === user.id.toString()">
+                        <div class="group" v-if="smallScreen || props.item.owner.id === user.id">
                             <Popover v-slot="{ open }" class="relative z-30">
                                 <PopoverButton
                                     :class="open ? '' : 'text-opacity-90'"
@@ -129,7 +129,7 @@
                                         <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                             <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
                                                 <div
-                                                    v-if="props.item.owner.id === user.id.toString()"
+                                                    v-if="props.item.owner.id === user.id"
                                                     class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
                                                     @click="
                                                         showDeletePostDialog = true;
@@ -307,7 +307,7 @@
                     @submit.prevent="handleAddComment(false)"
                 >
                     <div>
-                        <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :small="true" alt="avatar" />
+                        <AvatarImg :id="user.id" :showOnlineStatus="false" :small="true" alt="avatar" />
                     </div>
                     <input
                         ref="inputRef"

@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="w-20 h-20 grid cursor-pointer items-center justify-items-center">
-                    <AvatarImg small @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="String(user.id)" />
+                    <AvatarImg small @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="user.id" />
                     <button
                         class="mt-2 py-2 px-4 text-white rounded-md max-w-max hover:bg-primarylight"
                         @click="showLogoutDialog = true"
@@ -144,7 +144,7 @@
                                         <AvatarImg
                                             @click="toggleShowUserConfigDialog"
                                             class="cursor-pointer"
-                                            :id="String(user.id)"
+                                            :id="user.id"
                                         />
                                     </div>
                                     <div class="ml-3">

@@ -21,7 +21,7 @@ import { useSocketActions } from './socketStore';
 import { useAuthState } from './authStore';
 import config from '@/config';
 import { uuidv4 } from '@/common';
-import { startFetchStatusLoop } from '@/store/statusStore';
+import { startFetchStatus } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
@@ -35,7 +35,6 @@ const state = reactive<ChatState>({
     unreadChats: [],
 });
 
-export const selectedId = ref('');
 export const selectedMessageId = ref(undefined);
 export const isLoading = ref(false);
 
@@ -46,11 +45,13 @@ export enum MessageAction {
 
 interface MessageState {
     actions: {
-        [key: string]: {
-            message: Message<any>;
-            type: MessageAction;
-        };
+        [key: string]: MessageActionBody;
     };
+}
+
+export interface MessageActionBody {
+    message: Message<any>;
+    type: MessageAction;
 }
 
 export const messageState = reactive<MessageState>({
@@ -131,7 +132,7 @@ const addChat = (chat: Chat) => {
         const { user } = useAuthState();
         const otherContact: Contact = <Contact>chat?.contacts?.find(c => c.id !== user.id);
         if (otherContact) {
-            startFetchStatusLoop(otherContact);
+            startFetchStatus(otherContact);
         }
     }
 
@@ -148,10 +149,9 @@ export const removeChat = (chatId: string) => {
     state.chats = state.chats.filter(c => c.chatId !== chatId);
     state.chatRequests = state.chatRequests.filter(c => c.chatId !== chatId);
     sortChats();
-    selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const addGroupchat = (name: string, contacts: GroupContact[]) => {
+const addGroupChat = (name: string, contacts: GroupContact[]) => {
     const { user } = useAuthState();
 
     const contactInGroup = contacts
@@ -185,7 +185,7 @@ const addGroupchat = (name: string, contacts: GroupContact[]) => {
             },
         ],
         name: name,
-        adminId: user.id.toString(),
+        adminId: user.id,
         read: null,
         acceptedChat: true,
         draft: null,
@@ -339,7 +339,7 @@ const addMessage = (chatId: string, message: any) => {
     }
 
     if (message.type === 'EDIT') {
-        const index = chat.messages.findIndex(mes => mes.id.toString() === message.id.toString());
+        const index = chat.messages.findIndex(mes => mes.id === message.id.toString());
 
         if (index === -1) return;
         message.type = chat.messages[index].type;
@@ -663,7 +663,7 @@ export const usechatsActions = () => {
         addMessage,
         sendFile,
         sendMessageObject,
-        addGroupchat,
+        addGroupChat,
         readMessage,
         acceptChat,
         removeChat,

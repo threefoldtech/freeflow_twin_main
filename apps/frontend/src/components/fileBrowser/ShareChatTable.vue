@@ -99,9 +99,9 @@
     </div>
 </template>
 <script lang="ts" setup>
-    import { Chat } from '@/types';
+    import { Chat, SharedFileInterface } from '@/types';
     import Spinner from '@/components/Spinner.vue';
-    import { addShare, IFileShare, selectedPaths } from '@/store/fileBrowserStore';
+    import { addShare, selectedPaths } from '@/store/fileBrowserStore';
     import { computed, onBeforeMount, ref } from 'vue';
     import { SearchIcon } from '@heroicons/vue/solid';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -111,7 +111,7 @@
 
     interface IProps {
         data: any[];
-        selectedFile?: IFileShare;
+        selectedFile?: SharedFileInterface;
     }
 
     const props = defineProps<IProps>();

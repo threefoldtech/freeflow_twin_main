@@ -166,7 +166,7 @@
                                     @click="disableSidebar"
                                 />
                             </div>
-                            <group-management
+                            <groupManagement
                                 :chat="chat"
                                 @app-call="popupMeeting"
                                 @app-block="blockChat"
@@ -176,7 +176,7 @@
                                 @app-delete-user="deleteUser"
                                 @clickedProfile="popupProfile"
                             >
-                            </group-management>
+                            </groupManagement>
                         </div>
                     </aside>
                 </div>
@@ -221,7 +221,7 @@
                             :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
                         >
                             <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
-                                <AvatarImg :id="String(contact.id)" small />
+                                <AvatarImg :id="contact.id" small />
                             </div>
                             <p
                                 class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"

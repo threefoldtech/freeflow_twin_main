@@ -10,7 +10,6 @@ import { useAuthState } from '@/store/authStore';
 import {
     Chat,
     ContactInterface,
-    DtId,
     FileShareMessageType,
     MessageBodyType,
     MessageTypes,
@@ -206,7 +205,7 @@ export const goToFilesInChat = async (chat?: Chat) => {
         router.push({
             name: received ? 'filesReceivedInChatNested' : 'filesSentInChatNested',
             params: {
-                chatId: String(chat.chatId),
+                chatId: chat.chatId,
             },
         });
         chatFiles.value = await chatFilesReceived(chat, received);
@@ -713,13 +712,13 @@ export const clickBreadcrumb = async (item, breadcrumbs, idx) => {
     }
 
     const params = router.currentRoute.value.params;
-    let splitted = String(params.path).split('/').slice(0);
+    let splitter = String(params.path).split('/').slice(0);
     //Deleting all empty values
-    splitted = splitted.filter(function (element) {
+    splitter = splitter.filter(function (element) {
         return element !== '';
     });
 
-    const newPath = splitted.slice(0, idx - 1);
+    const newPath = splitter.slice(0, idx - 1);
 
     router.push({
         name: 'sharedWithMeItemNested',
@@ -997,7 +996,7 @@ export const fetchFileAccessDetails = async (
     return fileAccessDetails;
 };
 
-export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
+export const getExternalPathInfo = async (digitalTwinId: string, token: string, shareId: string) => {
     let params = { shareId: shareId, token: token };
     const locationApiEndpoint = `/api/v2/quantum/file/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';

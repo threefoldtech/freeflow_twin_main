@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '../types';
+import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '@/types';
 import config from '@/config';
-import { uuidv4 } from '../../src/common/index';
+import { uuidv4 } from '@/common';
 import { useAuthState } from './authStore';
-import { Message, DtId } from '../types/index';
+import { Message } from '../types/index';
 import { reactive, toRefs } from 'vue';
 
 const state = reactive<ContactState>({
@@ -36,11 +36,11 @@ const retrieveDTContacts = async () => {
 //     return isAvailable
 // }
 
-const addContact = async (username: DtId, location: string, _dontCheck = false) => {
+const addContact = async (username: string, location: string, _dontCheck = false) => {
     const { user } = useAuthState();
     const addMessage: Message<SystemBody> = {
         id: uuidv4(),
-        chatId: String(username),
+        chatId: username,
         body: {
             type: SystemMessageTypes.CONTACT_REQUEST_SEND,
             message: `Request has been sent to ${username}`,

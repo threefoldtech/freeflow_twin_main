@@ -7,14 +7,14 @@ export interface User extends Contact {
 }
 
 export interface Message<T> {
-    id: Id;
+    id: string;
     chatId: string;
-    from: DtId;
-    to: Id | DtId;
+    from: string;
+    to: string;
     body: T;
     timeStamp: Date;
     type: MessageBodyType | String;
-    subject: Id | null;
+    subject: string | null;
     replies: Message<MessageBodyType>[];
     updated?: Date;
     action?: MessageAction;
@@ -22,6 +22,7 @@ export interface Message<T> {
 
 export interface MessageBodyType {
     filename?: string;
+    type?: FileTypes;
     url?: string;
 }
 
@@ -33,8 +34,8 @@ export interface QuoteBodyType extends MessageBodyType {
 }
 
 interface IRead {
-    userId: Id;
-    messageId: Id;
+    userId: string;
+    messageId: string;
 }
 export interface Chat {
     chatId: string;
@@ -59,12 +60,8 @@ export interface GroupContact extends Contact {
 }
 
 export interface AnonymousContact {
-    id: DtId;
+    id: string;
 }
-
-export interface DtId extends Id {}
-
-export interface Id extends String {}
 
 export interface GroupChat extends Chat {}
 
