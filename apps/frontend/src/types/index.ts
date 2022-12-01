@@ -30,7 +30,7 @@ export interface StringMessageType extends String, MessageBodyType {}
 
 export interface QuoteBodyType extends MessageBodyType {
     message: string;
-    quotedMessage: Message<MessageBodyType>;
+    quotedMessage: Message<any>;
 }
 
 interface IRead {
@@ -39,7 +39,7 @@ interface IRead {
 }
 export interface Chat {
     chatId: string;
-    messages: Message<MessageBodyType>[];
+    messages: Message<any>[];
     read: IRead[];
     contacts: (GroupContact | Contact)[];
     acceptedChat: boolean;

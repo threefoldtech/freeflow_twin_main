@@ -43,7 +43,7 @@
                         ></MessageContent>
                     </main>
                     <div class="h-9 items-center absolute right-1.5 -bottom-3 hidden my-message:block">
-                        <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
+                        <i class="fas fa-check-double text-accent-300" v-if="isRead"></i>
                         <i class="fas fa-check text-gray-400" v-else></i>
                     </div>
                 </div>
@@ -93,9 +93,7 @@
                         <span class="text-gray-600 pl-2">Download</span>
                     </span>
                     <div class="pr-4 text-gray-600 date inline-block text-xs">
-                        <!--<span v-if="message.updated" class="mr-4">edited</span>-->
                         <Time :time="new Date(message.timeStamp)" />
-                        <!-- {{ message }} -->
                     </div>
                 </div>
             </div>
@@ -166,52 +164,28 @@
     } from '@/store/contextmenuStore';
     import { calcExternalResourceLink } from '@/services/urlService';
 
+    const { user } = useAuthState();
+    const { addScrollEvent } = useScrollActions();
+
     interface IProps {
-        message: Message<MessageBodyType>;
+        message: Message<any>;
         chatId: string;
         isMine: boolean;
         isGroup: boolean;
-        isreadbyme: boolean;
-        isread: boolean;
+        isReadByMe: boolean;
+        isRead: boolean;
         isFirstMessage: boolean;
         isLastMessage: boolean;
     }
 
     const isDownloadingAttachment = ref<boolean>(false);
+
     const props = defineProps<IProps>();
-
-    defineEmits(['openEditShare', 'clickedProfile']);
-
-    const { user } = useAuthState();
-
-    watch(
-        triggerWatchOnRightClickItem,
-        async () => {
-            if (!rightClickedItemIsMessage(currentRightClickedItem.value)) return;
-            if (currentRightClickedItem.value.data.id !== props.message.id) return;
-
-            switch (rightClickItemAction.value) {
-                case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
-                    replyMessage(props.chatId, props.message);
-                    break;
-                case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
-                    editMessage(props.chatId, props.message);
-                    break;
-                case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
-                    deleteMessage(props.message);
-                    break;
-                default:
-                    break;
-            }
-            rightClickItemAction.value = null;
-        },
-        { deep: true }
-    );
-
-    const { addScrollEvent } = useScrollActions();
+    const emit = defineEmits(['openEditShare', 'clickedProfile']);
 
     onMounted(() => {
         addScrollEvent();
+        if (!props.isReadByMe) read();
     });
 
     const read = () => {
@@ -219,12 +193,7 @@
         readMessage(props.chatId, props.message.id.toString());
     };
 
-    if (!props.isreadbyme) {
-        read();
-    }
-
     const deleteMessage = (message: Message<MessageBodyType>) => {
-        //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
             chatId: props.chatId,
             id: message.id,
@@ -240,7 +209,6 @@
     };
 
     const deleteReply = (message: Message<StringMessageType>, reply) => {
-        //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
             chatId: props.chatId,
             id: reply.id,
@@ -255,30 +223,44 @@
         sendMessageObject(props.chatId, updatedMessage);
     };
 
-    const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
-        //todo: save downloaded file in attachments folder
+    const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) => {
         const url = calcExternalResourceLink((message.body as { url: string }).url);
         const res = await axios.get(url, { responseType: 'blob' });
         const blob = new Blob([res.data], { type: res.headers['content-type'] });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
         const filename = res.headers['content-disposition'].split('filename=')[1].split('.')[0];
         const extension = res.headers['content-disposition'].split('.')[1].split(';')[0];
+
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
         link.download = `${filename}.${extension}`;
         link.click();
-        return;
-
-        // if (count >= 4) {
-        //     isDownloadingAttachment.value = false;
-        //     console.log("Couldn't download attachments");
-        //     return;
-        // }
-        // isDownloadingAttachment.value = true;
-        // const response = await downloadAttachment(message);
-        // count++;
-        // if (response !== 'OK') await downloadAttachmentToQuantum(message);
-        // await sleep(1500);
-        // isDownloadingAttachment.value = false;
     };
+
+    watch(
+        triggerWatchOnRightClickItem,
+        async () => {
+            if (!rightClickedItemIsMessage(currentRightClickedItem.value)) return;
+            if (currentRightClickedItem.value.data.id !== props.message.id) return;
+
+            switch (rightClickItemAction.value) {
+                case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
+                    replyMessage(props.chatId, props.message);
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
+                    editMessage(props.chatId, props.message);
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
+                    deleteMessage(props.message);
+                    break;
+
+                default:
+                    break;
+            }
+            rightClickItemAction.value = null;
+        },
+        { deep: true }
+    );
 </script>
 <style lang="css" scoped></style>

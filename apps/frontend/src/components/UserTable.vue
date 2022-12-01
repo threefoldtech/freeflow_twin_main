@@ -87,7 +87,7 @@
 
     interface IProps {
         placeholder?: string;
-        data: any[];
+        data: Contact[];
     }
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -115,9 +115,7 @@
     };
 
     const searchResults = () => {
-        return props.data.filter((item: Contact) => {
-            return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
-        });
+        return props.data.filter(contact => contact.id.toLowerCase().includes(searchTerm.value.toLowerCase()));
     };
 </script>
 

@@ -216,6 +216,7 @@
     import { getUnreadChats, useChatsState } from '@/store/chatStore';
 
     const { unreadChats } = useChatsState();
+    const { user } = useAuthState();
 
     const init = async () => {
         await getUnreadChats();
@@ -238,11 +239,6 @@
             icon: '/quantum.svg',
             enabled: true,
         },
-        // {
-        //     name: AppType.Forum,
-        //     icon: 'fas fa-stream',
-        //     enabled: true,
-        // },
         {
             name: AppType.Glass,
             icon: '/glass.svg',
@@ -253,16 +249,10 @@
             icon: '/kutana.svg',
             enabled: true,
         },
-        // {
-        //     name: AppType.Meetings,
-        //     icon: 'fas fa-video',
-        // },
     ];
     const router = useRouter();
 
     const emit = defineEmits(['clicked']);
-
-    const { user } = useAuthState();
 
     const showLogoutDialog = ref(false);
 

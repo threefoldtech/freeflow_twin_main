@@ -119,26 +119,12 @@
         checkbox.checked = true;
     }, 5);
 
-    const chosenOption = ref('');
-    const searchTerm = ref('');
-
-    const reset = () => {
-        emit('update:modelValue', '');
-        chosenOption.value = '';
-        searchTerm.value = '';
-    };
 
     const handleInput = evt => {
         emit('update:modelValue', evt.target.value);
     };
 
-    const handleClick = item => {
-        console.log(chosenOption.value);
-        chosenOption.value = item.id;
-        searchTerm.value = item.id;
-        emit('update:modelValue', item.id);
-        emit('clicked');
-    };
+    const searchTerm = ref('');
 
     const searchResults = () => {
         return props.data.filter((c: Contact) => {
@@ -156,13 +142,6 @@
         props.usersInGroup.splice(index, 1);
     };
 
-    const trimStringMidway = (text: string) => {
-        const str1 = text.substr(0, text.length / 2);
-        const str2 = text.substr(text.length / 2 + 1, text.length);
-
-        return str1.substr(0, str1.length / 2) + '...' + str2.substr(str2.length / 2, str2.length);
-    };
-
     watch(searchResults, () => {
         for (let user of searchResults()) {
             const index = searchResults().findIndex(c => c.id == user.id);
@@ -175,8 +154,4 @@
     });
 </script>
 
-<style scoped>
-    .mh-48 {
-        max-height: 10rem;
-    }
-</style>
+<style scoped></style>

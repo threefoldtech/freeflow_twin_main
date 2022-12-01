@@ -105,7 +105,6 @@
 
     const props = withDefaults(defineProps<Props>(), { preventRecursion: false, isDownloadingAttachment: false });
     const showFilePreview = ref(false);
-    const showConfirmDialog = ref(false);
     const filePreviewSrc = ref('');
     const fileContent = ref('');
     const editedFileContent = ref('');
@@ -123,6 +122,8 @@
         editedFileContent.value = fileContent.value;
         showFilePreview.value = true;
     };
+
+    const showConfirmDialog = ref(false);
 
     const closeEditor = () => {
         showFilePreview.value = false;

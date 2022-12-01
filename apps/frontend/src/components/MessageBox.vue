@@ -55,8 +55,8 @@
                     :isGroup="chat.isGroup"
                     :isLastMessage="isLastMessage(chat, i)"
                     :isMine="message.from === user.id"
-                    :isread="i <= lastRead"
-                    :isreadbyme="i <= lastReadByMe"
+                    :isRead="i <= lastRead"
+                    :isReadByMe="i <= lastReadByMe"
                     :message="message"
                     @copy="copyMessage($event, message)"
                     @openEditShare="editFileSharePermission"
@@ -303,7 +303,6 @@
             });
         }
     );
-
 </script>
 <style scoped type="text/css">
     .loading:after {
