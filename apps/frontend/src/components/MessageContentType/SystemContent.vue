@@ -57,7 +57,7 @@
         };
 
         sendMessage(chat.value.chatId, msg, MessageTypes.SYSTEM);
-        popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
+        popupCenter(`/videoRoom/${id}`, 'video room', 800, 550);
     };
 
     const getVideoRoomId = () => {

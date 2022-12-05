@@ -499,7 +499,7 @@ export const itemAction = async (item: PathInfoModel) => {
         return;
     }
     const result = router.resolve({
-        name: 'editfile',
+        name: 'editFile',
         params: { path: btoa(item.path), attachments: String(savedAttachments.value) },
     });
 
@@ -945,7 +945,7 @@ export const goToExternalOnlyOffice = (item: SharedFileInterface) => {
         return;
     }
     const url = router.resolve({
-        name: 'editfile',
+        name: 'editFile',
         params: {
             path: btoa(item.path),
             shareId: item.id,
@@ -957,7 +957,7 @@ export const goToExternalOnlyOffice = (item: SharedFileInterface) => {
 
 export const goToOwnOnlyOffice = () => {
     const url = router.resolve({
-        name: 'editfile',
+        name: 'editFile',
         params: {
             path: btoa(sharedItem.value.path),
             shareId: '',

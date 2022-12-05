@@ -9,12 +9,8 @@ export const useIntersectionObserver = (
     const isFullyInView = ref(false);
     const isObserved = ref(false);
 
-    watch(target, () => {
-        if (isObserved.value || !target.value) return;
-        observer.observe(target.value);
-    });
-
     let observer: IntersectionObserver;
+
     onMounted(() => {
         observer = new IntersectionObserver(([entry]) => {
             intersectionRatio.value = entry.intersectionRatio;
@@ -37,6 +33,11 @@ export const useIntersectionObserver = (
     };
 
     onUnmounted(unobserve);
+
+    watch(target, () => {
+        if (isObserved.value || !target.value) return;
+        observer.observe(target.value);
+    });
 
     return {
         intersectionRatio,

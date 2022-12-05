@@ -5,12 +5,12 @@ import Callback from '@/views/Callback.vue';
 const routes: Array<any> = [
     {
         path: '/',
-        name: 'Home',
+        name: 'home',
         component: Home,
     },
     {
         path: '/callback',
-        name: 'Callback',
+        name: 'callback',
         component: Callback,
     },
 ];

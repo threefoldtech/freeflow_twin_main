@@ -115,7 +115,7 @@
     };
 
     const searchResults = () => {
-        return props.data.filter(contact => contact.id.toLowerCase().includes(searchTerm.value.toLowerCase()));
+        return props.data.filter(contact => contact.id?.toLowerCase().includes(searchTerm.value.toLowerCase()));
     };
 </script>
 

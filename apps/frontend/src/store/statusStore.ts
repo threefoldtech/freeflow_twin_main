@@ -2,17 +2,17 @@ import axios from 'axios';
 import { ref } from 'vue';
 import { reactive } from '@vue/reactivity';
 import { useAuthState } from '@/store/authStore';
-import { calcExternalResourceLink } from '../services/urlService';
+import { calcExternalResourceLink } from '@/services/urlService';
 import { Contact } from '@/types';
 import { useDebounceFn } from '@vueuse/core';
 
 export const statusList = reactive<Object>({});
 export const fetching: string[] = [];
 export const watchingUsers = [];
-export const showUserOfflineMessage = ref<boolean>(false);
+export const showUserOfflineMessage = ref(false);
 
 export const fetchStatus = useDebounceFn(async (digitalTwinId: string) => {
-    if (statusList[digitalTwinId]) return statusList[<string>digitalTwinId];
+    if (statusList[digitalTwinId]) return statusList[digitalTwinId];
     const { user } = useAuthState();
     const locationApiEndpoint = '/api/v2/user/status';
     let location = '';

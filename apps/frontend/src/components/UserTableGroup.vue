@@ -119,7 +119,6 @@
         checkbox.checked = true;
     }, 5);
 
-
     const handleInput = evt => {
         emit('update:modelValue', evt.target.value);
     };

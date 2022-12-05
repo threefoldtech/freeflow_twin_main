@@ -9,7 +9,7 @@
 
         <app-layout>
             <div
-                v-if="route.name !== 'editfile'"
+                v-if="route.name !== 'editFile'"
                 v-show="path === '/glass' && hasBrowserBeenStartedOnce"
                 class="h-full"
             >

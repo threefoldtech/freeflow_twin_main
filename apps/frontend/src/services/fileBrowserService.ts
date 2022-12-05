@@ -1,13 +1,6 @@
 import axios, { AxiosRequestConfig, AxiosResponse, ResponseType } from 'axios';
 import config from '@/config';
-import {
-    createNotification,
-    createPercentProgressNotification,
-    fail,
-    success,
-    updateNotification,
-} from '@/store/notificiationStore';
-import { ProgressNotification, Status } from '@/types/notifications';
+import { createPercentProgressNotification, fail, success, updateNotification } from '@/store/notificiationStore';
 import { ContactInterface, SharedFileInterface } from '@/types';
 import { calcExternalResourceLink } from './urlService';
 import { accessDenied, PathInfoModel } from '@/store/fileBrowserStore';
@@ -32,16 +25,6 @@ export interface PathInfo {
     lastAccessed: Date;
 }
 
-export interface ShareInfo {
-    [id: string]: {
-        path: string;
-        shares: {
-            expiration: number;
-            token: string;
-        };
-    };
-}
-
 export interface GetShareToken {
     token: string;
 }
@@ -61,12 +44,6 @@ export const getDirectoryContent = async (
     params.append('path', path);
     if (attachments) params.append('attachments', '1');
     return await axios.get<PathInfo[]>(`${config.baseUrl}api/v2/quantum/dir/content`, { params: params });
-};
-
-export const getDirectoryInfo = async (path: string) => {
-    const params = new URLSearchParams();
-    params.append('path', path);
-    return await axios.get(`${config.baseUrl}api/v2/quantum/dir/info`, { params: params });
 };
 
 export const createDirectory = async (path: string, name: string): Promise<AxiosResponse<PathInfo>> => {
@@ -89,11 +66,7 @@ export const getFileInfo = async (
     return await axios.get(`${config.baseUrl}api/v2/quantum/file/info`, { params: params });
 };
 
-export const uploadFile = async (
-    path: string,
-    file: File,
-    withNotification = true
-): Promise<AxiosResponse<PathInfo>> => {
+export const uploadFile = async (path: string, file: File): Promise<AxiosResponse<PathInfo>> => {
     const { sendHandleUploadedFile } = useSocketActions();
 
     const formData = new FormData();
@@ -105,21 +78,19 @@ export const uploadFile = async (
         },
     } as AxiosRequestConfig;
 
-    let notification: ProgressNotification | undefined = undefined;
-    if (withNotification) {
-        notification = createPercentProgressNotification('Uploading file', file.name, 0);
-        cfg = {
-            ...cfg,
-            onUploadProgress: function (progressEvent) {
-                notification.progress = Math.round((progressEvent.loaded / progressEvent.total) * 100) / 100;
-                if (notification.progress === 1) return;
-                updateNotification(notification);
-            },
-        };
-    }
+    const notification = createPercentProgressNotification('Uploading file', file.name, 0);
+    cfg = {
+        ...cfg,
+        onUploadProgress: function (progressEvent) {
+            notification.progress = Math.round((progressEvent.loaded / progressEvent.total) * 100) / 100;
+            if (notification.progress === 1) return;
+            updateNotification(notification);
+        },
+    };
+
     try {
         const response = await axios.post(`${config.baseUrl}api/v2/files/upload`, formData, cfg);
-        if (withNotification && response.status >= 300) {
+        if (response.status >= 300) {
             notification.title = 'Upload failed';
             fail(notification);
         } else {
@@ -137,7 +108,6 @@ export const uploadFile = async (
 
         return response;
     } catch (ex) {
-        if (!withNotification) return;
         if (ex.message === 'Request failed with status code 413') {
             notification.title = 'File is too big!';
             fail(notification);
@@ -153,6 +123,7 @@ export const deleteFile = async (path: string) => {
 };
 
 export const downloadFileEndpoint = `${config.baseUrl}api/v2/files/download/compressed`;
+
 export const getDownloadFileEndpoint = (path: string) => {
     return `${downloadFileEndpoint}?path=${btoa(path)}`;
 };
@@ -163,16 +134,13 @@ export const downloadFile = async (path: string, responseType: ResponseType = 'b
     });
 };
 
-export const getChatsWithAttachments = async () => {
-    return await axios.get(`${endpoint}/attachments`);
-};
-
 export const searchDir = async (searchTerm: string, currentDir: string) => {
     const params = new URLSearchParams();
     params.append('search', searchTerm);
     params.append('dir', currentDir);
     return await axios.get<PathInfo[]>(`${config.baseUrl}api/v2/quantum/search`, { params: params });
 };
+
 export const copyFiles = async (paths: string[], pathToPaste: string) => {
     return await axios.post<PathInfo[]>(`${endpoint}/files/copy`, { paths: paths, destination: pathToPaste });
 };
@@ -196,6 +164,7 @@ export const updateFile = async (path: string, content: string, location: string
 export const renameFile = async (oldPath: string, newPath: string) => {
     return await axios.put<PathInfo>(`${config.baseUrl}api/v2/quantum/rename`, { from: oldPath, to: newPath });
 };
+
 export const addShare = async (userId: string, path: string, filename: string, size: number, writable: boolean) => {
     return await axios.post<GetShareToken>(`${config.baseUrl}api/v2/quantum/share`, {
         userId,
@@ -206,6 +175,7 @@ export const addShare = async (userId: string, path: string, filename: string, s
         size,
     });
 };
+
 export const removeFilePermissions = async (chatId: string, path: string, location: string) => {
     return await axios.post<GetShareToken>(`${config.baseUrl}api/v2/quantum/share/permissions`, {
         chatId,
@@ -217,6 +187,7 @@ export const removeFilePermissions = async (chatId: string, path: string, locati
 export const getShared = async (_shareStatus: string) => {
     return await axios.get<SharedFileInterface[]>(`${config.baseUrl}api/v2/quantum/shares/shared-with-me`);
 };
+
 export const getShareWithId = async (id: string) => {
     if (!id) return null;
     const params = new URLSearchParams();
@@ -273,22 +244,6 @@ export const getShareByPath = async (path: string): Promise<SharedFileInterface>
     return (await axios.get(`${endpoint}/share/path?path=${btoa(path)}`)).data;
 };
 
-export const downloadAttachment = async (message: any) => {
-    createNotification('Downloading attachment', `from ${message.from}`, Status.Info);
-    try {
-        const msgUrl = message.body.url;
-        // TODO: handle in nest
-        const response = await axios.get(`${endpoint}/attachment/download`, {
-            params: { owner: message.from, path: msgUrl, to: message.to, messageId: message.id },
-        });
-        createNotification('Attachment successfully downloaded', `from ${message.from}`, Status.Success);
-        return response?.data;
-    } catch (ex) {
-        createNotification('Something went wrong during the download', `from ${message.from}`, Status.Error);
-        return;
-    }
-};
-
 export const hasSpecialCharacters = (name: string) => {
     const format = /[`!@#$%^*=[\]{};':"\\|<>\/?~]/;
     return format.test(name);
@@ -314,10 +269,10 @@ export const generateDocumentServerConfig = (
     writeToken: string | undefined,
     extension: string,
     fileName: string,
-    isAttachement: boolean = false,
+    isAttachment: boolean = false,
     isLoading: boolean = false
 ) => {
-    const readUrl = generateFileBrowserUrl('http', `[${location}]`, path, readToken, isAttachement);
+    const readUrl = generateFileBrowserUrl('http', `[${location}]`, path, readToken, isAttachment);
 
     const writeUrl = generateFileBrowserUrl('http', `[${location}]`, path, writeToken);
 

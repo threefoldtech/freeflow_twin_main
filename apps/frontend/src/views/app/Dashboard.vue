@@ -27,13 +27,13 @@
     import { getAllPosts } from '@/services/socialService';
     import { allSocialPosts, isLoadingSocialPosts } from '@/store/socialStore';
     import Spinner from '@/components/Spinner.vue';
-    import { notifcationPermissionGranted } from '@/store/notificiationStore';
+    import { notificationPermissionGranted } from '@/store/notificiationStore';
 
     (async () => {
         await getAllPosts();
 
         Notification.requestPermission().then(result => {
-            if (result === 'granted') notifcationPermissionGranted.value = true;
+            if (result === 'granted') notificationPermissionGranted.value = true;
         });
     })();
 
