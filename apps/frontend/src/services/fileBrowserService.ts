@@ -263,15 +263,12 @@ export const generateFileBrowserUrl = (
 
 export const generateDocumentServerConfig = (
     location: string,
-    path: string,
-    key: string,
-    readToken: string,
-    writeToken: string | undefined,
-    extension: string,
-    fileName: string,
+    fileDetails: EditPathInfo,
     isAttachment: boolean = false,
     isLoading: boolean = false
 ) => {
+    const { path, key, readToken, writeToken, extension, name } = fileDetails;
+
     const readUrl = generateFileBrowserUrl('http', `[${location}]`, path, readToken, isAttachment);
 
     const writeUrl = generateFileBrowserUrl('http', `[${location}]`, path, writeToken);
@@ -282,7 +279,7 @@ export const generateDocumentServerConfig = (
         document: {
             fileType: extension,
             key,
-            title: fileName,
+            title: name,
             url: readUrl,
         },
         height: '100%',

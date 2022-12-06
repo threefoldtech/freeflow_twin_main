@@ -125,8 +125,6 @@
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import { useRoute, useRouter } from 'vue-router';
-    import { isUndefined } from 'lodash';
-    import { showShareDialog } from '@/services/dialogService';
     import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
     import { decodeString } from '@/utils/files';
     import Dialog from '@/components/Dialog.vue';
@@ -149,6 +147,26 @@
         fileTableDiv.value?.focus();
     });
 
+    onBeforeMount(async () => {
+        if (route.params.name === 'sharedWithMeItemNested') {
+            currentDirectory.value = decodeString(<string>route.params.path);
+        }
+
+        if (window.innerWidth < 1024) {
+            fileBrowserTypeView.value = 'GRID';
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        if (sharedDir.value) return;
+
+        if (!currentDirectory.value) currentDirectory.value = '/';
+        sharedDir.value = false;
+        searchResults.value = [];
+        searchDirValue.value = '';
+        return;
+    });
+
     const monacoOptions = {
         minimap: {
             enabled: false,
@@ -164,38 +182,6 @@
             fileBrowserTypeView.value = 'GRID';
         }
     };
-
-    onBeforeMount(async () => {
-        if (route.params.name === 'sharedWithMeItemNested') {
-            currentDirectory.value = decodeString(<string>route.params.path);
-        }
-
-        if (window.innerWidth < 1024) {
-            fileBrowserTypeView.value = 'GRID';
-        }
-
-        window.addEventListener('resize', handleResize);
-
-        if (!sharedDir.value) {
-            if (route.params.editFileShare === 'true') {
-                selectItem(sharedItem.value);
-                selectedTab.value = 1;
-                showShareDialog.value = true;
-                await updateContent(currentDirectory.value);
-                sharedItem.value = null;
-                sharedDir.value = false;
-                searchResults.value = [];
-                searchDirValue.value = '';
-
-                return;
-            }
-            if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
-            sharedDir.value = false;
-            searchResults.value = [];
-            searchDirValue.value = '';
-            return;
-        }
-    });
 
     const showFilePreview = ref(false);
     const filePreviewSrc = ref('');

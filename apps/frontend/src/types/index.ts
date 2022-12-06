@@ -15,7 +15,7 @@ export interface Message<T> {
     timeStamp: Date;
     type: MessageBodyType | String;
     subject: string | null;
-    replies: Message<MessageBodyType>[];
+    replies: Message<any>[];
     updated?: Date;
     action?: MessageAction;
 }
@@ -37,6 +37,7 @@ interface IRead {
     userId: string;
     messageId: string;
 }
+
 export interface Chat {
     chatId: string;
     messages: Message<any>[];
@@ -74,7 +75,7 @@ export enum Roles {
 export enum SystemMessageTypes {
     REMOVE_USER = 'REMOVE_USER',
     ADD_USER = 'ADD_USER',
-    JOINED_VIDEOROOM = 'JOINED_VIDEOROOM',
+    JOINED_VIDEO_ROOM = 'JOINED_VIDEO_ROOM',
     CONTACT_REQUEST_SEND = 'CONTACT_REQUEST_SEND',
     USER_LEFT_GROUP = 'USER_LEFT_GROUP',
     CHANGE_USER_ROLE = 'CHANGE_USER_ROLE',

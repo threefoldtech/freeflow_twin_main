@@ -1,6 +1,6 @@
 <template>
     <div
-        v-if="message.body.type === SystemMessageTypes.JOINED_VIDEOROOM"
+        v-if="message.body.type === SystemMessageTypes.JOINED_VIDEO_ROOM"
         class="cursor-pointer flex justify-center items-center mb-4"
         @click="joinVideo"
     >
@@ -51,7 +51,7 @@
     const joinVideo = () => {
         const id = getVideoRoomId();
         const msg = {
-            type: SystemMessageTypes.JOINED_VIDEOROOM,
+            type: SystemMessageTypes.JOINED_VIDEO_ROOM,
             message: `${user.id} joined the video chat`,
             id,
         };

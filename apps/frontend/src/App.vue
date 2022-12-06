@@ -36,7 +36,7 @@
     import version from '../public/config/version';
     import { getMe, useAuthState } from '@/store/authStore';
     import { computed, onBeforeMount } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
+    import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
     import { useSocketActions } from '@/store/socketStore';
     import { initBlocklist } from '@/store/blockStore';
@@ -44,7 +44,6 @@
     const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
 
-    const router = useRouter();
     onBeforeMount(async () => {
         if (user) {
             initializeSocket(user.id.toString());
