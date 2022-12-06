@@ -95,8 +95,8 @@
         const path = atob(<string>route.params.path);
 
         if (shareId) {
-          //if not your own file
-          const shareDetails = await getShareWithId(shareId);
+            //if not your own file
+            const shareDetails = await getShareWithId(shareId);
             if (!shareDetails) isLoading.value = false;
 
             await startFetchStatus(shareDetails.owner);

@@ -360,13 +360,7 @@
     import { useIntersectionObserver } from '@/lib/intersectionObserver';
     import { useRoute, useRouter } from 'vue-router';
     import { disableSidebar, getShowSideBar, toggleSideBar } from '@/services/sidebarService';
-    import {
-        AnonymousContact,
-        Contact,
-        JoinedVideoRoomBody,
-        MessageTypes,
-        SystemMessageTypes,
-    } from '@/types';
+    import { AnonymousContact, Contact, JoinedVideoRoomBody, MessageTypes, SystemMessageTypes } from '@/types';
     import MessageBox from '@/components/MessageBox.vue';
     import Button from '@/components/Button.vue';
     import { userIsBlocked } from '@/store/blockStore';
