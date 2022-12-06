@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '../types';
+import { Contact, DtContact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '../types';
 import config from '@/config';
 import { uuidv4 } from '../../src/common/index';
 import { useAuthState } from './authStore';
@@ -96,5 +96,5 @@ export const useContactsActions = () => {
 
 interface ContactState {
     contacts: Contact[];
-    dtContacts: Contact[];
+    dtContacts: DtContact[];
 }

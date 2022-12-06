@@ -82,6 +82,13 @@ export interface Contact extends AnonymousContact {
     appId?: string;
 }
 
+export interface DtContact {
+    appId: string;
+    derivedPublicKey: string;
+    location: string;
+    username: string;
+}
+
 export interface GroupContact extends Contact {
     roles: Roles[];
 }

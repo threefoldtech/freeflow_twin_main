@@ -81,13 +81,13 @@
 </template>
 
 <script setup lang="ts">
-    import { Contact } from '@/types';
+    import { Contact, DtContact } from '@/types';
     import { onBeforeMount, ref } from 'vue';
     import { SearchIcon } from '@heroicons/vue/solid';
 
     interface IProps {
         placeholder?: string;
-        data: any[];
+        data: DtContact[];
     }
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -115,8 +115,8 @@
     };
 
     const searchResults = () => {
-        return props.data.filter((item: Contact) => {
-            return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
+        return props.data.filter(item => {
+            return item.username?.toLowerCase().includes(searchTerm.value?.toLowerCase());
         });
     };
 </script>
