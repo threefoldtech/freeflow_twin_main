@@ -196,9 +196,9 @@
         filteredContacts.value = await getUnblockedContacts(filteredContacts.value, user.id.toString());
     });
 
-    const contactAdd = (contact: Contact) => {
+    const contactAdd = (contact: DtContact) => {
         const contactToAdd: Contact = {
-            id: contact?.id ? contact.id : manualContactAddUsername.value,
+            id: contact?.username ?? manualContactAddUsername.value,
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
         const { chats } = useChatsState();

@@ -110,7 +110,7 @@
         searchTerm.value = '';
     };
 
-    const handleClick = (item: Contact) => {
+    const handleClick = (item: DtContact) => {
         emit('addContact', item);
     };
 
