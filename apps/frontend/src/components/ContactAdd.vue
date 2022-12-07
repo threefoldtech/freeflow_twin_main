@@ -191,7 +191,10 @@
     onBeforeMount(async () => {
         isDevelopment.value = process.env.NODE_ENV === 'development';
         const { dtContacts } = useContactsState();
-        possibleUsers.value = dtContacts;
+        possibleUsers.value = dtContacts.map(c => {
+            c.username = c.username.split('.')[0];
+            return c;
+        });
         await retrieveContacts();
         filteredContacts.value = await getUnblockedContacts(filteredContacts.value, user.id.toString());
     });
