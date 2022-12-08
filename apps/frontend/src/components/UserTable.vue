@@ -62,7 +62,7 @@
                                                         class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center"
                                                         aria-hidden="true"
                                                     />
-                                                    <p>{{ item.appId }}</p>
+                                                    <p>{{ item.app_id }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -87,7 +87,7 @@
 
     interface IProps {
         placeholder?: string;
-        data: DtContact[];
+        data: Contact[];
     }
 
     const props = withDefaults(defineProps<IProps>(), {
@@ -110,13 +110,13 @@
         searchTerm.value = '';
     };
 
-    const handleClick = (item: DtContact) => {
+    const handleClick = (item: Contact) => {
         emit('addContact', item);
     };
 
     const searchResults = () => {
         return props.data.filter(item => {
-            return item.username?.toLowerCase().includes(searchTerm.value?.toLowerCase());
+            return item.id?.toLowerCase().includes(searchTerm.value?.toLowerCase());
         });
     };
 </script>

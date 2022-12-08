@@ -96,5 +96,5 @@ export const useContactsActions = () => {
 
 interface ContactState {
     contacts: Contact[];
-    dtContacts: DtContact[];
+    dtContacts: Contact[];
 }

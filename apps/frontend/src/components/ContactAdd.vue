@@ -173,7 +173,7 @@
     const groupnameAddError = ref('');
     const usernameInGroupAdd = ref('');
     const usersInGroup = ref<GroupContact[]>([]);
-    const possibleUsers = ref<DtContact[]>([]);
+    const possibleUsers = ref<Contact[]>([]);
     const contactAddError = ref('');
 
     const manualContactAddUsername = ref<string>('');
@@ -191,17 +191,14 @@
     onBeforeMount(async () => {
         isDevelopment.value = process.env.NODE_ENV === 'development';
         const { dtContacts } = useContactsState();
-        possibleUsers.value = dtContacts.map(c => {
-            c.username = c.username.split('.')[0];
-            return c;
-        });
+        possibleUsers.value = dtContacts;
         await retrieveContacts();
         filteredContacts.value = await getUnblockedContacts(filteredContacts.value, user.id.toString());
     });
 
-    const contactAdd = (contact: DtContact) => {
+    const contactAdd = (contact: Contact) => {
         const contactToAdd: Contact = {
-            id: contact?.username ?? manualContactAddUsername.value,
+            id: contact?.id ?? manualContactAddUsername.value,
             location: contact?.location ? contact.location : manualContactAddLocation.value,
         };
         const { chats } = useChatsState();
