@@ -22,19 +22,19 @@ export class AuthGuard implements CanActivate {
 
         const req = context.switchToHttp().getRequest();
 
-        // if (isDevelopment) {
-        //     const derivedSeed = randomBytes(32).toString('base64');
-        //     req.session.userId = userId;
-        //     if (!this._yggdrasilService.isInitialised()) await this._yggdrasilService.setupYggdrasil(derivedSeed);
-        //
-        //     const seed = this._encryptionService.decodeSeed(derivedSeed);
-        //     const { publicKey, secretKey } = this._encryptionService.getKeyPair(seed);
-        //
-        //     await this._keyService.updateKey({ pk: publicKey, keyType: KeyType.Public });
-        //     await this._keyService.updateKey({ pk: secretKey, keyType: KeyType.Private });
-        //
-        //     return true;
-        // }
+        if (isDevelopment) {
+            const derivedSeed = randomBytes(32).toString('base64');
+            req.session.userId = userId;
+            if (!this._yggdrasilService.isInitialised()) await this._yggdrasilService.setupYggdrasil(derivedSeed);
+
+            const seed = this._encryptionService.decodeSeed(derivedSeed);
+            const { publicKey, secretKey } = this._encryptionService.getKeyPair(seed);
+
+            await this._keyService.updateKey({ pk: publicKey, keyType: KeyType.Public });
+            await this._keyService.updateKey({ pk: secretKey, keyType: KeyType.Private });
+
+            return true;
+        }
 
         const sessionUserId = req.session?.userId;
         if (!sessionUserId) return false;
