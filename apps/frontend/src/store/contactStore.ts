@@ -20,7 +20,7 @@ const retrieveContacts = async () => {
 const retrieveDTContacts = async () => {
     if (state.dtContacts.length > 0) return state.dtContacts;
 
-    const { data } = await axios.get(`${config.appBackend}api/digitaltwin`);
+    const { data } = await axios.get(`${config.appBackend}api/users/digitaltwin`);
     state.dtContacts = data;
     return data;
 };
@@ -96,5 +96,5 @@ export const useContactsActions = () => {
 
 interface ContactState {
     contacts: Contact[];
-    dtContacts: DtContact[];
+    dtContacts: Contact[];
 }

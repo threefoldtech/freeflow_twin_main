@@ -1,5 +1,5 @@
 export const config = {
-    appBackend: 'https://login.staging.jimber.io',
+    appBackend: 'https://login.threefold.me',
     kycBackend: 'https://openkyc.staging.jimber.org',
     appId: 'digitaltwin-test.jimbertesting.be',
     seedPhrase:

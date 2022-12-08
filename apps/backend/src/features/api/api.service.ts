@@ -33,10 +33,10 @@ export class ApiService {
     async registerDigitalTwin({ doubleName, signedAddress }: { doubleName: string; signedAddress: string }) {
         try {
             return await axios.put(
-                `${this._configService.get<string>('appBackend')}/api/digitaltwin/${doubleName}/ip`,
+                `${this._configService.get<string>('appBackend')}/api/users/digitaltwin/${doubleName}`,
                 {
-                    appId: this._configService.get<string>('appId'),
-                    signedYggdrasilIp: signedAddress,
+                    app_id: this._configService.get<string>('appId'),
+                    signed_yggdrasil_ip_address: signedAddress,
                 }
             );
         } catch (error) {
