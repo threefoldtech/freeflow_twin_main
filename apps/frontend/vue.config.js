@@ -34,6 +34,11 @@ module.exports = {
                 },
             },
         },
+        devServer: {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+            },
+        },
         devtool: 'source-map',
     },
     chainWebpack: config => {
