@@ -42,11 +42,6 @@ const app = createApp(App)
 // this fixes some issues with rendering inside of QouteContent n
 app.component('MessageContent', MessageContent);
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    next();
-});
-
 app.directive('focus', {
     // When the bound element is mounted into the DOM...
     mounted(el) {
