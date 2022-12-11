@@ -444,7 +444,7 @@
     const countComments = (total = 0, comments = props.item.replies) => {
         for (let comment of comments) {
             total++;
-            total = countComments(total, comment.replies);
+            if (comment.replies?.length > 0) total = countComments(total, comment.replies);
         }
         return total;
     };
