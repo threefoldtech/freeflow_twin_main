@@ -65,19 +65,6 @@
 
     console.log('Version: ' + version);
 
-    if (!document.cookie.includes('clearCache')) {
-        //clear browser cache name that starts with 'workbox-precache-v2'
-        caches.keys().then(names => {
-            for (let name of names) {
-                if (name.startsWith('workbox-precache-v2')) {
-                    caches.delete(name);
-                    break;
-                }
-            }
-        });
-        document.cookie = 'clearCache=true; max-age=31536000';
-    }
-
     document.querySelector('body').classList.add('overflow-y-hidden');
 
     const isDev = import.meta.env.DEV || process.env.NODE_ENV === 'staging';
