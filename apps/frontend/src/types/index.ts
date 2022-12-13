@@ -78,8 +78,7 @@ export interface PersonChat extends Chat {}
 
 export interface Contact extends AnonymousContact {
     location: string;
-    username?: string;
-    appId?: string;
+    app_Id?: string;
 }
 
 export interface DtContact {

@@ -48,7 +48,7 @@
                                         <div class="flex">
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ item.username }}
+                                                    {{ item.id }}
                                                 </div>
                                                 <div class="flex align-center text-sm text-gray-500">
                                                     <em
