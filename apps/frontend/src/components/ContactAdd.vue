@@ -156,7 +156,7 @@
     import { ref, onBeforeMount } from 'vue';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
     import { useAuthState } from '@/store/authStore';
-    import { Contact, GroupContact, Roles } from '@/types';
+    import { Contact, DtContact, GroupContact, Roles } from '@/types';
     import UserTable from '@/components/UserTable.vue';
     import UserTableGroup from '@/components/UserTableGroup.vue';
     import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue';

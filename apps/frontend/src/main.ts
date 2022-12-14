@@ -4,7 +4,6 @@ import './assets/index.css';
 import router from '@/plugins/Router';
 import '@fortawesome/fontawesome-free/js/all';
 import socketIo from '@/plugins/SocketIo';
-// import { registerSW } from 'virtual:pwa-register';
 import contextmenu from 'v-contextmenu';
 import 'v-contextmenu/dist/themes/default.css';
 import config from '@/config';
@@ -17,15 +16,6 @@ import 'floating-vue/dist/style.css';
 
 FloatingVue.options.themes.menu.delay.hide = 0;
 FloatingVue.options.themes.menu.delay.show = 600;
-
-// registerSW({
-//     onOfflineReady() {
-//         console.log('SW: Offline ready');
-//     },
-//     onRegisterError(error) {
-//         console.log('SW: Error registering', error);
-//     },
-// });
 
 const app = createApp(App)
     .directive('click-outside', clickOutside)

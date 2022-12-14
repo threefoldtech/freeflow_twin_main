@@ -48,7 +48,7 @@
                                         <div class="flex">
                                             <div class="ml-4">
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ item.username }}
+                                                    {{ item.id }}
                                                 </div>
                                                 <div class="flex align-center text-sm text-gray-500">
                                                     <em
@@ -62,7 +62,7 @@
                                                         class="w-5 text-gray-400 fas fa-location-arrow mr-2 text-center"
                                                         aria-hidden="true"
                                                     />
-                                                    <p>{{ item.appId }}</p>
+                                                    <p>{{ item.app_id }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-    import { Contact } from '@/types';
+    import { Contact, DtContact } from '@/types';
     import { onBeforeMount, ref } from 'vue';
     import { SearchIcon } from '@heroicons/vue/solid';
 
@@ -115,7 +115,7 @@
     };
 
     const searchResults = () => {
-        return props.data.filter(contact => contact.id?.toLowerCase().includes(searchTerm.value.toLowerCase()));
+        return props.data.filter(contact => contact.id?.toLowerCase().includes(searchTerm.value?.toLowerCase()));
     };
 </script>
 

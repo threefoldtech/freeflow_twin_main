@@ -13,7 +13,7 @@ export class ChatController {
     @Post()
     @UseGuards(AuthGuard)
     async acceptChatRequest(@Query('id') id: string): Promise<ChatDTO> {
-        if (!id) throw new BadRequestException('please provice a valid chat id');
+        if (!id) throw new BadRequestException('please provide a valid chat id');
         return await this._chatService.acceptChatRequest(id);
     }
 

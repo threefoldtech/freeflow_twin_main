@@ -52,8 +52,14 @@ export interface Chat {
 
 export interface Contact extends AnonymousContact {
     location: string;
-    username?: string;
-    appId?: string;
+    app_Id?: string;
+}
+
+export interface DtContact {
+    appId: string;
+    derivedPublicKey: string;
+    location: string;
+    username: string;
 }
 
 export interface GroupContact extends Contact {

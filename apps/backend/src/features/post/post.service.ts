@@ -349,7 +349,8 @@ export class PostService {
         for (const comment of comments) {
             if (comment.id === commentId) return comment;
             if (comment.replies.length === 0) continue;
-            return this.findComment(comment.replies, commentId);
+            const foundComment = this.findComment(comment.replies, commentId);
+            if (foundComment) return foundComment;
         }
     }
 
@@ -360,7 +361,10 @@ export class PostService {
                 return comments;
             }
             if (comment.replies.length === 0) continue;
-            comment.replies = this.replaceComment(comment.replies, newComment);
+
+            const changedComments = this.replaceComment(comment.replies, newComment);
+            if (!changedComments) continue;
+            comment.replies = changedComments;
             return comments;
         }
     }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Contact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '@/types';
+import { Contact, DtContact, GroupContact, MessageTypes, Roles, SystemBody, SystemMessageTypes } from '@/types';
 import config from '@/config';
 import { uuidv4 } from '@/common';
 import { useAuthState } from './authStore';
@@ -20,7 +20,7 @@ const retrieveContacts = async () => {
 const retrieveDTContacts = async () => {
     if (state.dtContacts.length > 0) return state.dtContacts;
 
-    const { data } = await axios.get(`${config.appBackend}api/digitaltwin`);
+    const { data } = await axios.get(`${config.appBackend}api/users/digitaltwin`);
     state.dtContacts = data;
     return data;
 };

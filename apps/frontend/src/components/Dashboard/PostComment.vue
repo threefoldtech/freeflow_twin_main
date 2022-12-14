@@ -95,7 +95,7 @@
     </div>
     <ReplyComment
         v-for="reply in commentsSorted"
-        v-if="commentsSorted.length > 0 && CommentType.COMMENT"
+        v-if="commentsSorted?.length > 0 && CommentType.COMMENT"
         :key="reply.id"
         :comment="reply"
         @updateComments="e => $emit('updateComments', e)"
@@ -177,7 +177,7 @@
     });
 
     const commentsSorted = computed(() => {
-        return props.comment?.replies.sort(function (a, b) {
+        return props.comment?.replies?.sort(function (a, b) {
             return new Date(a.createdOn).getTime() - new Date(b.createdOn).getTime();
         });
     });
