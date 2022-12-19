@@ -501,9 +501,7 @@
             );
         }
 
-        useDebounceFn(() => {
-            draftMessage(selectedId, createMessage());
-        }, 500);
+        draftMessage(selectedId, createMessage());
     });
 
     watch(action, () => {

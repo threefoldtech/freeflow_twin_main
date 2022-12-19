@@ -26,6 +26,7 @@ import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
 import { FileAction } from 'custom-types/file-actions.type';
+import { useDebounceFn } from '@vueuse/core';
 
 const messageLimit = 50;
 const state = reactive<ChatState>({
@@ -650,10 +651,10 @@ export const useChatsState = () => {
     };
 };
 
-export const draftMessage = (chatId: string, message: any) => {
+export const draftMessage = useDebounceFn((chatId: string, message: any) => {
     getChat(chatId).draft = message;
     axios.put(`${config.baseUrl}api/v2/chats/draft`, message);
-};
+}, 500);
 
 export const usechatsActions = () => {
     return {
