@@ -150,7 +150,7 @@
                                 @dragstart="event => onDragStart(event, item)"
                                 @dragleave="event => onDragLeave(event)"
                                 @drop="() => onDrop(item)"
-                                @mousedown.right="setCurrentRightClickedItem(item)"
+                                @mousedown.right="setCurrentRightClickedItem(item, RIGHT_CLICK_TYPE.LOCAL_FILE)"
                                 v-contextmenu:contextmenu-filebrowser-item-local
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
