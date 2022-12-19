@@ -11,8 +11,10 @@ export const fetching: string[] = [];
 export const watchingUsers = [];
 export const showUserOfflineMessage = ref(false);
 
-export const fetchStatus = useDebounceFn(async (digitalTwinId: string) => {
-    if (statusList[digitalTwinId]) return statusList[digitalTwinId];
+export const fetchStatus = async (digitalTwinId: string) => {
+    if (statusList[digitalTwinId]) {
+        return statusList[digitalTwinId];
+    }
     const { user } = useAuthState();
     const locationApiEndpoint = '/api/v2/user/status';
     let location = '';
@@ -30,7 +32,7 @@ export const fetchStatus = useDebounceFn(async (digitalTwinId: string) => {
     } catch (error) {
         showUserOfflineMessage.value = true;
     }
-}, 50);
+};
 
 export const startFetchStatus = async (contact: Contact) => {
     if (watchingUsers.find(wu => wu === contact.id) && !statusList[<string>contact.id]) {
