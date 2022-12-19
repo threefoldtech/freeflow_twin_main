@@ -215,7 +215,7 @@
 
     const getMessageInput = () => {
         const draft = props.chat?.draft;
-        if (!draft?.action) return String(draft?.body) ?? '';
+        if (!draft?.action) return String(draft?.body ?? '');
 
         if (draft?.action === 'EDIT') {
             editMessage(draft.to, draft.body, draft.id);
