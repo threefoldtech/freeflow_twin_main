@@ -190,7 +190,8 @@
     const isExtensionSupported = (image: File) => {
         const extensions = { ...ImageFileExtension, ...VideoFileExtension };
         const options = Object.values(extensions);
-        if (!options.includes(<ImageFileExtension | VideoFileExtension>image.type)) {
+        const fileExtension = image.name.split('.').pop();
+        if (!options.includes(<ImageFileExtension | VideoFileExtension>fileExtension)) {
             showError('Only png/jpeg and video formats are allowed');
         }
     };
