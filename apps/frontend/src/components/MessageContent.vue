@@ -34,15 +34,18 @@
 
     <div
         v-if="showFilePreview"
-        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
+        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed md:p-8 p-0"
         @click.self="closeEditor()"
     >
-        <XIcon class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50" @click="closeEditor()" />
+        <XIcon
+            class="absolute right-4 top-4 md:w-12 md:h-12 sm:w-10 sm:h-10 w-8 h-8 cursor-pointer text-white z-50"
+            @click="closeEditor()"
+        />
 
         <button
             v-if="!readOnly"
             @click="saveChanges(true)"
-            class="py-2 px-4 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
+            class="sm:py-2 py-1 sm:px-4 px-2 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
         >
             <SaveIcon class="w-6 h-6 inline-block mr-2" />
             Save changes
@@ -53,7 +56,7 @@
             v-model="editedFileContent"
             :extension="extension"
             :options="{ readOnly }"
-            class="w-screen h-[750px]"
+            class="w-screen md:h-[80vh] sm:h-[85vh] h-[88vh] md:mt-0 mt-10"
         />
     </div>
 
