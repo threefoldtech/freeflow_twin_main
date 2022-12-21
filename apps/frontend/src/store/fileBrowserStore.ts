@@ -502,6 +502,12 @@ export const itemAction = async (item: PathInfoModel) => {
         goToFolderInCurrentDirectory(item);
         return;
     }
+
+    if (isMobile()) {
+        createNotification('Not supported on mobile', 'This type of file is not supported on mobile.');
+        return;
+    }
+
     const result = router.resolve({
         name: 'editfile',
         params: { path: btoa(item.path), attachments: String(savedAttachments.value) },
@@ -1063,4 +1069,8 @@ export const getSharedFolderContent = async (owner, shareId, path: string = '/')
     const { user } = useAuthState();
 
     return await Api.getSharedFolderContent(owner, shareId, <string>user.id, path);
+};
+
+export const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 };
