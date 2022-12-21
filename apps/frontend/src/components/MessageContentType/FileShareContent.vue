@@ -22,13 +22,14 @@
 <script lang="ts" setup>
     import { useAuthState } from '@/store/authStore';
     import {
-        formatBytes,
-        sharedDir,
-        goTo,
         currentDirectory,
-        sharedItem,
-        selectedTab,
+        formatBytes,
+        goTo,
+        isMobile,
         selectedPaths,
+        selectedTab,
+        sharedDir,
+        sharedItem,
     } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message } from '@/types';
 
@@ -37,6 +38,7 @@
     import { isSimpleTextFile } from '@/services/contentService';
     import { getShareWithId } from '@/services/fileBrowserService';
     import { getChat } from '@/store/chatStore';
+    import { createNotification } from '@/store/notificiationStore';
 
     interface IProp {
         message: Object;
@@ -68,6 +70,11 @@
             if (!permission && owner.id !== user.id) return;
 
             emit('showFile', { name: sharedItem.value.name, url: src, permission });
+            return;
+        }
+
+        if (isMobile()) {
+            createNotification('Not supported on mobile', 'This type of file is not supported on mobile.');
             return;
         }
 
