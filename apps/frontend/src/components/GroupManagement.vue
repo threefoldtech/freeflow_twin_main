@@ -2,7 +2,7 @@
     <div class="px-2 py-2 w-full flex justify-start">
         <div class="flex xl:grid xl:grid-cols-2 w-full gap-y-2 items-center justify-around xl:justify-items-center">
             <div
-                v-if="!blocked"
+                v-if="!blocked && !mobile"
                 class="flex flex-col bg-white text-primary items-center px-2 justify-center w-24 h-16 rounded-lg border border-gray-300 cursor-pointer"
                 @click="$emit('app-call')"
             >
@@ -254,7 +254,7 @@
     import { blocklist, getUnblockedContacts, userIsBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
-    import { getFileType, getIconDirty } from '@/store/fileBrowserStore';
+    import { getFileType, getIconDirty, isMobile } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
     import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
@@ -263,6 +263,8 @@
 
     const { updateContactsInGroup } = usechatsActions();
     const { user } = useAuthState();
+
+    const mobile = ref(isMobile());
 
     interface IProps {
         chat: Chat;
