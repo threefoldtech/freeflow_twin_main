@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col pt-2 pl-4 pb-2 pr-8">
-        <span class="break-all text-sm" v-html="body"></span>
+        <span class="break-all text-sm whitespace-pre-wrap" v-html="body"></span>
         <div v-if="previewUrl" class="pl-4 border-l-2 border-gray-400 my-message:border-icon">
             <a :href="hyperlink" class="flex items-center font-normal capitalize">
                 <img
