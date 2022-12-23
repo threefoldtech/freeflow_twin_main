@@ -134,7 +134,7 @@
                     </form>
 
                     <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatsend">
-                        <i class="fas fa-paper-plane"></i>
+                        <i class="fas fa-paper-plane sm:text-[18px] text-[25px]"></i>
                     </button>
                 </div>
             </div>
