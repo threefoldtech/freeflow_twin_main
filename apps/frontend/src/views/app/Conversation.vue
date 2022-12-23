@@ -77,6 +77,7 @@
                                 </div>
                                 <div class="h-full flex items-center self-end px-8 space-x-4">
                                     <button
+                                        v-if="!mobile"
                                         class="focus:outline-none hover:text-accent-300 text-gray-500"
                                         @click="popupMeeting"
                                     >
@@ -347,7 +348,6 @@
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
-    import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendRemoveUser } from '@/store/socketStore';
@@ -381,6 +381,7 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
     import Alert from '@/components/Alert.vue';
     import Topbar from '@/components/Topbar.vue';
+    import { isMobile } from '@/store/fileBrowserStore';
 
     const online = useOnline();
     const messageBox = ref<HTMLElement>(null);
@@ -400,6 +401,8 @@
     const { retrieveChats, sendFile, sendMessage } = usechatsActions();
     const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
     const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
+
+    const mobile = ref(isMobile());
 
     watch(
         () => route.params.id,
