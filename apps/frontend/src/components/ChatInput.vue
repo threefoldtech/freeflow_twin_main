@@ -108,6 +108,7 @@
                                 autofocus
                                 maxlength="2000"
                                 @input="resizeTextarea()"
+                                @click="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
                                 @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
