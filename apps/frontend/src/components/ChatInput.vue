@@ -100,7 +100,7 @@
                     </button>
                 </div>
                 <div class="flex">
-                    <form class="w-full" @submit.prevent="chatsend" @keydown.enter.prevent="chatsend">
+                    <form class="w-full" @submit.prevent="chatsend" @keydown.enter.exact.prevent="chatsend">
                         <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                             <textarea
                                 v-model="messageInput"
