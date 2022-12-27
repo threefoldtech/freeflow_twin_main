@@ -79,16 +79,36 @@
         </div>
 
         <div
-            v-if="selectedPaths.length > 0"
+            v-if="selectedPaths.length > 0 || copiedFiles.length > 0"
             class="lg:hidden fixed top-0 left-0 flex-shrink-0 h-16 w-full bg-white border-b border-gray-200 flex items-center"
             style="z-index: 40"
         >
-            <x-icon @click="selectedPaths = []" class="h-7 w-7 ml-3 text-blue-500" aria-hidden="true" />
+            <x-icon
+                v-if="selectedPaths.length > 0"
+                @click="selectedPaths = []"
+                class="h-7 w-7 ml-3 text-blue-500"
+                aria-hidden="true"
+            />
+
             <div class="flex justify-between w-full px-4 items-center">
-                <p class="text-lg text-blue-500">
+                <p v-if="selectedPaths.length > 0" class="text-lg text-blue-500">
                     {{ selectedPaths.length }} item<span v-if="selectedPaths.length > 1">s</span>
                 </p>
+
+                <div
+                    v-if="copiedFiles.length > 0"
+                    @click="copyPasteSelected"
+                    class="mx-2 px-2 py-1 text-white font-bold bg-primary border-2 border-primary hover:text-primary hover:bg-white rounded-md cursor-pointer flex flex-row items-center"
+                >
+                    <ClipboardIcon class="h-5 w-5 text-gray-500" aria-hidden="true" />
+                    <p class="text-gray-600 pl-1 pr-2">Paste {{ copiedFiles.length }} file(s)</p>
+                    <div @click.stop="clearClipboard">
+                        <i class="fas fill-current text-red-400 fa-window-close text-[25px] ml-1"></i>
+                    </div>
+                </div>
+
                 <dots-horizontal-icon
+                    v-if="selectedPaths.length > 0"
                     class="h-5 w-5 text-blue-500"
                     aria-hidden="true"
                     @click="showSelectedActions = true"
@@ -134,6 +154,28 @@
                             @click="showSelectedActions = true"
                         />
                         <p class="text-gray-600 pl-5">Rename</p>
+                    </div>
+                    <div
+                        v-if="selectedPaths.length === 1"
+                        class="mx-4 cursor-pointer flex"
+                        @click="
+                            cutFiles();
+                            showSelectedActions = false;
+                        "
+                    >
+                        <ScissorsIcon class="h-5 w-5 text-gray-500" aria-hidden="true" />
+                        <p class="text-gray-600 pl-5">Cut</p>
+                    </div>
+                    <div
+                        v-if="selectedPaths.length === 1"
+                        class="mx-4 cursor-pointer flex"
+                        @click="
+                            copyFiles();
+                            showSelectedActions = false;
+                        "
+                    >
+                        <ClipboardCopyIcon class="h-5 w-5 text-gray-500" aria-hidden="true" />
+                        <p class="text-gray-600 pl-5">Copy</p>
                     </div>
                     <div
                         v-if="selectedPaths.length > 0"
@@ -294,7 +336,17 @@
     } from '@/store/contextmenuStore';
     import Alert from '@/components/Alert.vue';
     import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
-    import { DotsHorizontalIcon, XIcon, ShareIcon, PencilIcon, DownloadIcon, TrashIcon } from '@heroicons/vue/outline';
+    import {
+        DotsHorizontalIcon,
+        XIcon,
+        ShareIcon,
+        PencilIcon,
+        DownloadIcon,
+        TrashIcon,
+        ScissorsIcon,
+        ClipboardCopyIcon,
+        ClipboardIcon,
+    } from '@heroicons/vue/outline';
     import Tooltip from '@/components/Tooltip.vue';
 
     const { chats } = useChatsState();
