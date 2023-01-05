@@ -84,6 +84,7 @@ async function startVueApp() {
 
     //@ts-ignore
     window.flutter_inappwebview.callHandler('RETRIEVE_IDENTIFIER').then(function (data) {
+        console.log('Reaching RETRIEVE_IDENTIFIER');
         console.log(data);
     });
 }
