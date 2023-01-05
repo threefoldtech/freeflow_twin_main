@@ -73,11 +73,9 @@ async function startVueApp() {
         },
     });
 
-    await sleep(1000);
-
-    console.log('Reached this part');
-
     app.use(contextmenu).mount('#app');
+
+    await sleep(1000);
 
     //@ts-ignore
     window.flutter_inappwebview.callHandler('VUE_INITIALIZED');
