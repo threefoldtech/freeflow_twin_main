@@ -41,6 +41,11 @@
         });
     })();
 
+    console.log(globalThis);
+    console.log(window);
+    console.log('Coming inside dashboard and logging vue initialized');
+    globalThis?.flutter_inappwebview?.callHandler('VUE_INITIALIZED');
+
     const showLoader = computed(() => {
         if (allSocialPosts.value.length >= 1) return false;
         return !!isLoadingSocialPosts.value;

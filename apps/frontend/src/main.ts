@@ -90,6 +90,9 @@ async function startVueApp() {
 
     //@ts-ignore
     console.log('CALLED VUE_INITIALIZED');
+
+    //@ts-ignore
+    window.flutter_inappwebview.callHandler('VUE_INITIALIZED');
     globalThis?.flutter_inappwebview?.callHandler('VUE_INITIALIZED');
 }
 
