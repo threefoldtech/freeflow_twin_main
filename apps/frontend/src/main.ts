@@ -7,7 +7,6 @@ import socketIo from '@/plugins/SocketIo';
 import contextmenu from 'v-contextmenu';
 import 'v-contextmenu/dist/themes/default.css';
 import config from '@/config';
-('@/config');
 import MessageContent from '@/components/MessageContent.vue';
 import { clickOutside } from '@/plugins/ClickOutside';
 import axios from 'axios';
@@ -16,29 +15,6 @@ import 'floating-vue/dist/style.css';
 
 FloatingVue.options.themes.menu.delay.hide = 0;
 FloatingVue.options.themes.menu.delay.show = 600;
-
-const app = createApp(App)
-    .directive('click-outside', clickOutside)
-    .use(router)
-    .use(FloatingVue)
-    .use(socketIo, {
-        connection: config.baseUrl,
-        options: {
-            debug: true,
-        },
-        transports: ['websocket'],
-    });
-
-// this fixes some issues with rendering inside of QouteContent n
-app.component('MessageContent', MessageContent);
-
-app.directive('focus', {
-    // When the bound element is mounted into the DOM...
-    mounted(el) {
-        // Focus the element
-        el?.focus();
-    },
-});
 
 axios.interceptors.response.use(
     function (response) {
@@ -54,5 +30,62 @@ axios.interceptors.response.use(
     }
 );
 
-app.use(contextmenu).mount('#app');
-export default app;
+const initializeFlutterInAppWebViewPolyFill = () => {
+    //@ts-ignore
+    if (window.flutter_inappwebview) {
+        return;
+    }
+
+    //@ts-ignore
+    window.flutter_inappwebview = {
+        async callHandler(key, ...args) {
+            console.log('Webview event called: ', {
+                key,
+                ...args,
+            });
+        },
+    };
+};
+
+let sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function startVueApp() {
+    initializeFlutterInAppWebViewPolyFill();
+
+    const app = createApp(App)
+        .directive('click-outside', clickOutside)
+        .use(router)
+        .use(FloatingVue)
+        .use(contextmenu)
+        .use(socketIo, {
+            connection: config.baseUrl,
+            options: {
+                debug: true,
+            },
+            transports: ['websocket'],
+        });
+
+    app.component('MessageContent', MessageContent);
+
+    app.directive('focus', {
+        mounted(el) {
+            el?.focus();
+        },
+    });
+
+    await sleep(1000);
+
+    console.log('Reached this part');
+
+    app.use(contextmenu).mount('#app');
+
+    //@ts-ignore
+    window.flutter_inappwebview.callHandler('VUE_INITIALIZED');
+
+    //@ts-ignore
+    window.flutter_inappwebview.callHandler('RETRIEVE_IDENTIFIER').then(function (data) {
+        console.log(data);
+    });
+}
+
+startVueApp();
