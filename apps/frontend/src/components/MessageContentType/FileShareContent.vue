@@ -21,7 +21,13 @@
 
 <script lang="ts" setup>
     import { useAuthState } from '@/store/authStore';
-    import { formatBytes, goToExternalOnlyOffice, sharedItem, goToOwnOnlyOffice } from '@/store/fileBrowserStore';
+    import {
+        formatBytes,
+        isMobile,
+        sharedItem,
+        goToOwnOnlyOffice,
+        goToExternalOnlyOffice,
+    } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message } from '@/types';
 
     import { useRouter } from 'vue-router';
@@ -46,6 +52,11 @@
 
         if (isSimpleTextFile(sharedItem.value.name)) {
             await showTextFile(message.chatId);
+            return;
+        }
+
+        if (isMobile()) {
+            createNotification('Not supported on mobile', 'This type of file is not supported on mobile.');
             return;
         }
 
