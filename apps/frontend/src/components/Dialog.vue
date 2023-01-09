@@ -45,16 +45,8 @@
     </transition>
 </template>
 <script lang="ts" setup>
-    import { nextTick, onBeforeMount, onMounted, onUpdated, ref } from 'vue';
+    import { onUpdated, ref } from 'vue';
     import { XIcon } from '@heroicons/vue/solid';
-
-    defineEmits(['update-model-value']);
-
-    const dialogRef = ref<HTMLElement>(null);
-
-    onUpdated(() => {
-        if (dialogRef.value) dialogRef.value.focus();
-    });
 
     interface IProps {
         modelValue?: boolean;
@@ -63,10 +55,16 @@
         noActions: boolean;
     }
 
+    const emit = defineEmits(['update-model-value']);
     const props = withDefaults(defineProps<IProps>(), {
         modelValue: false,
         noActions: true,
         okButtonText: 'Ok',
         cancelButtonText: 'Cancel',
+    });
+    const dialogRef = ref<HTMLElement>(null);
+
+    onUpdated(() => {
+        if (dialogRef.value) dialogRef.value.focus();
     });
 </script>

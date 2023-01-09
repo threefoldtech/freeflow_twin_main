@@ -22,54 +22,36 @@
 <script lang="ts" setup>
     import { useAuthState } from '@/store/authStore';
     import {
-        currentDirectory,
         formatBytes,
-        goTo,
         isMobile,
-        selectedPaths,
-        selectedTab,
-        sharedDir,
         sharedItem,
+        goToOwnOnlyOffice,
+        goToExternalOnlyOffice,
     } from '@/store/fileBrowserStore';
     import { FileShareMessageType, Message } from '@/types';
 
     import { useRouter } from 'vue-router';
-    import { showShareDialog } from '@/services/dialogService';
     import { isSimpleTextFile } from '@/services/contentService';
     import { getShareWithId } from '@/services/fileBrowserService';
     import { getChat } from '@/store/chatStore';
     import { createNotification } from '@/store/notificiationStore';
 
     interface IProp {
-        message: Object;
+        message: Message<FileShareMessageType>;
     }
-
-    const props = defineProps<IProp>();
-    const emit = defineEmits(['showFile']);
 
     const { user } = useAuthState();
 
+    const props = defineProps<IProp>();
+    const emit = defineEmits(['showFile']);
     const router = useRouter();
+
     const visitFileInMessage = async (message: Message<FileShareMessageType>) => {
         sharedItem.value = message.body;
+        createNotification('Opening file...', 'This may take some time.');
 
         if (isSimpleTextFile(sharedItem.value.name)) {
-            const { user } = useAuthState();
-            const chat = getChat(message.chatId);
-            let path = sharedItem.value.path;
-            path = path.replace('/appdata/storage/', '');
-            const owner = sharedItem.value.owner;
-            const ownerLocation = owner?.location;
-            const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
-
-            const shareDetails = await getShareWithId(sharedItem.value.id);
-            const permission = shareDetails.permissions.find(p => {
-                if (chat?.isGroup) return p.userId === chat.chatId;
-                return p.userId === user.id;
-            });
-            if (!permission && owner.id !== user.id) return;
-
-            emit('showFile', { name: sharedItem.value.name, url: src, permission });
+            await showTextFile(message.chatId);
             return;
         }
 
@@ -78,50 +60,29 @@
             return;
         }
 
-        if (!sharedItem.value.isFolder && message.from === user.id) {
-            //Only office
-            const url = router.resolve({
-                name: 'editfile',
-                params: {
-                    path: btoa(sharedItem.value.path),
-                    shareId: '',
-                    attachments: 'false',
-                },
-            });
-            window.open(url.href, '_blank');
+        const isOwnFile = !sharedItem.value.isFolder && message.from === user.id;
+        if (isOwnFile) {
+            goToOwnOnlyOffice();
             return;
         }
+        goToExternalOnlyOffice(sharedItem.value);
+    };
 
-        if (
-            message.body.path.split('/')[0] === '' &&
-            message.body.path.split('/').length === 2 &&
-            !message.body.isFolder &&
-            message.from === user.id
-        ) {
-            //File is located in root folder
-            router.push({ name: 'quantum' });
-            selectedTab.value = 1;
-            showShareDialog.value = true;
-            selectedPaths.value[0] = message;
-            return;
-        }
+    const showTextFile = async (chatId: string) => {
+        const chat = getChat(chatId);
+        const path = sharedItem.value.path.replace('/appdata/storage/', '');
+        const owner = sharedItem.value.owner;
+        const ownerLocation = owner?.location;
+        const src = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
 
-        if (message.from === user.id) {
-            router.push({
-                name: 'quantumFolder',
-                params: {
-                    folder: message.body.isFolder
-                        ? btoa(message.body.path)
-                        : //Redirecting to folder of the file
-                          btoa(message.body.path.split('/').slice(0, -1).join('/')),
-                    editFileShare: 'true',
-                },
-            });
-            return;
-        }
-        currentDirectory.value = '';
-        goTo(message.body);
-        sharedDir.value = true;
+        const shareDetails = await getShareWithId(sharedItem.value.id);
+        const permission = shareDetails.permissions.find(p => {
+            if (chat?.isGroup) return p.userId === chat.chatId;
+            return p.userId === user.id;
+        });
+        if (!permission && owner.id !== user.id) return;
+
+        emit('showFile', { name: sharedItem.value.name, url: src, permission });
     };
 </script>
 <style></style>

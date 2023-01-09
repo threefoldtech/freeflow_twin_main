@@ -91,7 +91,7 @@
     import Dialog from '@/components/Dialog.vue';
 
     import { isAudio, isImage, isVideo } from '@/services/contentService';
-    import { Message, MessageBodyType, MessageTypes, SharePermission, SharePermissionInterface } from '@/types';
+    import { Message, MessageTypes, SharePermission, SharePermissionInterface } from '@/types';
     import { ref } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { updateFile } from '@/services/fileBrowserService';
@@ -99,7 +99,7 @@
     import { useAuthState } from '@/store/authStore';
 
     interface Props {
-        message: Message<MessageBodyType>;
+        message: Message<any>;
         preventRecursion?: boolean;
         isDownloadingAttachment?: boolean;
     }
@@ -108,7 +108,6 @@
 
     const props = withDefaults(defineProps<Props>(), { preventRecursion: false, isDownloadingAttachment: false });
     const showFilePreview = ref(false);
-    const showConfirmDialog = ref(false);
     const filePreviewSrc = ref('');
     const fileContent = ref('');
     const editedFileContent = ref('');
@@ -126,6 +125,8 @@
         editedFileContent.value = fileContent.value;
         showFilePreview.value = true;
     };
+
+    const showConfirmDialog = ref(false);
 
     const closeEditor = () => {
         showFilePreview.value = false;

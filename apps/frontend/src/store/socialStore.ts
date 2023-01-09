@@ -14,4 +14,4 @@ export interface MESSAGE_POST_SHARE_BODY {
 }
 
 export const allSocialPosts = ref<IPostContainerDTO[]>([]);
-export const isLoadingSocialPosts = ref<boolean>(false);
+export const isLoadingSocialPosts = ref(false);

@@ -6,11 +6,10 @@
 </template>
 
 <script setup lang="ts">
-    import { defineComponent } from 'vue';
     import { clock, minuteClock, hourClock, ClockType } from '@/services/clockService';
     import TimeContent from '@/components/TimeContent.vue';
 
-    const props = defineProps<{ time: Data }>();
+    const props = defineProps<{ time: Date }>();
 
     const now = new Date();
     const diff = now.getTime() - props.time.getTime();

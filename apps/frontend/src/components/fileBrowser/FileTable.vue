@@ -1,40 +1,17 @@
 <template>
     <v-contextmenu ref="contextmenu-filebrowser-item-local">
         <v-contextmenu-item
-            v-if="!currentRightClickedItem?.data?.isDirectory"
-            @click="
-                () => {
-                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE;
-                }
-            "
+            v-if="!rightClickedItem?.data?.isDirectory"
+            @click="setAction(RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.SHARE)"
             >Share
         </v-contextmenu-item>
-        <v-contextmenu-item
-            @click="
-                () => {
-                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD;
-                }
-            "
+        <v-contextmenu-item @click="setAction(RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.DOWNLOAD)"
             >Download
         </v-contextmenu-item>
-        <v-contextmenu-item
-            @click="
-                () => {
-                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME;
-                }
-            "
+        <v-contextmenu-item @click="setAction(RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.RENAME)"
             >Rename
         </v-contextmenu-item>
-        <v-contextmenu-item
-            @click="
-                () => {
-                    triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                    rightClickItemAction = RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE;
-                }
-            "
+        <v-contextmenu-item @click="setAction(RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.DELETE)"
             >Delete
         </v-contextmenu-item>
     </v-contextmenu>
@@ -173,7 +150,7 @@
                                 @dragstart="event => onDragStart(event, item)"
                                 @dragleave="event => onDragLeave(event)"
                                 @drop="() => onDrop(item)"
-                                @mousedown.right="setCurrentRightClickedItem(item)"
+                                @mousedown.right="setCurrentRightClickedItem(item, RIGHT_CLICK_TYPE.LOCAL_FILE)"
                                 v-contextmenu:contextmenu-filebrowser-item-local
                             >
                                 <td class="px-6 py-4 whitespace-nowrap hidden">
@@ -193,7 +170,14 @@
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex flex-row items-center text-md">
                                         <div class="mr-3 w-7 text-center">
-                                            <i :class="getIcon(item) + ' ' + getIconColor(item)" class="fa-2x"></i>
+                                            <i
+                                                :class="
+                                                    getIcon(item.isDirectory, item.fileType) +
+                                                    ' ' +
+                                                    getIconColor(item.isDirectory, item.fileType)
+                                                "
+                                                class="fa-2x"
+                                            ></i>
                                         </div>
                                         <span class="hover:underline" @click.stop="emit('itemClicked', item)">
                                             {{ item.name }}
@@ -270,7 +254,7 @@
                             @dragstart="event => onDragStart(event, item)"
                             @dragleave="event => onDragLeave(event)"
                             @drop="() => onDrop(item)"
-                            @mousedown.right="setCurrentRightClickedItem(item)"
+                            @mousedown.right="setCurrentRightClickedItem(item, RIGHT_CLICK_TYPE.LOCAL_FILE)"
                         >
                             <div
                                 :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
@@ -279,7 +263,11 @@
                                 <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i
                                         :key="item.name"
-                                        :class="getIcon(item) + ' ' + getIconColor(item)"
+                                        :class="
+                                            getIcon(item.isDirectory, item.fileType) +
+                                            ' ' +
+                                            getIconColor(item.isDirectory, item.fileType)
+                                        "
                                         class="fa-lg"
                                     ></i>
                                     <p
@@ -325,7 +313,6 @@
         PathInfoModel,
         savedAttachments,
         savedAttachmentsIsLoading,
-        selectAll,
         selectedPaths,
         selectItem,
         sortAction,
@@ -334,10 +321,12 @@
     import { useRoute, useRouter } from 'vue-router';
     import {
         currentRightClickedItem,
-        RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
+        RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM,
         RIGHT_CLICK_TYPE,
         rightClickItemAction,
         triggerWatchOnRightClickItem,
+        setCurrentRightClickedItem,
+        ICurrentRightClickItem,
     } from '@/store/contextmenuStore';
     import Spinner from '@/components/Spinner.vue';
 
@@ -350,11 +339,13 @@
     const router = useRouter();
     const emit = defineEmits(['itemClicked']);
 
-    const setCurrentRightClickedItem = item => {
-        currentRightClickedItem.value = {
-            type: RIGHT_CLICK_TYPE.LOCAL_FILE,
-            data: item,
-        };
+    const rightClickedItem = computed(() => {
+        return currentRightClickedItem.value as ICurrentRightClickItem<PathInfoModel>;
+    });
+
+    const setAction = (action: RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM) => {
+        triggerWatchOnRightClickItem.value = !triggerWatchOnRightClickItem.value;
+        rightClickItemAction.value = action;
     };
 
     const handleSelect = (item: PathInfoModel) => {
@@ -416,27 +407,6 @@
 <style scoped>
     th.active .arrow {
         opacity: 1;
-    }
-
-    .arrow {
-        display: inline-block;
-        vertical-align: middle;
-        width: 0;
-        height: 0;
-        margin-left: 5px;
-        opacity: 0;
-    }
-
-    .arrow.asc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-bottom: 4px solid #1f0f5b;
-    }
-
-    .arrow.desc {
-        border-left: 4px solid transparent;
-        border-right: 4px solid transparent;
-        border-top: 4px solid #1f0f5b;
     }
 
     .hiddenItems {

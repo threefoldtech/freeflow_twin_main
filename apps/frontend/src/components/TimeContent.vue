@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-    import { defineComponent, computed } from 'vue';
+    import { computed } from 'vue';
     import moment from 'moment';
 
     const props = defineProps<{ time: Date }>();

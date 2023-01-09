@@ -24,9 +24,9 @@
 </template>
 
 <script setup lang="ts">
-    import { ref, watch } from 'vue';
+    import { watch } from 'vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
-    import { useSocketState } from '../store/socketStore';
+    import { useSocketState } from '@/store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
 

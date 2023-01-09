@@ -34,19 +34,24 @@
     }
 
     const props = defineProps<IProp>();
-
-    const hyperlink = ref(null);
+    const previewUrl = ref<{ title: string; description: string; link: string }>();
 
     let { body } = props.message;
     if (typeof body === 'object') body = body.message;
     if (typeof body === 'number') body = body.toString();
 
-    const replacer = (match: string) => emoji.emojify(match);
-    const words = body.split(' ');
+    onBeforeMount(async () => {
+        if (isValidURL(String(body))) {
+            try {
+                const response = await getPreview(getLinkFromString(String(body)));
+                previewUrl.value = response[0];
+            } catch (error) {
+                return;
+            }
+        }
+    });
 
-    const previewUrl = ref<{ title: string; description: string; link: string }>();
-
-    const me = useAuthState().user.id;
+    const hyperlink = ref(null);
 
     const makeLinksFromUrls = (message: string) => {
         if (!message) return;
@@ -56,26 +61,25 @@
 
         return message.replace(urlRegex, url => {
             hyperlink.value = url;
-            if (!hyperlink.value.match('^https?:\/\/')) {
-                hyperlink.value = 'http://' + hyperlink.value;
-            }
+            if (!url.match('^https?:\/\/')) hyperlink.value = 'http://' + url;
+
             return `${`<a href="${encodeURI(hyperlink.value)}" target="_blank" rel="noopener noreferrer"> ${encodeURI(
                 url
             )} </a>`}`;
         });
     };
 
+    const replacer = (match: string) => emoji.emojify(match);
+    const words = body.split(' ');
+    const me = useAuthState().user.id;
+
     const bodyReplacer = (oldBody: string) => {
         oldBody = oldBody.replace(/(:.*:)/g, replacer);
-        oldBody = oldBody.replaceAll('<', '&lt');
-        oldBody = oldBody.replaceAll('>', '&gt');
+        oldBody = oldBody.replaceAll(/[<>]/g, '&gt');
         words.map(word => {
-            word.startsWith('@') && word.slice(1) === me
-                ? (oldBody = oldBody.replace(
-                      word,
-                      `<span class="bg-blue-400 text-white p-1 text-sm rounded-sm cursor-pointer hover:bg-blue-500">${word}</span>`
-                  ))
-                : (oldBody = oldBody);
+            const iAmTagged = word.startsWith('@') && word.slice(1) === me;
+            const spanTag = `<span class="bg-blue-400 text-white p-1 text-sm rounded-sm cursor-pointer hover:bg-blue-500">${word}</span>`;
+            if (iAmTagged) oldBody = oldBody.replace(word, spanTag);
         });
 
         oldBody = makeLinksFromUrls(oldBody);
@@ -88,30 +92,16 @@
     const getLinkFromString = (body: string) => {
         const regex = /href="([^"]*)/;
 
-        if (body.match(regex)[1] != null) {
-            return body.match(regex)[1];
-        } else {
-            return null;
-        }
+        if (body.match(regex)[1] != null) return body.match(regex)[1];
+        return null;
     };
 
     const isValidURL = (url: string) => {
-        var res = url.match(
+        const res = url.match(
             /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
         );
         return res !== null;
     };
-
-    onBeforeMount(async () => {
-        if (isValidURL(String(body))) {
-            try {
-                const response = await getPreview(getLinkFromString(String(body)));
-                previewUrl.value = response[0];
-            } catch (error) {
-                return;
-            }
-        }
-    });
 
     const getFavIconOfSite = (link: string) => {
         return `https://www.google.com/s2/favicons?sz=64&domain_url=${link}`;

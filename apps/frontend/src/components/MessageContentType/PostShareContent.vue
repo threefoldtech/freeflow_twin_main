@@ -75,13 +75,6 @@
         return `${props.message.body.post?.body.substring(0, 255)}${text?.length > 255 ? '...' : ''}`;
     });
 
-    watch(showPost, () => {
-        if (showPost.value)
-            nextTick(() => {
-                dialogRef.value.focus();
-            });
-    });
-
     const refreshPost = (post: IPostContainerDTO) => {
         postData.value = post;
     };
@@ -105,6 +98,13 @@
         postData.value = post;
         showPost.value = true;
     };
+
+    watch(showPost, () => {
+        if (showPost.value)
+            nextTick(() => {
+                dialogRef.value.focus();
+            });
+    });
 </script>
 
 <style scoped></style>

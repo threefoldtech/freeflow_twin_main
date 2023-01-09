@@ -107,7 +107,7 @@
                                 <p class="text-xs text-gray-400">{{ timeAgo(item.post.createdOn) }}</p>
                             </div>
                         </div>
-                        <div class="group" v-if="smallScreen || props.item.owner.id === user.id.toString()">
+                        <div class="group" v-if="smallScreen || props.item.owner.id === user.id">
                             <Popover v-slot="{ open }" class="relative z-30">
                                 <PopoverButton
                                     :class="open ? '' : 'text-opacity-90'"
@@ -129,7 +129,7 @@
                                         <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                             <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
                                                 <div
-                                                    v-if="props.item.owner.id === user.id.toString()"
+                                                    v-if="props.item.owner.id === user.id"
                                                     class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
                                                     @click="
                                                         showDeletePostDialog = true;
@@ -226,18 +226,6 @@
                             src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
                         />
                     </div>
-                    <!-- <div> -->
-                    <!--     <p class="font-medium text-primary flex text-xs"> -->
-                    <!--         <span> -->
-                    <!--             {{ props.item.likes[0].id -->
-                    <!--             }}<span class="mr-1" v-if="props.item.likes.length > 2">,</span -->
-                    <!--             ><span v-else>&nbsp;likes this</span> -->
-                    <!--         </span> -->
-                    <!--     </p> -->
-                    <!--     <p class="text-gray-600 text-xs" v-if="props.item.likes.length > 2"> -->
-                    <!--         and {{ props.item.likes.length }} others liked this -->
-                    <!--     </p> -->
-                    <!-- </div> -->
                     <div class="flex items-center">
                         <HeartIconSolid class="hidden text-red-500 w-5 h-5 mr-2" />
                         <p class="text-gray-600 font-medium flex-shrink-0 text-sm">
@@ -319,7 +307,7 @@
                     @submit.prevent="handleAddComment(false)"
                 >
                     <div>
-                        <AvatarImg :id="String(user.id)" :showOnlineStatus="false" :small="true" alt="avatar" />
+                        <AvatarImg :id="user.id" :showOnlineStatus="false" :small="true" alt="avatar" />
                     </div>
                     <input
                         ref="inputRef"
@@ -360,14 +348,7 @@
 
 <script lang="ts" setup>
     import { HeartIcon as HeartIconSolid, XIcon } from '@heroicons/vue/solid';
-    import {
-        HeartIcon,
-        ChatAltIcon,
-        ShareIcon,
-        TrashIcon,
-        DotsVerticalIcon,
-        ChevronDownIcon,
-    } from '@heroicons/vue/outline';
+    import { HeartIcon, ChatAltIcon, ShareIcon, TrashIcon, DotsVerticalIcon } from '@heroicons/vue/outline';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useAuthState } from '@/store/authStore';
     import { ref, computed, onBeforeMount, watch, nextTick } from 'vue';
@@ -384,28 +365,28 @@
     import { IPostContainerDTO } from 'custom-types/post.type';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
     import { useScrollActions } from '@/store/scrollStore';
+    import { useDebounceFn } from '@vueuse/core';
 
+    const { user } = useAuthState();
     const { isScrollToNewComment } = useScrollActions();
 
     const props = defineProps<{ item: IPostContainerDTO }>();
-    const inputRef = ref(null);
-    const messageInput = ref<string>('');
-    const showComments = ref<boolean>(false);
-    const showAllImages = ref<boolean>(false);
-    const amount_likes = ref<number>(props.item.likes.length);
-    const showImagePreview = ref<boolean>(false);
-    const imagePreviewSrc = ref<string | null>(null);
-    const showShareDialog = ref<boolean>(false);
-    const showDeletePostDialog = ref(false);
-    const openPanel = ref<boolean>(false);
-    const mouseFocussed = ref(false);
-    const postingCommentInProgress = ref<boolean>(false);
-    const readMore = ref<boolean>(false);
-    const amount_lines = ref<number>(0);
-    const { user } = useAuthState();
+    const showAllImages = ref(false);
+    const showShareDialog = ref(false);
+    const readMore = ref(false);
     const emit = defineEmits<{
         (e: 'refreshPost', data: IPostContainerDTO): void;
     }>();
+
+    const localLike = ref(false);
+    const amount_lines = ref(0);
+
+    onBeforeMount(async () => {
+        if (props.item.likes.some(item => item.id === user.id)) {
+            localLike.value = true;
+        }
+        amount_lines.value = countLines(props.item.post.body.trimEnd());
+    });
 
     const smallScreen = ref(window.innerWidth < 640);
 
@@ -413,20 +394,13 @@
         smallScreen.value = window.innerWidth < 640;
     };
 
+    const openPanel = ref<boolean>(false);
+    const mouseFocussed = ref(false);
+
     //only shows user panel if mouse stays focussed for a moment
     const panelTimer = () => setTimeout(() => (openPanel.value = mouseFocussed.value), 600);
 
-    watch([showComments, amount_likes], () => {
-        getSinglePost(props.item.post.id, props.item.owner.location);
-    });
-
-    watch(showComments, () => {
-        nextTick(() => {
-            if (showComments.value) {
-                inputRef.value.focus();
-            }
-        });
-    });
+    const showDeletePostDialog = ref(false);
 
     const doDeletePost = () => {
         deletePost(props.item);
@@ -449,37 +423,18 @@
         return total;
     };
 
+    const showComments = ref(false);
+
     const showIsUserTyping = computed(() => {
         return props.item?.isTyping && props.item?.isTyping?.length !== 0 && showComments.value ? true : false;
     });
 
-    const debounce = (fn: Function, delay: number) => {
-        let timeout: number;
-
-        return (...args: any) => {
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-
-            timeout = setTimeout(() => {
-                fn(...args);
-            }, delay);
-        };
-    };
-
-    const onInput = debounce(() => {
+    const onInput = useDebounceFn(() => {
         setSomeoneIsTyping(props.item.post.id, props.item.owner.location, user.id.toString());
     }, 1000);
 
-    const localLike = ref(false);
-
-    onBeforeMount(async () => {
-        const { user } = useAuthState();
-        if (props.item.likes.some(item => item.id === user.id)) {
-            localLike.value = true;
-        }
-        amount_lines.value = countLines(props.item.post.body.trimEnd());
-    });
+    const showImagePreview = ref(false);
+    const imagePreviewSrc = ref<string | null>(null);
 
     const openImagePreview = image => {
         imagePreviewSrc.value = fetchPostAttachment(image);
@@ -500,20 +455,27 @@
         return moment(time).fromNow();
     };
 
+    const messageInput = ref('');
+    const postingCommentInProgress = ref(false);
+
     const handleAddComment = async (isReplyToComment: boolean = false, comment_id?: string, message?: string) => {
         if (postingCommentInProgress.value) return;
-        const comment_value = isReplyToComment ? message : messageInput.value;
-        if (!comment_value || comment_value === '' || !/\S/.test(comment_value)) return;
+        const commentValue = isReplyToComment ? message : messageInput.value;
+        if (!commentValue || commentValue === '' || !/\S/.test(commentValue)) return;
+
         postingCommentInProgress.value = true;
-        const comment = await commentOnPost(comment_value, props.item, isReplyToComment, comment_id);
+        const comment = await commentOnPost(commentValue, props.item, isReplyToComment, comment_id);
         messageInput.value = '';
-        const response = await getSinglePost(props.item.post.id, props.item.owner.location);
+        await getSinglePost(props.item.post.id, props.item.owner.location);
         postingCommentInProgress.value = false;
         if (!isReplyToComment) {
             isScrollToNewComment(true);
         }
+
         emit('refreshPost', comment);
     };
+
+    const amount_likes = ref(props.item.likes.length);
 
     const like = async () => {
         const { status } = await likePost(props.item.post.id, props.item.owner.location);
@@ -558,6 +520,20 @@
             },
         },
     ]);
+
+    watch([showComments, amount_likes], () => {
+        getSinglePost(props.item.post.id, props.item.owner.location);
+    });
+
+    const inputRef = ref(null);
+
+    watch(showComments, () => {
+        nextTick(() => {
+            if (showComments.value) {
+                inputRef.value.focus();
+            }
+        });
+    });
 </script>
 
 <style scoped>
@@ -581,17 +557,6 @@
     body {
         text-align: center;
     }
-
-    /*
-.some-holder-styles{
-display: none;
-position: absolute;
-z-index: 9;
-top: 50%;
-left: 50%;
-transform: translate(-50%,-50%);
-}
-*/
 
     .ds-preloader-block__loading-bubble {
         display: inline-block;
