@@ -27,7 +27,7 @@ export class FirebaseService {
             await axios.post(
                 'https://europe-west2-jimberlabs.cloudfunctions.net/api/identify',
                 {
-                    username: userId,
+                    username: userId + '.3bot',
                     appId: identificationData.appId,
                     identifier: identificationData.identifier,
                 },
