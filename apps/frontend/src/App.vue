@@ -40,6 +40,7 @@
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
     import { useSocketActions } from '@/store/socketStore';
     import { initBlocklist } from '@/store/blockStore';
+    import { sendIdentifierToBackend } from '@/services/firebaseService';
 
     const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
@@ -60,6 +61,8 @@
             user.id = profile.username;
             user.email = profile.email;
             user.image = `${window.location.origin}/api/v2/user/avatar`;
+
+            await sendIdentifierToBackend();
         }
     });
 

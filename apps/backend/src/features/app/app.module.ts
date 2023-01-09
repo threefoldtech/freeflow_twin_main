@@ -20,6 +20,7 @@ import { QuantumModule } from '../quantum/quantum.module';
 import { UserModule } from '../user/user.module';
 import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 import { ContainerModule } from '../container/container.module';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
     imports: [
@@ -55,6 +56,7 @@ import { ContainerModule } from '../container/container.module';
         PostModule,
         QuantumModule,
         ContainerModule,
+        FirebaseModule,
     ],
 })
 export class AppModule {

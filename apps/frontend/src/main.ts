@@ -77,17 +77,7 @@ async function startVueApp() {
 
     await sleep(1000);
 
-    //@ts-ignore
-    console.log('CALLED VUE_INITIALIZED');
-
-    //@ts-ignore
-    window.flutter_inappwebview.callHandler('VUE_INITIALIZED');
-
-    //@ts-ignore
-    window.flutter_inappwebview.callHandler('RETRIEVE_IDENTIFIER').then(function (data) {
-        console.log('Reaching RETRIEVE_IDENTIFIER');
-        console.log(data);
-    });
+    await globalThis.flutter_inappwebview.callHandler('VUE_INITIALIZED');
 }
 
 startVueApp();

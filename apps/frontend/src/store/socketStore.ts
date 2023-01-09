@@ -54,6 +54,9 @@ const initializeSocket = (username: string) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
         if (message.type !== 'READ' && !isChatOpen)
             createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
+
+        //     @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
+
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
