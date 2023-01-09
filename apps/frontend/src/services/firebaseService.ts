@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import { useAuthState } from '@/store/authStore';
+import { sleep } from '@/utils';
 
 export interface PostNotificationDto {
     timestamp: string;
@@ -13,7 +14,7 @@ export interface PostNotificationDto {
 
 export const retrieveFirebaseIdentifier = async (): Promise<string> => {
     // Sleep is needed due race conditions
-    await sleep(0.5);
+    await sleep(1);
 
     let firebaseIdentifier = await globalThis.flutter_inappwebview.callHandler('RETRIEVE_IDENTIFIER');
 
