@@ -57,13 +57,13 @@
         console.log('This is the users profile');
         console.log(profile);
 
-        await sendIdentifierToBackend();
-
         if (profile.username) {
             user.id = profile.username;
             user.email = profile.email;
             user.image = `${window.location.origin}/api/v2/user/avatar`;
         }
+
+        await sendIdentifierToBackend();
     });
 
     console.log('Version: ' + version);

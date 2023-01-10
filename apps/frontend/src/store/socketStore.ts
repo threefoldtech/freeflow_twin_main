@@ -14,6 +14,9 @@ import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
 import { allSocialPosts } from '@/store/socialStore';
 import { PostNotificationDto, sendNotificationToBackend } from '@/services/firebaseService';
+import { isUserMobile } from '@/utils/webview.utils';
+
+export let connectedSocketId = '';
 
 const state = reactive<State>({
     socket: '',
@@ -35,11 +38,10 @@ const initializeSocket = (username: string) => {
     state.socket = inject('socket');
 
     state.socket.on('connect', () => {
+        connectedSocketId = state.socket.id;
         console.log('connected with socket.');
     });
-    state.socket.emit('identify', {
-        name: username,
-    });
+
     state.socket.on('chat_removed', (chatId: string) => {
         removeChat(chatId);
         const { removeUnreadChats } = usechatsActions();
@@ -54,10 +56,15 @@ const initializeSocket = (username: string) => {
     state.socket.on('message', async (message: Message<any>) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
 
-        //     @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
+        // @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
 
         if (message.type !== 'READ' && !isChatOpen) {
-            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
+            console.log('JOEHOE');
+            if (!isUserMobile)
+                createOSNotification(
+                    'Message received',
+                    `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`
+                );
 
             const mobileNotification: PostNotificationDto = {
                 message: message.body,

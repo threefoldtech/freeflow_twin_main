@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import { useAuthState } from '@/store/authStore';
-import { sleep } from '@/utils';
+import { isUserMobile, retrieveFirebaseIdentifier } from '@/utils/webview.utils';
 
 export interface PostNotificationDto {
     message: string;
@@ -9,22 +9,18 @@ export interface PostNotificationDto {
     group: string;
 }
 
-export const retrieveFirebaseIdentifier = async (): Promise<string> => {
-    // Sleep is needed due race conditions
-    await sleep(1);
-
-    let firebaseIdentifier = await globalThis.flutter_inappwebview.callHandler('RETRIEVE_IDENTIFIER');
-
-    return firebaseIdentifier ?? '';
-};
-
 export const sendIdentifierToBackend = async (): Promise<void> => {
     console.log('Saving identifier to backend');
     const { user } = useAuthState();
 
     const identifier = await retrieveFirebaseIdentifier();
 
-    if (!identifier || identifier == '') return;
+    if (!identifier || identifier == '') {
+        isUserMobile.value = false;
+        return;
+    }
+
+    isUserMobile.value = true;
 
     const appId = user.id + '.' + config.getAppId();
 
