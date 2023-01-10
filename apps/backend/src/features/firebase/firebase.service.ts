@@ -18,7 +18,7 @@ export class FirebaseService {
         try {
             const userId = await this._configService.get<string>('userId');
             const sk = await this._keyService.getKey({ userId: userId, keyType: KeyType.Private });
-            const pk = await this._keyService.getKey({ userId: userId, keyType: KeyType.Public });
+
             const header = { intention: 'identify' };
 
             const signedHeader = this._encryptionService.createSignature({ data: header, secretKey: sk.key });
