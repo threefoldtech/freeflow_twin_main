@@ -265,7 +265,7 @@
 </template>
 
 <script setup lang="ts">
-    import { nextTick, onBeforeMount, ref, watch } from 'vue';
+    import { nextTick, ref, watch } from 'vue';
     import {
         selectedPaths,
         deleteFiles,
@@ -282,13 +282,13 @@
     import Button from '@/components/Button.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
-    import { usechatsActions, useChatsState } from '@/store/chatStore';
+    import { useChatsState } from '@/store/chatStore';
 
     import { showShareDialog } from '@/services/dialogService';
     import {
         currentRightClickedItem,
-        RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM,
-        RIGHT_CLICK_TYPE,
+        RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM,
+        rightClickedItemIsFile,
         rightClickItemAction,
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
@@ -298,12 +298,9 @@
     import Tooltip from '@/components/Tooltip.vue';
 
     const { chats } = useChatsState();
-    const { retrieveChats } = usechatsActions();
 
-    let debounce;
     const tabs = ['Create shares', 'Edit shares'];
     const newNameInput = ref<HTMLInputElement>();
-    const showDeleteDialog = ref(false);
     const showRenameDialog = ref(false);
     const newName = ref<string>('');
     const showSelectedActions = ref(false);
@@ -316,10 +313,6 @@
             newNameInput.value.focus();
         });
     };
-
-    onBeforeMount(() => {
-        retrieveChats();
-    });
 
     const doRenameFile = (rename: boolean) => {
         if (rename) renameFile(selectedPaths.value[0], newName.value);
@@ -344,35 +337,37 @@
         selectedTab.value = 0;
     };
 
+    const showDeleteDialog = ref(false);
+
     watch(
         triggerWatchOnRightClickItem,
         async () => {
-            if (currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.LOCAL_FILE) {
-                selectedPaths.value.length = 0;
-                //@ts-ignore
-                selectedPaths.value[0] = currentRightClickedItem.value.data;
-                switch (rightClickItemAction.value) {
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DELETE:
-                        showDeleteDialog.value = true;
-                        break;
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.RENAME:
-                        showRenameDialog.value = true;
-                        newName.value = currentRightClickedItem.value.data.name;
-                        nextTick(() => {
-                            newNameInput.value.focus();
-                        });
-                        break;
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.DOWNLOAD:
-                        await downloadFiles();
-                        break;
-                    case RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM.SHARE:
-                        showShareDialog.value = true;
-                        break;
-                    default:
-                        break;
-                }
+            if (!rightClickedItemIsFile(currentRightClickedItem.value)) return;
+
+            selectedPaths.value.length = 0;
+            selectedPaths.value[0] = currentRightClickedItem.value.data;
+            switch (rightClickItemAction.value) {
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.DELETE:
+                    showDeleteDialog.value = true;
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.RENAME:
+                    showRenameDialog.value = true;
+                    newName.value = currentRightClickedItem.value.data.name;
+                    await nextTick(() => newNameInput.value.focus());
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.DOWNLOAD:
+                    await downloadFiles();
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM.SHARE:
+                    showShareDialog.value = true;
+                    break;
+
+                default:
+                    break;
             }
-            return;
         },
         { deep: true }
     );

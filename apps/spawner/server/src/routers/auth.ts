@@ -3,7 +3,7 @@ import { appCallback, getAppLoginUrl } from '../service/authService';
 
 export const router = Router();
 
-router.get('/signin/:name', async (request, respose) => {
+router.get('/signIn/:name', async (request, respose) => {
     console.log(request.rawHeaders);
     console.log(request.cookies);
     const name = request.params.name;

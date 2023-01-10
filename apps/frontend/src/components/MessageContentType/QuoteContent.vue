@@ -7,7 +7,7 @@
             class="quote"
         >
             <div v-if="!preventRecursion" class="pl-4 border-l-2 border-gray-400 my-message:border-icon">
-                <div v-if="message.body.quotedMessage !== 'SYSTEM'" class="font-bold my-message:text-icon">
+                <div class="font-bold my-message:text-icon">
                     {{ message.body.quotedMessage.from }}
                 </div>
                 <MessageContent :message="message.body.quotedMessage" preventRecursion></MessageContent>
@@ -20,9 +20,10 @@
 
 <script lang="ts" setup>
     import MessageContent from '../MessageContent.vue';
+    import { Message, QuoteBodyType } from '@/types';
 
     interface IProp {
-        message: Object;
+        message: Message<QuoteBodyType>;
         preventRecursion?: boolean;
     }
 

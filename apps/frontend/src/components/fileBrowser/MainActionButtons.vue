@@ -134,29 +134,9 @@
     import { PlusSmIcon as PlusSmIconOutline, FolderAddIcon, DocumentAddIcon } from '@heroicons/vue/outline';
     import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
 
-    const showCreateFolderDialog = ref(false);
     const showCreateFileDialog = ref(false);
-    const showMainActionsOverlay = ref(false);
-    const newFolderInput = ref<HTMLInputElement>();
-    const newFileInput = ref<any>(undefined);
     const selectedFiles = ref<File[]>([]);
-    const newFileInputArray = ref<File[]>([]);
-    const createFolderErrors = ref<string[]>([]);
-    const manualContactAdd = ref<string>('');
     const fileUploadErrors = ref<string>('');
-
-    watch(manualContactAdd, () => {
-        createFolderErrors.value = [];
-        if (hasSpecialCharacters(manualContactAdd.value))
-            createFolderErrors.value.push('No special characters allowed in folder names.');
-
-        if (manualContactAdd.value.includes('/')) {
-            createFolderErrors.value.push("'/' is not allowed in folder names.");
-        }
-        if (manualContactAdd.value.length >= 50) {
-            createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
-        }
-    });
 
     const updateCreateFileDialog = (val: boolean) => {
         if (!val) {
@@ -172,6 +152,10 @@
         clearFiles();
         showCreateFileDialog.value = false;
     };
+
+    const showCreateFolderDialog = ref(false);
+    const showMainActionsOverlay = ref(false);
+    const newFolderInput = ref<HTMLInputElement>();
 
     const showNewFolderDialog = () => {
         showCreateFolderDialog.value = true;
@@ -191,6 +175,8 @@
         selectedFiles.value.push(...files);
     };
 
+    const newFileInput = ref<any>(undefined);
+
     const clearFiles = () => {
         selectedFiles.value = [];
         newFileInput.value.value = null;
@@ -198,6 +184,8 @@
     const clearFolderInput = () => {
         newFolderInput.value.value = '';
     };
+
+    const newFileInputArray = ref<File[]>([]);
 
     const handleFileSelectChange = () => {
         newFileInputArray.value = Array.from(newFileInput.value?.files);
@@ -210,9 +198,8 @@
         });
     };
 
-    watch(showCreateFolderDialog, () => {
-        manualContactAdd.value = '';
-    });
+    const createFolderErrors = ref<string[]>([]);
+    const manualContactAdd = ref<string>('');
 
     const updateCreateFolderDialog = (val: boolean) => {
         createFolderErrors.value = [];
@@ -246,6 +233,23 @@
         newFileInputArray.value.splice(newFileInputArray.value.indexOf(file), 1);
         newFileInput.value.value = newFileInputArray.value;
     };
+
+    watch(manualContactAdd, () => {
+        createFolderErrors.value = [];
+        if (hasSpecialCharacters(manualContactAdd.value))
+            createFolderErrors.value.push('No special characters allowed in folder names.');
+
+        if (manualContactAdd.value.includes('/')) {
+            createFolderErrors.value.push("'/' is not allowed in folder names.");
+        }
+        if (manualContactAdd.value.length >= 50) {
+            createFolderErrors.value.push('Folder names have a maximum character length of 50 characters.');
+        }
+    });
+
+    watch(showCreateFolderDialog, () => {
+        manualContactAdd.value = '';
+    });
 </script>
 
 <style scoped></style>

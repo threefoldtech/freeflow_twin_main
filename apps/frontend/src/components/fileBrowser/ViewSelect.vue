@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
     import { ViewGridIcon, ViewListIcon } from '@heroicons/vue/solid';
-    import { fileBrowserTypeView, sharedDir, sharedWithMeCurrentFolder } from '@/store/fileBrowserStore';
+    import { fileBrowserTypeView } from '@/store/fileBrowserStore';
 
     const props = defineProps<{ searchDirValue?: string }>();
 </script>

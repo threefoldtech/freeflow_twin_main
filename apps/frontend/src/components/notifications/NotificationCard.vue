@@ -10,18 +10,26 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, PropType } from 'vue';
+    import { computed } from 'vue';
     import { Notification, NotificationType, ProgressNotification } from '@/types/notifications';
     import InfoNotification from '@/components/notifications/InfoNotification.vue';
     import ProgressNotificationComponent from '@/components/notifications/ProgressNotification.vue';
     import { destroyNotification } from '@/store/notificiationStore';
 
     interface IProp {
-        notification: Object;
+        notification: Notification;
+    }
+
+    interface IBody {
+        content: any;
+        props: {
+            notification: Notification;
+        };
     }
 
     const props = defineProps<IProp>();
-    const body = computed(() => {
+
+    const body = computed<IBody>(() => {
         if (props.notification.type === NotificationType.Info)
             return {
                 content: InfoNotification,
