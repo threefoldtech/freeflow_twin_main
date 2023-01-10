@@ -50,7 +50,7 @@ export const sendNotificationToBackend = async (notificationData: PostNotificati
         appId: appId,
     };
 
-    console.log('Posting to :', `${config.baseUrl}api/v2/firebase/notifiy`);
+    console.log('Posting to :', `${config.baseUrl}api/v2/firebase/notify`);
     console.log('Data: ', data);
     try {
         await axios.post(`${config.baseUrl}api/v2/firebase/notify`, data);
