@@ -28,6 +28,8 @@ export const sendIdentifierToBackend = async (): Promise<void> => {
     const identifier = await retrieveFirebaseIdentifier();
     const appId = user.id + '.' + config.getAppId();
 
+    console.log('Posting to :', `${config.baseUrl}api/v2/firebase/identify`);
+    console.log('Data: ', { appId: appId, identifier: identifier });
     try {
         await axios.post(`${config.baseUrl}api/v2/firebase/identify`, { appId: appId, identifier: identifier });
     } catch (e) {

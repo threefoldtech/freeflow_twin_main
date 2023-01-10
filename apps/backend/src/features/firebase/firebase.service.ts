@@ -24,6 +24,13 @@ export class FirebaseService {
             const signedHeader = this._encryptionService.createSignature({ data: header, secretKey: sk.key });
             const encodedHeader = Buffer.from(signedHeader).toString('base64');
 
+            console.log('Saving identifier to microservice with following values: ');
+            console.log({
+                username: userId + '.3bot',
+                appId: identificationData.appId,
+                identifier: identificationData.identifier,
+            });
+
             await axios.post(
                 'https://europe-west2-jimberlabs.cloudfunctions.net/api/identify',
                 {
