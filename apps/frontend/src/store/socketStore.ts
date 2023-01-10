@@ -58,7 +58,6 @@ const initializeSocket = (username: string) => {
         // @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
 
         if (message.type !== 'READ' && !isChatOpen) {
-            console.log('JOEHOE');
             if (!isUserMobile)
                 createOSNotification(
                     'Message received',
@@ -71,7 +70,7 @@ const initializeSocket = (username: string) => {
                 sender: message.from.toString(),
             };
 
-            await sendNotificationToBackend(mobileNotification);
+            sendNotificationToBackend(mobileNotification);
         }
 
         const { user } = useAuthState();
