@@ -13,6 +13,7 @@ import config from '@/config';
 import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
 import { allSocialPosts } from '@/store/socialStore';
+import { PostNotificationDto, sendNotificationToBackend } from '@/services/firebaseService';
 
 const state = reactive<State>({
     socket: '',
@@ -50,12 +51,22 @@ const initializeSocket = (username: string) => {
     state.socket.on('chat_unblocked', (chatId: string) => {
         removeUserFromBlockList(chatId);
     });
-    state.socket.on('message', (message: Message<any>) => {
+    state.socket.on('message', async (message: Message<any>) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
-        if (message.type !== 'READ' && !isChatOpen)
-            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
 
         //     @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
+
+        if (message.type !== 'READ' && !isChatOpen) {
+            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
+
+            const mobileNotification: PostNotificationDto = {
+                message: message.body,
+                group: 'false',
+                sender: message.from.toString(),
+            };
+
+            await sendNotificationToBackend(mobileNotification);
+        }
 
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {

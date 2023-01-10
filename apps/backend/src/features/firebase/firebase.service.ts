@@ -60,7 +60,7 @@ export class FirebaseService {
             const signedHeader = this._encryptionService.createSignature({ data: header, secretKey: sk.key });
             const encodedHeader = Buffer.from(signedHeader).toString('base64');
 
-            await axios.post('https://europe-west2-jimberlabs.cloudfunctions.net/api/notify', notificationData, {
+            await axios.post('https://europe-west2-jimberlabs.cloudfunctions.net/api/notification', notificationData, {
                 headers: {
                     'Jimber-Authorization': encodedHeader,
                 },
