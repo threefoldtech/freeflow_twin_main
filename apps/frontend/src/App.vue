@@ -60,9 +60,9 @@
             user.id = profile.username;
             user.email = profile.email;
             user.image = `${window.location.origin}/api/v2/user/avatar`;
-        }
 
-        await sendIdentifierToBackend();
+            await sendIdentifierToBackend();
+        }
     });
 
     console.log('Version: ' + version);

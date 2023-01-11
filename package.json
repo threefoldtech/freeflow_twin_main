@@ -8,9 +8,9 @@
         "prepare": "husky install"
     },
     "devDependencies": {
+        "husky": "^7.0.0",
         "prettier": "^2.6.2",
-        "turbo": "^1.2.5",
-        "husky": "^7.0.0"
+        "turbo": "^1.2.5"
     },
     "workspaces": [
         "packages/*",
