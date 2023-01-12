@@ -51,10 +51,10 @@
     });
 
     const joinVideo = () => {
-      if (isMobile()) {
-        createNotification('Not supported', 'Video chat is not supported on mobile devices');
-        return;
-      }
+        if (isMobile()) {
+            createNotification('Not supported', 'Video chat is not supported on mobile devices');
+            return;
+        }
 
         const id = getVideoRoomId();
         const msg = {
