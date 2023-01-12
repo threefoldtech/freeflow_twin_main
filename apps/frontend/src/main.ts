@@ -31,13 +31,11 @@ axios.interceptors.response.use(
 );
 
 const initializeFlutterInAppWebViewPolyFill = () => {
-    //@ts-ignore
-    if (window.flutter_inappwebview) {
+    if (globalThis.flutter_inappwebview) {
         return;
     }
 
-    //@ts-ignore
-    window.flutter_inappwebview = {
+    globalThis.flutter_inappwebview = {
         async callHandler(key, ...args) {
             console.log('Webview event called: ', {
                 key,

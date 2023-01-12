@@ -64,13 +64,12 @@ export class FirebaseService {
             //     publicKey: pk.key,
             // });
 
-            console.log('This is encrypted message');
-            console.log(notificationData.message);
-
             const header = { intention: 'notification' };
 
             const signedHeader = this._encryptionService.createSignature({ data: header, secretKey: sk.key });
             const encodedHeader = Buffer.from(signedHeader).toString('base64');
+
+            console.log('Posting notification to firebase sync');
 
             await axios.post('https://europe-west2-jimberlabs.cloudfunctions.net/api/notification', notificationData, {
                 headers: {
