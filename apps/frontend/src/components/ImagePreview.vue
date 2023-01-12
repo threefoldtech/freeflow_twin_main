@@ -30,7 +30,6 @@
 </template>
 
 <script setup lang="ts">
-    import { computed } from 'vue';
     import { clearImageSrc, getImageSrc } from '@/store/imageStore';
 
     const close = () => {

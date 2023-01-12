@@ -21,11 +21,12 @@ import { useSocketActions } from './socketStore';
 import { useAuthState } from './authStore';
 import config from '@/config';
 import { uuidv4 } from '@/common';
-import { startFetchStatusLoop } from '@/store/statusStore';
+import { startFetchStatus } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
 import { FileAction } from 'custom-types/file-actions.type';
+import { useDebounceFn } from '@vueuse/core';
 
 const messageLimit = 50;
 const state = reactive<ChatState>({
@@ -35,7 +36,6 @@ const state = reactive<ChatState>({
     unreadChats: [],
 });
 
-export const selectedId = ref('');
 export const selectedMessageId = ref(undefined);
 export const isLoading = ref(false);
 
@@ -46,11 +46,13 @@ export enum MessageAction {
 
 interface MessageState {
     actions: {
-        [key: string]: {
-            message: Message<any>;
-            type: MessageAction;
-        };
+        [key: string]: MessageActionBody;
     };
+}
+
+export interface MessageActionBody {
+    message: Message<any>;
+    type: MessageAction;
 }
 
 export const messageState = reactive<MessageState>({
@@ -75,19 +77,17 @@ export const clearMessageAction = (chatId: string) => {
 };
 
 const retrieveChats = async () => {
+    if (state.chats.length > 0) return state.chats;
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
-    await axios.get(`${config.baseUrl}api/v2/chats`, { params: params }).then(response => {
-        const incomingchats = response.data;
+    const res = await axios.get(`${config.baseUrl}api/v2/chats`, { params: params });
+    const incomingChats = res.data;
 
-        // debugger
-        incomingchats.forEach((chat: Chat) => {
-            addChat(chat);
-        });
-        sortChats();
-        isLoading.value = false;
-    });
+    incomingChats.forEach((chat: Chat) => addChat(chat));
+    sortChats();
+    isLoading.value = false;
+    return incomingChats;
 };
 
 export const editMessage = (chatId: string, message: any, messageId?: string) => {
@@ -133,7 +133,7 @@ const addChat = (chat: Chat) => {
         const { user } = useAuthState();
         const otherContact: Contact = <Contact>chat?.contacts?.find(c => c.id !== user.id);
         if (otherContact) {
-            startFetchStatusLoop(otherContact);
+            startFetchStatus(otherContact);
         }
     }
 
@@ -150,10 +150,9 @@ export const removeChat = (chatId: string) => {
     state.chats = state.chats.filter(c => c.chatId !== chatId);
     state.chatRequests = state.chatRequests.filter(c => c.chatId !== chatId);
     sortChats();
-    selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
-const addGroupchat = (name: string, contacts: GroupContact[]) => {
+const addGroupChat = (name: string, contacts: GroupContact[]) => {
     const { user } = useAuthState();
 
     const contactInGroup = contacts
@@ -187,7 +186,7 @@ const addGroupchat = (name: string, contacts: GroupContact[]) => {
             },
         ],
         name: name,
-        adminId: user.id.toString(),
+        adminId: user.id,
         read: null,
         acceptedChat: true,
         draft: null,
@@ -341,7 +340,7 @@ const addMessage = (chatId: string, message: any) => {
     }
 
     if (message.type === 'EDIT') {
-        const index = chat.messages.findIndex(mes => mes.id.toString() === message.id.toString());
+        const index = chat.messages.findIndex(mes => mes.id === message.id.toString());
 
         if (index === -1) return;
         message.type = chat.messages[index].type;
@@ -652,10 +651,10 @@ export const useChatsState = () => {
     };
 };
 
-export const draftMessage = (chatId: string, message: any) => {
+export const draftMessage = useDebounceFn((chatId: string, message: any) => {
     getChat(chatId).draft = message;
     axios.put(`${config.baseUrl}api/v2/chats/draft`, message);
-};
+}, 500);
 
 export const usechatsActions = () => {
     return {
@@ -665,7 +664,7 @@ export const usechatsActions = () => {
         addMessage,
         sendFile,
         sendMessageObject,
-        addGroupchat,
+        addGroupChat,
         readMessage,
         acceptChat,
         removeChat,
@@ -693,6 +692,14 @@ interface ChatState {
     chatRequests: Chat[];
     chatInfo: ChatInfo;
     unreadChats: string[];
+}
+
+export interface IShareChat {
+    name: string;
+    chatId: string;
+    canWrite: boolean;
+    isAlreadySent: boolean;
+    loading: boolean;
 }
 
 export const handleRead = (message: Message<string>) => {

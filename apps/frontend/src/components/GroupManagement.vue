@@ -64,7 +64,7 @@
         </div>
         <ul role="list" class="divide-y divide-gray-200 w-full border-t">
             <li
-                v-for="(contact, idx) in chat.contacts"
+                v-for="contact in chat.contacts"
                 :key="contact.id + chat.contacts.length"
                 class="py-3 px-3 sm:px-4 grid grid-cols-2 items-center"
             >
@@ -72,7 +72,7 @@
                     @click="$emit('clickedProfile', contact)"
                     class="flex items-center justify-self-start overflow-hidden overflow-ellipsis cursor-pointer"
                 >
-                    <AvatarImg :id="String(contact.id)" :contact="contact" small />
+                    <AvatarImg :id="contact.id" :contact="contact" small />
                     <div class="ml-3">
                         <p class="text-sm font-medium text-gray-900">{{ contact.id }}</p>
                     </div>
@@ -111,9 +111,9 @@
                 v-for="file in sidebarFileList"
             >
                 <a :href="calcExternalResourceLink(file.body.url)" class="block outline-none border-none"
-                    ><i :class="getIconDirty(false, getFileType(file.fileType))" class="fa-lg"></i>
+                    ><i :class="getIcon(false, getFileType(getExtension(file.body.filename)))" class="fa-lg"></i>
                     <span class="ml-2 font-normal text-gray-800" :title="moment(file.timeStamp).fromNow()">{{
-                        truncate(file)
+                        truncate(file.body)
                     }}</span>
                 </a>
             </li>
@@ -248,16 +248,16 @@
 <script setup lang="ts">
     import { computed, ref, watch } from 'vue';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { usechatsActions } from '../store/chatStore';
-    import { useContactsState } from '../store/contactStore';
-    import { useAuthState } from '../store/authStore';
+    import { usechatsActions } from '@/store/chatStore';
+    import { useContactsState } from '@/store/contactStore';
+    import { useAuthState } from '@/store/authStore';
     import { blocklist, getUnblockedContacts, userIsBlocked } from '@/store/blockStore';
     import { UserAddIcon, XIcon } from '@heroicons/vue/outline';
     import { ChevronDoubleDownIcon, ChevronDoubleUpIcon, TrashIcon } from '@heroicons/vue/solid';
-    import { getFileType, getIconDirty, isMobile } from '@/store/fileBrowserStore';
+    import { getFileType, getIcon, getExtension, isMobile } from '@/store/fileBrowserStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import moment from 'moment';
-    import { Chat, Contact, GroupContact, MessageTypes, Roles, SystemMessageTypes } from '@/types';
+    import { Chat, Contact, GroupContact, MessageBodyType, MessageTypes, Roles, SystemMessageTypes } from '@/types';
     import Alert from '@/components/Alert.vue';
     import { useDebounceFn } from '@vueuse/core';
 
@@ -273,15 +273,10 @@
     const props = defineProps<IProps>();
 
     const sidebarFileList = computed(() => {
-        const files = props.chat.messages.filter(msg => msg.type === MessageTypes.FILE);
-        files.map(file => {
-            const url = file.body.url;
-            file.body.url = url;
-        });
-        return files;
+        return props.chat.messages.filter(msg => msg.type === MessageTypes.FILE);
     });
 
-    defineEmits([
+    const emit = defineEmits([
         'app-call',
         'app-block',
         'app-delete',
@@ -291,42 +286,27 @@
         'clickedProfile',
     ]);
 
-    const searchInput = ref<string>('');
-    const openAddUserToGroup = ref<boolean>(false);
-
-    const filteredMembers = computed(() => {
-        const { groupContacts } = useContactsState();
-        return groupContacts
-            .filter(con => !props.chat.contacts.some(c => c.id === con.id))
-            .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()))
-            .filter(c => !blocklist.value.includes(c.id.toString()));
-    });
-
-    const unblockedMembers = ref<GroupContact[]>(filteredMembers.value);
-
-    const loadUnblocked = async () => {
-        unblockedMembers.value = await getUnblockedContacts(filteredMembers.value, user.id.toString());
-    };
-
-    watch(filteredMembers, val => {
-        loadUnblocked();
-    });
+    const openAddUserToGroup = ref(false);
 
     const showRemoveUserDialog = ref(false);
     const showChangeUserRoleDialog = ref(false);
     const selectedUser = ref<GroupContact>();
 
-    const truncate = ({ body, extension }) => {
+    const truncate = (body: MessageBodyType) => {
         return body.filename?.length < 30
             ? body.filename
             : `${body?.filename?.slice(0, 15)}...${body?.filename?.slice(-15)}`;
     };
 
     const changeUserRole = (contact: GroupContact | Contact) => {
-        if ('roles' in contact) {
-            showChangeUserRoleDialog.value = true;
-            selectedUser.value = contact;
-        }
+        if (!isGroupContact(contact)) return;
+
+        showChangeUserRoleDialog.value = true;
+        selectedUser.value = contact;
+    };
+
+    const isGroupContact = (contact: Contact): contact is GroupContact => {
+        return !!(contact as GroupContact).roles;
     };
 
     const doChangeUserRole = () => {
@@ -344,11 +324,13 @@
         showRemoveUserDialog.value = true;
         selectedUser.value = contact;
     };
+
     const doRemoveFromGroup = () => {
         updateContactsInGroup(props.chat.chatId, selectedUser.value, SystemMessageTypes.REMOVE_USER);
         showRemoveUserDialog.value = false;
         selectedUser.value = null;
     };
+
     const addToGroup = useDebounceFn(async contact => {
         if (selectedUser.value?.id === contact.id) return;
         selectedUser.value = contact;
@@ -356,7 +338,6 @@
     }, 20);
 
     const isAdmin = computed(() => {
-        //@ts-ignore
         return props.chat.adminId == user.id;
     });
 
@@ -370,6 +351,26 @@
     const blocked = computed(() => {
         if (!props.chat || props.chat.isGroup) return false;
         return userIsBlocked(props.chat.chatId.toString());
+    });
+
+    const searchInput = ref('');
+
+    const filteredMembers = computed(() => {
+        const { groupContacts } = useContactsState();
+        return groupContacts
+            .filter(con => !props.chat.contacts.some(c => c.id === con.id))
+            .filter(c => c.id.toLowerCase().includes(searchInput.value.toLowerCase()))
+            .filter(c => !blocklist.value.includes(c.id.toString()));
+    });
+
+    const unblockedMembers = ref<GroupContact[]>(filteredMembers.value);
+
+    const loadUnblocked = async () => {
+        unblockedMembers.value = await getUnblockedContacts(filteredMembers.value, user.id.toString());
+    };
+
+    watch(filteredMembers, () => {
+        loadUnblocked();
     });
 </script>
 

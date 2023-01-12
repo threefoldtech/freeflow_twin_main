@@ -49,8 +49,8 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent, onMounted, PropType, ref } from 'vue';
-    import { NotificationType, ProgressNotification, Status } from '@/types/notifications';
+    import { computed } from 'vue';
+    import { ProgressNotification, Status } from '@/types/notifications';
 
     interface IProps {
         notification: ProgressNotification;
@@ -63,7 +63,7 @@
     const getPercentage = computed(() => {
         if (props.notification.max === 1) return ~~(progress.value * 100);
 
-        return ~~((progress.value / props.notification.max) * 100);
+        return Math.floor((progress.value / props.notification.max) * 100);
     });
 
     const getProgress = computed(() => {

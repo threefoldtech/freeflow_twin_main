@@ -2,11 +2,6 @@ import { reactive } from '@vue/reactivity';
 import axios from 'axios';
 import { User } from '../types';
 
-export const getMyStatus = async () => {
-    const res = await axios.get(`${window.location.origin}/api/v2/user/status`);
-    return res.data.status;
-};
-
 const authState = reactive<AuthState>({
     user: {
         id: window.location.host.split('.')[0].replace('localhost:8080', 'localhost:3000'),

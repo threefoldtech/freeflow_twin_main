@@ -31,19 +31,19 @@
                             <div class="sm:flex sm:items-start">
                                 <div
                                     :class="{
-                                        'bg-red-100': type == 'warning',
-                                        'bg-green-100': type == 'success',
-                                        'bg-blue-100': type == 'info',
+                                        'bg-red-100': type === 'warning',
+                                        'bg-green-100': type === 'success',
+                                        'bg-blue-100': type === 'info',
                                     }"
                                     class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10"
                                 >
                                     <information-circle-icon
-                                        v-if="type == 'info'"
+                                        v-if="type === 'info'"
                                         class="h-6 w-6 text-blue-600"
                                         aria-hidden="true"
                                     />
                                     <check-circle-icon
-                                        v-else-if="type == 'success'"
+                                        v-else-if="type === 'success'"
                                         class="h-6 w-6 text-green-600"
                                         aria-hidden="true"
                                     />
@@ -72,14 +72,17 @@
 <script lang="ts" setup>
     import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
     import { ExclamationIcon, InformationCircleIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+
     interface IProps {
         showAlert: boolean;
         type?: string;
     }
+
     const { showAlert, type } = withDefaults(defineProps<IProps>(), {
         showAlert: false,
         type: 'warning',
     });
+
     const emit = defineEmits(['close']);
     const close = () => {
         emit('close');

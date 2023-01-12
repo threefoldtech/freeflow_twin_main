@@ -171,14 +171,14 @@ export const commentOnPost = async (
         id: uuidv4(),
         body: message,
         owner: {
-            id: String(user.id),
+            id: user.id,
             location: user.location,
         },
         post: {
             id: item.post.id,
             owner: {
-                location: String(item.owner.location),
-                id: String(item.owner.id),
+                location: item.owner.location,
+                id: item.owner.id,
             },
         },
         type: isReplyToComment ? CommentType.COMMENT_REPLY : CommentType.COMMENT,
@@ -192,7 +192,7 @@ export const commentOnPost = async (
 };
 
 export const updateSomeoneIsTyping = (postId: string, userId: string) => {
-    if (user.id.toString() === userId) return;
+    if (user.id === userId) return;
     const id = uuidv4();
     allSocialPosts.value = allSocialPosts?.value.map((item, idx) => {
         if (item.post.id === postId) {

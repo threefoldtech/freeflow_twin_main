@@ -29,11 +29,11 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "http://localhost:3000/nest/auth/signin?username=edward",
+                            "raw": "http://localhost:3000/nest/auth/signIn?username=edward",
                             "protocol": "http",
                             "host": ["localhost"],
                             "port": "3000",
-                            "path": ["nest", "auth", "signin"],
+                            "path": ["nest", "auth", "signIn"],
                             "query": [
                                 {
                                     "key": "username",

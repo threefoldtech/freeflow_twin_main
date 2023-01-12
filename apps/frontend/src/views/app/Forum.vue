@@ -6,7 +6,6 @@
 
 <script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
-    import { defineComponent } from 'vue';
 
     const forumUrl = 'https://browser.jimber.org/?browsercontrols=false#https://forum.threefold.io/';
 </script>

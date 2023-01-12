@@ -36,9 +36,8 @@
 
 <script lang="ts" setup>
     import { computed } from 'vue';
-    import { findLastIndex } from 'lodash';
     import { useAuthState } from '@/store/authStore';
-    import { Chat, FileTypes, Message, MessageBodyType, MessageTypes, SystemBody } from '@/types';
+    import { Chat, FileShareMessageType, FileTypes, MessageTypes, QuoteBodyType, SystemBody } from '@/types';
     import moment from 'moment';
     import { statusList } from '@/store/statusStore';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -47,31 +46,21 @@
     import { usechatsActions } from '@/store/chatStore';
 
     const { newUnreadChats, removeUnreadChats } = usechatsActions();
+    const { user } = useAuthState();
 
     interface IProps {
         chat: Chat;
         collapsed: Boolean;
     }
-
     const props = defineProps<IProps>();
-    defineEmits(['selectChat']);
-    const { user } = useAuthState();
+    const emit = defineEmits(['selectChat']);
 
-    const lastReadByMe = computed(() => {
-        let lastReadMessage = props.chat.read[<string>user.id];
-        return findLastIndex(
-            props.chat.messages,
-            (message: Message<MessageBodyType>) => lastReadMessage === message.id
-        );
-    });
     const lastMessage = computed(() => {
-        return props.chat && props.chat.messages && props.chat.messages.length
-            ? props.chat.messages[props.chat.messages.length - 1]
-            : 'No messages yet';
+        const lastIndex = props.chat?.messages?.length - 1;
+        if (!lastIndex) return;
+        return props.chat.messages[lastIndex];
     });
-    const newMessages = computed(() => {
-        return props.chat.messages.length - lastReadByMe.value - 1;
-    });
+
     const timeAgo = time => {
         return moment(time).fromNow();
     };
@@ -81,23 +70,23 @@
     });
 
     const router = useRouter();
-    const currentRoute = computed(() => router.currentRoute.value);
 
     const lastMessageBody = computed(() => {
-        const lstmsg = lastMessage.value;
-        switch (lstmsg.type) {
+        const msg = lastMessage.value;
+        if (!msg) return;
+        switch (msg.type) {
             case 'GIF':
                 return 'Gif was sent';
             case 'QUOTE':
-                return lstmsg.body.message;
+                return (msg.body as QuoteBodyType).message;
             case MessageTypes.SYSTEM:
-                return (lstmsg.body as SystemBody).message;
+                return (msg.body as unknown as SystemBody).message;
             case 'FILE': {
-                if (lstmsg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
+                if (msg.body.type === FileTypes.RECORDING) return 'Voice recording was sent';
                 return 'File has been uploaded';
             }
             case 'FILE_SHARE': {
-                if (lstmsg?.body?.isFolder) {
+                if ((msg?.body as FileShareMessageType)?.isFolder) {
                     return 'Folder has been shared';
                 }
                 return 'File has been shared';
@@ -107,7 +96,7 @@
             }
             case 'DELETE':
             default:
-                return lstmsg.body;
+                return msg.body;
         }
     });
 
@@ -125,7 +114,7 @@
             return 50;
         }
 
-        let missedMessages = props.chat.messages.length - (index + 1);
+        const missedMessages = props.chat.messages.length - (index + 1);
         const chatId = props.chat.chatId;
         missedMessages === 0 ? removeUnreadChats(chatId) : newUnreadChats(chatId);
         return missedMessages;
@@ -138,21 +127,8 @@
 </script>
 
 <style scoped>
-    .content {
-        width: calc(100% - 4rem);
-    }
-
     .name {
         max-width: calc(100% - 150px);
         box-sizing: border-box;
-    }
-
-    .chatcard {
-        box-sizing: border-box;
-        width: 100%;
-    }
-
-    .chatcard:hover {
-        background-color: lightgray;
     }
 </style>
