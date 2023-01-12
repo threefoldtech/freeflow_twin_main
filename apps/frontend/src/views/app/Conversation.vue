@@ -406,7 +406,7 @@
     const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
 
-    const mobile = ref(isMobile());
+    const mobile = ref<boolean>(isMobile());
 
     onMounted(() => {
         nextTick(() => scrollToBottom(true));
