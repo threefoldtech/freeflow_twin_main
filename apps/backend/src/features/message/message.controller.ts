@@ -141,12 +141,17 @@ export class MessageController {
         if (chat.isGroup && chat.adminId === userId) this._chatService.handleGroupAdmin({ chat, message });
 
         const isConnected = (await this._userGateway.getConnections()) > 0;
-        if (!isConnected) {
+
+        // When there is no connection open => send a message
+        // When the message type is different from READ (Since we automatically send a READ message so
+        // the message gets automatically read by ourselves
+
+        if (!isConnected && message.type != MessageType.READ) {
             const postMessage: PostNotificationDto = {
                 timestamp: message.timeStamp.toString(),
-                message: message.body.toString(),
+                message: 'sent you a message',
                 sender: message.from,
-                group: 'false',
+                group: chat.isGroup.toString(),
                 me: userId + '.3bot',
                 appId: this._configService.get('appId'),
             };
