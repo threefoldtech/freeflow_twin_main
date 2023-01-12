@@ -15,6 +15,9 @@ export class FirebaseService {
     ) {}
 
     async sendIdentifierToMicroService(identificationData: PostIdentificationDto) {
+        const isDevelopment = this._configService.get('NODE_ENV') === 'development';
+        if (isDevelopment) return;
+
         try {
             const userId = await this._configService.get<string>('userId');
             const sk = await this._keyService.getKey({ userId: userId, keyType: KeyType.Private });
@@ -51,6 +54,9 @@ export class FirebaseService {
     }
 
     async notifyUserInMicroService(notificationData: PostNotificationDto) {
+        const isDevelopment = this._configService.get('NODE_ENV') === 'development';
+        if (isDevelopment) return;
+
         try {
             const userId = await this._configService.get<string>('userId');
             const sk = await this._keyService.getKey({ userId: userId, keyType: KeyType.Private });

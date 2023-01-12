@@ -11,6 +11,8 @@ import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
 import { MessageController } from './message.controller';
 import { MessageService } from './message.service';
 import { MessageRedisRepository } from './repositories/message-redis.repository';
+import { UserModule } from '../user/user.module';
+import { FirebaseModule } from '../firebase/firebase.module';
 
 @Module({
     imports: [
@@ -21,6 +23,8 @@ import { MessageRedisRepository } from './repositories/message-redis.repository'
         forwardRef(() => QuantumModule),
         forwardRef(() => BlockedContactModule),
         forwardRef(() => ApiModule),
+        forwardRef(() => UserModule),
+        forwardRef(() => FirebaseModule),
         KeyModule,
     ],
     controllers: [MessageController],

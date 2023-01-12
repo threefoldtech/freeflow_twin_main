@@ -9,5 +9,6 @@ import { YggdrasilModule } from '../yggdrasil/yggdrasil.module';
     imports: [KeyModule, forwardRef(() => EncryptionModule), forwardRef(() => YggdrasilModule)],
     controllers: [FirebaseController],
     providers: [FirebaseService],
+    exports: [FirebaseService],
 })
 export class FirebaseModule {}

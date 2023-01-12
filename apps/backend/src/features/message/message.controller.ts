@@ -23,6 +23,9 @@ import {
     StringMessageState,
     SystemMessageState,
 } from './states/message.state';
+import { UserGateway } from '../user/user.gateway';
+import { FirebaseService } from '../firebase/firebase.service';
+import { PostNotificationDto } from '../firebase/dtos/firebase.dtos';
 
 @Controller('messages')
 export class MessageController {
@@ -36,6 +39,8 @@ export class MessageController {
         private readonly _blockedContactService: BlockedContactService,
         private readonly _apiService: ApiService,
         private readonly _chatGateway: ChatGateway,
+        private readonly _userGateway: UserGateway,
+        private readonly _firebaseService: FirebaseService,
         private readonly _quantumService: QuantumService
     ) {
         // contact request handler
@@ -105,6 +110,7 @@ export class MessageController {
 
     @Put()
     async handleIncomingMessage(@Body() message: MessageDTO<unknown>) {
+        console.log('Coming here');
         const blockedContacts = await this._blockedContactService.getBlockedContactIds();
         const isBlocked = blockedContacts.find(c => c === message.from);
 
@@ -133,6 +139,20 @@ export class MessageController {
 
         const userId = this._configService.get<string>('userId');
         if (chat.isGroup && chat.adminId === userId) this._chatService.handleGroupAdmin({ chat, message });
+
+        const isConnected = (await this._userGateway.getConnections()) > 0;
+        if (!isConnected) {
+            const postMessage: PostNotificationDto = {
+                timestamp: message.timeStamp.toString(),
+                message: message.body.toString(),
+                sender: message.from,
+                group: 'false',
+                me: userId + '.3bot',
+                appId: this._configService.get('appId'),
+            };
+
+            this._firebaseService.notifyUserInMicroService(postMessage);
+        }
 
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
     }
