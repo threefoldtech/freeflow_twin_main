@@ -23,7 +23,7 @@
             <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1" @click.stop="selectFile">
                 <i class="fas fa-paperclip transform" style="--tw-rotate: -225deg"></i>
             </button>
-            <input class="hidden" type="file" id="fileinput" ref="fileinput" @change="changeFile" />
+            <input class="hidden" type="file" id="fileInput" ref="fileInput" @change="changeFile" />
             <button
                 class="hover:text-icon mx-2 my-0 p-0 self-center flex-1"
                 @click.stop="startRecording"
@@ -56,7 +56,7 @@
                         @click="tagPerson(contact)"
                         :class="{ 'bg-gray-200': activeTag === idx }"
                     >
-                        <AvatarImg :id="String(contact.id)" small />
+                        <AvatarImg :id="contact.id" small />
                         <div class="ml-3">
                             <p class="text-sm font-medium text-gray-900">
                                 {{ contact.id }}
@@ -100,7 +100,7 @@
                     </button>
                 </div>
                 <div class="flex">
-                    <form class="w-full" @submit.prevent="chatsend" @keydown.enter.exact.prevent="chatsend">
+                    <form class="w-full" @submit.prevent="chatSend" @keydown.enter.exact.prevent="chatSend">
                         <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                             <textarea
                                 v-model="messageInput"
@@ -133,7 +133,7 @@
                         </div>
                     </form>
 
-                    <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatsend">
+                    <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatSend">
                         <i class="fas fa-paper-plane sm:text-[18px] text-[25px]"></i>
                     </button>
                 </div>
@@ -160,6 +160,7 @@
         draftMessage,
         editMessage,
         MessageAction,
+        MessageActionBody,
         messageState,
         replyMessage,
         usechatsActions,
@@ -174,47 +175,38 @@
         MessageTypes,
         QuoteBodyType,
         Contact,
-        AnonymousContact,
+        GroupContact,
     } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { useDebounceFn } from '@vueuse/core';
 
-    const emit = defineEmits(['messageSend', 'failed']);
+    const { sendMessage, sendFile } = usechatsActions();
+    const { addScrollEvent } = useScrollActions();
 
     interface IProps {
         chat: Chat;
     }
 
     const props = defineProps<IProps>();
-
-    // Not actually a vue component but CustomElement ShadowRoot. I know vue doesnt really like it and gives a warning.
     new EmojiPickerElement();
 
-    const { sendMessage, sendFile } = usechatsActions();
-
-    const message = ref(null);
-    const messageInput = ref('');
-    const fileinput = ref();
-    const attachment = ref();
-
-    const stopRecording = ref(null);
-    const showEmoji = ref(false);
-
-    const { addScrollEvent } = useScrollActions();
-
-    const showTagPerson = ref(false);
-    const activeTag = ref(0);
+    const emit = defineEmits(['messageSend', 'failed']);
     const contactsRef = ref([...props.chat.contacts]);
-    const contacts = computed<(Contact | AnonymousContact)[]>({
+    const collapsed = ref(true);
+
+    const contacts = computed<(GroupContact | Contact)[]>({
         get() {
-            return contactsRef.value.sort((a, b) => a.id.localeCompare(String(b.id)));
+            return contactsRef.value.sort((a, b) => a.id.localeCompare(b.id));
         },
         set(newVal) {
             contactsRef.value = newVal;
         },
     });
+
+    const message = ref(null);
 
     const resizeTextarea = () => {
         let area = message.value;
@@ -222,83 +214,29 @@
         area.style.height = area.scrollHeight + 'px';
     };
 
-    if (props.chat.draft) {
-        if (props.chat.draft?.action === 'EDIT') {
-            messageInput.value = String(props.chat.draft.body);
-            editMessage(props.chat.draft.to, props.chat.draft.body, props.chat.draft.id);
-        }
-        if (props.chat.draft?.action === 'REPLY') {
-            messageInput.value = String(props.chat.draft.body.message);
-            replyMessage(props.chat.draft.to, props.chat.draft.body.quotedMessage);
-        }
-        if (!props.chat.draft.action) {
-            messageInput.value = String(props.chat.draft.body ?? '');
-        }
-    }
-    const selectedId = String(props.chat.chatId);
+    const getMessageInput = () => {
+        const draft = props.chat?.draft;
+        if (!draft?.action) return String(draft?.body ?? '');
 
-    const action = computed(() => {
-        if (!selectedId) {
-            return;
+        if (draft?.action === 'EDIT') {
+            editMessage(draft.to, draft.body, draft.id);
+            return String(draft.body);
         }
-        return messageState?.actions[selectedId];
-    });
+
+        const draftBody = draft.body as QuoteBodyType;
+        replyMessage(draft.to, draftBody.quotedMessage);
+        return String(draftBody.message);
+    };
+
+    const messageInput = ref(getMessageInput());
+    const selectedId = props.chat.chatId;
 
     const clearAction = () => {
         messageInput.value = '';
         clearMessageAction(selectedId);
     };
 
-    watch(action, () => {
-        if (action.value && message.value) {
-            message.value.focus();
-        }
-        if (action?.value?.type === MessageAction.EDIT) {
-            if (action.value.message.type === MessageTypes.QUOTE) {
-                messageInput.value = action.value.message.body.message;
-            } else {
-                messageInput.value = action.value.message.body;
-            }
-        }
-        draftMessage(selectedId, createMessage());
-        nextTick(() => {
-            resizeTextarea();
-        });
-    });
-
-    const debounce = (fn: Function, delay: number) => {
-        let timeout: number;
-
-        return (...args: any) => {
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-
-            timeout = setTimeout(() => {
-                fn(...args);
-            }, delay);
-        };
-    };
-
-    const debounceDraft = debounce(() => {
-        draftMessage(selectedId, createMessage());
-    }, 500);
-
-    watch(messageInput, () => {
-        showTagPerson.value = false;
-        const messageInputs = messageInput.value?.split(' ');
-        const latestMessage = messageInputs ? messageInputs[messageInputs.length - 1] : '';
-        if (props.chat.isGroup && latestMessage.startsWith('@')) {
-            showTagPerson.value = true;
-            contacts.value = [...props.chat.contacts].filter(c =>
-                String(c.id).toLowerCase().includes(latestMessage.toLowerCase().substring(1))
-            );
-        }
-
-        debounceDraft();
-    });
-
-    const createEditBody = (action: { message: { body: { message: string }; type: MessageBodyType } }) => {
+    const createEditBody = (action: MessageActionBody) => {
         let newBody = action.message.body;
         //space for later types
         switch (action.message.type) {
@@ -312,6 +250,11 @@
         }
         return newBody;
     };
+
+    const action = computed(() => {
+        if (!selectedId) return;
+        return messageState?.actions[selectedId];
+    });
 
     const createMessage = () => {
         const { user } = useAuthState();
@@ -384,7 +327,11 @@
         return;
     };
 
-    const chatsend = async () => {
+    const attachment = ref();
+    const showEmoji = ref(false);
+    const activeTag = ref(0);
+
+    const chatSend = async () => {
         const atIdx = messageInput.value.lastIndexOf('@');
         if (showTagPerson.value && atIdx > -1) {
             const contact = contacts.value[activeTag.value];
@@ -421,18 +368,22 @@
         showEmoji.value = false;
     };
 
+    const fileInput = ref();
+
     const selectFile = () => {
-        fileinput.value.click();
+        fileInput.value.click();
     };
 
     const changeFile = () => {
-        attachment.value = fileinput.value?.files[0];
+        attachment.value = fileInput.value?.files[0];
         message.value.focus();
     };
 
     const removeFile = () => {
         attachment.value = null;
     };
+
+    const stopRecording = ref(null);
 
     const startRecording = async () => {
         const stream = await navigator.mediaDevices.getUserMedia({
@@ -459,9 +410,11 @@
             stream.getAudioTracks().forEach(at => at.stop());
         };
     };
+
     const toggleEmoji = () => {
         showEmoji.value = !showEmoji.value;
     };
+
     const hideEmoji = () => {
         if (!showEmoji) {
             return;
@@ -470,9 +423,11 @@
     };
 
     const showGif = ref(false);
+
     const toggleGif = () => {
         showGif.value = !showGif.value;
     };
+
     const sendGif = async gif => {
         showGif.value = false;
         const { sendMessage } = usechatsActions();
@@ -480,6 +435,7 @@
         emit('messageSend');
         addScrollEvent();
     };
+
     const hideGif = () => {
         showGif.value = false;
     };
@@ -496,20 +452,14 @@
     });
 
     const onPaste = (e: ClipboardEvent) => {
-        if (!e.clipboardData) {
-            return;
-        }
+        if (!e.clipboardData) return;
 
         let items = e.clipboardData.items;
 
-        if (!items) {
-            return;
-        }
+        if (!items) return;
 
         for (let i = 0; i < items.length; i++) {
-            if (items[i].type.indexOf('image') == -1) {
-                continue;
-            }
+            if (items[i].type.indexOf('image') == -1) continue;
 
             const pastedImage: File = items[i].getAsFile();
             const uniqueName = `${pastedImage.name.split('.')[0]}-${uuidv4()}.${pastedImage.name.split('.').pop()}`;
@@ -539,7 +489,38 @@
         }
     });
 
-    const collapsed = ref(true);
+    const showTagPerson = ref(false);
+
+    watch(messageInput, () => {
+        showTagPerson.value = false;
+        const messageInputs = messageInput.value?.split(' ');
+        const latestMessage = messageInputs ? messageInputs[messageInputs.length - 1] : '';
+        if (props.chat.isGroup && latestMessage.startsWith('@')) {
+            showTagPerson.value = true;
+            contacts.value = [...props.chat.contacts].filter(c =>
+                c.id.toLowerCase().includes(latestMessage.toLowerCase().substring(1))
+            );
+        }
+
+        draftMessage(selectedId, createMessage());
+    });
+
+    watch(action, () => {
+        if (action.value && message.value) {
+            message.value.focus();
+        }
+        if (action?.value?.type === MessageAction.EDIT) {
+            if (action.value.message.type === MessageTypes.QUOTE) {
+                messageInput.value = action.value.message.body.message;
+            } else {
+                messageInput.value = action.value.message.body;
+            }
+        }
+        draftMessage(selectedId, createMessage());
+        nextTick(() => {
+            resizeTextarea();
+        });
+    });
 </script>
 
 <style scoped></style>

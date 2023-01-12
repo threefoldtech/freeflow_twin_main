@@ -9,13 +9,15 @@ import {
 } from '@/types/notifications';
 import { uuidv4 } from '@/common';
 
-export const notifcationPermissionGranted = ref(false);
+export const notificationPermissionGranted = ref(false);
 export const notifications = ref<Notification[]>([]);
+
 export const addNotification = (n: Notification) => {
     notifications.value.push(n);
     if (!canDestroy(n)) return;
     setTimeout(() => destroyNotification(n), n.options?.interval ?? 5000);
 };
+
 export const destroyNotification = (n: Notification) => {
     notifications.value = notifications.value.filter(x => x.id !== n.id);
 };
@@ -132,31 +134,5 @@ export const createPercentProgressNotification = (
         max: 1,
     } as ProgressNotification;
     notifications.value.push(n);
-    return n;
-};
-
-export const createProgressNotification = (
-    title: string,
-    text,
-    max: number,
-    interval = 5000,
-    start = 0,
-    options = defaultOptions as ProgressNotificationOptions
-) => {
-    const newOptions = {
-        ...defaultOptions,
-        ...options,
-    } as ProgressNotificationOptions;
-    const n = {
-        id: uuidv4(),
-        type: NotificationType.Progress,
-        title: title,
-        text: text,
-        options: newOptions,
-        status: Status.Info,
-        progress: start,
-        max: max,
-    } as ProgressNotification;
-    addNotification(n);
     return n;
 };

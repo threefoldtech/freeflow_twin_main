@@ -1,5 +1,6 @@
-import { ref, watch } from 'vue';
-import { Chat } from '@/types';
+import { ref } from 'vue';
+import { Chat, Message } from '@/types';
+import { PathInfoModel } from '@/store/fileBrowserStore';
 
 /************
  *
@@ -7,7 +8,7 @@ import { Chat } from '@/types';
  *
  ************/
 
-export enum RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM {
+export enum RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM {
     DELETE = 'DELETE',
     RENAME = 'RENAME',
     DOWNLOAD = 'DOWNLOAD',
@@ -19,6 +20,7 @@ export enum RIGHT_CLICK_ACTIONS_MESSAGE {
     EDIT = 'EDIT',
     DELETE = 'DELETE',
 }
+
 export enum RIGHT_CLICK_ACTIONS_CHAT_CARD {
     BLOCK = 'BLOCK',
     DELETE = 'DELETE',
@@ -29,7 +31,7 @@ export enum RIGHT_CLICK_ACTIONS_CHAT_CARD {
 export type RIGHT_CLICK_ACTIONS =
     | RIGHT_CLICK_ACTIONS_MESSAGE
     | RIGHT_CLICK_ACTIONS_CHAT_CARD
-    | RIGHT_CLICK_ACTIONS_FILEBROWSER_ITEM;
+    | RIGHT_CLICK_ACTIONS_FILE_BROWSER_ITEM;
 
 /**********
  *
@@ -49,12 +51,12 @@ export enum RIGHT_CLICK_TYPE {
  *
  **********/
 
-interface ICurrentRightClickItem {
+export interface ICurrentRightClickItem<T> {
     type: RIGHT_CLICK_TYPE;
-    data: Chat;
+    data: T;
 }
 
-export const currentRightClickedItem = ref<ICurrentRightClickItem | null>(null);
+export const currentRightClickedItem = ref<ICurrentRightClickItem<Chat | Message<any> | PathInfoModel> | null>(null);
 export const rightClickItemAction = ref<RIGHT_CLICK_ACTIONS | null>(null);
 export const triggerWatchOnRightClickItem = ref<boolean>(false);
 export const openBlockDialogFromOtherFile = ref<boolean>(false);
@@ -64,10 +66,26 @@ export const openDeleteUserDialogFromOtherFile = ref<boolean>(false);
 //This is so used to rerender a component
 export const conversationComponentRerender = ref<number>(0);
 
-export const setCurrentRightClickedItem = (item: Chat, type: RIGHT_CLICK_TYPE) => {
+export const setCurrentRightClickedItem = (item: Chat | Message<any> | PathInfoModel, type: RIGHT_CLICK_TYPE) => {
     triggerWatchOnRightClickItem.value = !triggerWatchOnRightClickItem;
     currentRightClickedItem.value = {
         type: type,
         data: item,
     };
+};
+
+export const rightClickedItemIsMessage = (
+    item: ICurrentRightClickItem<any>
+): item is ICurrentRightClickItem<Message<any>> => {
+    return item.type === RIGHT_CLICK_TYPE.MESSAGE;
+};
+
+export const rightClickedItemIsChat = (item: ICurrentRightClickItem<any>): item is ICurrentRightClickItem<Chat> => {
+    return item.type === RIGHT_CLICK_TYPE.CHAT_CARD;
+};
+
+export const rightClickedItemIsFile = (
+    item: ICurrentRightClickItem<any>
+): item is ICurrentRightClickItem<PathInfoModel> => {
+    return item.type === RIGHT_CLICK_TYPE.LOCAL_FILE;
 };

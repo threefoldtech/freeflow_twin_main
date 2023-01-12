@@ -9,7 +9,7 @@
     import { useRouter } from 'vue-router';
 
     export default defineComponent({
-        name: 'Home',
+        name: 'home',
         setup() {
             const router = useRouter();
 

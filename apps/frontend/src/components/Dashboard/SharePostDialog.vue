@@ -89,7 +89,7 @@
                                         </td>
                                         <td class="pr-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div
-                                                v-if="!isAlreadySharedWWithPerson(chat.chatId)"
+                                                v-if="!isAlreadySharedWithPerson(chat.chatId)"
                                                 class="flex items-center justify-end"
                                             >
                                                 <Spinner v-if="isInQueue(chat.chatId)" small />
@@ -103,7 +103,7 @@
                                             </div>
                                             <button
                                                 v-if="
-                                                    !isInQueue(chat.chatId) && !isAlreadySharedWWithPerson(chat.chatId)
+                                                    !isInQueue(chat.chatId) && !isAlreadySharedWithPerson(chat.chatId)
                                                 "
                                                 @click="sharePostWithFriend(chat.chatId)"
                                                 type="button"
@@ -111,7 +111,7 @@
                                             >
                                                 Share
                                             </button>
-                                            <p v-if="isAlreadySharedWWithPerson(chat.chatId)">Post shared</p>
+                                            <p v-if="isAlreadySharedWithPerson(chat.chatId)">Post shared</p>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -125,8 +125,8 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onBeforeMount, onMounted, onBeforeUnmount, ref } from 'vue';
-    import { usechatsActions, useChatsState } from '@/store/chatStore';
+    import { onBeforeMount, onMounted, onBeforeUnmount, ref } from 'vue';
+    import { useChatsState } from '@/store/chatStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import Spinner from '@/components/Spinner.vue';
     import { XIcon } from '@heroicons/vue/solid';
@@ -135,21 +135,31 @@
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
 
-    const emit = defineEmits(['close', 'image_clicked']);
-
-    const { retrieveChats } = usechatsActions();
     const { chats } = useChatsState();
 
-    const queue = ref<string[]>([]);
-    const peopleIHaveSharedWith = ref<string[]>([]);
+    const emit = defineEmits(['close', 'image_clicked']);
+    const props = defineProps<{ item: IPostContainerDTO; avatarImg: any }>();
     const dialogRef = ref<HTMLElement>(null);
     const readMore = ref<boolean>(false);
+
     let escListener = null;
 
-    const props = defineProps<{ item: IPostContainerDTO; avatarImg: any }>();
+    onBeforeMount(async () => {
+        escListener = (e: KeyboardEvent) => {
+            if (e.key !== 'Escape') {
+                return;
+            }
+            emit('close');
+        };
+        document.addEventListener('keyup', escListener);
+    });
 
     onMounted(() => {
         dialogRef.value.focus();
+    });
+
+    onBeforeUnmount(() => {
+        document.removeEventListener('keyup', escListener);
     });
 
     const fetchPostImage = (image: string) => {
@@ -162,6 +172,9 @@
         return moment(time).fromNow();
     };
 
+    const queue = ref<string[]>([]);
+    const peopleIHaveSharedWith = ref<string[]>([]);
+
     const sharePostWithFriend = async (id: string) => {
         queue.value.push(id);
         setTimeout(async () => {
@@ -173,12 +186,7 @@
         }, 2000);
     };
 
-    const parseContactLocation = (chatId: string, adminId: string) => {
-        const chat = chats.value.find(item => item.chatId === chatId);
-        return chat.contacts.find(contact => contact.id === adminId)['location'];
-    };
-
-    const isAlreadySharedWWithPerson = (id: string) => {
+    const isAlreadySharedWithPerson = (id: string) => {
         return peopleIHaveSharedWith.value.some(item => item === id);
     };
 
@@ -189,30 +197,6 @@
     const isInQueue = (id: string) => {
         return queue.value.some(item => item === id);
     };
-
-    const getAvatar = (location: string) => {
-        return calcExternalResourceLink(`http://[${location}]/api/v2/user/avatar/default`);
-    };
-
-    const avatarImg = computed(() => {
-        return calcExternalResourceLink(`http://[${props.item.owner.location}]/api/v2/user/avatar/default`);
-    });
-
-    onBeforeMount(async () => {
-        await retrieveChats();
-
-        escListener = (e: KeyboardEvent) => {
-            if (e.key !== 'Escape') {
-                return;
-            }
-            emit('close');
-        };
-        document.addEventListener('keyup', escListener);
-    });
-
-    onBeforeUnmount(() => {
-        document.removeEventListener('keyup', escListener);
-    });
 </script>
 
 <style scoped></style>

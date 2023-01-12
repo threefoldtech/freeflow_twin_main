@@ -34,7 +34,7 @@
                     class="absolute right-4 top-4 md:w-12 md:h-12 sm:w-10 sm:h-10 w-8 h-8 cursor-pointer text-white z-50"
                     @click="closeEditor()"
                 />
-                <div v-if="filePreviewType === IFileTypes.IMAGE">
+                <div v-if="filePreviewType === FileTypes.IMAGE">
                     <img
                         :src="filePreviewSrc"
                         class="pointer-events-none z-50 max-h-full"
@@ -43,13 +43,13 @@
                     />
                 </div>
 
-                <div v-else-if="filePreviewType === IFileTypes.VIDEO">
+                <div v-else-if="filePreviewType === FileTypes.VIDEO">
                     <video controls>
                         <source :src="filePreviewSrc" />
                     </video>
                 </div>
 
-                <div v-else-if="filePreviewType === IFileTypes.SIMPLE">
+                <div v-else-if="filePreviewType === FileTypes.SIMPLE">
                     <button
                         @click="saveChanges()"
                         class="sm:py-2 py-1 sm:px-4 px-2 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
@@ -128,8 +128,6 @@
     } from '@/store/fileBrowserStore';
     import TopBar from '@/components/fileBrowser/TopBar.vue';
     import { useRoute, useRouter } from 'vue-router';
-    import { isUndefined } from 'lodash';
-    import { showShareDialog } from '@/services/dialogService';
     import SomethingWentWrongModal from '@/components/fileBrowser/SomethingWentWrongModal.vue';
     import { decodeString } from '@/utils/files';
     import Dialog from '@/components/Dialog.vue';
@@ -140,7 +138,9 @@
     import { getFileInfo, updateFile } from '@/services/fileBrowserService';
     import { useAuthState } from '@/store/authStore';
     import { SharedFileInterface } from '@/types';
-    import { IFileTypes } from 'custom-types/file-actions.type';
+    import { FileTypes } from 'custom-types/file-actions.type';
+    import { createNotification } from '@/store/notificiationStore';
+    import { Status } from '@/types/notifications';
 
     const { user } = useAuthState();
 
@@ -148,6 +148,26 @@
 
     nextTick(() => {
         fileTableDiv.value?.focus();
+    });
+
+    onBeforeMount(async () => {
+        if (route.params.name === 'sharedWithMeItemNested') {
+            currentDirectory.value = decodeString(<string>route.params.path);
+        }
+
+        if (window.innerWidth < 1024) {
+            fileBrowserTypeView.value = 'GRID';
+        }
+
+        window.addEventListener('resize', handleResize);
+
+        if (sharedDir.value) return;
+
+        if (!currentDirectory.value) currentDirectory.value = '/';
+        sharedDir.value = false;
+        searchResults.value = [];
+        searchDirValue.value = '';
+        return;
     });
 
     const monacoOptions = {
@@ -166,38 +186,6 @@
         }
     };
 
-    onBeforeMount(async () => {
-        if (route.params.name === 'sharedWithMeItemNested') {
-            currentDirectory.value = decodeString(<string>route.params.path);
-        }
-
-        if (window.innerWidth < 1024) {
-            fileBrowserTypeView.value = 'GRID';
-        }
-
-        window.addEventListener('resize', handleResize);
-
-        if (!sharedDir.value) {
-            if (route.params.editFileShare === 'true') {
-                selectItem(sharedItem.value);
-                selectedTab.value = 1;
-                showShareDialog.value = true;
-                await updateContent(currentDirectory.value);
-                sharedItem.value = null;
-                sharedDir.value = false;
-                searchResults.value = [];
-                searchDirValue.value = '';
-
-                return;
-            }
-            if (isUndefined(currentDirectory.value)) currentDirectory.value = '/';
-            sharedDir.value = false;
-            searchResults.value = [];
-            searchDirValue.value = '';
-            return;
-        }
-    });
-
     const showFilePreview = ref(false);
     const filePreviewSrc = ref('');
     const filePreviewType = ref('');
@@ -214,10 +202,10 @@
             filePreviewSrc.value = calcExternalResourceLink(src);
 
             filePreviewType.value = isVideo(item.path)
-                ? IFileTypes.VIDEO
+                ? FileTypes.VIDEO
                 : isImage(item.path)
-                ? IFileTypes.IMAGE
-                : IFileTypes.SIMPLE;
+                ? FileTypes.IMAGE
+                : FileTypes.SIMPLE;
 
             if (filePreviewType.value !== 'simpleFile') {
                 showFilePreview.value = true;
@@ -233,7 +221,16 @@
     };
 
     const handleShareClick = async (item: SharedFileInterface) => {
+        createNotification('Getting file information', 'This may take some time.');
         const res = (await getFileInfo(item.path, item.owner.location)).data;
+        if (!res) {
+            createNotification(
+                'Failed to open file',
+                'The file you are trying to open is no longer available.',
+                Status.Error
+            );
+            return;
+        }
         await handleItemClick(res, item.owner.location);
     };
 
@@ -241,7 +238,7 @@
 
     const closeEditor = () => {
         showFilePreview.value = false;
-        if (filePreviewType.value !== IFileTypes.SIMPLE || editedFileContent.value === fileContent.value) {
+        if (filePreviewType.value !== FileTypes.SIMPLE || editedFileContent.value === fileContent.value) {
             return;
         }
         showConfirmDialog.value = true;

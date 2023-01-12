@@ -1,56 +1,56 @@
 import {
-    IAudioFileExtension,
-    IImageFileExtension,
-    ISimpleFileExtension,
-    IVideoFileExtension,
+    AudioFileExtension,
+    ImageFileExtension,
+    SimpleFileExtension,
+    VideoFileExtension,
 } from 'custom-types/file-actions.type';
 
 export const isImage = filename => {
     if (!filename) return false;
-    return Object.values(IImageFileExtension).includes(filename.split('.').pop());
+    return Object.values(ImageFileExtension).includes(filename.split('.').pop());
 };
 
 export const isAudio = filename => {
-    return Object.values(IAudioFileExtension).includes(filename.split('.').pop());
+    return Object.values(AudioFileExtension).includes(filename.split('.').pop());
 };
 
 export const isSimpleTextFile = fileName => {
     if (!fileName) return false;
-    return Object.values(ISimpleFileExtension).includes(fileName.split('.').pop());
+    return Object.values(SimpleFileExtension).includes(fileName.split('.').pop());
 };
 
 export const isVideo = filename => {
     if (!filename) return false;
-    return Object.values(IVideoFileExtension).includes(filename.split('.').pop());
+    return Object.values(VideoFileExtension).includes(filename.split('.').pop());
 };
 
 export const extensionToLanguage = (extension: string) => {
     switch (extension) {
-        case ISimpleFileExtension.JS:
+        case SimpleFileExtension.JS:
             return 'javascript';
-        case ISimpleFileExtension.TXT:
+        case SimpleFileExtension.TXT:
             return 'text';
-        case ISimpleFileExtension.JSON:
+        case SimpleFileExtension.JSON:
             return 'json';
-        case ISimpleFileExtension.HTML:
+        case SimpleFileExtension.HTML:
             return 'html';
-        case ISimpleFileExtension.TS:
+        case SimpleFileExtension.TS:
             return 'typescript';
-        case ISimpleFileExtension.CSS:
+        case SimpleFileExtension.CSS:
             return 'css';
-        case ISimpleFileExtension.SCSS:
+        case SimpleFileExtension.SCSS:
             return 'scss';
-        case ISimpleFileExtension.XML:
+        case SimpleFileExtension.XML:
             return 'xml';
-        case ISimpleFileExtension.YML:
+        case SimpleFileExtension.YML:
             return 'yaml';
-        case ISimpleFileExtension.YAML:
+        case SimpleFileExtension.YAML:
             return 'yaml';
-        case ISimpleFileExtension.MD:
+        case SimpleFileExtension.MD:
             return 'markdown';
-        case ISimpleFileExtension.MARKDOWN:
+        case SimpleFileExtension.MARKDOWN:
             return 'markdown';
-        case ISimpleFileExtension.PYTHON:
+        case SimpleFileExtension.PYTHON:
             return 'python';
         default:
             return 'text';

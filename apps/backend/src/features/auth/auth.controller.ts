@@ -35,7 +35,7 @@ export class AuthController {
         };
     }
 
-    @Get('signin')
+    @Get('signIn')
     @Redirect()
     async signIn(@Session() session: Record<string, unknown>, @Query() query: SignInQuery) {
         const appLogin = await this._authService.getAppLogin(`/api/v2/auth/callback`);
@@ -44,7 +44,7 @@ export class AuthController {
         return { url: loginUrl };
     }
 
-    @Post('signout')
+    @Post('signOut')
     @UseGuards(AuthGuard)
     async signOut(@Req() req: Request) {
         const promise = new Promise<void>((resolve, reject) => {

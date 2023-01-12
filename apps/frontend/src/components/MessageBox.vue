@@ -12,7 +12,7 @@
                     <button
                         @click="selectedTab = index"
                         class="w-full p-2 rounded-xl"
-                        :class="{ 'bg-primary text-white': index == selectedTab }"
+                        :class="{ 'bg-primary text-white': index === selectedTab }"
                     >
                         {{ tab }}
                     </button>
@@ -25,39 +25,21 @@
             ></ShareChatTable>
             <EditShare v-if="selectedEditFile && selectedTab === 1" :selectedFile="selectedEditFile.body" />
         </Dialog>
-        <v-contextmenu v-if="currentRightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
+        <v-contextmenu v-if="rightClickedItem?.data?.type !== 'DELETE'" ref="contextmenu-message">
             <v-contextmenu-item
-                v-if="currentRightClickedItem?.data?.from === user.id && currentRightClickedItem.data.type === 'STRING'"
-                @click="
-                    () => {
-                        triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                        rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.EDIT;
-                    }
-                "
+                v-if="rightClickedItem?.data?.from === user.id && rightClickedItem.data.type === 'STRING'"
+                @click="setAction(RIGHT_CLICK_ACTIONS_MESSAGE.EDIT)"
                 >Edit message
             </v-contextmenu-item>
             <v-contextmenu-item
-                v-if="currentRightClickedItem?.data?.from === user.id"
-                @click="
-                    () => {
-                        triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                        rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.DELETE;
-                    }
-                "
+                v-if="rightClickedItem?.data?.from === user.id"
+                @click="setAction(RIGHT_CLICK_ACTIONS_MESSAGE.DELETE)"
                 >Delete
             </v-contextmenu-item>
-            <v-contextmenu-item
-                @click="
-                    () => {
-                        triggerWatchOnRightClickItem = !triggerWatchOnRightClickItem;
-                        rightClickItemAction = RIGHT_CLICK_ACTIONS_MESSAGE.REPLY;
-                    }
-                "
-                >Reply
-            </v-contextmenu-item>
+            <v-contextmenu-item @click="setAction(RIGHT_CLICK_ACTIONS_MESSAGE.REPLY)">Reply</v-contextmenu-item>
         </v-contextmenu>
         <div class="relative w-full mt-8 px-4">
-            <div v-if="chatInfo.isLoading" class="flex flex-col justify-center items-center w-full">
+            <div v-if="chatInfo?.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
                 <span>Loading more messages</span>
             </div>
@@ -73,14 +55,14 @@
                     :isGroup="chat.isGroup"
                     :isLastMessage="isLastMessage(chat, i)"
                     :isMine="message.from === user.id"
-                    :isread="i <= lastRead"
-                    :isreadbyme="i <= lastReadByMe"
+                    :isRead="i <= lastRead"
+                    :isReadByMe="i <= lastReadByMe"
                     :message="message"
                     @copy="copyMessage($event, message)"
                     @openEditShare="editFileSharePermission"
-                    @mousedown.right="setCurrentRightClickedItem(message)"
+                    @mousedown.right="setCurrentRightClickedItem(message, RIGHT_CLICK_TYPE.MESSAGE)"
                     @clickedProfile="
-                        id =>
+                        (id: string) =>
                             $emit(
                                 'clickedProfile',
                                 chat.contacts.find(c => c.id === id)
@@ -162,24 +144,24 @@
     import MessageCard from '@/components/MessageCard.vue';
     import { useAuthState } from '@/store/authStore';
     import moment from 'moment';
-    import { computed, nextTick, onMounted, onUnmounted, onUpdated, ref, watch } from 'vue';
+    import { computed, nextTick, onMounted, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
-    import { isFirstMessage, isLastMessage, showDivider, messageBox } from '@/services/messageHelperService';
-    import { imageUploadQueue, usechatsActions, retrySendFile, useChatsState } from '@/store/chatStore';
-    import { XCircleIcon, ExclamationIcon } from '@heroicons/vue/solid';
-    import { useScrollActions } from '@/store/scrollStore';
+    import { isFirstMessage, isLastMessage, messageBox, showDivider } from '@/services/messageHelperService';
+    import { imageUploadQueue, retrySendFile, usechatsActions, useChatsState } from '@/store/chatStore';
+    import { ExclamationIcon, XCircleIcon } from '@heroicons/vue/solid';
     import Spinner from '@/components/Spinner.vue';
-    import { Chat, Message, MessageBodyType, MessageTypes } from '@/types';
+    import { Chat, Message, MessageBodyType, MessageTypes, QuoteBodyType, SharedFileInterface } from '@/types';
     import Dialog from '@/components/Dialog.vue';
     import EditShare from '@/components/fileBrowser/EditShare.vue';
     import ShareChatTable from '@/components/fileBrowser/ShareChatTable.vue';
     import {
-        rightClickItemAction,
         currentRightClickedItem,
-        triggerWatchOnRightClickItem,
         RIGHT_CLICK_ACTIONS_MESSAGE,
-        RIGHT_CLICK_ACTIONS_CHAT_CARD,
         RIGHT_CLICK_TYPE,
+        rightClickItemAction,
+        setCurrentRightClickedItem,
+        triggerWatchOnRightClickItem,
+        ICurrentRightClickItem,
     } from '@/store/contextmenuStore';
 
     interface IProps {
@@ -188,36 +170,33 @@
 
     const { chats } = useChatsState();
     const { user } = useAuthState();
+    const { getChatInfo, getNewMessages } = usechatsActions();
 
     const emit = defineEmits(['clickedProfile']);
-
+    const props = defineProps<IProps>();
     const tabs = ['Create shares', 'Edit permissions'];
+    const selectedTab = ref(1);
 
-    const messageBoxLocal = ref(null);
-    const selectedTab = ref<number>(1);
+    onMounted(() => nextTick(() => scrollToBottom()));
 
-    const scroll = () => {
+    const rightClickedItem = computed(() => {
+        return currentRightClickedItem.value as ICurrentRightClickItem<Message<any>>;
+    });
+
+    const setAction = (action: RIGHT_CLICK_ACTIONS_MESSAGE) => {
+        triggerWatchOnRightClickItem.value = !triggerWatchOnRightClickItem.value;
+        rightClickItemAction.value = action;
+    };
+
+    const messageBoxLocal = ref<HTMLDivElement>(null);
+
+    const scrollToBottom = () => {
         if (!messageBoxLocal.value) return;
         messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
     };
 
-    watch(messageBoxLocal, () => {
-        //Refs can't seem to bind to refs in other files in script setup
-        messageBox.value = messageBoxLocal.value;
-    });
-
-    const props = defineProps<IProps>();
-
-    const showShareDialog = ref<boolean>(false);
-
-    const selectedEditFile = ref<any>(null);
-
-    const setCurrentRightClickedItem = item => {
-        currentRightClickedItem.value = {
-            type: RIGHT_CLICK_TYPE.MESSAGE,
-            data: item,
-        };
-    };
+    const showShareDialog = ref(false);
+    const selectedEditFile = ref<Message<SharedFileInterface>>(null);
 
     const editFileSharePermission = file => {
         selectedEditFile.value = file;
@@ -240,14 +219,13 @@
         if (percent === 100) {
             setTimeout(() => {
                 imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id);
-                messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
+                scrollToBottom();
                 window.URL.revokeObjectURL(image.data);
             }, 200);
         }
         return !isNaN(percent) ? percent : 0;
     };
 
-    const { getChatInfo, getNewMessages } = usechatsActions();
     const lastRead = computed(() => {
         if (props.chat.read.constructor.name !== 'Array') return;
         const idx = props.chat.read.findIndex(r => r.userId === props.chat.chatId);
@@ -261,6 +239,7 @@
         if (idx === -1) return;
         return findLastIndex(props.chat.messages, message => props.chat.read[idx].messageId === message.id);
     });
+
     const handleScroll = async e => {
         let element = messageBox.value;
 
@@ -276,12 +255,38 @@
             });
         }
     };
-    const { addScrollEvent } = useScrollActions();
-    onMounted(() => {
-        //TODO make this more effecient
-        setTimeout(() => {
-            scroll();
-        }, 100);
+
+    const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
+        let data = '';
+        switch (message.type) {
+            case MessageTypes.STRING:
+            case MessageTypes.GIF:
+                data = String(message.body);
+                break;
+
+            case MessageTypes.FILE:
+                data = message.body.filename;
+                break;
+
+            case MessageTypes.FILE_SHARE:
+                data = (message.body as SharedFileInterface).name;
+                break;
+
+            case MessageTypes.QUOTE:
+                data = (message.body as QuoteBodyType).message;
+                break;
+
+            default:
+                return;
+        }
+        event.clipboardData.setData('text/plain', data);
+        event.preventDefault();
+    };
+
+    const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
+
+    watch(messageBoxLocal, () => {
+        messageBox.value = messageBoxLocal.value;
     });
 
     watch(
@@ -298,35 +303,6 @@
             });
         }
     );
-
-    const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
-        let data = '';
-        switch (message.type) {
-            case MessageTypes.STRING:
-            case MessageTypes.GIF:
-                data = <string>message.body;
-                break;
-            case MessageTypes.FILE:
-                // @ts-ignore
-                data = <string>message.body.filename;
-                break;
-            case MessageTypes.FILE_SHARE:
-                // @ts-ignore
-                data = <string>message.body.name;
-                break;
-            case MessageTypes.QUOTE:
-                // @ts-ignore
-                data = <string>message.body.message;
-                break;
-            default:
-                return;
-        }
-        //console.log(`COPY: ${data}`);
-        event.clipboardData.setData('text/plain', data);
-        event.preventDefault();
-    };
-
-    const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
 </script>
 <style scoped type="text/css">
     .loading:after {

@@ -14,20 +14,16 @@
 
 <script setup lang="ts">
     import AppLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, ref } from 'vue';
-    import { onMounted, onBeforeMount } from 'vue';
+    import { ref } from 'vue';
+    import { onMounted } from 'vue';
     import { useAuthState } from '@/store/authStore';
 
     const iframeUrl = ref('');
     const { user } = useAuthState();
 
-    onMounted(() => {
-        browse();
-    });
+    onMounted(() => browse());
 
-    function browse() {
-        iframeUrl.value = `https://kutana.uhuru.me/?username=${user.id}`;
-    }
+    const browse = () => (iframeUrl.value = `https://kutana.uhuru.me/?username=${user.id}`);
 </script>
 
 <style scoped type="text/css"></style>

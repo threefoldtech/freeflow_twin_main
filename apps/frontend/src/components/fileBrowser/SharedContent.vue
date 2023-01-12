@@ -7,11 +7,7 @@
             <div class="overflow-x-auto">
                 <div class="align-middle inline-block min-w-full">
                     <div class="overflow-hidden sm:rounded-lg">
-                        <table
-                            v-if="fileBrowserTypeView === 'LIST'"
-                            class="min-w-full divide-y divide-gray-200 shadow"
-                            :key="currentDirectory"
-                        >
+                        <table v-if="fileBrowserTypeView === 'LIST'" class="min-w-full divide-y divide-gray-200 shadow">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th
@@ -33,11 +29,7 @@
                                     v-for="item in sharedContent"
                                     v-if="!isQuantumChatFiles"
                                     class="hover:bg-gray-200 cursor-pointer h-10 border-b border-t border-gray-300"
-                                    :class="{
-                                        'bg-gray-100': isSelected(item),
-                                    }"
                                     @click="emit('itemClicked', item)"
-                                    @dblclick="emit('itemClicked', item)"
                                     :key="item.name"
                                 >
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -46,12 +38,9 @@
                                                 <i
                                                     class="fa-2x"
                                                     :class="
-                                                        getIconDirty(
-                                                            item.isFolder,
-                                                            getFileType(getExtension(item.name))
-                                                        ) +
+                                                        getIcon(item.isFolder, getFileType(getExtension(item.name))) +
                                                         ' ' +
-                                                        getIconColorDirty(
+                                                        getIconColor(
                                                             item.isFolder,
                                                             getFileType(getExtension(item.name))
                                                         )
@@ -110,9 +99,9 @@
                                             :key="item.name"
                                             class="fa-lg"
                                             :class="
-                                                getIconDirty(item.isFolder, getFileType(getExtension(item.name))) +
+                                                getIcon(item.isFolder, getFileType(getExtension(item.name))) +
                                                 ' ' +
-                                                getIconColorDirty(item.isFolder, getFileType(getExtension(item.name)))
+                                                getIconColor(item.isFolder, getFileType(getExtension(item.name)))
                                             "
                                         ></i>
                                         <p
@@ -141,10 +130,8 @@
         formatBytes,
         getExtension,
         getFileType,
-        getIconColorDirty,
-        getIconDirty,
-        PathInfoModel,
-        selectedPaths,
+        getIconColor,
+        getIcon,
         sharedContent,
         sharedBreadcrumbs,
         sharedFolderIsloading,
@@ -166,8 +153,6 @@
     const truncate = name => {
         return name.length < 50 ? name : `${name.slice(0, 25)}...${name.slice(-25)}`;
     };
-
-    const isSelected = (item: PathInfoModel) => selectedPaths.value.includes(item);
 </script>
 
 <style scoped></style>

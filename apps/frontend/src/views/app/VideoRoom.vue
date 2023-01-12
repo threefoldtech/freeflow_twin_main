@@ -22,9 +22,8 @@
 </template>
 
 <script setup lang="ts">
-    import AppLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, computed } from 'vue';
-    import { useAuthState } from '../../store/authStore';
+    import { computed } from 'vue';
+    import { useAuthState } from '@/store/authStore';
     import { useRoute } from 'vue-router';
 
     const { user } = useAuthState();
