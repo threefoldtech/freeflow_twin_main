@@ -75,6 +75,7 @@
                                 </div>
                                 <div class="h-full flex items-center self-end px-8 space-x-4">
                                     <button
+                                        v-if="!mobile"
                                         class="focus:outline-none hover:text-accent-300 text-gray-500"
                                         @click="popupMeeting"
                                     >
@@ -378,6 +379,7 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
     import Alert from '@/components/Alert.vue';
     import Topbar from '@/components/Topbar.vue';
+    import { isMobile } from '@/store/fileBrowserStore';
 
     const { sendFile, sendMessage } = usechatsActions();
     const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
@@ -403,6 +405,8 @@
     const showLeaveDialog = ref(false);
     const showDeleteUserDialog = ref(false);
     const showDeleteChatDialog = ref(false);
+
+    const mobile = ref<boolean>(isMobile());
 
     onMounted(() => {
         nextTick(() => scrollToBottom(true));

@@ -100,14 +100,15 @@
                     </button>
                 </div>
                 <div class="flex">
-                    <form class="w-full" @submit.prevent="chatSend" @keydown.enter.prevent="chatSend">
+                    <form class="w-full" @submit.prevent="chatSend" @keydown.enter.exact.prevent="chatSend">
                         <div class="mt-1 border-b border-gray-300 focus-within:border-primary">
                             <textarea
                                 v-model="messageInput"
-                                class="block w-full pl-1 min-h-[24px] max-h-[150px] h-9 resize-none overflow-y-auto whitespace-pre-wrap border-0 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
+                                class="block w-full pl-1 min-h-[24px] max-h-[150px] sm:h-9 h-10 resize-none overflow-y-auto whitespace-pre-wrap border-0 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
                                 autofocus
                                 maxlength="2000"
                                 @input="resizeTextarea()"
+                                @click="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
                                 @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
@@ -133,7 +134,7 @@
                     </form>
 
                     <button class="hover:text-icon mx-2 my-0 p-0 self-center" @click="chatSend">
-                        <i class="fas fa-paper-plane"></i>
+                        <i class="fas fa-paper-plane sm:text-[18px] text-[25px]"></i>
                     </button>
                 </div>
             </div>

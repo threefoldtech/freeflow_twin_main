@@ -108,7 +108,8 @@
                                                 'bg-accent-800 text-white rounded-md':
                                                     app?.enabled && router.currentRoute?.value.meta.app === app.name,
                                                 'text-gray-500': !app?.enabled,
-                                                'hidden md:block': app.name === AppType.Glass,
+                                                'hidden md:block':
+                                                    app.name === AppType.Glass || app.name === AppType.Kutana,
                                             }"
                                         >
                                             <div
