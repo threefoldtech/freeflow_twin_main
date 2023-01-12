@@ -52,47 +52,47 @@
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
                 >
                     <span
-                        class="reply text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline hidden my-message:inline"
                         @click="editMessage(props.chatId, message)"
                         v-if="message.type === MessageTypes.STRING || message.type === MessageTypes.QUOTE"
                     >
                         <i class="fa fa-pen"></i>
-                        <span class="text-gray-600 pl-2">Edit</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Edit</span>
                     </span>
 
                     <span
-                        class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline"
                         v-if="message.type !== 'DELETE'"
                         @click="replyMessage(props.chatId, message)"
                     >
                         <i class="fa fa-reply"></i>
-                        <span class="text-gray-600 pl-2">Reply</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Reply</span>
                     </span>
                     <span
-                        class="delete text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        class="delete text-xs sm:pr-4 pr-2 cursor-pointer hover:underline hidden my-message:inline"
                         @click="deleteMessage(message)"
                         v-if="message.type !== 'DELETE'"
                     >
                         <i class="fa fa-trash"></i>
-                        <span class="text-gray-600 pl-2">Delete</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Delete</span>
                     </span>
                     <span
-                        class="reply text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline hidden my-message:inline"
                         @click="$emit('openEditShare', props.message)"
                         v-if="message.type === MessageTypes.FILE_SHARE"
                     >
                         <i class="fa fa-pen"></i>
-                        <span class="text-gray-600 pl-2">Edit permissions</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Edit permissions</span>
                     </span>
                     <span
                         v-if="message.type === MessageTypes.FILE"
-                        class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline"
                         @click="downloadAttachmentToQuantum(message)"
                     >
                         <i class="fa fa-reply"></i>
-                        <span class="text-gray-600 pl-2">Download</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Download</span>
                     </span>
-                    <div class="pr-4 text-gray-600 date inline-block text-xs">
+                    <div class="sm:pr-4 pr-2 text-gray-600 date inline-block text-xs">
                         <Time :time="new Date(message.timeStamp)" />
                     </div>
                 </div>
