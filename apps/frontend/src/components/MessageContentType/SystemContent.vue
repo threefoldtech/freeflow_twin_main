@@ -31,6 +31,8 @@
     import { useAuthState } from '@/store/authStore';
     import { Message, MessageTypes, SystemBody, SystemMessageTypes } from '@/types';
     import * as crypto from 'crypto-js';
+    import { isMobile } from '@/store/fileBrowserStore';
+    import { createNotification } from '@/store/notificiationStore';
 
     interface IProp {
         message: Message<SystemBody>;
@@ -49,6 +51,11 @@
     });
 
     const joinVideo = () => {
+        if (isMobile()) {
+            createNotification('Not supported', 'Video chat is not supported on mobile devices');
+            return;
+        }
+
         const id = getVideoRoomId();
         const msg = {
             type: SystemMessageTypes.JOINED_VIDEO_ROOM,
