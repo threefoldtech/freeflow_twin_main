@@ -18,7 +18,6 @@ export class FirebaseController {
     @UseGuards(AuthGuard)
     @Post('identify')
     async postIdentifier(@Body() identificationData: PostIdentificationDto): Promise<void> {
-        console.log('Receiving /api/v2/firebase/identify');
         return await this._firebaseService.sendIdentifierToMicroService(identificationData);
     }
 
