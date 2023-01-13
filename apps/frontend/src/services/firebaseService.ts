@@ -46,7 +46,7 @@ export const sendNotificationToBackend = async (notificationData: PostNotificati
         message: 'sent you a message',
         sender: notificationData.sender,
         group: notificationData.group,
-        me: user.id + '.3bot',
+        me: user.id,
         appId: appId,
     };
 

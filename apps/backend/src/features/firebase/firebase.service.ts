@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { KeyService } from '../key/key.service';
-import axios from 'axios';
 import { KeyType } from '../key/models/key.model';
 import { ConfigService } from '@nestjs/config';
 import { EncryptionService } from '../encryption/encryption.service';
 import { PostIdentificationDto, PostNotificationDto } from './dtos/firebase.dtos';
+import { ApiService } from '../api/api.service';
 
 @Injectable()
 export class FirebaseService {
     constructor(
         private readonly _keyService: KeyService,
         private readonly _configService: ConfigService,
-        private readonly _encryptionService: EncryptionService
+        private readonly _encryptionService: EncryptionService,
+        private readonly _apiService: ApiService
     ) {}
 
     async sendIdentifierToMicroService(identificationData: PostIdentificationDto) {
@@ -27,26 +28,8 @@ export class FirebaseService {
             const signedHeader = this._encryptionService.createSignature({ data: header, secretKey: sk.key });
             const encodedHeader = Buffer.from(signedHeader).toString('base64');
 
-            console.log('Saving identifier to microservice with following values: ');
-            console.log({
-                username: userId + '.3bot',
-                appId: identificationData.appId,
-                identifier: identificationData.identifier,
-            });
-
-            await axios.post(
-                'https://europe-west2-jimberlabs.cloudfunctions.net/api/identify',
-                {
-                    username: userId + '.3bot',
-                    appId: identificationData.appId,
-                    identifier: identificationData.identifier,
-                },
-                {
-                    headers: {
-                        'Jimber-Authorization': encodedHeader,
-                    },
-                }
-            );
+            console.log('Saving identifier to microservice');
+            await this._apiService.saveIdentifierToExternal(identificationData, encodedHeader);
         } catch (e) {
             console.log(e);
             return;
@@ -76,12 +59,7 @@ export class FirebaseService {
             const encodedHeader = Buffer.from(signedHeader).toString('base64');
 
             console.log('Posting notification to firebase sync');
-
-            await axios.post('https://europe-west2-jimberlabs.cloudfunctions.net/api/notification', notificationData, {
-                headers: {
-                    'Jimber-Authorization': encodedHeader,
-                },
-            });
+            await this._apiService.postNotificationToExternal(notificationData, encodedHeader);
         } catch (e) {
             console.log(e);
             return;
