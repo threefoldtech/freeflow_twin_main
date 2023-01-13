@@ -15,29 +15,29 @@ jobs:
             #   continue-on-error: true
             - name: Build the Docker image
               run: docker build . --file ./docker/staging/Dockerfile --tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
-            #            - name: Build the spawner
-            #              working-directory: ./apps/spawner
-            #              run: |
-            #                  cp .env.sample .env
-            #                  docker-compose build
-            #              env:
-            #                  digital_twin_spawner_tag: ${{ github.sha }}
-            #                  digital_twin_frontend_tag: ${{ github.sha }}
-            #                  DIGITALTWIN_APPID: 'digitaltwin-test.jimbertesting.be'
-            #                  ENVIRONMENT: 'staging'
+            - name: Build the spawner
+              working-directory: ./apps/spawner
+              run: |
+                  cp .env.sample .env
+                  docker-compose build
+              env:
+                  digital_twin_spawner_tag: ${{ github.sha }}
+                  digital_twin_frontend_tag: ${{ github.sha }}
+                  DIGITALTWIN_APPID: 'digitaltwin-test.jimbertesting.be'
+                  ENVIRONMENT: 'staging'
             - name: Log into GitHub Container Registry
               run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login registry.gitlab.com -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             - name: Push all to gitlab registry
               run: |
                   docker tag registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin:latest
-                  # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
-                  # docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
+                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
+                  docker tag registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }} registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:latest
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:latest
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:latest
                   docker push registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
-                  # docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
+                  docker push registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
     deploy:
         needs: [build]
         runs-on: staging
@@ -52,18 +52,17 @@ jobs:
                   echo "registry.gitlab.com/3bot_app_jimber/digital_twin:${{ github.sha }}" > '/etc/digitaltwin/version.txt'
                   echo Removing all existing chat containers / volumes.
                   [ -z "$(docker ps --filter "name=-chat" -q)" ] && echo "No dockers need to be deleted" || docker rm -f $(docker ps --filter "name=-chat" -q)
-
-#            - name: Running spawner
-#              working-directory: ./apps/spawner
-#              run: |
-#                  cp .env.sample .env
-#                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
-#                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}
-#                  docker-compose down --remove-orphans
-#                  docker-compose up -d
-#                  echo Completed.
-#              env:
-#                  digital_twin_spawner_tag: ${{ github.sha }}
-#                  digital_twin_frontend_tag: ${{ github.sha }}
-#                  DIGITALTWIN_APPID: 'digitaltwin-test.jimbertesting.be'
-#                  ENVIRONMENT: 'staging'
+            - name: Running spawner
+              working-directory: ./apps/spawner
+              run: |
+                  cp .env.sample .env
+                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_spawner:${{ github.sha }}
+                  docker pull registry.gitlab.com/3bot_app_jimber/digital_twin_frontend:${{ github.sha }}   
+                  docker-compose down --remove-orphans
+                  docker-compose up -d
+                  echo Completed.
+              env:
+                  digital_twin_spawner_tag: ${{ github.sha }}
+                  digital_twin_frontend_tag: ${{ github.sha }}
+                  DIGITALTWIN_APPID: 'digitaltwin-test.jimbertesting.be'
+                  ENVIRONMENT: 'staging'
