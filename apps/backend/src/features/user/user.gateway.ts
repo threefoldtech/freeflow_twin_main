@@ -45,6 +45,10 @@ export class UserGateway implements OnGatewayInit {
      */
     async getConnections(): Promise<number> {
         const sockets = await this.server.allSockets();
+
+        console.log('Count of sockets: ');
+        console.log(sockets.size);
+
         return sockets.size;
     }
 

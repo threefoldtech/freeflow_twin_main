@@ -10,6 +10,10 @@ import config from '@/config';
 import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
 import { allSocialPosts } from '@/store/socialStore';
+import { PostNotificationDto, sendNotificationToBackend } from '@/services/firebaseService';
+import { isUserMobile } from '@/utils/webview.utils';
+
+export let connectedSocketId = '';
 
 const state = reactive<State>({
     socket: '',
@@ -30,11 +34,8 @@ const initializeSocket = (username: string) => {
     const router = useRouter();
     state.socket = inject('socket');
 
-    state.socket.emit('identify', {
-        name: username,
-    });
-
     state.socket.on('connect', () => {
+        connectedSocketId = state.socket.id;
         console.log('connected with socket.');
     });
 
@@ -51,11 +52,27 @@ const initializeSocket = (username: string) => {
     state.socket.on('chat_unblocked', (chatId: string) => {
         removeUserFromBlockList(chatId);
     });
-
-    state.socket.on('message', (message: Message<any>) => {
+    state.socket.on('message', async (message: Message<any>) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
-        if (message.type !== 'READ' && !isChatOpen)
-            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
+
+        // @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
+
+        if (message.type !== 'READ' && !isChatOpen) {
+            if (!isUserMobile)
+                createOSNotification(
+                    'Message received',
+                    `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`
+                );
+
+            const mobileNotification: PostNotificationDto = {
+                message: message.body,
+                group: 'false',
+                sender: message.from.toString(),
+            };
+
+            sendNotificationToBackend(mobileNotification);
+        }
+
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;

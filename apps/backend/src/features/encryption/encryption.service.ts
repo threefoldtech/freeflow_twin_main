@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { box, BoxKeyPair, hash, sign, SignKeyPair } from 'tweetnacl';
+import { box, BoxKeyPair, hash, randomBytes, sign, SignKeyPair } from 'tweetnacl';
 import { decodeBase64 } from 'tweetnacl-util';
+import { crypto_box_seal, crypto_sign_ed25519_pk_to_curve25519 } from 'libsodium-wrappers';
 
 @Injectable()
 export class EncryptionService {
@@ -157,5 +158,15 @@ export class EncryptionService {
             this.base64ToUint8Array(signature),
             decodeBase64(publicKey)
         );
+    }
+
+    encryptData({ data, publicKey }: { data: string; publicKey: string }): string {
+        const dataInBytes = this.base64ToUint8Array(Buffer.from(data).toString('base64'));
+
+        const decodedPublicKey = this.base64ToUint8Array(publicKey);
+
+        const encryptionKey: Uint8Array = crypto_sign_ed25519_pk_to_curve25519(decodedPublicKey);
+
+        return this.uint8ToBase64(crypto_box_seal(dataInBytes, encryptionKey, 'uint8array'));
     }
 }

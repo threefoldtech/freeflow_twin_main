@@ -36,7 +36,6 @@
             if (result === 'granted') notificationPermissionGranted.value = true;
         });
     })();
-
     const showLoader = computed(() => {
         if (allSocialPosts.value.length >= 1) return false;
         return !!isLoadingSocialPosts.value;

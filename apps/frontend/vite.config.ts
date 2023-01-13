@@ -15,6 +15,7 @@ export default defineConfig({
     },
     plugins: [vue()],
     resolve: {
+        preserveSymlinks: true,
         alias: {
             '@': path.resolve(__dirname, '/src'),
         },

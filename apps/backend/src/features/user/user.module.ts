@@ -19,8 +19,8 @@ import { UserService } from './user.service';
     imports: [
         DbModule,
         KeyModule,
-        ApiModule,
-        FileModule,
+        forwardRef(() => ApiModule),
+        forwardRef(() => FileModule),
         EncryptionModule,
         forwardRef(() => LocationModule),
         forwardRef(() => YggdrasilModule),
