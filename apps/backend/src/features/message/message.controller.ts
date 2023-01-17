@@ -151,7 +151,7 @@ export class MessageController {
                 message: 'sent you a message',
                 sender: message.from,
                 group: chat.isGroup.toString(),
-                me: userId + '.3bot',
+                me: userId,
                 appId: this._configService.get('appId'),
             };
 
