@@ -196,7 +196,7 @@
             action: FileAction.CHANGE_AVATAR,
             payload: { filename: avatar.filename },
         });
-        await fetchStatus(user.id);
+        await fetchStatus(user.id, true);
     };
 
     const userStatus = ref('');
