@@ -11,8 +11,8 @@ export const fetching: string[] = [];
 export const watchingUsers = [];
 export const showUserOfflineMessage = ref(false);
 
-export const fetchStatus = async (digitalTwinId: string) => {
-    if (statusList[digitalTwinId]) {
+export const fetchStatus = async (digitalTwinId: string, fetch = false) => {
+    if (statusList[digitalTwinId] && !fetch) {
         return statusList[digitalTwinId];
     }
     const { user } = useAuthState();
