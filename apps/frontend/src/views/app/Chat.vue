@@ -64,6 +64,7 @@
     import { onBeforeMount } from 'vue';
     import AddContact from '@/components/ContactAdd.vue';
     import Dialog from '@/components/Dialog.vue';
+    import { isMobile } from '@/store/fileBrowserStore';
 
     const { retrieveDTContacts, retrieveContacts } = useContactsActions();
 
@@ -77,7 +78,7 @@
     const lastOpenedChatId = useLocalStorage('lastOpenedChat', '');
     const router = useRouter();
 
-    if (lastOpenedChatId.value !== '') {
+    if (lastOpenedChatId.value !== '' && !isMobile()) {
         router.push({ name: 'single', params: { id: lastOpenedChatId.value } });
     }
 
