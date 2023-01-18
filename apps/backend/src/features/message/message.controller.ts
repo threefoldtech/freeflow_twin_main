@@ -149,8 +149,8 @@ export class MessageController {
         // currentRoute.endsWith to check if the message is read or not
 
         if (
-            (!isConnected && message.type != MessageType.READ) ||
-            (isConnected && message.type != MessageType.READ && !currentRoute.endsWith(message.from))
+            message.type != MessageType.READ &&
+            (!isConnected || (isConnected && !currentRoute.endsWith(message.from)))
         ) {
             const postMessage: PostNotificationDto = {
                 timestamp: message.timeStamp.toString(),
