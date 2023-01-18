@@ -1,1 +1,1 @@
-export let currentRoute : string = '';
+export let currentRoute: string = '';
