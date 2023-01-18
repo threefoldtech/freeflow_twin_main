@@ -10,7 +10,6 @@ import config from '@/config';
 import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
 import { allSocialPosts } from '@/store/socialStore';
-import { PostNotificationDto, sendNotificationToBackend } from '@/services/firebaseService';
 import { isUserMobile } from '@/utils/webview.utils';
 
 export let connectedSocketId = '';
@@ -63,14 +62,6 @@ const initializeSocket = (username: string) => {
                     'Message received',
                     `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`
                 );
-
-            const mobileNotification: PostNotificationDto = {
-                message: message.body,
-                group: 'false',
-                sender: message.from.toString(),
-            };
-
-            sendNotificationToBackend(mobileNotification);
         }
 
         const { user } = useAuthState();
@@ -136,6 +127,10 @@ const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate
     };
     const messageType = isUpdate ? 'update_message' : 'message';
     await state.socket.emit(messageType, data);
+};
+
+export const sendCurrentURL = async (url: string) => {
+    state.socket.emit('current_url', url);
 };
 
 export const sendRemoveChat = async (id: string) => {
