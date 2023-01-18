@@ -54,8 +54,6 @@ const initializeSocket = (username: string) => {
     state.socket.on('message', async (message: Message<any>) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
 
-        // @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
-
         if (message.type !== 'READ' && !isChatOpen) {
             if (!isMobile())
                 createOSNotification(
