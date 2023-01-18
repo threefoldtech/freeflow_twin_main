@@ -10,7 +10,7 @@ import config from '@/config';
 import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
 import { allSocialPosts } from '@/store/socialStore';
-import { isUserMobile } from '@/utils/webview.utils';
+import { isMobile } from '@/store/fileBrowserStore';
 
 export let connectedSocketId = '';
 
@@ -57,7 +57,7 @@ const initializeSocket = (username: string) => {
         // @TODO: CHECK SOCKET CONNECTIONS + SEND MESSAGE TO IDENTIFIER IF EXISTS
 
         if (message.type !== 'READ' && !isChatOpen) {
-            if (!isUserMobile)
+            if (!isMobile())
                 createOSNotification(
                     'Message received',
                     `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`

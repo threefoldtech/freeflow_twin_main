@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import { useAuthState } from '@/store/authStore';
-import { isUserMobile, retrieveFirebaseIdentifier } from '@/utils/webview.utils';
+import { retrieveFirebaseIdentifier } from '@/utils/webview.utils';
 
 export const sendIdentifierToBackend = async (): Promise<void> => {
     console.log('Saving identifier to backend');
@@ -10,11 +10,8 @@ export const sendIdentifierToBackend = async (): Promise<void> => {
     const identifier = await retrieveFirebaseIdentifier();
 
     if (!identifier || identifier == '') {
-        isUserMobile.value = false;
         return;
     }
-
-    isUserMobile.value = true;
 
     const appId = user.id + '.' + config.getAppId();
 
