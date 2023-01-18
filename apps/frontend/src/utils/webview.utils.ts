@@ -1,7 +1,4 @@
 import { sleep } from '@/utils/index';
-import { ref } from 'vue';
-
-export let isUserMobile = ref<boolean>(false);
 
 export const retrieveFirebaseIdentifier = async (): Promise<string> => {
     // Sleep is needed due race conditions

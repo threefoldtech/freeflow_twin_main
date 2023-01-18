@@ -26,6 +26,7 @@ import {
 import { UserGateway } from '../user/user.gateway';
 import { FirebaseService } from '../firebase/firebase.service';
 import { PostNotificationDto } from '../firebase/dtos/firebase.dtos';
+import { currentRoute } from '../../data';
 
 @Controller('messages')
 export class MessageController {
@@ -145,7 +146,12 @@ export class MessageController {
         // When the message type is different from READ (Since we automatically send a READ message so
         // the message gets automatically read by ourselves
 
-        if (!isConnected && message.type != MessageType.READ) {
+        // currentRoute.endsWith to check if the message is read or not
+
+        if (
+            message.type != MessageType.READ &&
+            (!isConnected || (isConnected && !currentRoute.endsWith(message.from)))
+        ) {
             const postMessage: PostNotificationDto = {
                 timestamp: message.timeStamp.toString(),
                 message: 'sent you a message',
