@@ -464,15 +464,14 @@
         if (!commentValue || commentValue === '' || !/\S/.test(commentValue)) return;
 
         postingCommentInProgress.value = true;
-        const comment = await commentOnPost(commentValue, props.item, isReplyToComment, comment_id);
+        await commentOnPost(commentValue, props.item, isReplyToComment, comment_id);
         messageInput.value = '';
-        await getSinglePost(props.item.post.id, props.item.owner.location);
+        const post = await getSinglePost(props.item.post.id, props.item.owner.location);
         postingCommentInProgress.value = false;
         if (!isReplyToComment) {
             isScrollToNewComment(true);
         }
-
-        emit('refreshPost', comment);
+        emit('refreshPost', post);
     };
 
     const amount_likes = ref(props.item.likes.length);
