@@ -26,7 +26,7 @@ import {
 import { UserGateway } from '../user/user.gateway';
 import { FirebaseService } from '../firebase/firebase.service';
 import { PostNotificationDto } from '../firebase/dtos/firebase.dtos';
-import { currentRoute } from '../../data';
+import { GlobalVars } from '../../data';
 
 @Controller('messages')
 export class MessageController {
@@ -150,7 +150,7 @@ export class MessageController {
 
         if (
             message.type != MessageType.READ &&
-            (!isConnected || (isConnected && !currentRoute.endsWith(message.from)))
+            (!isConnected || (isConnected && !GlobalVars.currentUrl.endsWith(message.from)))
         ) {
             const postMessage: PostNotificationDto = {
                 timestamp: message.timeStamp.toString(),
