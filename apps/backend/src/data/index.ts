@@ -1,1 +1,3 @@
-export let currentRoute: string = '';
+export class GlobalVars {
+    public static currentUrl: string = '';
+}
