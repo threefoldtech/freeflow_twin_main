@@ -17,6 +17,14 @@ export abstract class EntityRepository<TEntity extends Entity> {
     protected async findAll(): Promise<TEntity[]> {
         return await this._entityRepository.search().return.all();
     }
+
+    /**
+     * Get count of all entities.
+     */
+    protected async countAll(): Promise<number> {
+        return await this._entityRepository.search().return.count();
+    }
+
     /**
      * Finds all entities using pagination.
      * @param {Object} obj - Object.
