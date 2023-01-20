@@ -166,7 +166,7 @@ export const commentOnPost = async (
     item: IPostContainerDTO,
     isReplyToComment: boolean,
     comment_id?: string
-) => {
+): Promise<{ status: string }> => {
     const data: IPostComment = {
         id: uuidv4(),
         body: message,

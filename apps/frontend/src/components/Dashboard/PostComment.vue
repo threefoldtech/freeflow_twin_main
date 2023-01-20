@@ -186,8 +186,10 @@
         const { post } = props.comment;
 
         await deleteComment(post.id, props.comment.id, post.owner.location);
-        await getSinglePost(post.id, post.owner.location);
+        const res = await getSinglePost(post.id, post.owner.location);
         showDeleteCommentDialog.value = false;
+
+        emit('updateComments', res);
     };
 
     const avatarImg = computed(() => {
