@@ -211,7 +211,8 @@
                 break;
             }
             const vidOptions = Object.values(VideoFileExtension);
-            if (vidOptions.includes(<VideoFileExtension>file.type)) {
+            const fileExtension = file.name.split('.').pop() as VideoFileExtension;
+            if (vidOptions.includes(fileExtension)) {
                 newPostVideo.value = file;
                 newPostVideoUrl.value = URL.createObjectURL(file);
                 return;
