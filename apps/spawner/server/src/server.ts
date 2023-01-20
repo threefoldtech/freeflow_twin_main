@@ -1,10 +1,10 @@
 import express from 'express';
 import morgan from 'morgan';
 import { logger } from './logger';
-// eslint-disable-next-line @typescript-eslint/naming-convention
 import session from 'express-session';
 import { router as authRouter } from './routers/auth';
 import { router as listRouter } from './routers/list';
+import { router as versionRouter } from './routers/version';
 import { router as spawnRouter } from './routers/spawn';
 import { initDocker } from './service/dockerService';
 import cors, { CorsOptions } from 'cors';
@@ -57,6 +57,7 @@ const init = async () => {
 
     app.use('/api/v1/auth', authRouter);
     app.use('/api/v1/list', listRouter);
+    app.use('/api/v1/version', versionRouter);
 
     app.listen(9000, () => {
         logger.info(`server started at http://localhost:9000`);
