@@ -88,7 +88,7 @@
                             >
                                 <XIcon class="w-6 text-gray-400" />
                             </div>
-                            <video class="p-4" controls>
+                            <video class="p-4 max-h-[250px]" controls>
                                 <source :src="newPostVideoUrl" />
                             </video>
                         </div>
