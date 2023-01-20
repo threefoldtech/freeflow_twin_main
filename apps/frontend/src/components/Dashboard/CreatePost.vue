@@ -247,6 +247,15 @@
         newPostVideoUrl.value = '';
         for (const file of files) {
             checkFile(file);
+
+            const vidOptions = Object.values(VideoFileExtension);
+            const fileExtension = file.name.split('.').pop();
+            if (vidOptions.includes(fileExtension as VideoFileExtension)) {
+                newPostVideo.value = file;
+                newPostVideoUrl.value = URL.createObjectURL(file);
+                return;
+            }
+
             newPostImages.value.push(file);
         }
         error.value ? (newPostImages.value = []) : '';
