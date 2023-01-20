@@ -13,7 +13,7 @@ RUN set -ex \
  && git reset --hard v${YGGDRASIL_VERSION} \
  && ./build \
  && curl -sSfLo /tmp/dumb-init "https://github.com/Yelp/dumb-init/releases/download/v${DUMB_INIT_VERSION}/dumb-init_${DUMB_INIT_VERSION}_amd64" \
- && chmod 0755 /tmp/dumb-init 
+ && chmod 0755 /tmp/dumb-init
 
 
 FROM ubuntu:20.04
@@ -33,7 +33,7 @@ RUN git clone "https://github.com/RedisJSON/RedisJSON.git" /redis-json \
  && cd /redis-json \
  && cargo build --release
 
-RUN git clone --recursive "https://github.com/RediSearch/RediSearch.git" /redis-search \
+RUN git clone --branch 2.2 --recursive "https://github.com/RediSearch/RediSearch.git" /redis-search \
  && cd /redis-search \
  && make setup \
  && make build
@@ -57,7 +57,7 @@ COPY ./docker/dev/startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
 RUN mkdir /appdata
-RUN mkdir /appdata/user 
+RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
