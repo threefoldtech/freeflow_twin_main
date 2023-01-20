@@ -374,13 +374,15 @@ export class PostService {
 
     private removeComment(comments: IPostComment[], commentToRemove: IPostComment): IPostComment[] {
         for (const [i, comment] of comments.entries()) {
-            const hasReplies = comment.replies.length > 0;
             if (comment.id === commentToRemove.id) {
                 comments.splice(i, 1);
                 return comments;
             }
-            if (!hasReplies) continue;
-            comment.replies = this.removeComment(comment.replies, commentToRemove);
+            if (comment.replies.length === 0) continue;
+
+            const changedComments = this.removeComment(comment.replies, commentToRemove);
+            if (!changedComments) continue;
+            comment.replies = changedComments;
             return comments;
         }
     }
