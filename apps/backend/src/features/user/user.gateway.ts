@@ -82,6 +82,7 @@ export class UserGateway implements OnGatewayInit {
     }
 
     private async handleStatusEmit({ status }: { status: IStatusUpdate }) {
+        this.emitMessageToConnectedClients('update_status', status);
         Promise.all(
             this.contacts.map(async c => {
                 await this._apiService.sendStatusUpdate({ location: c.location, status });
