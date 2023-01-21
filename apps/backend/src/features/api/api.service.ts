@@ -605,4 +605,13 @@ export class ApiService {
             return;
         }
     }
+
+    async setContactAccepted(userId: string, location: string, accepted: boolean) {
+        const destinationUrl = `http://[${location}]/api/v2/contacts/${accepted}/${userId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
+            return;
+        }
+    }
 }

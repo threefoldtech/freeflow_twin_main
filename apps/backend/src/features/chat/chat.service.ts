@@ -33,6 +33,7 @@ export class ChatService {
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
         private readonly _chatGateway: ChatGateway,
+        @Inject(forwardRef(() => BlockedContactService))
         private readonly _blockedContactService: BlockedContactService
     ) {}
 
