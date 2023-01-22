@@ -36,6 +36,8 @@ const initializeSocket = (username: string) => {
     state.socket.on('connect', () => {
         connectedSocketId = state.socket.id;
         console.log('connected with socket.');
+        const { user } = useAuthState();
+        if (statusList[user?.id]) statusList[user?.id].isOnline = true;
     });
 
     state.socket.on('chat_removed', (chatId: string) => {
