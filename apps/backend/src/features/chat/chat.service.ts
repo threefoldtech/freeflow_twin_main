@@ -64,8 +64,8 @@ export class ChatService {
             Promise.all(
                 chat.parseContacts().map(async c => {
                     const isBlocked = await this._blockedContactService.isBlocked({ userId: c.id });
-                    const isCurrentUserBlocked = await this._apiService.checkIfBlocked(userId, c.location);
-                    if (isBlocked || isCurrentUserBlocked) return;
+                    //todo: check if contact is accepted instead of blocked
+                    if (isBlocked) return;
                     if (c.id === userId) {
                         this._chatGateway.emitMessageToConnectedClients('connection_request', {
                             ...chat.toJSON(),
