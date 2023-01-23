@@ -67,7 +67,7 @@
         await fetchStatus(user.id);
         const contact: Contact = {
             id: props.id,
-            location: watchingUsers[props.id]?.location,
+            location: watchingUsers[props.id]?.location ?? props.contact?.location,
         };
         if (!statusList[props.id] && contact.location) {
             await startFetchStatus(contact);
