@@ -330,10 +330,9 @@ export class PostService {
             const post = await this._postRepo.getPost({ id: deleteCommentDTO.postId });
             const comment = this.findComment(post.parseReplies(), deleteCommentDTO.commentId);
             if (!comment) throw new BadRequestException('comment not found');
-            const owner = post.parsePostOwner();
 
-            if (comment.owner.id !== this.user && this.user !== owner.id) {
-                throw new ForbiddenException('cannot delete comment as someone else if you are not the owner.');
+            if (comment.owner.id !== this.user) {
+                throw new ForbiddenException('cannot delete comment as someone else.');
             }
 
             const changedComments = this.removeComment(post.parseReplies(), comment);
