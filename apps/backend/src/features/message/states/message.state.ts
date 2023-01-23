@@ -223,7 +223,7 @@ export class SystemMessageState implements MessageState<SystemMessage> {
             messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m => m.toJSON()),
         };
 
-        if (!type || [SystemMessageType.JOINED_VIDEOROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type))
+        if (!type || [SystemMessageType.JOINED_VIDEO_ROOM, SystemMessageType.CONTACT_REQUEST_SEND].includes(type))
             return await this._subSystemMessageStateHandlers.get(SystemMessageType.DEFAULT).handle({
                 message,
                 chat: chatDTO,

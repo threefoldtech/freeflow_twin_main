@@ -163,7 +163,6 @@ export class MessageController {
 
             this._firebaseService.notifyUserInMicroService(postMessage);
         }
-
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
     }
 }
