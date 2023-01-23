@@ -14,9 +14,6 @@
     import PostComment from '@/components/Dashboard/PostComment.vue';
     import { computed, watch, ref } from 'vue';
     import { IPostComment, IPostContainerDTO } from 'custom-types/post.type';
-    import { useScrollState } from '@/store/scrollStore';
-
-    const { scrollToNewComment } = useScrollState();
 
     const props = defineProps<{ comments: IPostComment[] }>();
     const emit = defineEmits<{
@@ -30,13 +27,6 @@
         return props.comments.sort(function (a, b) {
             return new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime();
         });
-    });
-
-    watch(scrollToNewComment, () => {
-        if (scrollToNewComment.value) {
-            comments.value.scrollTop = 0;
-            scrollToNewComment.value = false;
-        }
     });
 </script>
 

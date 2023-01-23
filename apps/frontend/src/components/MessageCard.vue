@@ -151,7 +151,6 @@
         editMessage,
         replyMessage,
     } from '@/store/chatStore';
-    import { useScrollActions } from '@/store/scrollStore';
     import Time from '@/components/Time.vue';
     import axios from 'axios';
 
@@ -165,7 +164,6 @@
     import { calcExternalResourceLink } from '@/services/urlService';
 
     const { user } = useAuthState();
-    const { addScrollEvent } = useScrollActions();
 
     interface IProps {
         message: Message<any>;
@@ -184,7 +182,6 @@
     const emit = defineEmits(['openEditShare', 'clickedProfile']);
 
     onMounted(() => {
-        addScrollEvent();
         if (!props.isReadByMe) read();
     });
 

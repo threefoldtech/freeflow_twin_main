@@ -11,8 +11,8 @@
                     <slot name="topbar" />
                 </template>
             </Navigation>
-            <div class="content w-full h-full overflow-y-auto relative flex flex-col hide-scrollbar">
-                <div class="relative w-full h-full overflow-y-auto hide-scrollbar">
+            <div class="content w-full h-full overflow-y-auto relative flex flex-col">
+                <div class="relative w-full h-full overflow-y-auto">
                     <div class="absolute w-full h-full">
                         <ImagePreview />
                         <slot></slot>

@@ -31,7 +31,6 @@
             value: props.modelValue ?? '',
             theme: 'vs',
             padding: { top: 20, bottom: 20 },
-            scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
             minimap: { enabled: false },
             ...props.options,
         });

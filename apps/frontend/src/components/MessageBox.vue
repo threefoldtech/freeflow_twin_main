@@ -1,5 +1,5 @@
 <template>
-    <div ref="messageBoxLocal" class="overflow-y-auto" @scroll="handleScroll">
+    <div ref="messageBoxLocal" class="overflow-y-auto">
         <Dialog :modelValue="showShareDialog" @update-model-value="showShareDialog = false" :noActions="true">
             <template v-slot:title>
                 <h1 class="font-medium">
@@ -177,8 +177,6 @@
     const tabs = ['Create shares', 'Edit permissions'];
     const selectedTab = ref(1);
 
-    onMounted(() => nextTick(() => scrollToBottom()));
-
     const rightClickedItem = computed(() => {
         return currentRightClickedItem.value as ICurrentRightClickItem<Message<any>>;
     });
@@ -189,11 +187,6 @@
     };
 
     const messageBoxLocal = ref<HTMLDivElement>(null);
-
-    const scrollToBottom = () => {
-        if (!messageBoxLocal.value) return;
-        messageBoxLocal.value.scrollTop = messageBoxLocal.value.scrollHeight;
-    };
 
     const showShareDialog = ref(false);
     const selectedEditFile = ref<Message<SharedFileInterface>>(null);
@@ -219,7 +212,6 @@
         if (percent === 100) {
             setTimeout(() => {
                 imageUploadQueue.value = imageUploadQueue.value.filter(el => el.id !== image.id);
-                scrollToBottom();
                 window.URL.revokeObjectURL(image.data);
             }, 200);
         }
@@ -239,22 +231,6 @@
         if (idx === -1) return;
         return findLastIndex(props.chat.messages, message => props.chat.read[idx].messageId === message.id);
     });
-
-    const handleScroll = async e => {
-        let element = messageBox.value;
-
-        const oldScrollHeight = element.scrollHeight;
-        if (element.scrollTop < 100) {
-            getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
-                if (!newMessagesLoaded) return;
-
-                messageBoxLocal.value.scrollTo({
-                    top: element.scrollHeight - oldScrollHeight + element.scrollTop,
-                    behavior: 'auto',
-                });
-            });
-        }
-    };
 
     const copyMessage = (event: ClipboardEvent, message: Message<MessageBodyType>) => {
         let data = '';

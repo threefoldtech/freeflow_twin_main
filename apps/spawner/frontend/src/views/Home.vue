@@ -48,7 +48,7 @@
                                 </DisclosureButton>
                                 <DisclosurePanel class="max-w-md flex justify-center">
                                     <div
-                                        class="bg-black text-white mt-2 p-4 h-16 overflow-x-scroll overflow-y-hidden whitespace-nowrap rounded-md"
+                                        class="bg-black text-white mt-2 p-4 h-16 overflow-y-hidden whitespace-nowrap rounded-md"
                                     >
                                         <p class="text-white text-left">
                                             docker run -ti --sysctl net.ipv6.conf.all.disable_ipv6=0 -e "USER_ID={{

@@ -25,7 +25,7 @@
                 </div>
             </TabList>
             <TabPanels>
-                <TabPanel @wheel.prevent @touchmove.prevent @scroll.prevent class="relative">
+                <TabPanel @wheel.prevent @touchmove.prevent  class="relative">
                     <TransitionRoot
                         :show="isPublishingNewPost"
                         enter="transition-opacity duration-75"

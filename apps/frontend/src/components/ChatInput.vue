@@ -107,8 +107,6 @@
                                 class="block w-full pl-1 min-h-[24px] max-h-[150px] sm:h-9 h-10 resize-none overflow-y-auto whitespace-pre-wrap border-0 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
                                 autofocus
                                 maxlength="2000"
-                                @input="resizeTextarea()"
-                                @click="resizeTextarea()"
                                 ref="message"
                                 placeholder="Write a message ..."
                                 @keyup.arrow-up="activeTag > 0 ? activeTag-- : (activeTag = contacts.length - 1)"
@@ -178,13 +176,11 @@
         GroupContact,
     } from '@/types';
     import { uuidv4 } from '@/common';
-    import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { useDebounceFn } from '@vueuse/core';
 
     const { sendMessage, sendFile } = usechatsActions();
-    const { addScrollEvent } = useScrollActions();
 
     interface IProps {
         chat: Chat;
@@ -207,12 +203,6 @@
     });
 
     const message = ref(null);
-
-    const resizeTextarea = () => {
-        let area = message.value;
-        area.style.height = '36px';
-        area.style.height = area.scrollHeight + 'px';
-    };
 
     const getMessageInput = () => {
         const draft = props.chat?.draft;
@@ -314,7 +304,6 @@
 
     const clearMessage = () => {
         message.value.value = '';
-        resizeTextarea();
     };
 
     const tagPerson = contact => {
@@ -346,7 +335,6 @@
             sendMessageObject(selectedId, newMessage);
             clearAction();
             clearMessage();
-            addScrollEvent();
             return;
         }
 
@@ -433,7 +421,6 @@
         const { sendMessage } = usechatsActions();
         sendMessage(selectedId, gif, 'GIF');
         emit('messageSend');
-        addScrollEvent();
     };
 
     const hideGif = () => {
@@ -518,7 +505,6 @@
         }
         draftMessage(selectedId, createMessage());
         nextTick(() => {
-            resizeTextarea();
         });
     });
 </script>

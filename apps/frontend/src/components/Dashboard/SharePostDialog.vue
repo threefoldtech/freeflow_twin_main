@@ -7,7 +7,7 @@
         @click="$emit('close')"
     >
         <div
-            class="bg-white w-full h-full lg:max-h-[90vh] lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto hide-scrollbar"
+            class="bg-white w-full h-full lg:max-h-[90vh] lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto"
             @click.stop
         >
             <div class="bg-accent-700 text-white lg:rounded-tl-lg">

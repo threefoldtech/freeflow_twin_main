@@ -4,7 +4,6 @@
             :src="calcExternalResourceLink(message.body.url)"
             class="max-w-full"
             controls
-            @load="$emit('scroll')"
         ></audio>
     </div>
 </template>
@@ -17,5 +16,4 @@
     }
 
     const props = defineProps<IProp>();
-    const emits = defineEmits(['scroll']);
 </script>

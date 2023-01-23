@@ -364,11 +364,9 @@
     import Alert from '@/components/Alert.vue';
     import { IPostContainerDTO } from 'custom-types/post.type';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
-    import { useScrollActions } from '@/store/scrollStore';
     import { useDebounceFn } from '@vueuse/core';
 
     const { user } = useAuthState();
-    const { isScrollToNewComment } = useScrollActions();
 
     const props = defineProps<{ item: IPostContainerDTO }>();
     const showAllImages = ref(false);

@@ -116,7 +116,7 @@
                                     ></div>
                                 </template>
                             </MessageBox>
-                            <ChatInput v-if="!blocked" :chat="chat" @messageSend="scrollToBottom(true)" />
+                            <ChatInput v-if="!blocked" :chat="chat" />
                         </FileDropArea>
                     </div>
                     <div v-else class="grid h-full w-full place-items-center">
@@ -341,7 +341,6 @@
 </template>
 
 <script setup lang="ts">
-    import { useScrollActions, useScrollState } from '@/store/scrollStore';
     import AppLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
@@ -609,23 +608,12 @@
         return statusList[selectedId.value];
     });
 
-    const { scrollEvents } = useScrollState();
-    const { shiftScrollEvent } = useScrollActions();
-
     const blocked = computed(() => {
         if (!chat.value || chat.value.isGroup) return false;
         return userIsBlocked(<string>chat.value.chatId);
     });
 
     const showSideBar = getShowSideBar();
-
-    watch(scrollEvents, () => {
-        if (!scrollEvents.value || scrollEvents.value.length === 0) return;
-        nextTick(() => {
-            scrollToBottom(scrollEvents[0]);
-            shiftScrollEvent();
-        });
-    });
 
     watch(
         () => route.params.id,

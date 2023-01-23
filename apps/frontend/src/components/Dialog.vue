@@ -11,7 +11,7 @@
             @keydown.enter="$emit('update-model-value', true)"
         >
             <div
-                class="bg-white w-full h-full lg:h-auto lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto hide-scrollbar lg:overflow-hidden"
+                class="bg-white w-full h-full lg:h-auto lg:max-w-2xl lg:w-3/4 lg:rounded-lg overflow-y-auto lg:overflow-hidden"
                 @mousedown.stop
             >
                 <div class="bg-accent-700 text-white lg:rounded-t-lg">

@@ -18,7 +18,6 @@ export const popupCenter = (url: string, title: string, w: number, h: number, bl
         url,
         blank ? '_blank' : '',
         `
-      scrollbars=yes,
       width=${w / systemZoom},
       height=${h / systemZoom},
       top=${top},

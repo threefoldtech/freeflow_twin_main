@@ -23,7 +23,6 @@ import config from '@/config';
 import { uuidv4 } from '@/common';
 import { startFetchStatus } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
-import { useScrollActions } from './scrollStore';
 import { blocklist } from '@/store/blockStore';
 import { FileAction } from 'custom-types/file-actions.type';
 import { useDebounceFn } from '@vueuse/core';
@@ -287,7 +286,6 @@ const getNewMessages = async (chatId: string) => {
 };
 
 const addMessage = (chatId: string, message: any) => {
-    const { addScrollEvent } = useScrollActions();
     if (message.type === 'READ') {
         const chat: Chat = getChat(chatId);
 
@@ -335,7 +333,6 @@ const addMessage = (chatId: string, message: any) => {
         }
 
         setLastMessage(chatId, message);
-        addScrollEvent();
         return;
     }
 
@@ -359,7 +356,6 @@ const addMessage = (chatId: string, message: any) => {
 
     sortChats();
     setLastMessage(chatId, message);
-    addScrollEvent();
 };
 
 const sendMessage = (chatId: string, message: any, type: string = 'STRING') => {

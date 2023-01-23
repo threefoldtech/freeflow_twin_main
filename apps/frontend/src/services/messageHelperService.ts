@@ -2,11 +2,6 @@ import { Chat, MessageTypes } from '@/types';
 import moment from 'moment';
 import { ref } from 'vue';
 
-export const messageBox = ref<HTMLElement>(null);
-export const scrollMessageBoxToBottom = () => {
-    messageBox?.value?.scrollTo(0, messageBox.value.scrollHeight);
-};
-
 export const isLastMessage = (chat: Chat, index: number) => {
     if (index + 1 === chat.messages.length) {
         return true;
