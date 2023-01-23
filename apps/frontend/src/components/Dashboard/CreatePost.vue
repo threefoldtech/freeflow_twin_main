@@ -88,7 +88,7 @@
                             >
                                 <XIcon class="w-6 text-gray-400" />
                             </div>
-                            <video class="p-4" controls>
+                            <video class="p-4 max-h-[250px]" controls>
                                 <source :src="newPostVideoUrl" />
                             </video>
                         </div>
@@ -211,7 +211,8 @@
                 break;
             }
             const vidOptions = Object.values(VideoFileExtension);
-            if (vidOptions.includes(<VideoFileExtension>file.type)) {
+            const fileExtension = file.name.split('.').pop() as VideoFileExtension;
+            if (vidOptions.includes(fileExtension)) {
                 newPostVideo.value = file;
                 newPostVideoUrl.value = URL.createObjectURL(file);
                 return;
@@ -246,6 +247,15 @@
         newPostVideoUrl.value = '';
         for (const file of files) {
             checkFile(file);
+
+            const vidOptions = Object.values(VideoFileExtension);
+            const fileExtension = file.name.split('.').pop();
+            if (vidOptions.includes(fileExtension as VideoFileExtension)) {
+                newPostVideo.value = file;
+                newPostVideoUrl.value = URL.createObjectURL(file);
+                return;
+            }
+
             newPostImages.value.push(file);
         }
         error.value ? (newPostImages.value = []) : '';
