@@ -112,9 +112,6 @@ export class PostService {
 
                 await Promise.all(
                     contacts.map(async contact => {
-                        const blockedByContact = await this._apiService.checkIfBlocked(username, contact.location);
-                        if (blockedByContact) return;
-
                         const data = await this._apiService.getExternalPosts({
                             location: contact.location,
                             userId: contact.id,

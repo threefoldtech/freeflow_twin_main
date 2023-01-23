@@ -482,18 +482,6 @@ export class ApiService {
         }
     }
 
-    /**
-     * Check if you are blocked by the other twin.
-     */
-    async checkIfBlocked(location: string, userId: string): Promise<boolean> {
-        const url = `http://[${location}]/api/v2/blocked/${userId}`;
-        try {
-            return (await axios.get(url)).data;
-        } catch {
-            return false;
-        }
-    }
-
     async containerHealth(location: string): Promise<boolean> {
         const url = `http://[${location}]/api/v2/container/health`;
         try {
@@ -602,6 +590,15 @@ export class ApiService {
             });
         } catch (e) {
             console.log(e);
+            return;
+        }
+    }
+
+    async setContactAccepted(userId: string, location: string, accepted: boolean) {
+        const destinationUrl = `http://[${location}]/api/v2/contacts/${accepted}/${userId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
             return;
         }
     }

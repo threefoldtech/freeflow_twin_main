@@ -27,6 +27,7 @@ export class ContactService {
         private readonly _apiService: ApiService,
         @Inject(forwardRef(() => ChatService))
         private readonly _chatService: ChatService,
+        @Inject(forwardRef(() => BlockedContactService))
         private readonly _blockedContactService: BlockedContactService,
         @Inject(forwardRef(() => ChatGateway))
         private readonly _chatGateway: ChatGateway
@@ -297,6 +298,17 @@ export class ContactService {
         contact.contactRequest = contactRequest;
         contact.accepted = accepted;
         contact.containerOffline = containerOffline;
+        try {
+            return await this._contactRepo.updateContact({ contact });
+        } catch (error) {
+            throw new BadRequestException(`unable to update contact: ${error}`);
+        }
+    }
+
+    async setContactAccepted(id: string, accepted: boolean): Promise<Contact> {
+        const contact = await this.getContact({ id });
+        if (!contact) return;
+        contact.accepted = accepted;
         try {
             return await this._contactRepo.updateContact({ contact });
         } catch (error) {
