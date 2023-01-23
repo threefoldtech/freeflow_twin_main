@@ -47,7 +47,6 @@
     import { showUserOfflineMessage, startFetchStatus } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import {
-        EditPathInfo,
         generateDocumentServerConfig,
         generateFileBrowserUrl,
         getFileInfo,
@@ -119,7 +118,7 @@
         const fileInfo = (await getFileInfo(path, undefined, attachments)).data;
         isLoading.value = false;
         readUrl.value = generateFileBrowserUrl(
-            'http',
+            'https',
             window.location.hostname,
             fileInfo.path,
             fileInfo.readToken,
