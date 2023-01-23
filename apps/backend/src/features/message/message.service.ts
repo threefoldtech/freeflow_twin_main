@@ -49,17 +49,21 @@ export class MessageService {
      */
     async getMessagesFromChat({
         chatId,
-        offset,
         count,
+        totalMessagesLoaded = 0,
     }: {
         chatId: string;
-        offset: number;
         count: number;
+        totalMessagesLoaded?: number;
     }): Promise<MessageDTO<unknown>[]> {
         try {
-            const messages = (await this._messageRepo.getMessagesFromChat({ chatId, offset, count })).map(m =>
-                m.toJSON()
-            );
+            const messages = (
+                await this._messageRepo.getMessagesFromChat({
+                    chatId,
+                    offset: totalMessagesLoaded,
+                    count,
+                })
+            ).map(m => m.toJSON());
             return messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
         } catch (error) {
             throw new BadRequestException(`unable to fetch messages from chat: ${error}`);

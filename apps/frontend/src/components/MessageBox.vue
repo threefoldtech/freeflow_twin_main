@@ -41,7 +41,6 @@
         <div class="relative w-full mt-8 px-4">
             <div v-if="chatInfo?.isLoading" class="flex flex-col justify-center items-center w-full">
                 <Spinner />
-                <span>Loading more messages</span>
             </div>
             <div v-for="(message, i) in chat.messages">
                 <div v-if="showDivider(chat, i)" class="grey--text text-xs text-center p-4">
@@ -244,14 +243,13 @@
         let element = messageBox.value;
 
         const oldScrollHeight = element.scrollHeight;
-        if (element.scrollTop < 100) {
-            getNewMessages(<string>props.chat.chatId).then(newMessagesLoaded => {
-                if (!newMessagesLoaded) return;
+        if (element.scrollTop === 0) {
+            const newMessagesLoaded = await getNewMessages(<string>props.chat.chatId);
+            if (!newMessagesLoaded) return;
 
-                messageBoxLocal.value.scrollTo({
-                    top: element.scrollHeight - oldScrollHeight + element.scrollTop,
-                    behavior: 'auto',
-                });
+            messageBoxLocal.value.scrollTo({
+                top: element.scrollHeight - oldScrollHeight + element.scrollTop,
+                behavior: 'auto',
             });
         }
     };
