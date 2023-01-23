@@ -1,5 +1,5 @@
 <template>
-    <div ref="messageBoxLocal" class="overflow-y-auto bg-yellow-100" @scroll="handleScroll">
+    <div ref="messageBoxLocal" class="overflow-y-auto" @scroll="handleScroll">
         <Dialog :modelValue="showShareDialog" @update-model-value="showShareDialog = false" :noActions="true">
             <template v-slot:title>
                 <h1 class="font-medium">
