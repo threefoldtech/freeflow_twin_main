@@ -504,8 +504,7 @@
             }
         }
         draftMessage(selectedId, createMessage());
-        nextTick(() => {
-        });
+        nextTick(() => {});
     });
 </script>
 

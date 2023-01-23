@@ -367,7 +367,6 @@
     import FileDropArea from '@/components/FileDropArea.vue';
     import TimeContent from '@/components/TimeContent.vue';
     import { XIcon, InformationCircleIcon } from '@heroicons/vue/outline';
-    import { scrollMessageBoxToBottom } from '@/services/messageHelperService';
     import {
         conversationComponentRerender,
         openBlockDialogFromOtherFile,
@@ -601,7 +600,6 @@
 
     const scrollToBottom = (force = false) => {
         if (!force && !isIntersecting.value) return;
-        nextTick(() => scrollMessageBoxToBottom());
     };
 
     const status = computed(() => {

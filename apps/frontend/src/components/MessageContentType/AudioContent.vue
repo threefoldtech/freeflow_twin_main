@@ -1,10 +1,6 @@
 <template>
     <div class="p-3 mt-2">
-        <audio
-            :src="calcExternalResourceLink(message.body.url)"
-            class="max-w-full"
-            controls
-        ></audio>
+        <audio :src="calcExternalResourceLink(message.body.url)" class="max-w-full" controls></audio>
     </div>
 </template>
 

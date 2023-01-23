@@ -146,7 +146,7 @@
     import moment from 'moment';
     import { computed, nextTick, onMounted, ref, watch } from 'vue';
     import { findLastIndex } from 'lodash';
-    import { isFirstMessage, isLastMessage, messageBox, showDivider } from '@/services/messageHelperService';
+    import { isFirstMessage, isLastMessage, showDivider } from '@/services/messageHelperService';
     import { imageUploadQueue, retrySendFile, usechatsActions, useChatsState } from '@/store/chatStore';
     import { ExclamationIcon, XCircleIcon } from '@heroicons/vue/solid';
     import Spinner from '@/components/Spinner.vue';
@@ -261,9 +261,6 @@
 
     const chatInfo = computed(() => getChatInfo(<string>props.chat.chatId));
 
-    watch(messageBoxLocal, () => {
-        messageBox.value = messageBoxLocal.value;
-    });
 
     watch(
         () => props.chat.messages[props.chat.messages.length - 1],
