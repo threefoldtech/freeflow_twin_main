@@ -5,7 +5,7 @@
         @mouseover="showDots = true"
         @mouseleave="showDots = false"
     >
-        <VMenu placement="top">
+        <VMenu placement="top" :autoHide="false">
             <AvatarImg
                 :id="comment.owner.id"
                 :contact="comment.owner"
