@@ -25,6 +25,10 @@ export abstract class EntityRepository<TEntity extends Entity> {
         return await this._entityRepository.search().return.count();
     }
 
+    protected async countAllWhereEq({ where, eq }: { where: string; eq: string | boolean }): Promise<number> {
+        return await this._entityRepository.search().where(where).eq(eq).return.count();
+    }
+
     /**
      * Finds all entities using pagination.
      * @param {Object} obj - Object.

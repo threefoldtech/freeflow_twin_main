@@ -112,6 +112,7 @@ export const replyMessage = (chatId: string, message: any) => {
 };
 
 export const getChat = (chatId: string) => state.chats.find(x => x.chatId === chatId);
+
 const setChatHasMoreMessages = (chatId: string, hasMore: boolean): void => {
     state.chatInfo[chatId] = {
         ...(state.chatInfo[chatId] ?? { isLoading: false }),
@@ -246,14 +247,14 @@ const appendMessages = (chat: Chat, messages: Array<Message<MessageBodyType>> | 
 const fetchMessages = async (
     chatId: string,
     limit: number,
-    lastMessageId: string | undefined
+    totalMessagesLoaded: number
 ): Promise<GetMessagesResponse | undefined> => {
     const params = new URLSearchParams();
-    if (lastMessageId) params.append('fromId', lastMessageId);
+    if (totalMessagesLoaded) params.append('totalMessagesLoaded', totalMessagesLoaded.toString());
     params.append('limit', limit.toString());
 
     // TODO: handle in nest
-    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/v1/messages/${chatId}`, {
+    const response = await axios.get<GetMessagesResponse>(`${config.baseUrl}api/v2/messages/${chatId}`, {
         params: params,
     });
 
@@ -268,15 +269,14 @@ const fetchMessages = async (
 const getNewMessages = async (chatId: string) => {
     const info = getChatInfo(chatId);
     if (!info || info.isLoading || !info.hasMoreMessages) return;
-
     try {
         setChatMessagesAreLoading(chatId, true);
 
         const chat = getChat(chatId);
         if (!chat) return;
 
-        const response = await fetchMessages(<string>chat.chatId, messageLimit, <string>chat.messages[0]?.id);
-        setChatHasMoreMessages(<string>chat.chatId, response.hasMore);
+        const response = await fetchMessages(chat.chatId, messageLimit, chat.messages.length);
+        setChatHasMoreMessages(chat.chatId, response.hasMore);
         appendMessages(chat, response.messages);
         return response.messages.length > 0;
     } catch (ex) {

@@ -147,7 +147,6 @@ export class ChatService {
             for (let i = 0; i < chatDTOs.length; i++) {
                 const chatMessages = await this._messageService.getMessagesFromChat({
                     chatId: chatDTOs[i].chatId,
-                    offset,
                     count,
                 });
                 chatDTOs[i].messages = chatMessages ?? [];

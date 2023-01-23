@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Put } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Put, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { MessageType } from '../../types/message-types';
@@ -165,5 +165,16 @@ export class MessageController {
         }
 
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
+    }
+
+    @Get('/:chatId')
+    async getMessages(@Param('chatId') chatId: string, @Query() query: { totalMessagesLoaded: string; limit: string }) {
+        const { totalMessagesLoaded, limit } = query;
+        const chatMessages = await this._messageService.getMessagesFromChat({
+            chatId,
+            count: parseInt(limit),
+            totalMessagesLoaded: parseInt(totalMessagesLoaded),
+        });
+        return { messages: chatMessages, hasMore: chatMessages.length === parseInt(limit) };
     }
 }
