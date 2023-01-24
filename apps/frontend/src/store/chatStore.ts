@@ -390,7 +390,7 @@ export const sendMessageObject = (chatId: string, message: Message<MessageBodyTy
     // console.log(chatId, message);
     // @TODO when doing add message on SYSTEM/groupupdate results in  max call stack exeeded
     if (message.type !== 'SYSTEM') {
-        addMessage(chatId, message);
+        addMessage(chatId, { ...message });
     }
     const isEdit = message.type === 'EDIT' || message.type === 'DELETE';
     sendSocketMessage(chatId, message, isEdit);
