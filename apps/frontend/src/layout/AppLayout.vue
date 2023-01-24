@@ -2,7 +2,7 @@
     <suspense>
         <UserConfigDialog></UserConfigDialog>
     </suspense>
-    <div class="bg-gray-100 h-full relative text-sm">
+    <div class="bg-gray-100 h-full text-sm">
         <NotificationSection />
 
         <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
