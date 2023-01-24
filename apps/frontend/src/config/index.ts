@@ -1,4 +1,5 @@
 interface IConfig {
+    spawnerUrl: string;
     baseUrl: string;
     appBackend: string;
     documentServerLocation: string;
@@ -7,6 +8,7 @@ interface IConfig {
 }
 
 class Config implements IConfig {
+    spawnerUrl: string;
     baseUrl: string;
     appBackend: string;
     documentServerLocation: string;
@@ -24,6 +26,7 @@ class Config implements IConfig {
     }
 
     constructor(
+        spawnerUrl: string,
         baseUrl: string,
         appBackend: string,
         documentServerLocation: string,
@@ -31,6 +34,7 @@ class Config implements IConfig {
         beta: boolean | null,
         appId: string | undefined
     ) {
+        this.spawnerUrl = spawnerUrl;
         this.baseUrl = baseUrl;
         this.appBackend = appBackend;
         this.documentServerLocation = documentServerLocation;
@@ -42,6 +46,14 @@ class Config implements IConfig {
 
 // @ts-ignore
 const c = <IConfig>window.config;
-const config = new Config(c.baseUrl, c.appBackend, c.documentServerLocation, c.giphyApiKey, c.beta, undefined);
+const config = new Config(
+    c.spawnerUrl,
+    c.baseUrl,
+    c.appBackend,
+    c.documentServerLocation,
+    c.giphyApiKey,
+    c.beta,
+    undefined
+);
 
 export default config;

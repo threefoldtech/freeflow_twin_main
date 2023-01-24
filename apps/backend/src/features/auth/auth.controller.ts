@@ -75,8 +75,15 @@ export class AuthController {
         console.log('A');
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
         console.log('redirectUrl', redirectUrl);
-        const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
-        console.log('profileData', profileData);
+
+        let profileData: any;
+
+        try {
+            profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
+            console.log('profileData', profileData);
+        } catch (e) {
+            res.redirect('/error?reason=wrongUser');
+        }
 
         delete req.session.state;
 
