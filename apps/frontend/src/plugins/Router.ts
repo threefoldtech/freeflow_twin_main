@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
 import VideoRoom from '@/views/app/VideoRoom.vue';
+import Error from '@/views/Error.vue';
 import Forum from '@/views/app/Forum.vue';
 import Kutana from '@/views/app/Kutana.vue';
 import Chat from '@/views/app/Chat.vue';
@@ -52,6 +53,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'callback/:signedAttempt',
         component: Callback,
         meta: { requiresAuth: true },
+    },
+    {
+        path: '/error',
+        name: 'error',
+        component: Error,
     },
     {
         path: '/unauthorized',

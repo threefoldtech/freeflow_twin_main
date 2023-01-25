@@ -169,19 +169,22 @@
     import { useAuthState } from '@/store/authStore';
     import {
         Chat,
+        Contact,
         FileTypes,
+        GroupContact,
         Message,
         MessageBodyType,
         MessageTypes,
         QuoteBodyType,
-        Contact,
-        GroupContact,
     } from '@/types';
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { EmojiPickerElement } from 'unicode-emoji-picker';
     import AvatarImg from '@/components/AvatarImg.vue';
-    import { useDebounceFn } from '@vueuse/core';
+
+    import AudioRecorder from 'audio-recorder-polyfill';
+
+    window.MediaRecorder = AudioRecorder;
 
     const { sendMessage, sendFile } = usechatsActions();
     const { addScrollEvent } = useScrollActions();
@@ -390,7 +393,8 @@
             audio: true,
         });
 
-        const mediaRecorder = new MediaRecorder(stream);
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/wav' });
+
         const audioChunks = [];
 
         mediaRecorder.addEventListener('dataavailable', event => {
