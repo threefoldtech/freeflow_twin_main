@@ -1,7 +1,7 @@
 import { BadRequestException, forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { IFileShareMessage, MessageType } from '../../types/message-types';
+import { IFileShareMessage, MessageType, QuoteBodyType, StringMessageType } from '../../types/message-types';
 import { ChatGateway } from '../chat/chat.gateway';
 import { Chat } from '../chat/models/chat.model';
 import { ContactDTO } from '../contact/dtos/contact.dto';
@@ -179,12 +179,49 @@ export class MessageService {
         try {
             const message = await this._messageRepo.findMessageById(messageId);
             message.body = text;
-            message.type = MessageType.STRING;
             await this._messageRepo.updateMessage({ message });
+            this.renameQuotedStringMessages(message);
             return message.toJSON();
         } catch (error) {
             throw new BadRequestException(`unable to edit message: ${error}`);
         }
+    }
+
+    async renameQuotedFileShareMessages(message: MessageDTO<IFileShareMessage>) {
+        const msgReferences = (await this.getAllMessagesFromChat({ chatId: message.chatId }))
+            .filter(msg => msg.type === MessageType.QUOTE)
+            .filter(msg => (JSON.parse(msg.body) as QuoteBodyType).quotedMessage.body.id === message.body.id);
+        Promise.all(
+            msgReferences.map(async msg => {
+                const parsedMsgBody = JSON.parse(msg.body) as QuoteBodyType;
+                msg.body = JSON.stringify({
+                    ...parsedMsgBody,
+                    quotedMessage: {
+                        ...message,
+                        id: parsedMsgBody.quotedMessage.id,
+                        type: parsedMsgBody.quotedMessage.type,
+                    },
+                });
+                await this._messageRepo.updateMessage({ message: msg });
+            })
+        );
+    }
+
+    async renameQuotedStringMessages(message: MessageDTO<StringMessageType | QuoteBodyType>) {
+        const msgReferences = (await this.getAllMessagesFromChat({ chatId: message.chatId }))
+            .filter(msg => msg.type === MessageType.QUOTE)
+            .filter(msg => (JSON.parse(msg.body) as QuoteBodyType).quotedMessage?.id === message.id);
+        Promise.all(
+            msgReferences.map(async msg => {
+                msg.body = JSON.stringify({
+                    ...JSON.parse(msg.body),
+                    quotedMessage: message,
+                });
+                await this._messageRepo.updateMessage({
+                    message: msg,
+                });
+            })
+        );
     }
 
     async renameSharedMessage({ message, chatId }: { message: MessageDTO<IFileShareMessage>; chatId: string }) {
