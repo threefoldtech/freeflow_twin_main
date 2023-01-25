@@ -78,7 +78,10 @@ export class EditMessageState implements MessageState<string> {
     constructor(private readonly _chatGateway: ChatGateway, private readonly _messageService: MessageService) {}
 
     async handle({ message }: { message: MessageDTO<string> }) {
-        const editedMessage = await this._messageService.editMessage({ messageId: message.id, text: message.body });
+        const editedMessage = await this._messageService.editMessage({
+            messageId: message.id,
+            text: JSON.stringify(message.body),
+        });
         editedMessage.type = MessageType.EDIT;
         this._chatGateway.emitMessageToConnectedClients('message', editedMessage);
     }
@@ -138,6 +141,7 @@ export class RenameFileShareMessageState implements MessageState<IFileShareMessa
     async handle({ message, chat }: { message: MessageDTO<IFileShareMessage>; chat?: Chat }) {
         const owner = chat.isGroup ? chat.chatId : message.body.owner.id;
         await this._messageService.renameSharedMessage({ message, chatId: owner });
+        await this._messageService.renameQuotedFileShareMessages(message);
         const share = await this._quantumService.getShareById({ id: message.body.id });
         if (!share) return;
         await this._quantumService.updateShare(share, { ...message.body, isSharedWithMe: true }, true);

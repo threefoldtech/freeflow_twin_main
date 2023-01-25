@@ -1,8 +1,9 @@
-import { FileType } from 'custom-types/file-actions.type';
+import { FileType, FileTypes } from 'custom-types/file-actions.type';
 import { IPostDTO, IPostOwner } from 'custom-types/post.type';
 
 import { ContactDTO } from '../features/contact/dtos/contact.dto';
 import { IFileShare } from '../features/quantum/interfaces/file-share.interface';
+import { MessageDTO } from '../features/message/dtos/message.dto';
 
 export interface MessageBody {
     message: string;
@@ -47,7 +48,20 @@ export interface GroupUpdate extends SystemMessage {
     adminLocation: string;
 }
 
+export interface MessageBodyType {
+    filename?: string;
+    type?: FileTypes;
+    url?: string;
+}
+
 export type IFileShareMessage = IFileShare;
+
+export interface QuoteBodyType extends MessageBodyType {
+    message: string;
+    quotedMessage: MessageDTO<any>;
+}
+
+export interface StringMessageType extends String, MessageBodyType {}
 
 export enum MessageType {
     STRING = 'STRING',
