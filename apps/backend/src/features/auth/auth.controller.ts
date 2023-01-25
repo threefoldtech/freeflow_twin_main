@@ -17,6 +17,7 @@ import { LocationService } from '../location/location.service';
 import { YggdrasilService } from '../yggdrasil/yggdrasil.service';
 import { AuthService } from './auth.service';
 import { SignInQuery } from './query/sign-in.query';
+import { ProfileData } from './interfaces/auth.interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -76,7 +77,7 @@ export class AuthController {
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
         console.log('redirectUrl', redirectUrl);
 
-        let profileData: any;
+        let profileData: ProfileData;
 
         try {
             profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
