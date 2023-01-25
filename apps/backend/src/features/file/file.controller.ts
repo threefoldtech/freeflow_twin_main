@@ -47,13 +47,13 @@ export class FileController {
         const fileInfo = await this._quantumService.getFileInfo({ path: filePath });
 
         if (path.endsWith('.wav')) {
-            req.res.setHeader(`content-type`, `audio/wav`);
+            req.res.setHeader(`content-type`, `audio/x-wav`);
             req.res.setHeader(`content-length`, fileInfo.size);
-            req.res.setHeader(`content-transfer-encoding`, 'binary');
-            req.res.setHeader(`content-range`, 'something');
+            req.res.setHeader(`Accept-Ranges`, 'bytes');
         }
 
-        if (req.res) req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
+        if (req.res && !path.endsWith('.wav'))
+            req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
 
         fileStream.pipe(req.res);
 
