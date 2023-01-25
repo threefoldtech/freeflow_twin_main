@@ -390,7 +390,7 @@
             audio: true,
         });
 
-        const mediaRecorder = new MediaRecorder(stream);
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/mp4' });
 
         const audioChunks = [];
 
