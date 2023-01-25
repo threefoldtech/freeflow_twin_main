@@ -390,7 +390,7 @@
             audio: true,
         });
 
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs:h264' });
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
         const audioChunks = [];
 
         mediaRecorder.addEventListener('dataavailable', event => {
