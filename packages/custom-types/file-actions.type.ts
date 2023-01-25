@@ -65,6 +65,7 @@ export enum ImageFileExtension {
 export enum AudioFileExtension {
     MP3 = 'mp3',
     WEBM = 'WebM',
+    WAV = 'wav',
 }
 
 export enum VideoFileExtension {
