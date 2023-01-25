@@ -14,7 +14,7 @@
             >
                 <div class="flex-1 collapsed-bar:mb-2 flex flex-row items-center">
                     <button
-                        class="fixed lg:static bottom-5 right-5 bg-accent-600 hover:bg-accent-700 transition duration:300 rounded-full text-white mx-2 p-2 collapsed-bar:w-10 collapsed-bar:h-10"
+                        class="z-50 fixed lg:static bottom-5 right-5 bg-accent-600 hover:bg-accent-700 transition duration:300 rounded-full text-white mx-2 p-2 collapsed-bar:w-10 collapsed-bar:h-10"
                         @click="showAddUserDialog = true"
                     >
                         <PlusSmIconOutline class="h-6 w-6" aria-hidden="true" />
