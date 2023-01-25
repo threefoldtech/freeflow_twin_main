@@ -88,6 +88,13 @@
     }
 }
 
+html,
+body {
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+}
+
 @layer utilities {
     .bigmaingrid {
         display: grid;
