@@ -406,7 +406,7 @@ const sendFile = async (chatId: string, selectedFile: any, isBlob = false, isRec
     if (!isBlob) {
         formData.append('file', selectedFile);
     } else {
-        formData.append('file', selectedFile, `recording-${Date.now()}.mp4`);
+        formData.append('file', selectedFile, `recording-${Date.now()}.mp3`);
     }
 
     if (isRecording) formData.append('type', FileTypes.RECORDING);
