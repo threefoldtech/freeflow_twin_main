@@ -585,6 +585,7 @@ export class QuantumService {
             const chat = await this._chatService.getChat(p.userId);
             if (!chat) return;
             await this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
+            await this._messageService.renameQuotedFileShareMessages(msg);
             this._chatGateway.emitMessageToConnectedClients('chat_updated', {
                 ...chat.toJSON(),
                 messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>
