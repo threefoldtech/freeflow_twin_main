@@ -150,6 +150,7 @@ export class MessageController {
 
         if (
             message.type != MessageType.READ &&
+            message.from != userId &&
             (!isConnected || (isConnected && !GlobalVars.currentUrl.endsWith(message.from)))
         ) {
             const postMessage: PostNotificationDto = {
