@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    Header,
     Param,
     Post,
     Query,
@@ -40,6 +41,8 @@ export class FileController {
         const filePath = join(`${this.storageDir}`, path);
         if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
+
+        if (path.endsWith('.wav')) req.res.setHeader(`content-type`, `audio/wav`);
 
         const fileBuffer = this._fileService.readFile({ path: filePath });
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
