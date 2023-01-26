@@ -7,5 +7,5 @@ export const calculateBaseUrl = (userId: string) => {
 };
 
 export const calcExternalResourceLink = (location: string) => {
-    return `${window.location.origin}/api/v2/external/resource?loc=${encodeURI(location)}`;
+    return `${window.location.origin}/api/v2/external/resource?loc=${encodeURIComponent(location)}`;
 };
