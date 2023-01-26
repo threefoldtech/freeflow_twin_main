@@ -42,6 +42,7 @@ export class FileController {
         if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
 
+        // When there is a wav file, different handling of file return since fileStream is not working on Safari
         if (path.endsWith('.wav')) {
             return res.sendFile(filePath);
         }
