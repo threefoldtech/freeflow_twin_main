@@ -105,7 +105,7 @@
                             <textarea
                                 v-model="messageInput"
                                 class="block w-full pl-1 min-h-[24px] max-h-[150px] sm:h-9 h-10 resize-none overflow-y-auto whitespace-pre-wrap border-0 border-transparent focus:border-primary focus:ring-0 sm:text-sm"
-                                autofocus
+                                :autofocus="!isMobile()"
                                 maxlength="2000"
                                 @input="resizeTextarea()"
                                 @click="resizeTextarea()"
@@ -155,6 +155,8 @@
 </template>
 <script lang="ts" setup>
     import { computed, nextTick, ref, watch } from 'vue';
+    import { isMobile } from '@/store/fileBrowserStore';
+
     import {
         clearMessageAction,
         draftMessage,
@@ -445,7 +447,7 @@
     };
 
     nextTick(() => {
-        message.value.focus();
+        isMobile() ? message.value.blur() : message.value.focus();
         const emojiPicker = document.querySelector('unicode-emoji-picker');
         emojiPicker.addEventListener('emoji-pick', event => {
             message.value.value = `${message.value.value}${event.detail.emoji}`;
