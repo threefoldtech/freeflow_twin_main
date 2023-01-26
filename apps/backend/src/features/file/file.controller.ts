@@ -3,18 +3,18 @@ import {
     Controller,
     Delete,
     Get,
-    Header,
     Param,
     Post,
     Query,
     Req,
+    Res,
     StreamableFile,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
@@ -36,24 +36,21 @@ export class FileController {
     }
 
     @Get(':path')
-    async downloadFile(@Req() req: Request, @Param('path') path: string) {
+    async downloadFile(@Req() req: Request, @Res() res: Response, @Param('path') path: string) {
         path = Buffer.from(path, 'base64').toString('binary');
         const filePath = join(`${this.storageDir}`, path);
         if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
 
+        if (path.endsWith('.wav')) {
+            return res.sendFile(filePath);
+        }
+
         const fileBuffer = this._fileService.readFile({ path: filePath });
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });
         const fileInfo = await this._quantumService.getFileInfo({ path: filePath });
 
-        if (path.endsWith('.wav')) {
-            req.res.setHeader(`content-type`, `audio/x-wav`);
-            req.res.setHeader(`content-length`, fileInfo.size);
-            req.res.setHeader(`Accept-Ranges`, 'bytes');
-        }
-
-        if (req.res && !path.endsWith('.wav'))
-            req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
+        if (req.res) req.res.setHeader(`Content-Disposition`, `attachment; filename=${fileInfo.fullName}`);
 
         fileStream.pipe(req.res);
 
