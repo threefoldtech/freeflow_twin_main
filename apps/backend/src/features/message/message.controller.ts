@@ -149,6 +149,7 @@ export class MessageController {
         // currentRoute.endsWith to check if the message is read or not
 
         setTimeout(() => {
+            if (message.type !== MessageType.READ && message.from !== userId) return;
             const lastReadMessage = chat.parseRead()?.find(u => u.userId === userId)?.messageId;
             if (lastReadMessage === message.id) return;
 
