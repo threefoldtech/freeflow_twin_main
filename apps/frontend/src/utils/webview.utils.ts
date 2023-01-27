@@ -8,3 +8,11 @@ export const retrieveFirebaseIdentifier = async (): Promise<string> => {
 
     return firebaseIdentifier ?? '';
 };
+
+globalThis.RECEIVED_APP_BACKGROUND = () => {
+    console.log('RECEIVED APP IN BACKGROUND');
+};
+
+globalThis.RECEIVED_APP_FOREGROUND = () => {
+    console.log('RECEIVED APP IN FOREGROUND');
+};
