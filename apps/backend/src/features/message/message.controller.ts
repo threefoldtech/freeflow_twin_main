@@ -148,16 +148,17 @@ export class MessageController {
 
         // currentRoute.endsWith to check if the message is read or not
 
-        setTimeout(() => {
-            if (message.type !== MessageType.READ && message.from !== userId) return;
-            const lastReadMessage = chat.parseRead()?.find(u => u.userId === userId)?.messageId;
-            if (lastReadMessage === message.id) return;
+        setTimeout(async () => {
+            if (message.type === MessageType.READ && message.from !== userId) return;
+            const newChat = await this._chatService.getChat(chatId);
+            const lastReadMessageId = newChat.parseRead()?.find(u => u.userId === userId)?.messageId;
+            if (lastReadMessageId === message.id) return;
 
             const postMessage: PostNotificationDto = {
                 timestamp: message.timeStamp.toString(),
                 message: 'sent you a message',
                 sender: message.from,
-                group: chat.isGroup.toString(),
+                group: newChat.isGroup.toString(),
                 me: userId,
                 appId: this._configService.get('appId'),
             };
