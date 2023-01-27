@@ -140,7 +140,7 @@ export class MessageController {
         const userId = this._configService.get<string>('userId');
         if (chat.isGroup && chat.adminId === userId) this._chatService.handleGroupAdmin({ chat, message });
 
-        const isConnected = (await this._userGateway.getConnections()) > 0;
+        // const isConnected = (await this._userGateway.getConnections()) > 0;
 
         // When there is no connection open => send a message
         // When the message type is different from READ (Since we automatically send a READ message so
@@ -148,11 +148,10 @@ export class MessageController {
 
         // currentRoute.endsWith to check if the message is read or not
 
-        if (
-            message.type != MessageType.READ &&
-            message.from != userId &&
-            (!isConnected || (isConnected && !GlobalVars.currentUrl.endsWith(message.from)))
-        ) {
+        setTimeout(() => {
+            const lastReadMessage = chat.parseRead()?.find(u => u.userId === userId)?.messageId;
+            if (lastReadMessage === message.id) return;
+
             const postMessage: PostNotificationDto = {
                 timestamp: message.timeStamp.toString(),
                 message: 'sent you a message',
@@ -163,7 +162,24 @@ export class MessageController {
             };
 
             this._firebaseService.notifyUserInMicroService(postMessage);
-        }
+        }, 5000);
+
+        // if (
+        //     message.type != MessageType.READ &&
+        //     message.from != userId &&
+        //     (!isConnected || (isConnected && !GlobalVars.currentUrl.endsWith(message.from)))
+        // ) {
+        //     const postMessage: PostNotificationDto = {
+        //         timestamp: message.timeStamp.toString(),
+        //         message: 'sent you a message',
+        //         sender: message.from,
+        //         group: chat.isGroup.toString(),
+        //         me: userId,
+        //         appId: this._configService.get('appId'),
+        //     };
+        //
+        //     this._firebaseService.notifyUserInMicroService(postMessage);
+        // }
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
     }
 
