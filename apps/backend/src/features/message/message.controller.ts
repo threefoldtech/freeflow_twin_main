@@ -151,7 +151,7 @@ export class MessageController {
         setTimeout(async () => {
             if (message.type === MessageType.READ && message.from !== userId) return;
             const newChat = await this._chatService.getChat(chatId);
-            const lastReadMessageId = newChat.parseRead()?.find(u => u.userId === userId)?.messageId;
+            const lastReadMessageId = newChat?.parseRead()?.find(u => u.userId === userId)?.messageId;
             if (lastReadMessageId === message.id) return;
 
             const postMessage: PostNotificationDto = {
