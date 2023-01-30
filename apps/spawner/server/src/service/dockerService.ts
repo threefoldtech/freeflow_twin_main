@@ -99,6 +99,8 @@ export const spawnDocker = async (userId: string) => {
         await container.start();
         console.log('container started ');
     } catch (err) {
+        console.log('this is the error creating the docker')
+        console.log(err)
         logger.error('error', { err });
         throw err;
     }
