@@ -37,7 +37,7 @@ RUN git clone "https://github.com/RedisJSON/RedisJSON.git" /redis-json \
  && cargo fix --edition \
  && cargo build --release
 
-RUN git clone --recursive "https://github.com/RediSearch/RediSearch.git" /redis-search \
+RUN git clone --branch 2.2 --recursive "https://github.com/RediSearch/RediSearch.git" /redis-search \
  && cd /redis-search \
  && make setup \
  && make build
