@@ -89,7 +89,7 @@
                         class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline"
                         @click="downloadAttachmentToQuantum(message)"
                     >
-                        <i class="fa fa-reply"></i>
+                        <i class="fa fa-download"></i>
                         <span class="text-gray-600 sm:pl-2 pl-1">Download</span>
                     </span>
                     <div class="sm:pr-4 pr-2 text-gray-600 date inline-block text-xs">

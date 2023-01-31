@@ -24,7 +24,6 @@
             :class="{
                 'bg-red-500': status && !status.isOnline,
                 'bg-green-500': status && status.isOnline,
-                'bg-gray-300': !status,
             }"
             class="h-3 w-3 rounded-full absolute ring-2 ring-white bottom-0 right-0 transition-all"
         ></div>

@@ -300,24 +300,24 @@
                     {{ item }}
                 </a>
             </div>
-            <ShareChatTable v-if="selectedTab === 0" :data="chats"></ShareChatTable>
+            <ShareChatTable v-if="selectedTab === 0" :data="filteredContacts"></ShareChatTable>
             <EditShare v-if="selectedTab === 1" :selectedFile="selectedPaths[0]"></EditShare>
         </Dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { nextTick, ref, watch } from 'vue';
+    import { computed, nextTick, ref, watch } from 'vue';
     import {
-        selectedPaths,
+        Action,
+        clearClipboard,
+        copiedFiles,
+        copyPasteSelected,
         deleteFiles,
         downloadFiles,
-        copyPasteSelected,
-        copiedFiles,
-        clearClipboard,
         renameFile,
         selectedAction,
-        Action,
+        selectedPaths,
         selectedTab,
     } from '@/store/fileBrowserStore';
     import Dialog from '@/components/Dialog.vue';
@@ -337,17 +337,19 @@
     import Alert from '@/components/Alert.vue';
     import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
     import {
-        DotsHorizontalIcon,
-        XIcon,
-        ShareIcon,
-        PencilIcon,
-        DownloadIcon,
-        TrashIcon,
-        ScissorsIcon,
         ClipboardCopyIcon,
         ClipboardIcon,
+        DotsHorizontalIcon,
+        DownloadIcon,
+        PencilIcon,
+        ScissorsIcon,
+        ShareIcon,
+        TrashIcon,
+        XIcon,
     } from '@heroicons/vue/outline';
     import Tooltip from '@/components/Tooltip.vue';
+    import { Chat } from '@/types';
+    import { userIsBlocked } from '@/store/blockStore';
 
     const { chats } = useChatsState();
 
@@ -390,6 +392,10 @@
     };
 
     const showDeleteDialog = ref(false);
+
+    const filteredContacts = computed(() => {
+        return chats.value.filter((chat: Chat) => !userIsBlocked(chat.chatId));
+    });
 
     watch(
         triggerWatchOnRightClickItem,
