@@ -11,7 +11,6 @@ import { Contact } from '../contact/models/contact.model';
 import { LocationService } from '../location/location.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { UserService } from './user.service';
-import { GlobalVars } from '../../data';
 
 @WebSocketGateway({ cors: '*' })
 export class UserGateway implements OnGatewayInit {
@@ -112,8 +111,4 @@ export class UserGateway implements OnGatewayInit {
         await this._userService.updateStatus({ status });
     }
 
-    @SubscribeMessage('current_url')
-    async getCurrentUrl(@MessageBody() url: string) {
-        GlobalVars.currentUrl = url;
-    }
 }

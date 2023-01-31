@@ -25,8 +25,6 @@ import {
 } from './states/message.state';
 import { UserGateway } from '../user/user.gateway';
 import { FirebaseService } from '../firebase/firebase.service';
-import { PostNotificationDto } from '../firebase/dtos/firebase.dtos';
-import { GlobalVars } from '../../data';
 
 @Controller('messages')
 export class MessageController {
@@ -127,61 +125,14 @@ export class MessageController {
 
         message.chatId = chatId;
 
-        // TODO: fix encryption
-        // const validSignature = await this._messageService.verifySignedMessageByChat({
-        //     chat,
-        //     signedMessage: message,
-        // });
-        // if (!validSignature) throw new ForbiddenException('not allowed');
-
-        // if (message.type === MessageType.SYSTEM && chat.adminId !== message.from)
-        //     throw new ForbiddenException(`not allowed`);
-
         const userId = this._configService.get<string>('userId');
         if (chat.isGroup && chat.adminId === userId) this._chatService.handleGroupAdmin({ chat, message });
 
-        // const isConnected = (await this._userGateway.getConnections()) > 0;
-
-        // When there is no connection open => send a message
-        // When the message type is different from READ (Since we automatically send a READ message so
-        // the message gets automatically read by ourselves
-
-        // currentRoute.endsWith to check if the message is read or not
-
+        // Check if the message is still unread after 5 seconds => call notify function
         setTimeout(async () => {
-            if (message.type === MessageType.READ && message.from !== userId) return;
-            const newChat = await this._chatService.getChat(chatId);
-            const lastReadMessageId = newChat.parseRead()?.find(u => u.userId === userId)?.messageId;
-            if (lastReadMessageId === message.id) return;
-
-            const postMessage: PostNotificationDto = {
-                timestamp: message.timeStamp.toString(),
-                message: 'sent you a message',
-                sender: message.from,
-                group: newChat.isGroup.toString(),
-                me: userId,
-                appId: this._configService.get('appId'),
-            };
-
-            this._firebaseService.notifyUserInMicroService(postMessage);
+            await this._messageService.notifyIfUnread(message, chatId);
         }, 5000);
 
-        // if (
-        //     message.type != MessageType.READ &&
-        //     message.from != userId &&
-        //     (!isConnected || (isConnected && !GlobalVars.currentUrl.endsWith(message.from)))
-        // ) {
-        //     const postMessage: PostNotificationDto = {
-        //         timestamp: message.timeStamp.toString(),
-        //         message: 'sent you a message',
-        //         sender: message.from,
-        //         group: chat.isGroup.toString(),
-        //         me: userId,
-        //         appId: this._configService.get('appId'),
-        //     };
-        //
-        //     this._firebaseService.notifyUserInMicroService(postMessage);
-        // }
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
     }
 
