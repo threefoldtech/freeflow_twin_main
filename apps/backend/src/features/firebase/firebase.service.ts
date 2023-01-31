@@ -43,15 +43,6 @@ export class FirebaseService {
         try {
             const userId = await this._configService.get<string>('userId');
             const sk = await this._keyService.getKey({ userId: userId, keyType: KeyType.Private });
-            const pk = await this._keyService.getKey({ userId: userId, keyType: KeyType.Public });
-
-            console.log('Encrypting with public key');
-            console.log(pk.key);
-
-            // notificationData.message = this._encryptionService.encryptData({
-            //     data: oldMessage,
-            //     publicKey: pk.key,
-            // });
 
             const header = { intention: 'notification' };
 
