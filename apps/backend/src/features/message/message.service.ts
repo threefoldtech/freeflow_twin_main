@@ -265,6 +265,15 @@ export class MessageService {
         const newChat = await this._chatService.getChat(chatId);
 
         const lastReadMessageId = newChat.parseRead()?.find(u => u.userId === userId)?.messageId;
+
+        const allMessages = await this.getMessagesFromChat({ chatId: chatId, count: 50, totalMessagesLoaded: 0 });
+
+        const lastReadMessageIdx = allMessages.findIndex((m: MessageDTO<unknown>) => m.id === lastReadMessageId);
+        const currentMessageIdx = allMessages.findIndex((m: MessageDTO<unknown>) => m.id === message.id);
+
+        // When having more than 1 unread message
+        if (lastReadMessageIdx > currentMessageIdx) return;
+
         if (lastReadMessageId === message.id) return;
 
         this._notificationCount++;
@@ -275,7 +284,7 @@ export class MessageService {
                 console.log('I will trigger a notification with notificationCount: ', this._notificationCount);
                 const postMessage: PostNotificationDto = {
                     timestamp: message.timeStamp.toString(),
-                    message: `You have ${this._notificationCount} unread messages`,
+                    message: `You have unread messages`,
                     sender: message.from,
                     group: newChat.isGroup.toString(),
                     me: userId,
@@ -285,6 +294,6 @@ export class MessageService {
                 this._firebaseService.notifyUserInMicroService(postMessage);
                 this._notificationCount = 0;
             }
-        }, 5000);
+        }, 15000);
     }
 }
