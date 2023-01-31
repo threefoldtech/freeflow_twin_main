@@ -266,7 +266,10 @@
         error.value = false;
 
         isPublishingNewPost.value = true;
-        if (!isAllowedToPost.value) return;
+        if (!isAllowedToPost.value) {
+            isPublishingNewPost.value = false;
+            return;
+        }
         const files = [];
         newPostImages.value.forEach(file => files.push(file));
         newPostVideo.value ? files.push(newPostVideo.value) : '';
