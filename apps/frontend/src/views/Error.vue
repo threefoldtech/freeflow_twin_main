@@ -28,10 +28,10 @@
     </div>
 </template>
 <script lang="ts" setup>
-    import { isFromMobileApp } from '@/services/firebaseService';
     import config from '@/config';
     import { useRoute } from 'vue-router';
     import { computed, ComputedRef } from 'vue';
+    import { isMobile } from '@/store/fileBrowserStore';
 
     enum Reasons {
         WRONG_USER = 'wrongUser',
@@ -45,7 +45,7 @@
     });
 
     const goBack = async () => {
-        if (isFromMobileApp.value == true) {
+        if (isMobile()) {
             await globalThis.flutter_inappwebview.callHandler('GO_TO_USERNAME_SCREEN');
             return;
         }

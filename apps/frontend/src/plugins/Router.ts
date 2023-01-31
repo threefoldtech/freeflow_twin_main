@@ -285,8 +285,6 @@ router.beforeEach(async (to, _from, next) => {
     if (needsAuth && !(await isUserAuthenticated())) next({ name: 'home' });
     if (needsUnAuth && (await isUserAuthenticated())) next({ name: 'dashboard' });
 
-    await sendCurrentURL(to.path);
-
     //Starts the browser if the user navigates to /glass as first page
     if (window.innerWidth >= 768 && to.name === 'glass') {
         setHasBrowserBeenStartedOnce();

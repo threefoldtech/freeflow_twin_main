@@ -129,10 +129,6 @@ const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate
     await state.socket.emit(messageType, data);
 };
 
-export const sendCurrentURL = async (url: string) => {
-    state.socket.emit('current_url', url);
-};
-
 export const sendRemoveChat = async (id: string) => {
     state.socket.emit('remove_chat', id);
 };
