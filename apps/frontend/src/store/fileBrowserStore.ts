@@ -7,7 +7,15 @@ import moment from 'moment';
 import { createErrorNotification, createNotification } from '@/store/notificiationStore';
 import { Status } from '@/types/notifications';
 import { useAuthState } from '@/store/authStore';
-import { Chat, ContactInterface, DtId, FileShareMessageType, MessageTypes, SharedFileInterface } from '@/types';
+import {
+    Chat,
+    ContactInterface,
+    FileShareMessageType,
+    MessageBodyType,
+    MessageTypes,
+    SharedFileInterface,
+    SharePermissionInterface,
+} from '@/types';
 import axios from 'axios';
 import { calcExternalResourceLink } from '@/services/urlService';
 import { watchingUsers } from '@/store/statusStore';
@@ -20,18 +28,18 @@ import { decodeString } from '@/utils/files';
 declare const Buffer;
 
 export enum FileType {
-    Unknown,
-    Word,
-    Video,
-    Pdf,
-    Csv,
-    Audio,
-    Archive,
-    Excel,
-    Powerpoint,
-    Image,
-    Text,
-    Html,
+    Unknown = 'unknown',
+    Word = 'word',
+    Video = 'video',
+    Pdf = 'pdf',
+    Csv = 'csv',
+    Audio = 'audio',
+    Archive = 'archive',
+    Excel = 'excel',
+    Powerpoint = 'powerpoint',
+    Image = 'image',
+    Text = 'text',
+    Html = 'html',
 }
 
 export enum Action {
@@ -50,6 +58,18 @@ export interface PathInfoModel extends Api.PathInfo {
 
 export interface FullPathInfoModel extends Api.EditPathInfo {
     fileType: FileType;
+}
+
+export interface IFileShare {
+    id?: string;
+    path: string;
+    owner: ContactInterface;
+    name?: string | undefined;
+    isFolder: boolean;
+    isSharedWithMe: boolean;
+    size?: number | undefined;
+    lastModified?: number | undefined;
+    permissions: SharePermissionInterface[];
 }
 
 export interface ShareContent extends PathInfoModel {
@@ -185,7 +205,7 @@ export const goToFilesInChat = async (chat?: Chat) => {
         router.push({
             name: received ? 'filesReceivedInChatNested' : 'filesSentInChatNested',
             params: {
-                chatId: String(chat.chatId),
+                chatId: chat.chatId,
             },
         });
         chatFiles.value = await chatFilesReceived(chat, received);
@@ -200,34 +220,6 @@ export const goToFilesInChat = async (chat?: Chat) => {
     });
 
     chatsWithFiles.value = getchatsWithFiles(received);
-};
-
-export const loadFilesReceivedNested = async () => {
-    const { retrieveChats } = usechatsActions();
-    const { chats } = useChatsState();
-    const chatId = router.currentRoute.value.params?.chatId;
-    const received = router.currentRoute.value.meta.received as boolean;
-    if (!chatId) {
-        router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
-        sharedFolderIsloading.value = false;
-        return;
-    }
-
-    await retrieveChats();
-    const chat = chats.value.find(item => item.chatId === chatId);
-    if (!chat) {
-        router.push({ name: received ? 'filesReceivedInChat' : 'filesSentInChat' });
-        sharedFolderIsloading.value = false;
-        return;
-    }
-    chatFilesBreadcrumbs.value.push({
-        name: received ? 'Received files in chat' : 'Sent files in chat',
-        path: received ? '/quantum/received' : '/quantum/sent',
-    });
-    chatFilesBreadcrumbs.value.push({ name: chatId, path: router.currentRoute.value.path });
-
-    chatFiles.value = chatFilesReceived(chat, received);
-    sharedFolderIsloading.value = false;
 };
 
 export const fetchSharedInChatFiles = received => {
@@ -380,6 +372,10 @@ export const searchDir = async () => {
     const result = await Api.searchDir(searchDirValue.value, currentDirectory.value);
 
     if (result.status !== 200 || !result.data) throw new Error('Could not get search results');
+    if (searchDirValue.value === '') {
+        searchResults.value = [];
+        return;
+    }
     if (result.data.length <= 0) {
         searchResults.value = 'None';
         return;
@@ -502,8 +498,14 @@ export const itemAction = async (item: PathInfoModel) => {
         goToFolderInCurrentDirectory(item);
         return;
     }
+
+    if (isMobile()) {
+        createNotification('Not supported on mobile', 'This type of file is not supported on mobile.');
+        return;
+    }
+
     const result = router.resolve({
-        name: 'editfile',
+        name: 'editFile',
         params: { path: btoa(item.path), attachments: String(savedAttachments.value) },
     });
 
@@ -533,56 +535,15 @@ export const sortAction = function (s) {
     currentSort.value = s;
 };
 
-export const getIcon = (item: PathInfoModel) => {
-    if (item.isDirectory) return 'fas fa-folder';
-    switch (item.fileType) {
-        case FileType.Video:
-            return 'far fa-file-video';
-        case FileType.Word:
-            return 'far fa-file-word';
-        case FileType.Image:
-            return 'far fa-file-image';
-        case FileType.Pdf:
-            return 'far fa-file-pdf';
-        case FileType.Csv:
-            return 'far fa-file-csv';
-        case FileType.Audio:
-            return 'far fa-file-audio';
-        case FileType.Archive:
-            return 'far fa-file-archive';
-        case FileType.Excel:
-            return 'far fa-file-excel';
-        case FileType.Powerpoint:
-            return 'far fa-file-powerpoint';
-        default:
-            return 'far fa-file';
-    }
-};
-export const getIconDirty = (isFolder: boolean, fileType: FileType) => {
-    if (isFolder) return 'fas fa-folder';
+export const getIcon = (isDirectory: boolean, fileType: FileType) => {
+    if (isDirectory) return 'fas fa-folder';
 
-    switch (fileType) {
-        case FileType.Video:
-            return 'far fa-file-video';
-        case FileType.Word:
-            return 'far fa-file-word';
-        case FileType.Image:
-            return 'far fa-file-image';
-        case FileType.Pdf:
-            return 'far fa-file-pdf';
-        case FileType.Csv:
-            return 'far fa-file-csv';
-        case FileType.Audio:
-            return 'far fa-file-audio';
-        case FileType.Archive:
-            return 'far fa-file-archive';
-        case FileType.Excel:
-            return 'far fa-file-excel';
-        case FileType.Powerpoint:
-            return 'far fa-file-powerpoint';
-        default:
-            return 'far fa-file';
-    }
+    const fileIcons = Object.values(FileType);
+    const toBeFiltered = [FileType.Text, FileType.Html, FileType.Unknown];
+    const filteredFileIcons = fileIcons.filter(f => !toBeFiltered.includes(f));
+
+    if (filteredFileIcons.includes(fileType)) return `far fa-file-${fileType}`;
+    return 'far fa-file';
 };
 
 export const createModel = <T extends Api.PathInfo>(pathInfo: T): PathInfoModel => {
@@ -665,14 +626,13 @@ export const getFileType = (extension: string): FileType => {
         case 'pps':
         case 'ppsm':
         case 'ppsx':
-        case 'ppt':
         case 'pptm':
         case 'ods':
             return FileType.Excel;
         case 'odt':
             return FileType.Word;
         case 'odp':
-            return FileType.Powerpoint;
+        case 'ppt':
         case 'pptx':
             return FileType.Powerpoint;
         case 'html':
@@ -713,22 +673,9 @@ export const getFileLastModified = (val: any) => {
     return moment(dateObj).fromNow();
 };
 
-export const getIconColor = (item: PathInfoModel) => {
-    if (item.isDirectory) return 'text-primary';
-    switch (item.fileType) {
-        case FileType.Excel:
-            return 'text-primarylight';
-        case FileType.Word:
-            return 'text-primarylight';
-        case FileType.Powerpoint:
-            return 'text-primarylight';
-        default:
-            return 'text-primarylight';
-    }
-};
-export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
-    if (isFolder) return 'text-primary';
-    switch (filetype) {
+export const getIconColor = (isDirectory: boolean, fileType: FileType) => {
+    if (isDirectory) return 'text-primary';
+    switch (fileType) {
         case FileType.Excel:
             return 'text-green-400';
         case FileType.Word:
@@ -736,7 +683,7 @@ export const getIconColorDirty = (isFolder: boolean, filetype: FileType) => {
         case FileType.Powerpoint:
             return 'text-red-400';
         default:
-            return 'text-gray-600';
+            return 'text-primarylight';
     }
 };
 
@@ -771,13 +718,13 @@ export const clickBreadcrumb = async (item, breadcrumbs, idx) => {
     }
 
     const params = router.currentRoute.value.params;
-    let splitted = String(params.path).split('/').slice(0);
+    let splitter = String(params.path).split('/').slice(0);
     //Deleting all empty values
-    splitted = splitted.filter(function (element) {
+    splitter = splitter.filter(function (element) {
         return element !== '';
     });
 
-    const newPath = splitted.slice(0, idx - 1);
+    const newPath = splitter.slice(0, idx - 1);
 
     router.push({
         name: 'sharedWithMeItemNested',
@@ -998,16 +945,28 @@ export const goIntoSharedFolder = async (share: SharedFileInterface) => {
     }
 };
 
-export const goTo = async (item: SharedFileInterface) => {
+export const goToExternalOnlyOffice = (item: SharedFileInterface) => {
     if (item.isFolder) {
         goIntoSharedFolder(item);
         return;
     }
     const url = router.resolve({
-        name: 'editfile',
+        name: 'editFile',
         params: {
             path: btoa(item.path),
             shareId: item.id,
+            attachments: 'false',
+        },
+    });
+    window.open(url.href, '_blank');
+};
+
+export const goToOwnOnlyOffice = () => {
+    const url = router.resolve({
+        name: 'editFile',
+        params: {
+            path: btoa(sharedItem.value.path),
+            shareId: '',
             attachments: 'false',
         },
     });
@@ -1043,7 +1002,7 @@ export const fetchFileAccessDetails = async (
     return fileAccessDetails;
 };
 
-export const getExternalPathInfo = async (digitalTwinId: DtId, token: string, shareId: string) => {
+export const getExternalPathInfo = async (digitalTwinId: string, token: string, shareId: string) => {
     let params = { shareId: shareId, token: token };
     const locationApiEndpoint = `/api/v2/quantum/file/info?params=${btoa(JSON.stringify(params))}`;
     let location = '';
@@ -1063,4 +1022,20 @@ export const getSharedFolderContent = async (owner, shareId, path: string = '/')
     const { user } = useAuthState();
 
     return await Api.getSharedFolderContent(owner, shareId, <string>user.id, path);
+};
+
+export const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+};
+
+export const getMsgUrl = (body: MessageBodyType | SharedFileInterface) => {
+    if (isMessageBodyType(body)) return body.url;
+
+    const ownerLocation = body.owner.location;
+    let path = body.path.replace('/appdata/storage/', '');
+    return `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
+};
+
+const isMessageBodyType = (body: MessageBodyType | SharedFileInterface): body is MessageBodyType => {
+    return !!(body as MessageBodyType).url;
 };

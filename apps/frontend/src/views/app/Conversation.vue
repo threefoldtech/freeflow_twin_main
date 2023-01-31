@@ -55,8 +55,6 @@
                         class="relative h-full xl:flex flex-col flex-1"
                     >
                         <FileDropArea class="h-full flex flex-col" @send-file="files => doSendFiles(files)">
-                            <!--                            @send-file="files => files.forEach(f => sendFile(chat.chatId, f))"-->
-                            <!--                        >-->
                             <div
                                 class="topbar h-14 bg-white flex-row border border-t-0 border-b-0 border-r-0 border-gray-100 hidden lg:flex"
                             >
@@ -77,6 +75,7 @@
                                 </div>
                                 <div class="h-full flex items-center self-end px-8 space-x-4">
                                     <button
+                                        v-if="!mobile"
                                         class="focus:outline-none hover:text-accent-300 text-gray-500"
                                         @click="popupMeeting"
                                     >
@@ -166,7 +165,7 @@
                                     @click="disableSidebar"
                                 />
                             </div>
-                            <group-management
+                            <groupManagement
                                 :chat="chat"
                                 @app-call="popupMeeting"
                                 @app-block="blockChat"
@@ -176,7 +175,7 @@
                                 @app-delete-user="deleteUser"
                                 @clickedProfile="popupProfile"
                             >
-                            </group-management>
+                            </groupManagement>
                         </div>
                     </aside>
                 </div>
@@ -221,7 +220,7 @@
                             :class="contact.id === nextAdmin ? 'bg-gray-300 hover:bg-gray-300' : 'bg-gray-100'"
                         >
                             <div class="col-span-2 place-items-center grid rounded-full flex-shrink-0">
-                                <AvatarImg :id="String(contact.id)" small />
+                                <AvatarImg :id="contact.id" small />
                             </div>
                             <p
                                 class="col-span-8 pl-4 flex-col flex justify-center overflow-hidden overflow-ellipsis w-full font-semibold"
@@ -347,7 +346,6 @@
     import moment from 'moment';
     import { computed, nextTick, onBeforeMount, onMounted, onUpdated, ref, watch } from 'vue';
     import { useContactsActions, useContactsState } from '@/store/contactStore';
-    import { each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { isLoading, usechatsActions, useChatsState } from '@/store/chatStore';
     import { sendRemoveUser } from '@/store/socketStore';
@@ -381,37 +379,55 @@
     import { hasSpecialCharacters } from '@/services/fileBrowserService';
     import Alert from '@/components/Alert.vue';
     import Topbar from '@/components/Topbar.vue';
+    import { isMobile } from '@/store/fileBrowserStore';
 
-    const online = useOnline();
-    const messageBox = ref<HTMLElement>(null);
-    const route = useRoute();
-    const selectedId = ref(<string>route.params.id);
+    const { sendFile, sendMessage } = usechatsActions();
+    const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
+    const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
     const { contacts } = useContactsState();
     const { chats } = useChatsState();
     const { user } = useAuthState();
+
+    const online = useOnline();
+    const messageBox = ref<HTMLElement>(null);
+
     const m = val => moment(val);
     const showMenu = ref(false);
     const router = useRouter();
-    const showDialog = ref(false);
-    const showLeaveDialog = ref(false);
-    const showDeleteDialog = ref(false);
-    const showDeleteUserDialog = ref(false);
-    const showDeleteChatDialog = ref(false);
-    const { retrieveChats, sendFile, sendMessage } = usechatsActions();
-    const { addContact, retrieveDTContacts, retrieveContacts } = useContactsActions();
-    const { sendRemoveChat, sendBlockChat, sendUnBlockedChat } = useSocketActions();
-
-    watch(
-        () => route.params.id,
-        id => {
-            selectedId.value = <string>id;
-        }
-    );
+    const route = useRoute();
 
     onBeforeMount(async () => {
-        await retrieveChats();
         await retrieveDTContacts();
         await retrieveContacts();
+    });
+
+    const showDialog = ref(false);
+    const showLeaveDialog = ref(false);
+    const showDeleteUserDialog = ref(false);
+    const showDeleteChatDialog = ref(false);
+
+    const mobile = ref<boolean>(isMobile());
+
+    onMounted(() => {
+        nextTick(() => scrollToBottom(true));
+        if (openBlockDialogFromOtherFile.value) showDialog.value = true;
+        if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
+        if (openDeleteUserDialogFromOtherFile.value) showDeleteUserDialog.value = true;
+        showDeleteChatDialog.value = false;
+        openDeleteDialogFromOtherFile.value = false;
+        openBlockDialogFromOtherFile.value = false;
+        openDeleteUserDialogFromOtherFile.value = false;
+    });
+
+    onUpdated(() => {
+        //For when component is already mounted
+        if (openBlockDialogFromOtherFile.value) showDialog.value = true;
+        if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
+        if (openDeleteUserDialogFromOtherFile.value) showDeleteUserDialog.value = true;
+        showDeleteChatDialog.value = false;
+        openDeleteDialogFromOtherFile.value = false;
+        openBlockDialogFromOtherFile.value = false;
+        openDeleteUserDialogFromOtherFile.value = false;
     });
 
     const showProfileDialog = ref(false);
@@ -428,7 +444,6 @@
         if (!('location' in selectedUser.value)) return;
 
         if (!isPersonFriend.value) {
-            await retrieveChats();
             addContact(selectedUser.value.id, selectedUser.value.location);
         }
         await nextTick(async () => {
@@ -445,7 +460,6 @@
     };
 
     const popupProfile = async (contact: Contact | AnonymousContact) => {
-        console.log('contact', contact);
         if (!contact) return;
         if (!('location' in contact)) return;
 
@@ -462,6 +476,7 @@
 
     const showError = ref(false);
     const errorMessage = ref('');
+
     const doSendFiles = async (files: File[]) => {
         for (const f of files) {
             if (hasSpecialCharacters(f.name)) {
@@ -478,26 +493,9 @@
         }
     };
 
-    const getMessagesSortedByUser = computed(() => {
-        let chatBlockIndex = 0;
-        return chat.value.messages.reduce((acc: any, message) => {
-            if (acc[chatBlockIndex] && acc[chatBlockIndex].user === <string>message.from) {
-                acc[chatBlockIndex].messages.push(message);
-                return acc;
-            } else {
-                chatBlockIndex++;
-            }
-            acc[chatBlockIndex] = {
-                user: <string>message.from,
-                messages: [],
-            };
-            acc[chatBlockIndex].messages.push(message);
-            return acc;
-        }, {});
-    });
-
     const nextAdmin = ref('');
     const setNextAdmin = e => (nextAdmin.value = e.target.innerText);
+    const selectedId = ref(<string>route.params.id);
 
     const chat = computed(() => {
         const currentChat = chats.value.find(c => c.chatId == selectedId.value);
@@ -533,8 +531,6 @@
     });
 
     const popupMeeting = () => {
-        // @ts-ignore
-        // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
         const str: string = chat.value.isGroup
             ? chat.value.chatId
             : chat.value.contacts
@@ -546,7 +542,7 @@
         sendMessage(
             chat.value.chatId,
             {
-                type: SystemMessageTypes.JOINED_VIDEOROOM,
+                type: SystemMessageTypes.JOINED_VIDEO_ROOM,
                 message: `${user.id} joined the video chat`,
                 id: id.toString(),
             } as JoinedVideoRoomBody,
@@ -558,6 +554,8 @@
 
     const leaveChat = () => (showLeaveDialog.value = true);
 
+    const showDeleteDialog = ref(false);
+
     const deleteChat = () => (showDeleteDialog.value = true);
 
     const deleteUser = () => (showDeleteUserDialog.value = true);
@@ -566,7 +564,14 @@
         if (chat.value.isGroup && chat.value.contacts.length > 1) {
             const { updateContactsInGroup } = usechatsActions();
             if (!nextAdmin.value && user.id === chat.value.adminId) return;
-            await updateContactsInGroup(chat.value.chatId, user, SystemMessageTypes.USER_LEFT_GROUP, nextAdmin.value);
+            const contact = chat.value.contacts.find(c => c.id === user.id);
+            if (!('roles' in contact)) return;
+            await updateContactsInGroup(
+                chat.value.chatId,
+                contact,
+                SystemMessageTypes.USER_LEFT_GROUP,
+                nextAdmin.value
+            );
             return;
         }
         await doDeleteChat();
@@ -600,28 +605,6 @@
         nextTick(() => scrollMessageBoxToBottom());
     };
 
-    onMounted(() => {
-        nextTick(() => scrollToBottom(true));
-        if (openBlockDialogFromOtherFile.value) showDialog.value = true;
-        if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
-        if (openDeleteUserDialogFromOtherFile.value) showDeleteUserDialog.value = true;
-        showDeleteChatDialog.value = false;
-        openDeleteDialogFromOtherFile.value = false;
-        openBlockDialogFromOtherFile.value = false;
-        openDeleteUserDialogFromOtherFile.value = false;
-    });
-
-    onUpdated(() => {
-        //For when component is already mounted
-        if (openBlockDialogFromOtherFile.value) showDialog.value = true;
-        if (openDeleteDialogFromOtherFile.value) showLeaveDialog.value = true;
-        if (openDeleteUserDialogFromOtherFile.value) showDeleteUserDialog.value = true;
-        showDeleteChatDialog.value = false;
-        openDeleteDialogFromOtherFile.value = false;
-        openBlockDialogFromOtherFile.value = false;
-        openDeleteUserDialogFromOtherFile.value = false;
-    });
-
     const status = computed(() => {
         return statusList[selectedId.value];
     });
@@ -629,36 +612,27 @@
     const { scrollEvents } = useScrollState();
     const { shiftScrollEvent } = useScrollActions();
 
+    const blocked = computed(() => {
+        if (!chat.value || chat.value.isGroup) return false;
+        return userIsBlocked(<string>chat.value.chatId);
+    });
+
+    const showSideBar = getShowSideBar();
+
     watch(scrollEvents, () => {
-        if (!scrollEvents || scrollEvents.length === 0) return;
+        if (!scrollEvents.value || scrollEvents.value.length === 0) return;
         nextTick(() => {
             scrollToBottom(scrollEvents[0]);
             shiftScrollEvent();
         });
     });
 
-    const blocked = computed(() => {
-        if (!chat.value || chat.value.isGroup) return false;
-        return userIsBlocked(<string>chat.value.chatId);
-    });
-
-    let activeItem = ref('edit');
-    const isActive = menuItem => {
-        return activeItem.value === menuItem;
-    };
-
-    const setActive = menuItem => {
-        activeItem.value = menuItem;
-    };
-
-    const filteredContacts = computed(() => {
-        return contacts.filter(
-            //@ts-ignore
-            c => !chat.value.contacts.map(x => x.id).includes(c.id)
-        );
-    });
-
-    const showSideBar = getShowSideBar();
+    watch(
+        () => route.params.id,
+        id => {
+            selectedId.value = <string>id;
+        }
+    );
 </script>
 
 <style scoped type="text/css">

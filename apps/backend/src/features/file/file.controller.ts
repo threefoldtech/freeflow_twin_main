@@ -7,13 +7,14 @@ import {
     Post,
     Query,
     Req,
+    Res,
     StreamableFile,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 
@@ -35,11 +36,17 @@ export class FileController {
     }
 
     @Get(':path')
-    async downloadFile(@Req() req: Request, @Param('path') path: string) {
+    async downloadFile(@Req() req: Request, @Res() res: Response, @Param('path') path: string) {
         path = Buffer.from(path, 'base64').toString('binary');
         const filePath = join(`${this.storageDir}`, path);
         if (!path || !this._fileService.exists({ path: filePath }))
             throw new BadRequestException('please provide a valid file id');
+
+        if (path.endsWith('.wav')) {
+            req.res.setHeader(`content-type`, `audio/wav`);
+            req.res.setHeader(`content-transfer-encoding`, 'binary');
+            req.res.setHeader(`Accept-Ranges`, 'bytes');
+        }
 
         const fileBuffer = this._fileService.readFile({ path: filePath });
         const fileStream = await this._fileService.getFileStream({ file: fileBuffer });

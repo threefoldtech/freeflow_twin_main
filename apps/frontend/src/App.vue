@@ -9,7 +9,7 @@
 
         <app-layout>
             <div
-                v-if="route.name !== 'editfile'"
+                v-if="route.name !== 'editFile'"
                 v-show="path === '/glass' && hasBrowserBeenStartedOnce"
                 class="h-full"
             >
@@ -36,15 +36,15 @@
     import version from '../public/config/version';
     import { getMe, useAuthState } from '@/store/authStore';
     import { computed, onBeforeMount } from 'vue';
-    import { useRoute, useRouter } from 'vue-router';
+    import { useRoute } from 'vue-router';
     import { hasBrowserBeenStartedOnce } from '@/store/browserStore';
     import { useSocketActions } from '@/store/socketStore';
     import { initBlocklist } from '@/store/blockStore';
+    import { sendIdentifierToBackend } from '@/services/firebaseService';
 
     const { user } = useAuthState();
     const { initializeSocket } = useSocketActions();
 
-    const router = useRouter();
     onBeforeMount(async () => {
         if (user) {
             initializeSocket(user.id.toString());
@@ -60,6 +60,8 @@
             user.id = profile.username;
             user.email = profile.email;
             user.image = `${window.location.origin}/api/v2/user/avatar`;
+
+            await sendIdentifierToBackend();
         }
     });
 

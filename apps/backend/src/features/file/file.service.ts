@@ -22,6 +22,7 @@ import { join, parse, ParsedPath } from 'path';
 import { ReadableStreamBuffer } from 'stream-buffers';
 
 import { RenameFileDTO } from '../quantum/dtos/rename-file.dto';
+import { cp, move } from 'fs-extra';
 
 @Injectable()
 export class FileService {
@@ -90,9 +91,8 @@ export class FileService {
     moveFile({ from, to }: { from: string; to: string }): boolean {
         if (!from || !to) throw new BadRequestException('please specify a from and a to path to move the file to');
         if (!this.exists({ path: from })) throw new BadRequestException('file does not exist');
-        copyFile(from, to, err => {
+        move(from, to, { overwrite: true }, err => {
             if (err) throw err;
-            this.deleteFile({ path: from });
         });
         return true;
     }
@@ -107,7 +107,8 @@ export class FileService {
     copyFile({ from, to }: { from: string; to: string }): boolean {
         if (!from || !to) throw new BadRequestException('please specify a from and a to path to copy the file to');
         if (!this.exists({ path: from })) throw new BadRequestException('file does not exist');
-        copyFile(from, to, err => {
+        const isDirectory = !from.split('/').pop().includes('.');
+        cp(from, to, { recursive: isDirectory }, err => {
             if (err) throw err;
         });
         return true;
@@ -242,5 +243,9 @@ export class FileService {
         decryptedStreamBuffer.put(file);
         decryptedStreamBuffer.stop();
         return decryptedStreamBuffer;
+    }
+
+    isFolder(path: string) {
+        return !path.split('/').pop().includes('.');
     }
 }

@@ -11,16 +11,6 @@
         >
             <HomeIcon class="h-5 w-5 text-gray-400 hover:text-gray-500" aria-hidden="true" />
         </div>
-        <!--<div
-        class='rounded-full w-6 h-6 flex justify-center items-center'
-        @click='goBack'
-        :class='{
-                "bg-accent-300 hover:text-green-500 cursor-pointer": currentDirectory !== "/",
-                "bg-gray-500": currentDirectory === "/"
-            }'
-    >
-      <i class='fas fa-arrow-up text-white'></i>
-    </div>-->
 
         <div class="flex-1 mr-4">
             <div class="flex items-center" v-if="!sharedDir && !isQuantumChatFiles && !savedAttachments">
@@ -45,8 +35,6 @@
 
             <!-- SHARED BREADCRUMBS -->
             <div class="flex items-center" v-if="sharedDir && !isQuantumChatFiles">
-                <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
-
                 <template v-for="(breadcrumb, idx) in sharedBreadcrumbs">
                     <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                     <span v-if="idx !== 0 && breadcrumb">
@@ -65,7 +53,6 @@
             </div>
             <!-- CHAT FILES BREADCRUMBS -->
             <div class="flex items-center" v-if="isQuantumChatFiles">
-                <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
                 <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <template v-for="(breadcrumb, idx) in chatFilesBreadcrumbs" :key="idx">
                     <span v-if="idx !== 0 && breadcrumb">
@@ -78,7 +65,6 @@
             </div>
             <!-- SAVED ATTACHMENTS -->
             <div class="flex items-center" v-if="!isQuantumChatFiles && savedAttachments">
-                <!--<span class="mx-2 cursor-pointer" @click="router.push({ path: '/quantum' })">Home</span> -->
                 <ChevronRightIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
                 <template v-for="(breadcrumb, idx) in savedAttachmentsBreadcrumbs" :key="idx">
                     <span v-if="idx !== 0 && breadcrumb">
@@ -119,8 +105,6 @@
     const router = useRouter();
 
     const parts = computed(() => currentDirectory.value.split('/'));
-
-    console.log('parts', parts.value);
 
     const onDragEnter = (e: Event, i: number) => {
         if (!isDraggingFiles.value || !e || !e.target || i === parts.value.length - 1) return;

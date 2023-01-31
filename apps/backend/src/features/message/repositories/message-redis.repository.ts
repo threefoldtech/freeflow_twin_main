@@ -71,7 +71,19 @@ export class MessageRedisRepository extends EntityRepository<Message> {
         offset: number;
         count: number;
     }): Promise<Message[]> {
+        const totalMessagesCount = await this.countAllWhereEq({ where: 'chatId', eq: chatId });
+        if (offset >= totalMessagesCount) return [];
+
+        offset = totalMessagesCount - count - offset;
+        if (offset < 0) {
+            count += offset;
+            offset = 0;
+        }
         return await this.findAllWhereEqPaginated({ offset, count, where: 'chatId', eq: chatId });
+    }
+
+    async getAllMessagesCountFromChat(chatId: string): Promise<number> {
+        return await this.countAllWhereEq({ where: 'chatId', eq: chatId });
     }
 
     async getAllMessagesFromChat({ chatId }: { chatId: string }): Promise<Message[]> {

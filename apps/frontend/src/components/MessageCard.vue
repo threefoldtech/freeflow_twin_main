@@ -15,7 +15,7 @@
             :class="{
                 'opacity-0': !isLastMessage,
             }"
-            :id="String(message.from)"
+            :id="message.from"
             :showOnlineStatus="false"
         />
         <div class="flex-1">
@@ -38,12 +38,12 @@
                     <main class="max-w-[500px] break-all flex justify-between min-h-[36px]">
                         <MessageContent
                             :message="message"
-                            :key="String(message.id) + message.body"
+                            :key="message.id + message.body"
                             :isDownloadingAttachment="isDownloadingAttachment"
                         ></MessageContent>
                     </main>
                     <div class="h-9 items-center absolute right-1.5 -bottom-3 hidden my-message:block">
-                        <i class="fas fa-check-double text-accent-300" v-if="isread"></i>
+                        <i class="fas fa-check-double text-accent-300" v-if="isRead"></i>
                         <i class="fas fa-check text-gray-400" v-else></i>
                     </div>
                 </div>
@@ -52,57 +52,55 @@
                     :class="{ flex: selectedMessageId === message.id, hidden: selectedMessageId !== message.id }"
                 >
                     <span
-                        class="reply text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline hidden my-message:inline"
                         @click="editMessage(props.chatId, message)"
                         v-if="message.type === MessageTypes.STRING || message.type === MessageTypes.QUOTE"
                     >
                         <i class="fa fa-pen"></i>
-                        <span class="text-gray-600 pl-2">Edit</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Edit</span>
                     </span>
 
                     <span
-                        class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline"
                         v-if="message.type !== 'DELETE'"
                         @click="replyMessage(props.chatId, message)"
                     >
                         <i class="fa fa-reply"></i>
-                        <span class="text-gray-600 pl-2">Reply</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Reply</span>
                     </span>
                     <span
-                        class="delete text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        class="delete text-xs sm:pr-4 pr-2 cursor-pointer hover:underline hidden my-message:inline"
                         @click="deleteMessage(message)"
                         v-if="message.type !== 'DELETE'"
                     >
                         <i class="fa fa-trash"></i>
-                        <span class="text-gray-600 pl-2">Delete</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Delete</span>
                     </span>
                     <span
-                        class="reply text-xs pr-4 cursor-pointer hover:underline hidden my-message:inline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline hidden my-message:inline"
                         @click="$emit('openEditShare', props.message)"
                         v-if="message.type === MessageTypes.FILE_SHARE"
                     >
                         <i class="fa fa-pen"></i>
-                        <span class="text-gray-600 pl-2">Edit permissions</span>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Edit permissions</span>
                     </span>
                     <span
                         v-if="message.type === MessageTypes.FILE"
-                        class="reply text-xs pr-4 cursor-pointer hover:underline"
+                        class="reply text-xs sm:pr-4 pr-2 cursor-pointer hover:underline"
                         @click="downloadAttachmentToQuantum(message)"
                     >
-                        <i class="fa fa-reply"></i>
-                        <span class="text-gray-600 pl-2">Download</span>
+                        <i class="fa fa-download"></i>
+                        <span class="text-gray-600 sm:pl-2 pl-1">Download</span>
                     </span>
-                    <div class="pr-4 text-gray-600 date inline-block text-xs">
-                        <!--<span v-if="message.updated" class="mr-4">edited</span>-->
+                    <div class="sm:pr-4 pr-2 text-gray-600 date inline-block text-xs">
                         <Time :time="new Date(message.timeStamp)" />
-                        <!-- {{ message }} -->
                     </div>
                 </div>
             </div>
             <div class="flex flex-col mb-4 ml-4 border-l-2 pl-2" v-if="message.replies?.length > 0">
                 <div class="text-gray-400 self-start">Replies:</div>
-                <div v-for="reply in message.replies" :key="String(reply.id)" class="card flex mb-1">
-                    <AvatarImg class="mr-2" small :id="String(reply.from)" :showOnlineStatus="false" />
+                <div v-for="reply in message.replies" :key="reply.id" class="card flex mb-1">
+                    <AvatarImg class="mr-2" small :id="reply.from" :showOnlineStatus="false" />
                     <div
                         class="flex rounded-xl overflow-hidden"
                         :class="{
@@ -160,61 +158,34 @@
     import {
         currentRightClickedItem,
         RIGHT_CLICK_ACTIONS_MESSAGE,
-        RIGHT_CLICK_TYPE,
+        rightClickedItemIsMessage,
         rightClickItemAction,
         triggerWatchOnRightClickItem,
     } from '@/store/contextmenuStore';
     import { calcExternalResourceLink } from '@/services/urlService';
 
+    const { user } = useAuthState();
+    const { addScrollEvent } = useScrollActions();
+
     interface IProps {
-        message: Message<MessageBodyType>;
+        message: Message<any>;
         chatId: string;
         isMine: boolean;
         isGroup: boolean;
-        isreadbyme: boolean;
-        isread: boolean;
+        isReadByMe: boolean;
+        isRead: boolean;
         isFirstMessage: boolean;
         isLastMessage: boolean;
     }
 
     const isDownloadingAttachment = ref<boolean>(false);
+
     const props = defineProps<IProps>();
-
-    defineEmits(['openEditShare', 'clickedProfile']);
-
-    const { user } = useAuthState();
-
-    watch(
-        triggerWatchOnRightClickItem,
-        async () => {
-            if (
-                currentRightClickedItem.value.type === RIGHT_CLICK_TYPE.MESSAGE &&
-                (currentRightClickedItem.value.data as unknown as { id: string }).id === props.message.id
-            ) {
-                switch (rightClickItemAction.value) {
-                    case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
-                        replyMessage(props.chatId, props.message);
-                        break;
-                    case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
-                        editMessage(props.chatId, props.message);
-                        break;
-                    case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
-                        deleteMessage(props.message);
-                        break;
-                    default:
-                        break;
-                }
-                rightClickItemAction.value = null;
-            }
-            return;
-        },
-        { deep: true }
-    );
-
-    const { addScrollEvent } = useScrollActions();
+    const emit = defineEmits(['openEditShare', 'clickedProfile']);
 
     onMounted(() => {
         addScrollEvent();
+        if (!props.isReadByMe) read();
     });
 
     const read = () => {
@@ -222,12 +193,7 @@
         readMessage(props.chatId, props.message.id.toString());
     };
 
-    if (!props.isreadbyme) {
-        read();
-    }
-
     const deleteMessage = (message: Message<MessageBodyType>) => {
-        //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
             chatId: props.chatId,
             id: message.id,
@@ -243,7 +209,6 @@
     };
 
     const deleteReply = (message: Message<StringMessageType>, reply) => {
-        //@todo: show dialog
         const updatedMessage: Message<StringMessageType> = {
             chatId: props.chatId,
             id: reply.id,
@@ -258,30 +223,44 @@
         sendMessageObject(props.chatId, updatedMessage);
     };
 
-    const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>, count: number = 0) => {
-        //todo: save downloaded file in attachments folder
+    const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) => {
         const url = calcExternalResourceLink((message.body as { url: string }).url);
         const res = await axios.get(url, { responseType: 'blob' });
         const blob = new Blob([res.data], { type: res.headers['content-type'] });
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
         const filename = res.headers['content-disposition'].split('filename=')[1].split('.')[0];
         const extension = res.headers['content-disposition'].split('.')[1].split(';')[0];
+
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
         link.download = `${filename}.${extension}`;
         link.click();
-        return;
-
-        // if (count >= 4) {
-        //     isDownloadingAttachment.value = false;
-        //     console.log("Couldn't download attachments");
-        //     return;
-        // }
-        // isDownloadingAttachment.value = true;
-        // const response = await downloadAttachment(message);
-        // count++;
-        // if (response !== 'OK') await downloadAttachmentToQuantum(message);
-        // await sleep(1500);
-        // isDownloadingAttachment.value = false;
     };
+
+    watch(
+        triggerWatchOnRightClickItem,
+        async () => {
+            if (!rightClickedItemIsMessage(currentRightClickedItem.value)) return;
+            if (currentRightClickedItem.value.data.id !== props.message.id) return;
+
+            switch (rightClickItemAction.value) {
+                case RIGHT_CLICK_ACTIONS_MESSAGE.REPLY:
+                    replyMessage(props.chatId, props.message);
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_MESSAGE.EDIT:
+                    editMessage(props.chatId, props.message);
+                    break;
+
+                case RIGHT_CLICK_ACTIONS_MESSAGE.DELETE:
+                    deleteMessage(props.message);
+                    break;
+
+                default:
+                    break;
+            }
+            rightClickItemAction.value = null;
+        },
+        { deep: true }
+    );
 </script>
 <style lang="css" scoped></style>

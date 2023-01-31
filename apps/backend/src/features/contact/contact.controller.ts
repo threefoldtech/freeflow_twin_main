@@ -42,4 +42,14 @@ export class ContactController {
             containerOffline: false,
         });
     }
+
+    @Put(':accepted/:userId')
+    async setContactAccepted(@Param() { userId, accepted }: { userId: string; accepted: string }): Promise<Contact> {
+        return await this._contactService.updateContact({
+            id: userId,
+            contactRequest: false,
+            accepted: accepted === 'true',
+            containerOffline: false,
+        });
+    }
 }

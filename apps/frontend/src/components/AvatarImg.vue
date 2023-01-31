@@ -2,18 +2,18 @@
     <div
         :class="{
             'h-16 w-16': large,
-            'h-12 w-12': !small && !xsmall && !large,
+            'h-12 w-12': !small && !xSmall && !large,
             'h-10 w-10': small,
-            'h-8 w-8': xsmall,
+            'h-8 w-8': xSmall,
         }"
         class="grid relative"
     >
         <img
             :class="{
                 'h-16 w-16': large,
-                'h-12 w-12': !small && !xsmall && !large,
+                'h-12 w-12': !small && !xSmall && !large,
                 'h-10 w-10': small,
-                'h-8 w-8': xsmall,
+                'h-8 w-8': xSmall,
             }"
             class="bg-icon rounded-full focus:outline-none focus-visible:outline-none"
             alt="avatar"
@@ -25,7 +25,7 @@
                 'bg-red-500': status && !status.isOnline,
                 'bg-green-500': status && status.isOnline,
             }"
-            class="h-3 w-3 bg-gray-300 rounded-full absolute ring-2 ring-white bottom-0 right-0 transition-all"
+            class="h-3 w-3 rounded-full absolute ring-2 ring-white bottom-0 right-0 transition-all"
         ></div>
 
         <div
@@ -39,11 +39,10 @@
 
 <script lang="ts" setup>
     import { computed, onBeforeMount } from 'vue';
-    import { fetchStatus, statusList, startFetchStatusLoop } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '../services/urlService';
-    import { useAuthState } from '@/store/authStore';
+    import { statusList, startFetchStatus, watchingUsers, fetchStatus } from '@/store/statusStore';
+    import { calcExternalResourceLink } from '@/services/urlService';
     import { Contact, GroupContact } from '@/types';
-    import axios from 'axios';
+    import { useAuthState } from '@/store/authStore';
 
     interface IProps {
         id: string;
@@ -52,24 +51,30 @@
         unreadMessagesAmount?: number;
         large?: boolean;
         small?: boolean;
-        xsmall?: boolean;
+        xSmall?: boolean;
     }
 
     const props = withDefaults(defineProps<IProps>(), {
         showOnlineStatus: true,
         large: false,
         small: false,
-        xsmall: false,
+        xSmall: false,
     });
 
     onBeforeMount(async () => {
         const { user } = useAuthState();
         await fetchStatus(user.id);
-        if (!statusList[<string>props.id] && props.contact?.location) await startFetchStatusLoop(props.contact);
+        const contact: Contact = {
+            id: props.id,
+            location: watchingUsers[props.id]?.location ?? props.contact?.location,
+        };
+        if (!statusList[props.id] && contact.location) {
+            await startFetchStatus(contact);
+        }
     });
 
     const status = computed(() => {
-        return statusList[<string>props.id];
+        return statusList[props.id];
     });
 
     const src = computed(() => {

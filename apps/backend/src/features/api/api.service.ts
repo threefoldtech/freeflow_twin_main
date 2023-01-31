@@ -16,6 +16,7 @@ import { FailedRequestRepository } from './repositories/failed-request.repositor
 import { LikeCommentDTO } from '../post/dtos/request/like-comment.dto';
 import { DeleteCommentDTO } from '../post/dtos/delete-comment.dto';
 import { Contact } from '../contact/models/contact.model';
+import { PostIdentificationDto, PostNotificationDto } from '../firebase/dtos/firebase.dtos';
 
 @Injectable()
 export class ApiService {
@@ -481,18 +482,6 @@ export class ApiService {
         }
     }
 
-    /**
-     * Check if you are blocked by the other twin.
-     */
-    async checkIfBlocked({ location, userId }: { location: string; userId: string }): Promise<boolean> {
-        const url = `http://[${location}]/api/v2/blocked/${userId}`;
-        try {
-            return (await axios.get(url)).data;
-        } catch {
-            return false;
-        }
-    }
-
     async containerHealth(location: string): Promise<boolean> {
         const url = `http://[${location}]/api/v2/container/health`;
         try {
@@ -558,8 +547,58 @@ export class ApiService {
         params.append('attachments', attachments.toString());
         params.append('location', location);
         try {
-            return (await axios.get(url, { params })).data;
+            return (
+                await axios.get(url, {
+                    params,
+                    timeout: parseInt(this._configService.get<string>('bigPingTimeoutAxiosRequest')),
+                })
+            ).data;
         } catch {
+            return;
+        }
+    }
+
+    async saveIdentifierToExternal(data: PostIdentificationDto, encodedHeader: string) {
+        const userId = await this._configService.get<string>('userId');
+
+        try {
+            await axios.post(
+                'https://europe-west2-jimberlabs.cloudfunctions.net/api/identify',
+                {
+                    username: userId,
+                    appId: data.appId,
+                    identifier: data.identifier,
+                },
+                {
+                    headers: {
+                        'Jimber-Authorization': encodedHeader,
+                    },
+                }
+            );
+        } catch (e) {
+            console.log(e);
+            return;
+        }
+    }
+
+    async postNotificationToExternal(data: PostNotificationDto, encodedHeader: string) {
+        try {
+            await axios.post('https://europe-west2-jimberlabs.cloudfunctions.net/api/notification', data, {
+                headers: {
+                    'Jimber-Authorization': encodedHeader,
+                },
+            });
+        } catch (e) {
+            console.log(e);
+            return;
+        }
+    }
+
+    async setContactAccepted(userId: string, location: string, accepted: boolean) {
+        const destinationUrl = `http://[${location}]/api/v2/contacts/${accepted}/${userId}`;
+        try {
+            return (await axios.put<boolean>(destinationUrl)).data;
+        } catch (error) {
             return;
         }
     }

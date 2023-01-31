@@ -20,7 +20,7 @@
     import { Status, Notification } from '@/types/notifications';
 
     interface IProp {
-        notification: Object;
+        notification: Notification;
     }
     defineProps<IProp>();
 </script>

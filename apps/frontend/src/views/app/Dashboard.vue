@@ -27,20 +27,15 @@
     import { getAllPosts } from '@/services/socialService';
     import { allSocialPosts, isLoadingSocialPosts } from '@/store/socialStore';
     import Spinner from '@/components/Spinner.vue';
-    import { usechatsActions } from '@/store/chatStore';
-    import { notifcationPermissionGranted } from '@/store/notificiationStore';
-
-    const { retrieveChats } = usechatsActions();
+    import { notificationPermissionGranted } from '@/store/notificiationStore';
 
     (async () => {
         await getAllPosts();
-        await retrieveChats();
 
         Notification.requestPermission().then(result => {
-            if (result === 'granted') notifcationPermissionGranted.value = true;
+            if (result === 'granted') notificationPermissionGranted.value = true;
         });
     })();
-
     const showLoader = computed(() => {
         if (allSocialPosts.value.length >= 1) return false;
         return !!isLoadingSocialPosts.value;

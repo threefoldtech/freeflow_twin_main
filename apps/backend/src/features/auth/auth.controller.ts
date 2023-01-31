@@ -17,6 +17,7 @@ import { LocationService } from '../location/location.service';
 import { YggdrasilService } from '../yggdrasil/yggdrasil.service';
 import { AuthService } from './auth.service';
 import { SignInQuery } from './query/sign-in.query';
+import { ProfileData } from './interfaces/auth.interfaces';
 
 @Controller('auth')
 export class AuthController {
@@ -35,7 +36,7 @@ export class AuthController {
         };
     }
 
-    @Get('signin')
+    @Get('signIn')
     @Redirect()
     async signIn(@Session() session: Record<string, unknown>, @Query() query: SignInQuery) {
         const appLogin = await this._authService.getAppLogin(`/api/v2/auth/callback`);
@@ -44,7 +45,7 @@ export class AuthController {
         return { url: loginUrl };
     }
 
-    @Post('signout')
+    @Post('signOut')
     @UseGuards(AuthGuard)
     async signOut(@Req() req: Request) {
         const promise = new Promise<void>((resolve, reject) => {
@@ -75,8 +76,15 @@ export class AuthController {
         console.log('A');
         const redirectUrl = new URL(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
         console.log('redirectUrl', redirectUrl);
-        const profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
-        console.log('profileData', profileData);
+
+        let profileData: ProfileData;
+
+        try {
+            profileData = await this._authService.getProfileData({ redirectUrl, sessionState: req.session.state });
+            console.log('profileData', profileData);
+        } catch (e) {
+            res.redirect('/error?reason=wrongUser');
+        }
 
         delete req.session.state;
 

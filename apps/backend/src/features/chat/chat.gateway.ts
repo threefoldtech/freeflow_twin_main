@@ -85,7 +85,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect, On
         message.from = this._configService.get<string>('userId');
         const editedMessage = await this._messageService.editMessage({
             messageId: message.id,
-            text: message.body,
+            text: JSON.stringify(message.body),
         });
         editedMessage.type = message.type;
 

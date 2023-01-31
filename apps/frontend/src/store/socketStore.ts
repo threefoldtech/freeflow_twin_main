@@ -1,18 +1,18 @@
-import { Chat, Contact, Id, Message } from '@/types';
+import { Chat, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
 import { inject, toRefs } from 'vue';
 import { handleRead, newUnreadChats, removeChat, usechatsActions } from './chatStore';
 import { setLocation, useAuthState } from '@/store/authStore';
 import { addUserToBlockList, blocklist, removeUserFromBlockList } from '@/store/blockStore';
 import { createErrorNotification } from '@/store/notificiationStore';
-import { getAllPosts } from '@/services/socialService';
-import { getSharedContent } from '@/store/fileBrowserStore';
 import { FileAction } from 'custom-types/file-actions.type';
-import { loadAllUsers } from '@/store/userStore';
 import config from '@/config';
 import { statusList } from './statusStore';
 import { useRouter } from 'vue-router';
 import { allSocialPosts } from '@/store/socialStore';
+import { isMobile } from '@/store/fileBrowserStore';
+
+export let connectedSocketId = '';
 
 const state = reactive<State>({
     socket: '',
@@ -34,26 +34,36 @@ const initializeSocket = (username: string) => {
     state.socket = inject('socket');
 
     state.socket.on('connect', () => {
+        connectedSocketId = state.socket.id;
         console.log('connected with socket.');
+        const { user } = useAuthState();
+        if (statusList[user?.id]) statusList[user?.id].isOnline = true;
     });
-    state.socket.emit('identify', {
-        name: username,
-    });
+
     state.socket.on('chat_removed', (chatId: string) => {
         removeChat(chatId);
         const { removeUnreadChats } = usechatsActions();
         removeUnreadChats(chatId);
     });
+
     state.socket.on('chat_blocked', (chatId: string) => {
         addUserToBlockList(chatId);
     });
+
     state.socket.on('chat_unblocked', (chatId: string) => {
         removeUserFromBlockList(chatId);
     });
-    state.socket.on('message', (message: Message<any>) => {
+    state.socket.on('message', async (message: Message<any>) => {
         const isChatOpen = router.currentRoute.value.path.includes(message.chatId);
-        if (message.type !== 'READ' && !isChatOpen)
-            createOSNotification('Message received', `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`);
+
+        if (message.type !== 'READ' && !isChatOpen) {
+            if (!isMobile())
+                createOSNotification(
+                    'Message received',
+                    `From: ${message.from}\nMessage: ${truncate(message.body, 50)}`
+                );
+        }
+
         const { user } = useAuthState();
         if (message.type === 'FILE_SHARE_REQUEST') {
             return;
@@ -69,48 +79,44 @@ const initializeSocket = (username: string) => {
         }
         const { addMessage } = usechatsActions();
 
-        addMessage(String(message.to) === String(user.id) ? String(message.from) : String(message.to), message);
+        addMessage(message.to === user.id ? message.from : message.to, message);
     });
+
     state.socket.on('connection_request', (newContactRequest: Chat) => {
         const { addChat } = usechatsActions();
         addChat(newContactRequest);
         newUnreadChats(newContactRequest.chatId);
     });
+
     state.socket.on('chat_updated', (chat: Chat) => {
         const { updateChat } = usechatsActions();
         updateChat(chat);
     });
+
     state.socket.on('new_chat', (chat: Chat) => {
         const { addChat } = usechatsActions();
         addChat(chat);
     });
-    state.socket.on('posts_updated', () => {
-        getAllPosts();
-    });
+
     state.socket.on('disconnect', () => {
         createErrorNotification('Connection Lost', 'You appear to be having connection issues');
     });
-    state.socket.on('shares_updated', () => {
-        getSharedContent();
-    });
+
     state.socket.on('update_status', ({ id, isOnline }: { id: string; isOnline: boolean }) => {
         if (statusList[id]) statusList[id].isOnline = isOnline;
     });
+
     state.socket.on('appID', (url: string) => {
         config.setAppId(url);
     });
+
     state.socket.on('post_deleted', (id: string) => {
         allSocialPosts.value = allSocialPosts.value.filter(p => p.id !== id);
     });
+
     state.socket.on('yggdrasil', (location: string) => {
         console.log(`YGGDRASIL LOCATION SET TO: ${location}`);
         setLocation(location);
-    });
-    state.socket.on('blocked_contacts', (contacts: { id: string }[]) => {
-        blocklist.value = contacts;
-    });
-    state.socket.on('users_loaded', async (users: Contact[]) => {
-        loadAllUsers(users);
     });
 };
 
@@ -123,17 +129,19 @@ const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate
     await state.socket.emit(messageType, data);
 };
 
-export const sendRemoveChat = async (id: Id) => {
+export const sendRemoveChat = async (id: string) => {
     state.socket.emit('remove_chat', id);
 };
-export const sendRemoveUser = async (id: Id) => {
+
+export const sendRemoveUser = async (id: string) => {
     state.socket.emit('remove_user', id);
 };
-export const sendBlockChat = async (id: Id) => {
+
+export const sendBlockChat = async (id: string) => {
     state.socket.emit('block_chat', id);
 };
 
-const sendUnBlockedChat = async (id: Id) => {
+const sendUnBlockedChat = async (id: string) => {
     state.socket.emit('unblock_chat', id);
     blocklist.value = blocklist.value.filter(x => x !== id);
 };
@@ -183,10 +191,10 @@ interface State {
 }
 
 const createOSNotification = (title: string, body: string) => {
-    const notifImg = '/freeflow_logo.ico';
+    const notifyImg = '/freeflow_logo.ico';
     const options = {
         body,
-        icon: notifImg,
+        icon: notifyImg,
     };
     Notification.requestPermission().then(result => {
         if (result === 'granted') new Notification(title, options);

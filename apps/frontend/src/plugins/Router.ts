@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw, RouterView } from 'vue-
 import Home from '@/views/Home.vue';
 import FileBrowser from '@/views/app/FileBrowser.vue';
 import VideoRoom from '@/views/app/VideoRoom.vue';
+import Error from '@/views/Error.vue';
 import Forum from '@/views/app/Forum.vue';
 import Kutana from '@/views/app/Kutana.vue';
 import Chat from '@/views/app/Chat.vue';
@@ -38,23 +39,29 @@ import {
 const Browser = () => import('@/views/app/Browser.vue');
 
 import { setHasBrowserBeenStartedOnce } from '@/store/browserStore';
+import { sendCurrentURL } from '@/store/socketStore';
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
-        name: 'Home',
+        name: 'home',
         component: Home,
         meta: { requiresUnAuth: true },
     },
     {
         path: '/callback',
-        name: 'Callback/:signedAttempt',
+        name: 'callback/:signedAttempt',
         component: Callback,
         meta: { requiresAuth: true },
     },
     {
+        path: '/error',
+        name: 'error',
+        component: Error,
+    },
+    {
         path: '/unauthorized',
-        name: 'Unauthorized',
+        name: 'unauthorized',
         component: Unauthorised,
     },
     {
@@ -81,7 +88,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/quantum/edit/:path/:shareId?/:attachments',
-        name: 'editfile',
+        name: 'editFile',
         component: EditFile,
         meta: {
             back: 'quantum',
@@ -91,7 +98,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/quantum/options/:path/:shareId?/:attachments',
-        name: 'editoptions',
+        name: 'editOptions',
         component: EditOptions,
         meta: {
             back: 'quantum',
@@ -244,8 +251,8 @@ const routes: Array<RouteRecordRaw> = [
         },
     },
     {
-        name: 'videoroom',
-        path: '/videoroom/:id',
+        name: 'videoRoom',
+        path: '/videoRoom/:id',
         component: VideoRoom,
         meta: {
             app: AppType.Meetings,
@@ -272,12 +279,12 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, _from, next) => {
-    if (to.matched.some(record => record.meta.requiresAuth) && !(await isUserAuthenticated())) {
-        next({ name: 'Home' });
-    }
-    if (to.matched.some(record => record.meta.requiresUnAuth) && (await isUserAuthenticated())) {
-        next({ name: 'dashboard' });
-    }
+    const needsAuth = to.matched.some(record => record.meta.requiresAuth);
+    const needsUnAuth = to.matched.some(record => record.meta.requiresUnAuth);
+
+    if (needsAuth && !(await isUserAuthenticated())) next({ name: 'home' });
+    if (needsUnAuth && (await isUserAuthenticated())) next({ name: 'dashboard' });
+
     //Starts the browser if the user navigates to /glass as first page
     if (window.innerWidth >= 768 && to.name === 'glass') {
         setHasBrowserBeenStartedOnce();
@@ -285,6 +292,11 @@ router.beforeEach(async (to, _from, next) => {
     if (to.name === 'sharedWithMe') {
         sharedDir.value = true;
     }
+    next();
+});
+
+router.beforeEach(async (_to, _from, next) => {
+    if (document.body.clientWidth < 1280) disableSidebar();
     next();
 });
 
@@ -297,9 +309,7 @@ router.afterEach(async (to, _from) => {
     savedAttachments.value = false;
     if (
         to.meta.root_parent === 'quantum' &&
-        to.name !== 'quantumFolder' &&
-        to.name !== 'quantum' &&
-        to.name !== 'savedAttachments'
+        ['quantumFolder', 'quantum', 'savedAttachments'].includes(String(to.name))
     ) {
         await fetchBasedOnRoute();
         loadSharedItems();
@@ -307,47 +317,47 @@ router.afterEach(async (to, _from) => {
         sharedFolderIsloading.value = false;
         showSharedFolderErrorModal.value = false;
     }
-    if (to.name === 'quantumFolder') {
-        loadLocalFolder();
-    }
-    if (to.meta.sharedFolder) {
-        sharedDir.value = true;
-    }
-    if (to.name === 'savedAttachments') {
-        savedAttachmentsBreadcrumbs.value = [];
-        sharedDir.value = false;
-        savedAttachments.value = true;
-        isQuantumChatFiles.value = false;
-        savedAttachmentsBreadcrumbs.value.push({ name: 'Saved attachments', path: '/quantum/savedAttachments' });
-        await updateAttachments('/');
-        savedAttachmentsIsLoading.value = false;
-    }
-    if (to.name === 'savedAttachmentsFromChat') {
-        savedAttachmentsIsLoading.value = true;
-        savedAttachmentsBreadcrumbs.value = [];
-        savedAttachments.value = true;
-        sharedDir.value = false;
-        isQuantumChatFiles.value = false;
-        savedAttachmentsBreadcrumbs.value.push({ name: 'Saved attachments', path: '/quantum/savedAttachments' });
-        await updateAttachments(`/${to.params.chatId}`);
-        savedAttachmentsBreadcrumbs.value.push({
-            name: to.params.chatId,
-            path: `/quantum/savedAttachments/${to.params.chatId}`,
-        });
-        savedAttachmentsIsLoading.value = false;
-    }
-    if (to.name === 'quantum') {
-        sharedDir.value = false;
-        currentDirectory.value = '/';
-        await updateContent('/');
+
+    if (to.meta.sharedFolder) sharedDir.value = true;
+
+    switch (to.name) {
+        case 'quantumFolder':
+            loadLocalFolder();
+            break;
+
+        case 'savedAttachments':
+            await setPublicVariables('/');
+            savedAttachmentsIsLoading.value = false;
+            break;
+
+        case 'savedAttachmentsFromChat':
+            savedAttachmentsIsLoading.value = true;
+            await setPublicVariables(`/${to.params.chatId}`);
+            savedAttachmentsBreadcrumbs.value.push({
+                name: to.params.chatId,
+                path: `/quantum/savedAttachments/${to.params.chatId}`,
+            });
+            savedAttachmentsIsLoading.value = false;
+            break;
+
+        case 'quantum':
+            sharedDir.value = false;
+            currentDirectory.value = '/';
+            await updateContent('/');
+            break;
+
+        default:
+            break;
     }
 });
 
-router.beforeEach(async (_to, _from, next) => {
-    if (document.body.clientWidth < 1280) {
-        disableSidebar();
-    }
-    next();
-});
+const setPublicVariables = async (path: string) => {
+    savedAttachmentsBreadcrumbs.value = [];
+    sharedDir.value = false;
+    savedAttachments.value = true;
+    isQuantumChatFiles.value = false;
+    savedAttachmentsBreadcrumbs.value.push({ name: 'Saved attachments', path: '/quantum/savedAttachments' });
+    await updateAttachments(path);
+};
 
 export default router;

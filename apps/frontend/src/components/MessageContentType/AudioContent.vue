@@ -10,9 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, defineComponent } from 'vue';
     import { calcExternalResourceLink } from '@/services/urlService';
-    import AudioPlayer from '@/components/AudioPlayer.vue';
 
     interface IProp {
         message: Object;

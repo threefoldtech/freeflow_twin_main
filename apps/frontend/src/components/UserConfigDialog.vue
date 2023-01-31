@@ -19,7 +19,7 @@
                             <i class="fas fa-pen text-icon"></i>
                         </div>
                         <AvatarImg
-                            :id="String(user.id)"
+                            :id="user.id"
                             large
                             class="ring-icon ring-offset-1 peer-hover:ring-1 overflow-hidden"
                         />
@@ -54,7 +54,7 @@
                             style="resize: none"
                             class="w-full autoexpand tracking-wide py-2 px-4 mb-3 leading-relaxed appearance-none block w-full bg-gray-200 border border-gray-200 rounded focus:outline-none focus:bg-white focus:border-gray-500"
                             :disabled="!isEditingStatus"
-                            :placeholder="myStatus"
+                            :placeholder="statusList[user.id]?.status ?? 'No status set'"
                             maxlength="150"
                         >
                         </textarea>
@@ -120,9 +120,9 @@
 </template>
 
 <script setup lang="ts">
-    import { computed, nextTick, onBeforeMount, ref, watch, watchEffect } from 'vue';
-    import { useAuthState, getMyStatus } from '../store/authStore';
-    import { useSocketActions } from '../store/socketStore';
+    import { computed, ref, watch, watchEffect } from 'vue';
+    import { useAuthState } from '@/store/authStore';
+    import { useSocketActions } from '@/store/socketStore';
     import Dialog from '@/components/Dialog.vue';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { blocklist } from '@/store/blockStore';
@@ -131,62 +131,32 @@
     import { useRoute, useRouter } from 'vue-router';
     import { showUserConfigDialog } from '@/services/dialogService';
     import { statusList } from '@/store/statusStore';
-    import { calcExternalResourceLink } from '../services/urlService';
+    import { calcExternalResourceLink } from '@/services/urlService';
     import VueCropper from 'vue-cropperjs';
     import 'cropperjs/dist/cropper.css';
     import { FileAction } from 'custom-types/file-actions.type';
 
-    const emit = defineEmits(['addUser']);
-
     const { user } = useAuthState();
-    const fileInput = ref();
-    const file = ref();
-    const userStatus = ref('');
-    const isEditingStatus = ref(false);
+
+    const emit = defineEmits(['addUser']);
     const router = useRouter();
     const route = useRoute();
-    const myStatus = await getMyStatus();
-    const cropper = ref(null);
     const isHoveringAvatar = ref(false);
-    const showEditAvatar = ref(false);
 
-    watch(showEditAvatar, () => {
-        if (showEditAvatar.value) {
-            window.addEventListener('keypress', enterPressed);
-            return;
-        }
-        window.removeEventListener('keypress', enterPressed);
-    });
-    watchEffect(() => {
-        if (!cropper.value) {
-            return;
-        }
-        if (!file.value) {
-            cropper.value.destroy();
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = event => {
-            cropper.value.replace(event.target.result);
-        };
-        reader.readAsDataURL(file.value);
-    });
     const enterPressed = e => {
         if (e.key === 'Enter') {
             saveNewAvatar();
         }
     };
-    const backOrMenu = () => {
-        if (route.meta && route.meta.back) {
-            router.push({ name: <any>route.meta.back });
-            return;
-        }
-        showUserConfigDialog.value = true;
-    };
+
+    const fileInput = ref();
 
     const selectFile = () => {
         fileInput.value.click();
     };
+
+    const file = ref();
+    const showEditAvatar = ref(false);
 
     const changeFile = () => {
         const newFile = fileInput.value?.files[0];
@@ -198,6 +168,8 @@
         showEditAvatar.value = true;
         fileInput.value.value = null;
     };
+
+    const cropper = ref(null);
 
     const saveNewAvatar = async () => {
         const blob = await (await fetch(cropper.value?.getCroppedCanvas().toDataURL(file.value.type))).blob();
@@ -212,10 +184,6 @@
         showEditAvatar.value = false;
     };
 
-    const removeFile = () => {
-        file.value = null;
-    };
-
     const closeDialog = (newVal: boolean) => {
         showUserConfigDialog.value = newVal;
     };
@@ -228,8 +196,11 @@
             action: FileAction.CHANGE_AVATAR,
             payload: { filename: avatar.filename },
         });
-        await fetchStatus(user.id);
+        await fetchStatus(user.id, true);
     };
+
+    const userStatus = ref('');
+    const isEditingStatus = ref(false);
 
     const setEditStatus = (edit: boolean) => {
         isEditingStatus.value = edit;
@@ -251,8 +222,8 @@
     const addUser = () => {
         emit('addUser');
     };
+
     const status = computed(() => {
-        console.log(statusList, user.id);
         return statusList[<string>user.id];
     });
 
@@ -263,23 +234,32 @@
 
         return calcExternalResourceLink(status.value.avatar);
     });
+
+    watch(showEditAvatar, () => {
+        if (showEditAvatar.value) {
+            window.addEventListener('keypress', enterPressed);
+            return;
+        }
+        window.removeEventListener('keypress', enterPressed);
+    });
+
+    watchEffect(() => {
+        if (!cropper.value) return;
+
+        if (!file.value) {
+            cropper.value.destroy();
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = event => {
+            cropper.value.replace(event.target.result);
+        };
+        reader.readAsDataURL(file.value);
+    });
 </script>
 
 <style scoped>
-    .configDialog {
-        position: absolute;
-        margin: auto;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 800px;
-        height: 600px;
-        z-index: 10;
-        background-color: aquamarine;
-        border: 2px solid black;
-    }
-
     .avatar-container {
         position: relative;
     }

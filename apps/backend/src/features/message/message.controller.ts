@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Put } from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Param, Put, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { MessageType } from '../../types/message-types';
@@ -23,6 +23,8 @@ import {
     StringMessageState,
     SystemMessageState,
 } from './states/message.state';
+import { UserGateway } from '../user/user.gateway';
+import { FirebaseService } from '../firebase/firebase.service';
 
 @Controller('messages')
 export class MessageController {
@@ -36,6 +38,8 @@ export class MessageController {
         private readonly _blockedContactService: BlockedContactService,
         private readonly _apiService: ApiService,
         private readonly _chatGateway: ChatGateway,
+        private readonly _userGateway: UserGateway,
+        private readonly _firebaseService: FirebaseService,
         private readonly _quantumService: QuantumService
     ) {
         // contact request handler
@@ -121,19 +125,25 @@ export class MessageController {
 
         message.chatId = chatId;
 
-        // TODO: fix encryption
-        // const validSignature = await this._messageService.verifySignedMessageByChat({
-        //     chat,
-        //     signedMessage: message,
-        // });
-        // if (!validSignature) throw new ForbiddenException('not allowed');
-
-        // if (message.type === MessageType.SYSTEM && chat.adminId !== message.from)
-        //     throw new ForbiddenException(`not allowed`);
-
         const userId = this._configService.get<string>('userId');
         if (chat.isGroup && chat.adminId === userId) this._chatService.handleGroupAdmin({ chat, message });
 
+        // Check if the message is still unread after 5 seconds => call notify function
+        setTimeout(async () => {
+            await this._messageService.notifyIfUnread(message, chatId);
+        }, 5000);
+
         return await this._messageStateHandlers.get(message.type).handle({ message, chat });
+    }
+
+    @Get('/:chatId')
+    async getMessages(@Param('chatId') chatId: string, @Query() query: { totalMessagesLoaded: string; limit: string }) {
+        const { totalMessagesLoaded, limit } = query;
+        const chatMessages = await this._messageService.getMessagesFromChat({
+            chatId,
+            count: parseInt(limit),
+            totalMessagesLoaded: parseInt(totalMessagesLoaded),
+        });
+        return { messages: chatMessages, hasMore: chatMessages.length === parseInt(limit) };
     }
 }

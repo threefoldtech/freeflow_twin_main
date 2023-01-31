@@ -36,7 +36,7 @@
                     </div>
                 </div>
                 <div class="w-20 h-20 grid cursor-pointer items-center justify-items-center">
-                    <AvatarImg small @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="String(user.id)" />
+                    <AvatarImg small @click="toggleShowUserConfigDialog" class="cursor-pointer" :id="user.id" />
                     <button
                         class="mt-2 py-2 px-4 text-white rounded-md max-w-max hover:bg-primarylight"
                         @click="showLogoutDialog = true"
@@ -108,7 +108,8 @@
                                                 'bg-accent-800 text-white rounded-md':
                                                     app?.enabled && router.currentRoute?.value.meta.app === app.name,
                                                 'text-gray-500': !app?.enabled,
-                                                'hidden md:block': app.name === AppType.Glass,
+                                                'hidden md:block':
+                                                    app.name === AppType.Glass || app.name === AppType.Kutana,
                                             }"
                                         >
                                             <div
@@ -144,7 +145,7 @@
                                         <AvatarImg
                                             @click="toggleShowUserConfigDialog"
                                             class="cursor-pointer"
-                                            :id="String(user.id)"
+                                            :id="user.id"
                                         />
                                     </div>
                                     <div class="ml-3">
@@ -216,6 +217,7 @@
     import { getUnreadChats, useChatsState } from '@/store/chatStore';
 
     const { unreadChats } = useChatsState();
+    const { user } = useAuthState();
 
     const init = async () => {
         await getUnreadChats();
@@ -238,11 +240,6 @@
             icon: '/quantum.svg',
             enabled: true,
         },
-        // {
-        //     name: AppType.Forum,
-        //     icon: 'fas fa-stream',
-        //     enabled: true,
-        // },
         {
             name: AppType.Glass,
             icon: '/glass.svg',
@@ -253,16 +250,10 @@
             icon: '/kutana.svg',
             enabled: true,
         },
-        // {
-        //     name: AppType.Meetings,
-        //     icon: 'fas fa-video',
-        // },
     ];
     const router = useRouter();
 
     const emit = defineEmits(['clicked']);
-
-    const { user } = useAuthState();
 
     const showLogoutDialog = ref(false);
 

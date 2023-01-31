@@ -6,21 +6,16 @@
 
 <script lang="ts" setup>
     import { calcExternalResourceLink } from '@/services/urlService';
-    import { Message, MessageBodyType } from '@/types';
+    import { Message, MessageBodyType, SharedFileInterface } from '@/types';
+    import { getMsgUrl } from '@/store/fileBrowserStore';
 
     interface IProp {
-        message: Message<MessageBodyType>;
+        message: Message<MessageBodyType | SharedFileInterface>;
     }
 
     const props = defineProps<IProp>();
-    let msgUrl = props.message.body.url;
-    if (!msgUrl) {
-        const ownerLocation = props.message.body.owner.location;
-        let path = props.message.body.path;
-        path = path.replace('/appdata/storage/', '');
-        msgUrl = `http://[${ownerLocation}]/api/v2/files/${btoa(path)}`;
-    }
-    const src = calcExternalResourceLink(msgUrl);
+
+    const src = calcExternalResourceLink(getMsgUrl(props.message.body));
 </script>
 
 <style scoped></style>

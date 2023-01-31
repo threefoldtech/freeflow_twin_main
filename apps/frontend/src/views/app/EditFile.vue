@@ -44,26 +44,22 @@
         getFileType,
     } from '@/store/fileBrowserStore';
     import { get } from 'scriptjs';
-    import { showUserOfflineMessage, startFetchStatusLoop } from '@/store/statusStore';
+    import { showUserOfflineMessage, startFetchStatus } from '@/store/statusStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import {
-        EditPathInfo,
         generateDocumentServerConfig,
         generateFileBrowserUrl,
         getFileInfo,
         getShareWithId,
     } from '@/services/fileBrowserService';
     import Spinner from '@/components/Spinner.vue';
-    import { isUndefined } from 'lodash';
     import { getOwnLocation } from '@/services/userService';
 
     const route = useRoute();
     const fileType = ref<FileType>();
-    const readUrl = ref<string>();
-    const isLoading = ref<boolean>(true);
-    const location = ref<string>('');
-    const path = atob(<string>route.params.path);
-    const shareId = <string>route.params.shareId;
+    const readUrl = ref('');
+    const isLoading = ref(true);
+    const location = ref('');
 
     const isSupported = computed(() => {
         return [
@@ -77,97 +73,59 @@
     });
 
     onMounted(async () => {
+        const shareId = <string>route.params.shareId;
+        const attachments = route.params.attachments === 'true';
+
+        const fileAccessDetails = await getFileDetails(attachments, shareId);
+        fileType.value = getFileType(getExtension(fileAccessDetails.fullName));
+
+        if (!isSupported.value) return;
+
         if (!shareId) location.value = await getOwnLocation();
 
-        const attachments = route.params.attachments === 'true';
-        let fileAccesDetails: EditPathInfo;
-        let documentServerconfig;
+        const documentServerConfig = generateDocumentServerConfig(location.value, fileAccessDetails, attachments);
+        get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+            //@ts-ignore
+            new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
+        });
+    });
+
+    const getFileDetails = async (attachments: boolean, shareId: string) => {
+        const path = atob(<string>route.params.path);
 
         if (shareId) {
+            //if not your own file
             const shareDetails = await getShareWithId(shareId);
-            if (isUndefined(shareDetails)) isLoading.value = false;
-            await startFetchStatusLoop(shareDetails.owner);
-            if (showUserOfflineMessage.value || accessDenied.value) {
-                isLoading.value = false;
-            }
+            if (!shareDetails) isLoading.value = false;
+
+            await startFetchStatus(shareDetails.owner);
+            if (showUserOfflineMessage.value || accessDenied.value) isLoading.value = false;
             location.value = shareDetails.owner.location;
-            fileAccesDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
+            const fileAccessDetails = await fetchFileAccessDetails(shareDetails.owner, shareId, path, attachments);
             isLoading.value = false;
 
             const apiEndpoint = generateFileBrowserUrl(
                 'http',
                 `[${shareDetails.owner.location}]`,
-                fileAccesDetails.path,
-                fileAccesDetails.readToken
+                fileAccessDetails.path,
+                fileAccessDetails.readToken
             );
-            const encodedEndpoint = calcExternalResourceLink(encodeURIComponent(apiEndpoint));
-            readUrl.value = encodedEndpoint;
-        } else {
-            fileAccesDetails = (await getFileInfo(path, undefined, attachments)).data;
-
-            isLoading.value = false;
-            readUrl.value = generateFileBrowserUrl(
-                'http',
-                window.location.hostname,
-                fileAccesDetails.path,
-                fileAccesDetails.readToken,
-                attachments
-            );
+            readUrl.value = calcExternalResourceLink(encodeURIComponent(apiEndpoint));
+            return fileAccessDetails;
         }
 
-        fileType.value = getFileType(getExtension(fileAccesDetails.fullName));
-
-        if (isSupported.value) {
-            console.log(`USED ONLYOFFICE LOCATION: ${location.value}`);
-            documentServerconfig = generateDocumentServerConfig(
-                location.value,
-                fileAccesDetails.path,
-                fileAccesDetails.key,
-                fileAccesDetails.readToken,
-                fileAccesDetails.writeToken,
-                fileAccesDetails.extension,
-                fileAccesDetails.name,
-                attachments,
-                isLoading.value
-            );
-            get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
-                //@ts-ignore
-                new window.DocsAPI.DocEditor('placeholder', documentServerconfig);
-            });
-            return;
-        }
-
-        if (fileType.value === FileType.Image) {
-            //If statement so that we don't override the URl of a file that is shared
-            if (readUrl.value) {
-                isLoading.value = false;
-                return;
-            }
-            readUrl.value = generateFileBrowserUrl(
-                'http',
-                window.location.hostname,
-                fileAccesDetails.path,
-                fileAccesDetails.readToken
-            );
-            isLoading.value = false;
-            return;
-        }
-        if (fileType.value === FileType.Video) {
-            //If statement so that we don't override the URl of a file that is shared
-            if (readUrl.value) {
-                isLoading.value = false;
-                return;
-            }
-            readUrl.value = generateFileBrowserUrl(
-                'http',
-                window.location.hostname,
-                fileAccesDetails.path,
-                fileAccesDetails.readToken
-            );
-            isLoading.value = false;
-            return;
-        }
-    });
+        //your own file
+        const fileInfo = (await getFileInfo(path, undefined, attachments)).data;
+        isLoading.value = false;
+        readUrl.value = generateFileBrowserUrl(
+            'https',
+            window.location.hostname,
+            fileInfo.path,
+            fileInfo.readToken,
+            attachments
+        );
+        return fileInfo;
+    };
 </script>
 
 <style scoped></style>

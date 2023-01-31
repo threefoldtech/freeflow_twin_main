@@ -1,17 +1,20 @@
-import { DtId } from './../types/index';
 import axios from 'axios';
 import { ref } from 'vue';
 import { reactive } from '@vue/reactivity';
 import { useAuthState } from '@/store/authStore';
-import { calcExternalResourceLink } from '../services/urlService';
+import { calcExternalResourceLink } from '@/services/urlService';
 import { Contact } from '@/types';
+import { useDebounceFn } from '@vueuse/core';
 
 export const statusList = reactive<Object>({});
 export const fetching: string[] = [];
 export const watchingUsers = [];
-export const showUserOfflineMessage = ref<boolean>(false);
+export const showUserOfflineMessage = ref(false);
 
-export const fetchStatus = async (digitalTwinId: DtId) => {
+export const fetchStatus = async (digitalTwinId: string, fetch = false) => {
+    if (statusList[digitalTwinId] && !fetch) {
+        return statusList[digitalTwinId];
+    }
     const { user } = useAuthState();
     const locationApiEndpoint = '/api/v2/user/status';
     let location = '';
@@ -31,11 +34,12 @@ export const fetchStatus = async (digitalTwinId: DtId) => {
     }
 };
 
-export const startFetchStatusLoop = async (contact: Contact) => {
+export const startFetchStatus = async (contact: Contact) => {
     if (watchingUsers.find(wu => wu === contact.id) && !statusList[<string>contact.id]) {
         await fetchStatus(contact.id);
         return;
     }
+
     watchingUsers.push(contact.id);
     watchingUsers[<string>contact.id] = {
         location: contact.location,
@@ -44,19 +48,4 @@ export const startFetchStatusLoop = async (contact: Contact) => {
 
     await fetchStatus(contact.id);
     fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    // setInterval(async () => {
-    //     try {
-    //         if (fetching.indexOf(<string>contact.id) !== -1) {
-    //             return;
-    //         }
-    //         fetching.push(<string>contact.id);
-    //         await fetchStatus(contact.id);
-
-    //         fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    //     } catch (e) {
-    //         setTimeout(() => {
-    //             fetching.splice(fetching.indexOf(<string>contact.id), 1);
-    //         }, 10000);
-    //     }
-    // }, 5000);
 };

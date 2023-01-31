@@ -27,6 +27,7 @@ export class ContactService {
         private readonly _apiService: ApiService,
         @Inject(forwardRef(() => ChatService))
         private readonly _chatService: ChatService,
+        @Inject(forwardRef(() => BlockedContactService))
         private readonly _blockedContactService: BlockedContactService,
         @Inject(forwardRef(() => ChatGateway))
         private readonly _chatGateway: ChatGateway
@@ -99,7 +100,7 @@ export class ContactService {
         let newContact = await this.getContact({ id });
         if (newContact?.accepted) message.body.message = `You can now start chatting with ${newContact.id} again`;
 
-        if (!newContact)
+        if (!newContact) {
             try {
                 newContact = await this._contactRepo.addNewContact({
                     id,
@@ -111,7 +112,7 @@ export class ContactService {
             } catch (error) {
                 throw new BadRequestException(`unable to create contact: ${error}`);
             }
-
+        }
         const signedMessage = await this._keyService.appendSignatureToMessage({ message });
         const newMessage = await this._messageService.createMessage(signedMessage);
         const chat = await this._chatService.createChat({
@@ -171,6 +172,18 @@ export class ContactService {
 
         const existingContact = await this.getContact({ id });
         const existingMessages = await this._messageService.getAllMessagesFromChat({ chatId: existingContact?.id });
+        const existingChat = existingContact ? await this._chatService.getChat(existingContact?.id) : undefined;
+
+        if (existingContact && existingChat) {
+            await this.updateContact({
+                id,
+                contactRequest: false,
+                accepted: true,
+                containerOffline: false,
+            });
+            await this._apiService.acceptContactRequest({ ownId: me.id, contactLocation: location });
+        }
+
         if (existingContact && existingMessages.length > 0) return;
 
         let newContact;
@@ -285,6 +298,17 @@ export class ContactService {
         contact.contactRequest = contactRequest;
         contact.accepted = accepted;
         contact.containerOffline = containerOffline;
+        try {
+            return await this._contactRepo.updateContact({ contact });
+        } catch (error) {
+            throw new BadRequestException(`unable to update contact: ${error}`);
+        }
+    }
+
+    async setContactAccepted(id: string, accepted: boolean): Promise<Contact> {
+        const contact = await this.getContact({ id });
+        if (!contact) return;
+        contact.accepted = accepted;
         try {
             return await this._contactRepo.updateContact({ contact });
         } catch (error) {

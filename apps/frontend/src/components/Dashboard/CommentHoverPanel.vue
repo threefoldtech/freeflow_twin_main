@@ -70,7 +70,7 @@
     import { IPostContainerDTO } from 'custom-types/post.type';
 
     const { addContact, retrieveContacts } = useContactsActions();
-    const { getChat, retrieveChats } = usechatsActions();
+    const { getChat } = usechatsActions();
 
     const props = defineProps<{
         comment: IPostContainerDTO;
@@ -108,7 +108,6 @@
         e.preventDefault();
         if (userLocation.value === props.comment.owner.location) return;
         if (!useContactsState().contacts.some(item => item.id === props.comment.owner.id)) {
-            await retrieveChats();
             await addContact(props.comment.owner.id, props.comment.owner.location);
         }
         await nextTick(async () => {

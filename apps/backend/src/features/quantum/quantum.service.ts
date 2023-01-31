@@ -185,10 +185,13 @@ export class QuantumService {
     }): Promise<void> {
         const path = join(toPath, name);
         if (path === fromPath) return;
-        const pathWithCount =
-            count === 0
-                ? path
-                : `${path.substring(0, path.lastIndexOf('.'))} (${count})${path.substring(path.lastIndexOf('.'))}`;
+        const isFolder = this._fileService.isFolder(name);
+
+        const beginOfPath = isFolder ? path : `${toPath}/${name.split('.')[0]}`;
+        const endOfPath = isFolder ? '' : `.${name.split('.')[1]}`;
+
+        const pathWithCount = count === 0 ? path : `${beginOfPath} (${count})${endOfPath}`;
+
         if (this._fileService.exists({ path: pathWithCount }))
             return this.createFileWithRetry({ fromPath, toPath, name, count: count + 1 });
 
@@ -218,10 +221,12 @@ export class QuantumService {
         if (this.isUserFolder({ path: fromPath })) throw new ForbiddenException('cannot copy user data');
 
         const path = join(toPath, name);
-        const pathWithCount =
-            count === 0
-                ? path
-                : `${path.substring(0, path.lastIndexOf('.'))} (${count})${path.substring(path.lastIndexOf('.'))}`;
+        const isFolder = this._fileService.isFolder(name);
+
+        const beginOfPath = isFolder ? path : `${toPath}/${name.split('.')[0]}`;
+        const endOfPath = isFolder ? '' : `.${name.split('.')[1]}`;
+
+        const pathWithCount = count === 0 ? path : `${beginOfPath} (${count})${endOfPath}`;
 
         if (this._fileService.exists({ path: pathWithCount })) {
             return this.copyFileWithRetry({ fromPath, toPath, name, count: count + 1 });
@@ -580,6 +585,7 @@ export class QuantumService {
             const chat = await this._chatService.getChat(p.userId);
             if (!chat) return;
             await this._messageService.renameSharedMessage({ message: msg, chatId: chat.chatId });
+            await this._messageService.renameQuotedFileShareMessages(msg);
             this._chatGateway.emitMessageToConnectedClients('chat_updated', {
                 ...chat.toJSON(),
                 messages: (await this._messageService.getAllMessagesFromChat({ chatId: chat.chatId })).map(m =>

@@ -33,7 +33,7 @@ export interface IQuantumFile {
     path: string;
 }
 
-export enum ISimpleFileExtension {
+export enum SimpleFileExtension {
     TXT = 'txt',
     JSON = 'json',
     HTML = 'html',
@@ -49,25 +49,26 @@ export enum ISimpleFileExtension {
     PYTHON = 'python',
 }
 
-export enum IFileTypes {
+export enum FileTypes {
     IMAGE = 'image',
     VIDEO = 'video',
     SIMPLE = 'simpleFile',
 }
 
-export enum IImageFileExtension {
+export enum ImageFileExtension {
     GIF = 'gif',
     PNG = 'png',
     JPG = 'jpg',
     JPEG = 'jpeg',
 }
 
-export enum IAudioFileExtension {
+export enum AudioFileExtension {
     MP3 = 'mp3',
     WEBM = 'WebM',
+    WAV = 'wav',
 }
 
-export enum IVideoFileExtension {
+export enum VideoFileExtension {
     MP4 = 'mp4',
     MOV = 'mov',
     AVI = 'avi',

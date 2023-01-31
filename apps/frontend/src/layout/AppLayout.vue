@@ -2,7 +2,7 @@
     <suspense>
         <UserConfigDialog></UserConfigDialog>
     </suspense>
-    <div class="bg-gray-100 h-full relative text-sm">
+    <div class="bg-gray-100 h-full text-sm">
         <NotificationSection />
 
         <div class="pl-0 relative h-full w-full maingrid lg:bigmaingrid">
@@ -24,9 +24,9 @@
 </template>
 
 <script setup lang="ts">
-    import { ref, watch } from 'vue';
+    import { watch } from 'vue';
     import UserConfigDialog from '@/components/UserConfigDialog.vue';
-    import { useSocketState } from '../store/socketStore';
+    import { useSocketState } from '@/store/socketStore';
     import ImagePreview from '@/components/ImagePreview.vue';
     import NotificationSection from '@/components/notifications/NotificationSection.vue';
 
