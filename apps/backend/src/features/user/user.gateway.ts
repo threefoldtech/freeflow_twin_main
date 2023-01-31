@@ -11,7 +11,6 @@ import { Contact } from '../contact/models/contact.model';
 import { LocationService } from '../location/location.service';
 import { QuantumService } from '../quantum/quantum.service';
 import { UserService } from './user.service';
-import { GlobalVars } from '../../data';
 
 @WebSocketGateway({ cors: '*' })
 export class UserGateway implements OnGatewayInit {
@@ -46,10 +45,6 @@ export class UserGateway implements OnGatewayInit {
      */
     async getConnections(): Promise<number> {
         const sockets = await this.server.allSockets();
-
-        console.log('Count of sockets: ');
-        console.log(sockets.size);
-
         return sockets.size;
     }
 
@@ -110,10 +105,5 @@ export class UserGateway implements OnGatewayInit {
     @SubscribeMessage('status_update')
     async handleStatusUpdate(@MessageBody() status: string) {
         await this._userService.updateStatus({ status });
-    }
-
-    @SubscribeMessage('current_url')
-    async getCurrentUrl(@MessageBody() url: string) {
-        GlobalVars.currentUrl = url;
     }
 }

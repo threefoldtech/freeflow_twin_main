@@ -9,17 +9,26 @@ import { KeyService } from '../key/key.service';
 import { CreateMessageDTO, MessageDTO } from './dtos/message.dto';
 import { Message } from './models/message.model';
 import { MessageRedisRepository } from './repositories/message-redis.repository';
+import { ChatService } from '../chat/chat.service';
+import { FirebaseService } from '../firebase/firebase.service';
+import { debounceFunction } from '../../utils/debounce';
+import { PostNotificationDto } from '../firebase/dtos/firebase.dtos';
 
 @Injectable()
 export class MessageService {
     private userId: string;
+    private _notificationCount: number = 0;
 
     constructor(
         private readonly _messageRepo: MessageRedisRepository,
         private readonly _configService: ConfigService,
         private readonly _keyService: KeyService,
         @Inject(forwardRef(() => ChatGateway))
-        private readonly _chatGateway: ChatGateway
+        private readonly _chatGateway: ChatGateway,
+        @Inject(forwardRef(() => ChatService))
+        private readonly _chatService: ChatService,
+        @Inject(forwardRef(() => FirebaseService))
+        private readonly _firebaseService: FirebaseService
     ) {
         this.userId = this._configService.get<string>('userId');
     }
@@ -246,5 +255,45 @@ export class MessageService {
     determineChatID<T>({ to, from }: MessageDTO<T>): string {
         if (to === this._configService.get<string>('userId')) return from;
         return to;
+    }
+
+    async notifyIfUnread(message: MessageDTO<unknown>, chatId: string): Promise<void> {
+        const userId = this._configService.get<string>('userId');
+        if (message.from == userId) return;
+
+        if (message.type === MessageType.READ) return;
+        const newChat = await this._chatService.getChat(chatId);
+
+        const lastReadMessageId = newChat.parseRead()?.find(u => u.userId === userId)?.messageId;
+
+        const allMessages = await this.getMessagesFromChat({ chatId: chatId, count: 50, totalMessagesLoaded: 0 });
+
+        const lastReadMessageIdx = allMessages.findIndex((m: MessageDTO<unknown>) => m.id === lastReadMessageId);
+        const currentMessageIdx = allMessages.findIndex((m: MessageDTO<unknown>) => m.id === message.id);
+
+        // When having more than 1 unread message
+        if (lastReadMessageIdx > currentMessageIdx) return;
+
+        if (lastReadMessageId === message.id) return;
+
+        this._notificationCount++;
+
+        // Make system which does not trigger everytime a new notification for each message
+        debounceFunction(() => {
+            if (this._notificationCount !== 0) {
+                console.log('I will trigger a notification with notificationCount: ', this._notificationCount);
+                const postMessage: PostNotificationDto = {
+                    timestamp: message.timeStamp.toString(),
+                    message: `You have unread messages`,
+                    sender: message.from,
+                    group: newChat.isGroup.toString(),
+                    me: userId,
+                    appId: this._configService.get('appId'),
+                };
+
+                this._firebaseService.notifyUserInMicroService(postMessage);
+                this._notificationCount = 0;
+            }
+        }, 15000);
     }
 }
