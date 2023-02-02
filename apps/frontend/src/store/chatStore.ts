@@ -31,7 +31,6 @@ import { useDebounceFn } from '@vueuse/core';
 const messageLimit = 50;
 const state = reactive<ChatState>({
     chats: [],
-    unBlockedChats: [],
     chatRequests: [],
     chatInfo: {},
     unreadChats: [],
@@ -723,7 +722,6 @@ interface ChatInfo {
 
 interface ChatState {
     chats: Chat[];
-    unBlockedChats: Chat[];
     chatRequests: Chat[];
     chatInfo: ChatInfo;
     unreadChats: string[];

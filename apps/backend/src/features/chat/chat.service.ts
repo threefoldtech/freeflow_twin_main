@@ -163,7 +163,6 @@ export class ChatService {
             const chats = await this._chatRepository.getChats({ offset, count });
             const contacts = await this._contactService.getContacts();
             const blockedContacts = await this._blockedContactService.getBlockedContacts();
-            console.log(JSON.stringify(blockedContacts));
             chats.forEach(c => {
                 const contact = contacts.find(contact => contact.id === c.chatId);
                 const blockedContact = blockedContacts.find(contact => contact.id === c.chatId);
