@@ -158,6 +158,33 @@ export class ChatService {
         }
     }
 
+    async getUnblockedChats({ offset = 0, count = 50 }: { offset?: number; count?: number } = {}): Promise<ChatDTO[]> {
+        try {
+            const chats = await this._chatRepository.getChats({ offset, count });
+            const contacts = await this._contactService.getContacts();
+            const blockedContacts = await this._blockedContactService.getBlockedContacts();
+            console.log(JSON.stringify(blockedContacts));
+            chats.forEach(c => {
+                const contact = contacts.find(contact => contact.id === c.chatId);
+                const blockedContact = blockedContacts.find(contact => contact.id === c.chatId);
+                if (!contact && !c.isGroup && blockedContact) {
+                    chats.splice(chats.indexOf(c), 1);
+                }
+            });
+            const chatDTOs = chats.map(c => c.toJSON());
+            for (let i = 0; i < chatDTOs.length; i++) {
+                const chatMessages = await this._messageService.getMessagesFromChat({
+                    chatId: chatDTOs[i].chatId,
+                    count,
+                });
+                chatDTOs[i].messages = chatMessages ?? [];
+            }
+            return chatDTOs;
+        } catch (error) {
+            throw new NotFoundException('no chats found');
+        }
+    }
+
     /**
      * Gets accepted chats using pagination.
      * @param {Object} obj - Object.

@@ -126,7 +126,7 @@
 
 <script lang="ts" setup>
     import { onBeforeMount, onMounted, onBeforeUnmount, ref } from 'vue';
-    import { useChatsState } from '@/store/chatStore';
+    import { useChatsState, usechatsActions } from '@/store/chatStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import Spinner from '@/components/Spinner.vue';
     import { XIcon } from '@heroicons/vue/solid';
@@ -134,8 +134,11 @@
     import { IPostContainerDTO } from 'custom-types/post.type';
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { Chat } from '@/types';
 
-    const { chats } = useChatsState();
+    // const { chats } = useChatsState();
+    const { retrieveUnBlockedChats } = usechatsActions();
+    const chats = ref<Chat[]>([]);
 
     const emit = defineEmits(['close', 'image_clicked']);
     const props = defineProps<{ item: IPostContainerDTO; avatarImg: any }>();
@@ -145,6 +148,7 @@
     let escListener = null;
 
     onBeforeMount(async () => {
+        chats.value = await retrieveUnBlockedChats();
         escListener = (e: KeyboardEvent) => {
             if (e.key !== 'Escape') {
                 return;
