@@ -3,9 +3,9 @@
     "private": true,
     "version": "0.0.1",
     "scripts": {
-        "serve": "vite serve",
-        "dev": "vite",
-        "build": "vite build",
+        "serve": "vite serve --force",
+        "dev": "vite --force",
+        "build": "vite build --force",
         "pretty": "prettier --write --ignore-path .gitignore --check --plugin-search-dir=. ."
     },
     "dependencies": {
