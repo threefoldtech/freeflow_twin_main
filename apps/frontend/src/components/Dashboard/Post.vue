@@ -294,6 +294,7 @@
                 <CommentsContainer
                     v-if="showComments && item.replies.length > 0"
                     :comments="item.replies"
+                    :post-owner="item.ownerId"
                     :postingCommentInProgress="postingCommentInProgress"
                     class="border-t-2 rounded-b-lg"
                     :class="{ 'max-h-[35rem]': $route.name === 'single' }"

@@ -323,19 +323,23 @@ export class PostService {
     async deleteComment(deleteCommentDTO: DeleteCommentDTO): Promise<{ status: string }> {
         try {
             const myLocation = await this._locationService.getOwnLocation();
-            if (deleteCommentDTO.ownerLocation !== myLocation) {
+            //If your comment is on a post from someone else, you can only delete it if you are the owner of the comment.
+            if (this.user === deleteCommentDTO.userId && deleteCommentDTO.ownerLocation !== myLocation) {
                 return await this._apiService.deleteExternalComment({ deleteCommentDTO });
             }
 
             const post = await this._postRepo.getPost({ id: deleteCommentDTO.postId });
+            if (!post) throw new BadRequestException('post not found');
             const comment = this.findComment(post.parseReplies(), deleteCommentDTO.commentId);
             if (!comment) throw new BadRequestException('comment not found');
-            const owner = post.parsePostOwner();
+            const postOwner = post.parsePostOwner();
 
-            if (comment.owner.id !== this.user && this.user !== owner.id) {
+            //if you are not the owner of the comment and post it is only logic that you cannot delete it.
+            if (comment.owner.id !== this.user && this.user !== postOwner.id) {
                 throw new ForbiddenException('cannot delete comment as someone else if you are not the owner.');
             }
 
+            //If you are the owner of the comment or of the post, you can delete the comment.
             const changedComments = this.removeComment(post.parseReplies(), comment);
             post.replies = stringifyReplies(changedComments);
             await this._postRepo.updatePost(post);
