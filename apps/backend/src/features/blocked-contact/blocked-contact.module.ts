@@ -9,6 +9,8 @@ import { BlockedContactService } from './blocked-contact.service';
 import { BlockedContactRedisRepository } from './repositories/blocked-contact-redis.repository';
 import { ApiModule } from '../api/api.module';
 import { ContactModule } from '../contact/contact.module';
+import { MessageModule } from '../message/message.module';
+import { ChatRedisRepository } from '../chat/repositories/chat-redis.repository';
 
 @Module({
     imports: [
@@ -16,11 +18,12 @@ import { ContactModule } from '../contact/contact.module';
         forwardRef(() => YggdrasilModule),
         forwardRef(() => ApiModule),
         forwardRef(() => ContactModule),
+        forwardRef(() => MessageModule),
         KeyModule,
         EncryptionModule,
     ],
     controllers: [BlockedContactController],
-    providers: [BlockedContactService, BlockedContactRedisRepository],
+    providers: [BlockedContactService, BlockedContactRedisRepository, ChatRedisRepository],
     exports: [BlockedContactService],
 })
 export class BlockedContactModule {}
