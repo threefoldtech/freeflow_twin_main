@@ -25,27 +25,36 @@
             <h2 class="py-2">Create new</h2>
         </template>
         <template v-slot:content>
-            <div class="flex justify-around py-4">
-                <div class="flex flex-col items-center" @click="showNewFolderDialog()">
-                    <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
-                        <FolderAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+            <div class="pt-6 pb-8 flex flex-col">
+                <div class="flex justify-around pb-6">
+                    <div class="flex flex-col items-center" @click="showNewFolderDialog()">
+                        <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
+                            <FolderAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+                        </div>
+                        <p class="mt-1">Folder</p>
                     </div>
-                    <p class="mt-1">Folder</p>
+                    <div
+                        class="flex flex-col items-center"
+                        @click="
+                            () => {
+                                showCreateFileDialog = true;
+                                showMainActionsOverlay = false;
+                            }
+                        "
+                    >
+                        <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
+                            <DocumentAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+                        </div>
+                        <p class="mt-1">File</p>
+                    </div>
                 </div>
-                <div
-                    class="flex flex-col items-center"
-                    @click="
-                        () => {
-                            showCreateFileDialog = true;
-                            showMainActionsOverlay = false;
-                        }
-                    "
+                <button
+                    type="button"
+                    @click="showMainActionsOverlay = false"
+                    className="inline-flex items-center justify-center mx-12 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
-                    <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
-                        <DocumentAddIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
-                    </div>
-                    <p class="mt-1">File</p>
-                </div>
+                    Cancel
+                </button>
             </div>
         </template>
     </MainActionsOverlay>
