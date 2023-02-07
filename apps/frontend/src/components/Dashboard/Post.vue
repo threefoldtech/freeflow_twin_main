@@ -1,11 +1,11 @@
 <template>
     <div
         v-if="showImagePreview"
-        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed p-8"
+        class="inset-0 bg-black bg-opacity-70 w-full h-full flex justify-center items-center z-50 fixed p-8"
         @click="showImagePreview = false"
     >
         <XIcon
-            class="absolute right-4 top-4 w-12 h-12 cursor-pointer text-white z-50"
+            class="absolute right-4 top-9 w-6 h-6 cursor-pointer text-white z-50"
             @click="showImagePreview = false"
         />
         <img :src="imagePreviewSrc" class="pointer-events-none z-50 max-h-full" @click.stop />
@@ -38,7 +38,7 @@
         </template>
     </Alert>
 
-    <div class="bg-white my-5 rounded">
+    <div class="bg-white rounded" :class="{ 'my-5': isDashboard }">
         <div class="p-6">
             <div>
                 <div class="relative">
@@ -371,7 +371,9 @@
     const { user } = useAuthState();
     const { isScrollToNewComment } = useScrollActions();
 
-    const props = defineProps<{ item: IPostContainerDTO }>();
+    const props = withDefaults(defineProps<{ item: IPostContainerDTO; isDashboard?: boolean }>(), {
+        isDashboard: false,
+    });
     const showAllImages = ref(false);
     const showShareDialog = ref(false);
     const readMore = ref(false);

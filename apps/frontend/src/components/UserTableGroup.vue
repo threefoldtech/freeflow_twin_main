@@ -61,10 +61,10 @@
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ item.id }}
                                                 </div>
-                                                <div class="text-sm text-gray-500 md:hidden">
-                                                    {{ item.location }}
+                                                <div class="text-sm text-gray-500 xs:hidden">
+                                                    {{ trimStringInTheMiddle(item.location, 25) }}
                                                 </div>
-                                                <div class="text-sm text-gray-500 hidden md:block">
+                                                <div class="text-sm text-gray-500 hidden xs:block">
                                                     {{ item.location }}
                                                 </div>
                                             </div>
@@ -121,6 +121,18 @@
 
     const handleInput = evt => {
         emit('update:modelValue', evt.target.value);
+    };
+
+    const trimStringInTheMiddle = (str: string, maxLength: number) => {
+        if (str.length <= maxLength) {
+            return str;
+        }
+        const separator = '...';
+        const sepLen = separator.length;
+        const charsToShow = maxLength - sepLen;
+        const frontChars = Math.ceil(charsToShow / 2);
+        const backChars = Math.floor(charsToShow / 2);
+        return str.substr(0, frontChars) + separator + str.substr(str.length - backChars);
     };
 
     const searchTerm = ref('');

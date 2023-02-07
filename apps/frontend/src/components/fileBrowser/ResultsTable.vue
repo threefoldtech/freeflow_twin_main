@@ -165,7 +165,7 @@
                         >
                             <div
                                 :class="{ 'bg-gray-200': isSelected(item), 'bg-white': !isSelected(item) }"
-                                class="group w-full aspect-w-12 aspect-h-4 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
+                                class="group w-full aspect-w-12 h-16 rounded-lg border-2 hover:bg-gray-200 transition duration:200 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-gray-100 focus-within:ring-indigo-500 overflow-hidden flex justify-center items-center"
                             >
                                 <div class="flex justify-start items-center cursor-pointer px-4">
                                     <i

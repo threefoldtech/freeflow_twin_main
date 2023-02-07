@@ -15,10 +15,10 @@
             @keydown.esc="showPost = false"
             class="z-50 inset-0 w-full h-full bg-opacity-25 bg-black fixed flex items-center justify-center drop-shadow-md"
         >
-            <XIcon class="w-12 h-12 absolute right-4 top-4 text-white cursor-pointer" />
+            <XIcon class="w-6 h-6 absolute right-4 top-4 text-white cursor-pointer" />
             <div
                 @click.stop
-                class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[95%] rounded-lg overflow-y-auto"
+                class="m-4 w-full sm:w-9/12 md:w-7/12 lg:w-2/4 xl:w-1/2 2xl:w-2/5 z-50 max-h-[85%] rounded-lg overflow-y-auto hide-scrollbar"
             >
                 <Post @click.stop @refreshPost="refreshPost" :item="postData" />
             </div>
