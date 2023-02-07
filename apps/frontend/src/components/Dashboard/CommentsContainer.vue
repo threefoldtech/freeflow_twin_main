@@ -4,7 +4,7 @@
             @replyToComment="e => $emit('replyToComment', e)"
             @updateComments="e => $emit('updateComments', e)"
             :key="comment.id"
-            :post-owner="props.postOwner"
+            :post-owner="postOwner"
             v-for="comment in commentsSorted"
             :comment="comment"
         />

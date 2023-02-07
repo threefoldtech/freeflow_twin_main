@@ -54,7 +54,7 @@
         </div>
 
         <Popover
-            v-if="showDots && (comment?.owner.id === user.id || props.postOwner === user.id)"
+            v-if="showDots && (comment?.owner.id === user.id || postOwner === user.id)"
             v-slot="{ open }"
             class="relative z-30"
         >
@@ -63,7 +63,7 @@
                 class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
             >
                 <DotsHorizontalIcon
-                    v-if="showDots && (comment?.owner.id === user.id || props.postOwner === user.id)"
+                    v-if="showDots && (comment?.owner.id === user.id || postOwner === user.id)"
                     class="text-gray-400 mb-5 w-5 h-5 cursor-pointer hover:text-gray-600"
                 />
             </PopoverButton>
@@ -79,7 +79,7 @@
                     <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                         <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
                             <div
-                                v-if="comment.owner.id === user.id || props.postOwner === user.id"
+                                v-if="comment.owner.id === user.id || postOwner === user.id"
                                 class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
                                 @click="
                                     showDeleteCommentDialog = true;
