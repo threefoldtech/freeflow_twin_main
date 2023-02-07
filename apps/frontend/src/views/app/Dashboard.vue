@@ -2,7 +2,7 @@
     <AppLayout>
         <div>
             <div ref="dashboardWindow" class="flex flex-row">
-                <div class="my-0 mx-auto lg:p-4 lg:px-2 w-full lg:w-[800px]">
+                <div class="mx-auto lg:p-4 lg:px-2 w-full lg:w-[800px]">
                     <div v-if="isLoadingSocialPosts" class="fixed right-5 bottom-5 flex items-center">
                         <p class="mr-4">Loading</p>
                         <Spinner />
@@ -12,7 +12,7 @@
                         <Spinner />
                     </div>
                     <p class="flex justify-center my-8" v-if="isLoadingSocialPosts">Loading posts</p>
-                    <Post :item="item" v-for="item in allSocialPosts" :key="item.post.id" />
+                    <Post :is-dashboard="true" :item="item" v-for="item in allSocialPosts" :key="item.post.id" />
                 </div>
             </div>
             <div></div>

@@ -36,7 +36,11 @@ module.exports = {
                 gradienta: '#544297',
                 gradientb: '#36127C',
             },
+            screens: {
+                xs: '410px',
+            },
         },
+
         fontFamily: {
             sans: ['inter', ...defaultTheme.fontFamily.sans],
             serif: [...defaultTheme.fontFamily.serif],
@@ -44,21 +48,39 @@ module.exports = {
         },
     },
     plugins: [
-        plugin(function ({ addVariant, e }) {
-            addVariant('my-message', ({ modifySelectors, separator }) => {
-                modifySelectors(({ className }) => {
+        plugin(function ({
+            addVariant,
+            e
+        }) {
+            addVariant('my-message', ({
+                modifySelectors,
+                separator
+            }) => {
+                modifySelectors(({
+                    className
+                }) => {
                     return `.my-message .${e(`my-message${separator}${className}`)}`;
                 });
             });
 
-            addVariant('collapsed-bar', ({ modifySelectors, separator }) => {
-                modifySelectors(({ className }) => {
+            addVariant('collapsed-bar', ({
+                modifySelectors,
+                separator
+            }) => {
+                modifySelectors(({
+                    className
+                }) => {
                     return `.collapsed-bar .${e(`collapsed-bar${separator}${className}`)}`;
                 });
             });
 
-            addVariant('group-chat', ({ modifySelectors, separator }) => {
-                modifySelectors(({ className }) => {
+            addVariant('group-chat', ({
+                modifySelectors,
+                separator
+            }) => {
+                modifySelectors(({
+                    className
+                }) => {
                     return `.group-chat .${e(`group-chat${separator}${className}`)}`;
                 });
             });
