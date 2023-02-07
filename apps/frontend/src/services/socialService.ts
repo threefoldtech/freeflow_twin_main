@@ -131,13 +131,14 @@ export const likeComment = async (
     ).data;
 };
 
-export const deleteComment = async (postId: string, commentId: string, location: string) => {
+export const deleteComment = async (postId: string, commentId: string, location: string, userId: string) => {
     return (
         await axios.delete(`${endpoint}/comment/delete`, {
             data: {
                 postId,
                 commentId,
                 ownerLocation: location,
+                userId: userId,
             },
         })
     ).data;

@@ -35,9 +35,7 @@
                 </div>
                 <div class="hidden lg:block bg-gray-100 w-auto rounded-lg px-2 py-2">
                     <div class="font-semibold">
-                        <p class="text-sm font-semibold">
-                            {{ comment.owner.id }}
-                        </p>
+                        <p class="text-sm font-semibold">{{ comment.owner.id }}</p>
                     </div>
                     <div class="text-sm">
                         {{ comment.body }}
@@ -66,16 +64,16 @@
         </div>
 
         <Popover
-            v-if="showDots && comment?.owner.id === user.id"
+            v-if="showDots && (comment?.owner.id === user.id || postOwner === user.id)"
             v-slot="{ open }"
-            class="hidden lg:block relative z-30"
+            class="relative z-30"
         >
             <PopoverButton
                 :class="open ? '' : 'text-opacity-90'"
                 class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
             >
                 <DotsHorizontalIcon
-                    v-if="showDots && comment?.owner.id === user.id"
+                    v-if="showDots && (comment?.owner.id === user.id || postOwner === user.id)"
                     class="text-gray-400 mb-5 w-5 h-5 cursor-pointer hover:text-gray-600"
                 />
             </PopoverButton>
@@ -91,7 +89,7 @@
                     <div class="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                         <div class="relative grid gap-8 bg-white px-6 py-4 rounded-lg">
                             <div
-                                v-if="comment.owner.id === user.id"
+                                v-if="comment.owner.id === user.id || postOwner === user.id"
                                 class="flex items-center cursor-pointer text-gray-500 hover:text-red-900"
                                 @click="
                                     showDeleteCommentDialog = true;
@@ -112,6 +110,7 @@
         v-if="commentsSorted?.length > 0 && CommentType.COMMENT"
         :key="reply.id"
         :comment="reply"
+        :post-owner="postOwner"
         @updateComments="e => $emit('updateComments', e)"
     />
     <form
@@ -217,7 +216,7 @@
     import { onLongPress } from '@vueuse/core';
     import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
 
-    const props = defineProps<{ comment: IPostComment }>();
+    const props = defineProps<{ comment: IPostComment; postOwner: string }>();
     const showReplyInput = ref<boolean>(false);
     const replyInput = ref<string>('');
     const myLocation = ref<string>('');
@@ -256,7 +255,7 @@
     const handleDeleteComment = async () => {
         const { post } = props.comment;
 
-        await deleteComment(post.id, props.comment.id, post.owner.location);
+        await deleteComment(post.id, props.comment.id, post.owner.location, props.comment.owner.id);
         const res = await getSinglePost(post.id, post.owner.location);
         showDeleteCommentDialog.value = false;
 

@@ -2,4 +2,5 @@ export class DeleteCommentDTO {
     postId: string;
     commentId: string;
     ownerLocation: string;
+    userId: string;
 }

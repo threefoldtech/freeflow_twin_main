@@ -4,6 +4,7 @@
             @replyToComment="e => $emit('replyToComment', e)"
             @updateComments="e => $emit('updateComments', e)"
             :key="comment.id"
+            :post-owner="postOwner"
             v-for="comment in commentsSorted"
             :comment="comment"
         />
@@ -18,7 +19,7 @@
 
     const { scrollToNewComment } = useScrollState();
 
-    const props = defineProps<{ comments: IPostComment[] }>();
+    const props = defineProps<{ comments: IPostComment[]; postOwner: string }>();
     const emit = defineEmits<{
         (e: 'updateComments', post: IPostContainerDTO): void;
         (e: 'replyToComment', { input, comment_id }: { input: string; comment_id: string }): void;
