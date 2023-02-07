@@ -28,7 +28,7 @@ export class BlockedContactController {
         return blockedContacts.includes(id);
     }
 
-    @Get('unblocked')
+    @Get('chats/unblocked')
     @UseGuards(AuthGuard)
     async getUnblockedChats(@Query('offset') offset = 0, @Query('count') count = 50): Promise<ChatDTO[]> {
         return await this._blockedContactService.getUnblockedChats({ offset, count });

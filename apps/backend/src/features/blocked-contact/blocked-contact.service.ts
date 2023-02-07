@@ -95,9 +95,6 @@ export class BlockedContactService {
             const chats = await this._chatRepository.getChats({ offset, count });
             const contacts = await this._contactService.getContacts();
             const blockedContacts = await this.getBlockedContacts();
-            console.log(JSON.stringify(chats));
-            console.log(JSON.stringify(contacts));
-            console.log(JSON.stringify(blockedContacts));
             chats.forEach(c => {
                 const contact = contacts.find(contact => contact.id === c.chatId);
                 const blockedContact = blockedContacts.find(contact => contact.id === c.chatId);
@@ -106,7 +103,6 @@ export class BlockedContactService {
                 }
             });
             const chatDTOs = chats.map(c => c.toJSON());
-            console.log(JSON.stringify(chatDTOs));
             for (let i = 0; i < chatDTOs.length; i++) {
                 const chatMessages = await this._messageService.getMessagesFromChat({
                     chatId: chatDTOs[i].chatId,
@@ -114,7 +110,6 @@ export class BlockedContactService {
                 });
                 chatDTOs[i].messages = chatMessages ?? [];
             }
-            console.log(JSON.stringify(chatDTOs));
             return chatDTOs;
         } catch (error) {
             throw new NotFoundException('no chats found');
