@@ -94,7 +94,7 @@ export const retrieveUnBlockedChats = async () => {
     const params = new URLSearchParams();
     params.append('limit', messageLimit.toString());
     isLoading.value = true;
-    const res = await axios.get(`${config.baseUrl}api/v2/chats/unblocked`, { params: params });
+    const res = await axios.get(`${config.baseUrl}api/v2/blocked/unblocked`, { params: params });
     let incomingChats = res.data;
 
     incomingChats = sortUnblockedChats(incomingChats);
