@@ -23,7 +23,17 @@
 
         <div class="flex items-center justify-center space-x-2 relative">
             <div class="block">
-                <div class="bg-gray-100 w-auto rounded-lg px-2 py-2">
+                <div ref="htmlRef" class="block lg:hidden bg-gray-100 w-auto rounded-lg px-2 py-2">
+                    <div class="font-semibold">
+                        <p class="text-sm font-semibold">
+                            {{ comment.owner.id }}
+                        </p>
+                    </div>
+                    <div class="text-sm">
+                        {{ comment.body }}
+                    </div>
+                </div>
+                <div class="hidden lg:block bg-gray-100 w-auto rounded-lg px-2 py-2">
                     <div class="font-semibold">
                         <p class="text-sm font-semibold">
                             {{ comment.owner.id }}
@@ -55,7 +65,11 @@
             </div>
         </div>
 
-        <Popover v-if="showDots && comment?.owner.id === user.id" v-slot="{ open }" class="relative z-30">
+        <Popover
+            v-if="showDots && comment?.owner.id === user.id"
+            v-slot="{ open }"
+            class="hidden lg:block relative z-30"
+        >
             <PopoverButton
                 :class="open ? '' : 'text-opacity-90'"
                 class="items-center text-base font-medium text-white rounded-md group hover:text-opacity-100 focus:outline-none"
@@ -120,6 +134,52 @@
             <span class="material-symbols-rounded text-primary text-4xl"> send </span>
         </button>
     </form>
+    <MainActionsOverlay
+        style="margin-top: 0; margin-bottom: 0"
+        :model-value="isMobileMenuActive"
+        @update-model-value="isMobileMenuActive = false"
+    >
+        <template #content>
+            <div class="pt-6 pb-8 flex flex-col">
+                <div class="flex justify-around pb-6">
+                    <div
+                        v-if="comment.owner.id === user.id"
+                        class="flex flex-col items-center"
+                        @click="
+                            showDeleteCommentDialog = true;
+                            isMobileMenuActive = false;
+                        "
+                    >
+                        <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
+                            <TrashIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+                        </div>
+                        <p class="mt-1">Delete</p>
+                    </div>
+                    <div
+                        class="flex flex-col items-center"
+                        @click="
+                            () => {
+                                showReplyInput = true;
+                                isMobileMenuActive = false;
+                            }
+                        "
+                    >
+                        <div class="inline-flex items-center p-2.5 border border-gray-400 rounded-full">
+                            <ReplyIcon aria-hidden="true" class="h-6 w-6 text-gray-400" />
+                        </div>
+                        <p class="mt-1">Reply</p>
+                    </div>
+                </div>
+                <button
+                    type="button"
+                    @click="isMobileMenuActive = false"
+                    className="inline-flex items-center justify-center mx-12 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                >
+                    Cancel
+                </button>
+            </div>
+        </template>
+    </MainActionsOverlay>
 
     <Alert v-if="showDeleteCommentDialog" :showAlert="showDeleteCommentDialog" @close="showDeleteCommentDialog = false">
         <template #title> Deleting comment</template>
@@ -146,7 +206,7 @@
     import CommentHoverPanel from '@/components/Dashboard/CommentHoverPanel.vue';
     import ReplyComment from '@/components/Dashboard/PostComment.vue';
     import moment from 'moment';
-    import { ThumbUpIcon, DotsHorizontalIcon, TrashIcon } from '@heroicons/vue/solid';
+    import { ThumbUpIcon, DotsHorizontalIcon, TrashIcon, ReplyIcon } from '@heroicons/vue/solid';
     import { calcExternalResourceLink } from '@/services/urlService';
     import { myYggdrasilAddress, useAuthState } from '@/store/authStore';
     import AvatarImg from '@/components/AvatarImg.vue';
@@ -154,6 +214,8 @@
     import { deleteComment, getSinglePost, likeComment } from '@/services/socialService';
     import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
     import Alert from '@/components/Alert.vue';
+    import { onLongPress } from '@vueuse/core';
+    import MainActionsOverlay from '@/components/fileBrowser/MainActionsOverlay.vue';
 
     const props = defineProps<{ comment: IPostComment }>();
     const showReplyInput = ref<boolean>(false);
@@ -162,6 +224,15 @@
     const { user } = useAuthState();
     const showDots = ref<boolean>(false);
     const showDeleteCommentDialog = ref<boolean>(false);
+
+    const htmlRef = ref<HTMLElement | null>(null);
+    const isMobileMenuActive = ref(false);
+
+    const onLongPressCallbackHook = (e: PointerEvent) => {
+        isMobileMenuActive.value = true;
+    };
+
+    onLongPress(htmlRef, onLongPressCallbackHook, { modifiers: { prevent: true }, delay: 1000 });
 
     const emit = defineEmits<{
         (e: 'updateComments', post: IPostContainerDTO): void;

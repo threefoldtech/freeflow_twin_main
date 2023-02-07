@@ -9,7 +9,7 @@
             @mousedown="$emit('update-model-value', false)"
             @keydown.esc="$emit('update-model-value', false)"
         >
-            <div class="form-container z-50 bg-white h-auto w-full overflow-auto fixed" @mousedown.stop>
+            <div class="z-50 bg-white h-auto w-full overflow-auto fixed" @mousedown.stop>
                 <slot name="header" />
                 <slot name="content" />
             </div>
