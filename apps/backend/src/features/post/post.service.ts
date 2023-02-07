@@ -150,6 +150,9 @@ export class PostService {
             } catch (error) {
                 throw new BadRequestException(`unable to get post: ${error}`);
             }
+        const contacts = await this._contactService.getContacts();
+        const contact = contacts.find(c => c.location === ownerLocation);
+        if (!contact) return;
         return await this._apiService.getExternalPost({ location: ownerLocation, postId });
     }
 
