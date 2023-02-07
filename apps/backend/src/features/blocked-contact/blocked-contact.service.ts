@@ -1,13 +1,11 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { CreateBlockedContactDTO, DeleteBlockedContactDTO } from './dtos/blocked-contact.dto';
 import { BlockedContact } from './models/blocked-contact.model';
 import { BlockedContactRedisRepository } from './repositories/blocked-contact-redis.repository';
 import { ContactService } from '../contact/contact.service';
 import { ApiService } from '../api/api.service';
 import { ConfigService } from '@nestjs/config';
-import { MessageService } from '../message/message.service';
-import { ChatRedisRepository } from '../chat/repositories/chat-redis.repository';
-import { ChatDTO } from '../chat/dtos/chat.dto';
 
 @Injectable()
 export class BlockedContactService {
@@ -15,9 +13,7 @@ export class BlockedContactService {
         private _blockedContactRepo: BlockedContactRedisRepository,
         private _contactService: ContactService,
         private _apiService: ApiService,
-        private _configService: ConfigService,
-        private _chatRepo: ChatRedisRepository,
-        private _messageService: MessageService
+        private _configService: ConfigService
     ) {}
 
     /**
@@ -87,38 +83,5 @@ export class BlockedContactService {
      */
     async isBlocked({ userId }: { userId: string }): Promise<boolean> {
         return (await this.getBlockedContactIds()).includes(userId);
-    }
-
-    /**
-     * Gets chats using pagination.
-     * @param {Object} obj - Object.
-     * @param {number} obj.offset - Chat offset, defaults to 0.
-     * @param {number} obj.count - Amount of chats to fetch, defaults to 50.
-     * @return {ChatDTO[]} - Found chats.
-     */
-    async getUnblockedChats({ offset = 0, count = 50 }: { offset?: number; count?: number } = {}): Promise<ChatDTO[]> {
-        try {
-            const chats = await this._chatRepo.getChats({ offset, count });
-            const contacts = await this._contactService.getContacts();
-            const blockedContacts = await this.getBlockedContacts();
-            chats.forEach(c => {
-                const contact = contacts.find(contact => contact.id === c.chatId);
-                const blockedContact = blockedContacts.find(contact => contact.id === c.chatId);
-                if (!contact && !c.isGroup && blockedContact) {
-                    chats.splice(chats.indexOf(c), 1);
-                }
-            });
-            const chatDTOs = chats.map(c => c.toJSON());
-            for (let i = 0; i < chatDTOs.length; i++) {
-                const chatMessages = await this._messageService.getMessagesFromChat({
-                    chatId: chatDTOs[i].chatId,
-                    count,
-                });
-                chatDTOs[i].messages = chatMessages ?? [];
-            }
-            return chatDTOs;
-        } catch (error) {
-            throw new NotFoundException('no chats found');
-        }
     }
 }
