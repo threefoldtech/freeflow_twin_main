@@ -9,6 +9,11 @@
             class="focus:border-primary focus:ring-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md"
             :placeholder="placeholder"
             v-focus
+            @input="
+                e => {
+                    searchTerm = e.target.value;
+                }
+            "
         />
         <div
             v-if="!!searchTerm"
