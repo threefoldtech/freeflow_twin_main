@@ -1,6 +1,6 @@
 <template>
     <div class="w-full h-full">
-        <div class="w-[98%] h-full ml-auto mr-auto" id="editor"></div>
+        <div class="w-[90%] h-[90%] ml-auto mr-auto" id="editor"></div>
     </div>
 </template>
 
