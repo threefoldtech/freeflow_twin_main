@@ -34,30 +34,31 @@
 
     <div
         v-if="showFilePreview"
-        class="inset-0 bg-black bg-opacity-50 w-full h-full flex justify-center items-center z-50 fixed md:p-8 p-0"
+        class="inset-0 bg-black bg-opacity-70 w-full h-full flex justify-center items-center z-50 fixed md:p-8 p-0"
         @click.self="closeEditor()"
     >
         <XIcon
             class="absolute right-4 top-4 md:w-12 md:h-12 sm:w-10 sm:h-10 w-8 h-8 cursor-pointer text-white z-50"
             @click="closeEditor()"
         />
+        <div class="flex flex-col w-full h-full justify-end">
+            <button
+                v-if="!readOnly"
+                @click="saveChanges(true)"
+                class="sm:py-2 py-1 sm:px-4 px-2 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 md:left-24 top-4 border-2 border-primary"
+            >
+                <SaveIcon class="w-6 h-6 inline-block mr-2" />
+                Save changes
+            </button>
 
-        <button
-            v-if="!readOnly"
-            @click="saveChanges(true)"
-            class="sm:py-2 py-1 sm:px-4 px-2 ml-2 text-white rounded-md justify-self-end bg-primary absolute left-5 top-4 border-2"
-        >
-            <SaveIcon class="w-6 h-6 inline-block mr-2" />
-            Save changes
-        </button>
-
-        <MonacoEditor
-            theme="vs"
-            v-model="editedFileContent"
-            :extension="extension"
-            :options="{ readOnly }"
-            class="w-screen md:h-[80vh] sm:h-[85vh] h-[88vh] md:mt-0 mt-10"
-        />
+            <MonacoEditor
+                theme="vs"
+                v-model="editedFileContent"
+                :extension="extension"
+                :options="{ readOnly }"
+                class="md:h-[80vh] sm:h-[85vh] h-[88vh]"
+            />
+        </div>
     </div>
 
     <Dialog :modelValue="showConfirmDialog" @updateModelValue="saveChanges" :noActions="true">
