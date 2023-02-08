@@ -177,7 +177,12 @@
                     <span class="sr-only">Open sidebar</span>
                     <MenuIcon class="h-8 text-primary" aria-hidden="true" />
                 </button>
-                <img alt="logo FreeFlow" src="/freeflow_purple.svg" class="h-10 mt-3" />
+                <img
+                    alt="logo FreeFlow"
+                    src="/freeflow_purple.svg"
+                    class="h-10 mt-3"
+                    @click="changePage('dashboard')"
+                />
                 <div class="w-16 h-10"></div>
             </div>
             <slot name="content" />
