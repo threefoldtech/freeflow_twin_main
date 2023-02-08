@@ -57,7 +57,7 @@
                 <div class="-mt-2 sm:-mx-6 lg:-mx-8">
                     <div class="pt-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                         <div class="overflow-hidden border-b md:border-r border-gray-200">
-                            <table class="w-full divide-y divide-gray-200">
+                            <table v-if="!isLoading" class="w-full divide-y divide-gray-200">
                                 <thead>
                                     <tr>
                                         <th
@@ -116,6 +116,9 @@
                                     </tr>
                                 </tbody>
                             </table>
+                            <div class="max-w-full flex justify-center my-8" v-else>
+                                <Spinner small />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -126,16 +129,20 @@
 
 <script lang="ts" setup>
     import { onBeforeMount, onMounted, onBeforeUnmount, ref } from 'vue';
-    import { useChatsState } from '@/store/chatStore';
+    import { useChatsState, usechatsActions } from '@/store/chatStore';
     import { calcExternalResourceLink } from '@/services/urlService';
     import Spinner from '@/components/Spinner.vue';
     import { XIcon } from '@heroicons/vue/solid';
     import { sendMessageSharePost } from '@/services/socialService';
     import { IPostContainerDTO } from 'custom-types/post.type';
     import moment from 'moment';
-    import AvatarImg from '@/components/AvatarImg.vue';
 
-    const { chats } = useChatsState();
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { Chat } from '@/types';
+
+    const { retrieveUnBlockedChats } = usechatsActions();
+    const chats = ref<Chat[]>([]);
+    const isLoading = ref<boolean>(true);
 
     const emit = defineEmits(['close', 'image_clicked']);
     const props = defineProps<{ item: IPostContainerDTO; avatarImg: any }>();
@@ -145,6 +152,8 @@
     let escListener = null;
 
     onBeforeMount(async () => {
+        chats.value = await retrieveUnBlockedChats();
+        isLoading.value = false;
         escListener = (e: KeyboardEvent) => {
             if (e.key !== 'Escape') {
                 return;

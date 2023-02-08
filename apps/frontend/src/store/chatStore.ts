@@ -90,6 +90,18 @@ const retrieveChats = async () => {
     return incomingChats;
 };
 
+export const retrieveUnBlockedChats = async () => {
+    const params = new URLSearchParams();
+    params.append('limit', messageLimit.toString());
+    isLoading.value = true;
+    const res = await axios.get(`${config.baseUrl}api/v2/blocked/chats/unblocked`, { params: params });
+    let incomingChats = res.data;
+
+    incomingChats = sortUnblockedChats(incomingChats);
+    isLoading.value = false;
+    return incomingChats;
+};
+
 export const editMessage = (chatId: string, message: any, messageId?: string) => {
     if (messageId && typeof message === 'string') {
         const chat = state.chats.find(c => c.chatId === chatId);
@@ -575,6 +587,26 @@ const sortChats = () => {
     });
 };
 
+const sortUnblockedChats = chats => {
+    const blockList = blocklist.value;
+    chats.sort((a, b) => {
+        const aIsBlocked = blockList.includes(a.chatId);
+        const bIsBlocked = blockList.includes(b.chatId);
+        if (aIsBlocked && !bIsBlocked) return 1;
+
+        if (!aIsBlocked && bIsBlocked) return -1;
+
+        var adate = a.messages[a.messages.length - 1]
+            ? a.messages[a.messages.length - 1].timeStamp
+            : new Date(-8640000000000000);
+        var bdate = b.messages[b.messages.length - 1]
+            ? b.messages[b.messages.length - 1].timeStamp
+            : new Date(-8640000000000000);
+        return moment(bdate).unix() - moment(adate).unix();
+    });
+    return chats;
+};
+
 const readMessage = (chatId: string, messageId: string) => {
     const { user } = useAuthState();
 
@@ -660,6 +692,7 @@ export const usechatsActions = () => {
     return {
         addChat,
         retrieveChats,
+        retrieveUnBlockedChats,
         sendMessage,
         addMessage,
         sendFile,
