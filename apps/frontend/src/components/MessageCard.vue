@@ -223,12 +223,13 @@
         sendMessageObject(props.chatId, updatedMessage);
     };
 
+    const re = /(?:\.([^.]+))?$/;
     const downloadAttachmentToQuantum = async (message: Message<MessageBodyType>) => {
         const url = calcExternalResourceLink((message.body as { url: string }).url);
         const res = await axios.get(url, { responseType: 'blob' });
         const blob = new Blob([res.data], { type: res.headers['content-type'] });
         const filename = res.headers['content-disposition'].split('filename=')[1].split('.')[0];
-        const extension = res.headers['content-disposition'].split('.')[1].split(';')[0];
+        const extension = re.exec(res.headers['content-disposition'])[1];
 
         const link = document.createElement('a');
         link.href = window.URL.createObjectURL(blob);
