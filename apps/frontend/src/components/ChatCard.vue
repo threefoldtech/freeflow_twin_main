@@ -5,6 +5,7 @@
             'hover:bg-gray-100': !router.currentRoute?.value.path.includes(chat.chatId),
             'bg-gray-200 hover:bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
         }"
+        ref="htmlRef"
         @click="$emit('selectChat')"
         @keyup.enter="$emit('selectChat')"
     >
@@ -35,8 +36,9 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed } from 'vue';
+    import { computed, ref } from 'vue';
     import { useAuthState } from '@/store/authStore';
+    import { onLongPress } from '@vueuse/core';
     import { Chat, FileShareMessageType, FileTypes, MessageTypes, QuoteBodyType, SystemBody } from '@/types';
     import moment from 'moment';
     import { statusList } from '@/store/statusStore';
@@ -44,6 +46,7 @@
     import { useRouter } from 'vue-router';
     import { userIsBlocked } from '@/store/blockStore';
     import { usechatsActions } from '@/store/chatStore';
+    import { RIGHT_CLICK_TYPE, setCurrentRightClickedItem } from '@/store/contextmenuStore';
 
     const { newUnreadChats, removeUnreadChats } = usechatsActions();
     const { user } = useAuthState();
@@ -54,6 +57,14 @@
     }
     const props = defineProps<IProps>();
     const emit = defineEmits(['selectChat']);
+
+    const htmlRef = ref<HTMLElement | null>(null);
+
+    const onLongPressCallbackHook = (e: PointerEvent) => {
+        setCurrentRightClickedItem(props.chat, RIGHT_CLICK_TYPE.CHAT_CARD);
+    };
+
+    onLongPress(htmlRef, onLongPressCallbackHook, { modifiers: { prevent: true }, delay: 1000 });
 
     const lastMessage = computed(() => {
         const lastIndex = props.chat?.messages?.length - 1;
