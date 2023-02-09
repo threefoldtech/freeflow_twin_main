@@ -171,9 +171,15 @@
             <div class="z-10 h-16 bg-white border-b border-gray-200 flex justify-between">
                 <button
                     type="button"
-                    class="px-4 text-gray-500 focus:outline-none lg:hidden"
+                    class="px-4 text-gray-500 focus:outline-none lg:hidden relative"
                     @click="mobileMenuOpen = true"
                 >
+                    <p
+                        v-if="totalUnreadChats > 0"
+                        class="absolute text-xs -right-1 top-0.5 inline-block bg-gradient text-white rounded-full text-center w-6 h-6 pt-1"
+                    >
+                        {{ totalUnreadChats }}
+                    </p>
                     <span class="sr-only">Open sidebar</span>
                     <MenuIcon class="h-8 text-primary" aria-hidden="true" />
                 </button>
