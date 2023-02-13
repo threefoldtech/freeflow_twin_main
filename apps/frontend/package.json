@@ -43,6 +43,7 @@
         "monaco-editor-webpack-plugin": "^7.0.1",
         "monaco-languageclient": "^4.0.0",
         "node-emoji": "^1.11.0",
+        "pull-refresh-vue3": "^0.3.1",
         "regenerator-runtime": "^0.13.9",
         "scriptjs": "^2.5.9",
         "socket.io-client": "^4.5.1",
