@@ -47,6 +47,7 @@
     import { userIsBlocked } from '@/store/blockStore';
     import { usechatsActions } from '@/store/chatStore';
     import { RIGHT_CLICK_TYPE, setCurrentRightClickedItem } from '@/store/contextmenuStore';
+    import { isMobile } from '@/store/fileBrowserStore';
 
     const { newUnreadChats, removeUnreadChats } = usechatsActions();
     const { user } = useAuthState();
@@ -55,6 +56,7 @@
         chat: Chat;
         collapsed: Boolean;
     }
+
     const props = defineProps<IProps>();
     const emit = defineEmits(['selectChat']);
 
@@ -64,7 +66,7 @@
         setCurrentRightClickedItem(props.chat, RIGHT_CLICK_TYPE.CHAT_CARD);
     };
 
-    onLongPress(htmlRef, onLongPressCallbackHook, { modifiers: { prevent: true }, delay: 1000 });
+    if (isMobile()) onLongPress(htmlRef, onLongPressCallbackHook, { modifiers: { prevent: true }, delay: 1000 });
 
     const lastMessage = computed(() => {
         const lastIndex = props.chat?.messages?.length - 1;
