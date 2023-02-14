@@ -12,7 +12,21 @@
                         <Spinner />
                     </div>
                     <p class="flex justify-center my-8" v-if="isLoadingSocialPosts">Loading posts</p>
-                    <Post :is-dashboard="true" :item="item" v-for="item in allSocialPosts" :key="item.post.id" />
+                    <PullRefresh
+                        v-model="loading"
+                        @refresh="
+                            async () => {
+                                await getAllPosts();
+                                loading = false;
+                            }
+                        "
+                        pulling-text="Pull to refresh"
+                        loosing-text="Release to refresh"
+                        loading-text="Loading..."
+                        success-text="Refreshed"
+                    >
+                        <Post :is-dashboard="true" :item="item" v-for="item in allSocialPosts" :key="item.post.id" />
+                    </PullRefresh>
                 </div>
             </div>
             <div></div>
@@ -22,12 +36,15 @@
 <script setup lang="ts">
     import AppLayout from '@/layout/AppLayout.vue';
     import CreatePost from '@/components/Dashboard/CreatePost.vue';
+    import PullRefresh from 'pull-refresh-vue3';
     import Post from '@/components/Dashboard/Post.vue';
-    import { computed } from 'vue';
+    import { computed, ref } from 'vue';
     import { getAllPosts } from '@/services/socialService';
     import { allSocialPosts, isLoadingSocialPosts } from '@/store/socialStore';
     import Spinner from '@/components/Spinner.vue';
     import { notificationPermissionGranted } from '@/store/notificiationStore';
+
+    const loading = ref<boolean>(false);
 
     (async () => {
         await getAllPosts();
