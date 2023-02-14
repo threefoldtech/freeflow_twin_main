@@ -1,7 +1,7 @@
 <template>
     <div
         :class="{ 'ml-10': comment.type === CommentType.COMMENT_REPLY }"
-        class="flex items-center space-x-2 relative"
+        class="flex items-center space-x-2 relative select-none"
         @mouseover="showDots = true"
         @mouseleave="showDots = false"
     >

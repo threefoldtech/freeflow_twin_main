@@ -15,7 +15,7 @@
             <i class="fas fa-times"></i>
         </button>
     </div>
-    <div class="md:p-2 bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
+    <div class="md:p-2 pb-8 md:pb-0 bg-white flex flex-col min-h-[3em] md:flex-row" @paste="onPaste">
         <div class="md:col-span-4 flex flex-nowrap md:bg-transparent bg-gray-200" :class="{ hidden: !collapsed }">
             <button class="hover:text-icon mx-2 my-0 p-0 self-center flex-1 pt-0.5" @click="toggleGif">
                 <h2>GIF</h2>

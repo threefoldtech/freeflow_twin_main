@@ -1,6 +1,6 @@
 <template>
     <li
-        class="py-4 px-2 max-w-full grid grid-cols-10 cursor-pointer items-center"
+        class="py-4 px-2 max-w-full grid grid-cols-10 cursor-pointer items-center select-none"
         :class="{
             'hover:bg-gray-100': !router.currentRoute?.value.path.includes(chat.chatId),
             'bg-gray-200 hover:bg-gray-200': router.currentRoute?.value.path.includes(chat.chatId),
