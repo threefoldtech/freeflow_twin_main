@@ -156,6 +156,10 @@
                             :collapsed="collapsed"
                             @selectChat="setSelected(chat.chatId)"
                             @mousedown.right="setCurrentRightClickedItem(chat, RIGHT_CLICK_TYPE.CHAT_CARD)"
+                            v-on-long-press="[
+                                () => setCurrentRightClickedItem(chat, RIGHT_CLICK_TYPE.CHAT_CARD),
+                                { delay: 800, modifiers: { stop: true } },
+                            ]"
                             v-contextmenu:contextmenu-chat-card
                         />
                     </ul>
@@ -211,6 +215,8 @@
     import { userIsBlocked } from '@/store/blockStore';
     import { useSocketActions } from '@/store/socketStore';
     import { Chat } from '@/types';
+    import { onLongPress } from '@vueuse/core';
+    import { vOnLongPress } from '@vueuse/components';
 
     const { chats, chatRequests } = useChatsState();
     const { user } = useAuthState();
