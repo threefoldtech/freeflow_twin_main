@@ -79,7 +79,7 @@ export class ShareRedisRepository extends EntityRepository<Share> {
      * @return {Chat} - Found share.
      */
     async getShareByPath({ path }: { path: string }): Promise<Share> {
-        return await this.findOneAnd({ where: 'path', eq: path, and: 'isSharedWithMe', andEq: false });
+        return await this.findOne({ where: 'path', eq: path });
     }
 
     async updateShare({ share }: { share: Share }): Promise<Share> {
