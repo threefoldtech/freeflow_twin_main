@@ -51,7 +51,7 @@ RUN apt-get update -y && apt-get upgrade -y \
 RUN curl https://packages.redis.io/gpg | apt-key add - \
  && echo "deb https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
  && apt-get update -y \
- && apt-get install -y redis
+ && apt-get install -y redis npm
 
 COPY --from=yggdrasil_builder /src/yggdrasil    /usr/bin/
 COPY --from=yggdrasil_builder /src/yggdrasilctl /usr/bin/

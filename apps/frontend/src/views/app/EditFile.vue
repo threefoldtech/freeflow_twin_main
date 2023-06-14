@@ -35,6 +35,7 @@
 
 <script setup lang="ts">
     import { computed, onMounted, ref } from 'vue';
+    import config from '@/config';
     import { useRoute } from 'vue-router';
     import {
         accessDenied,
@@ -84,7 +85,7 @@
         if (!shareId) location.value = await getOwnLocation();
 
         const documentServerConfig = generateDocumentServerConfig(location.value, fileAccessDetails, attachments);
-        get(`https://documentserver.digitaltwin-test.jimbertesting.be/web-apps/apps/api/documents/api.js`, () => {
+        get(`${config.documentServerLocation}/web-apps/apps/api/documents/api.js`, () => {
             //@ts-ignore
             new window.DocsAPI.DocEditor('placeholder', documentServerConfig);
         });
