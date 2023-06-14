@@ -239,7 +239,10 @@ export class QuantumController {
         if (!editFileResponse?.url) throw new NotFoundException('no url provided');
 
         const url = new URL(editFileResponse.url);
-        url.hostname = 'documentserver.digitaltwin-test.jimbertesting.be';
+
+        const hostName = this._configService.get<string>("documentServerLocation")
+
+        url.hostname = hostName;
         url.protocol = 'https:';
         const fileResponse = syncRequest('GET', url);
         const fileBuffer = <Buffer>fileResponse.body;
