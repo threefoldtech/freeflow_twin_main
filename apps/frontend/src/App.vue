@@ -17,7 +17,7 @@
                     class="relative h-full w-full"
                     title="forum"
                     id="forum-iframe"
-                    src="https://browser.jimber.org/?browsercontrols=true#https://duckduckgo.com/"
+                    src="https://browser-v3.jimber.io/#https://duckduckgo.com/"
                     allow="geolocation; microphone; camera; encrypted-media; clipboard-read; clipboard-write;"
                 />
             </div>
