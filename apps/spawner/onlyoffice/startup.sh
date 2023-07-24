@@ -1,3 +1,3 @@
 #!/bin/bash
-yggdrasil -useconffile /etc/yggdrasil.conf &
+yggdrasil -useconffile /conf/yggdrasil.conf &
 /app/ds/run-document-server.sh
