@@ -24,8 +24,9 @@ RUN echo 'deb [signed-by=/usr/local/apt-keys/yggdrasil-keyring.gpg] http://neila
 RUN apt-get update
 RUN apt-get install -y yggdrasil
 
-# Generate Yggdrasil configuration file
+# Generate the ygg conf, and add peers inside it 
 RUN yggdrasil -genconf > /etc/yggdrasil.conf
+RUN sed -i 's/Peers:\s\[\]/Peers: \[\n\ttcp:\/\/gent02.dev.grid.tf:9943\n\ttcp:\/\/gent02.test.grid.tf:9943\n\ttcp:\/\/gw307.vienna2.greenedgecloud.com:9943\n\ttcp:\/\/gw330.salzburg1.greenedgecloud.com:9943\n\ttcp:\/\/gw425.vienna2.greenedgecloud.com:9943\n\ttls:\/\/s2.i2pd.xyz:39575\n\ttls:\/\/ygg-ukr.incognet.io:8884\n\ttls:\/\/yggno.de:18227\n\ttls:\/\/fi1.servers.devices.cwinfo.net:61995\n\ttls:\/\/51.255.223.60:54232\n\t\]/g' /etc/yggdrasil.conf
 
 # Set the startup script as the entrypoint
 ENTRYPOINT ["/startup.sh"]

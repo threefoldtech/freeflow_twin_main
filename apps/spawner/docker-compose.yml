@@ -43,6 +43,8 @@ services:
         build:
             context: ./onlyoffice
         container_name: onlyoffice-documentserver
+        environment:
+            - JWT_ENABLED=false
         restart: always
         networks:
             - chatnet
