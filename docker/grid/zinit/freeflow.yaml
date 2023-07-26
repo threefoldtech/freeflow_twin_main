@@ -1,0 +1,4 @@
+exec: sh -c "./scripts/init.sh"
+after:
+  - sshd-init
+oneshot: true

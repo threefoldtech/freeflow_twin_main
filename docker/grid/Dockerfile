@@ -18,10 +18,8 @@ RUN set -ex \
 FROM node:16-alpine as builder
 WORKDIR /app
 COPY . .
-RUN ls
 RUN yarn
 RUN yarn build
-
 
 FROM ubuntu:20.04 as redis_builder
 RUN apt-get update -y && apt-get upgrade -y \
@@ -46,14 +44,13 @@ FROM nginx:latest
 ENV NODEJS_VERSION=16
 
 RUN apt-get update -y && apt-get upgrade -y \
- && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y nginx curl musl-tools nano iputils-ping procps iproute2 imagemagick software-properties-common wget gnupg
+ && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y nginx ufw sudo curl musl-tools nano iputils-ping procps iproute2 imagemagick software-properties-common wget gnupg
 
 RUN apt install openssh-server -y &&\
     mkdir -p /root/.ssh/ &&\
     chmod 700 /root/.ssh &&\
     touch /root/.ssh/authorized_keys &&\
     chmod 600 /root/.ssh/authorized_keys
-
 
 RUN curl https://packages.redis.io/gpg | apt-key add - \
  && echo "deb https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
@@ -74,11 +71,8 @@ COPY --from=redis_builder /redis-json /redis-json
 COPY --from=redis_builder /redis-search /redis-search
 
 RUN curl -sL "https://deb.nodesource.com/setup_${NODEJS_VERSION}.x" | bash -
-RUN apt-get install -y nodejs
+RUN apt-get install -y nodejs npm
 RUN npm install pm2 -g
-
-COPY ./docker/grid/startup.sh /init.sh
-RUN chmod +x /init.sh
 
 RUN mkdir /appdata
 RUN mkdir /appdata/user
@@ -90,7 +84,7 @@ RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download
 
 RUN mkdir -p /etc/zinit
 COPY ./docker/grid/zinit /etc/zinit
+COPY ./docker/grid/scripts /scripts/
+RUN chmod +x /scripts/*.sh
 
-RUN ./init.sh
-
-ENTRYPOINT [ "/sbin/zinit", "init" ]
+ENTRYPOINT  ["zinit", "init"]

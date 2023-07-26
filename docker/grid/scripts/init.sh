@@ -10,5 +10,7 @@ cd /app/apps/backend/dist
 node migrator/migrator.js
 
 echo "Copying production config"
+cat /usr/share/nginx/html/config/production.js
 cp /usr/share/nginx/html/config/production.js /usr/share/nginx/html/config/config-def.js
 echo "DONE"
+exit
