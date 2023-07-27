@@ -79,7 +79,7 @@ RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
-RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download/v0.2.5/zinit && \
+RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download/v0.2.10/zinit && \
     chmod +x /sbin/zinit
 
 RUN mkdir -p /etc/zinit
