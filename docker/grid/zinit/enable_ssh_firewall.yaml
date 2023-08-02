@@ -1,4 +1,0 @@
-exec: sh -c "./scripts/enable_ssh_firewall.sh"
-after:
-  - sshd-init
-oneshot: true

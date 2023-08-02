@@ -1,3 +1,1 @@
-exec: sh -c "/usr/sbin/sshd -D"
-after:
-  - sshd-init
+exec: bash -c "/usr/sbin/sshd -D"

@@ -18,8 +18,10 @@ RUN set -ex \
 FROM node:16-alpine as builder
 WORKDIR /app
 COPY . .
+RUN ls
 RUN yarn
 RUN yarn build
+
 
 FROM ubuntu:20.04 as redis_builder
 RUN apt-get update -y && apt-get upgrade -y \
@@ -44,13 +46,7 @@ FROM nginx:latest
 ENV NODEJS_VERSION=16
 
 RUN apt-get update -y && apt-get upgrade -y \
- && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y nginx ufw sudo curl musl-tools nano iputils-ping procps iproute2 imagemagick software-properties-common wget gnupg
-
-RUN apt install openssh-server -y &&\
-    mkdir -p /root/.ssh/ &&\
-    chmod 700 /root/.ssh &&\
-    touch /root/.ssh/authorized_keys &&\
-    chmod 600 /root/.ssh/authorized_keys
+ && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y nginx curl sudo musl-tools nano iputils-ping procps iproute2 imagemagick software-properties-common wget gnupg
 
 RUN curl https://packages.redis.io/gpg | apt-key add - \
  && echo "deb https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
@@ -70,21 +66,27 @@ COPY --from=builder /app /app
 COPY --from=redis_builder /redis-json /redis-json
 COPY --from=redis_builder /redis-search /redis-search
 
-RUN curl -sL "https://deb.nodesource.com/setup_${NODEJS_VERSION}.x" | bash -
-RUN apt-get install -y nodejs npm
-RUN npm install pm2 -g
+RUN curl -o- "https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.4/install.sh" | bash
+RUN nvm install v16.18.1
+RUN npm install pm2@5.2.2 -g
+
+# RUN sudo bash /tmp/nodesource_setup.sh
+# RUN sudo apt-get install -y nodejs npm
+
+COPY ./docker/grid/startup.sh /init.sh
+RUN chmod +x /init.sh
 
 RUN mkdir /appdata
 RUN mkdir /appdata/user
 COPY ./docker/avatar.jpg /appdata/user/avatar-default
 COPY ./docker/redis-example.conf /etc/redis/redis.conf
 
-RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download/v0.2.10/zinit && \
+RUN wget -O /sbin/zinit https://github.com/threefoldtech/zinit/releases/download/v0.2.5/zinit && \
     chmod +x /sbin/zinit
 
 RUN mkdir -p /etc/zinit
 COPY ./docker/grid/zinit /etc/zinit
-COPY ./docker/grid/scripts /scripts/
-RUN chmod +x /scripts/*.sh
 
-ENTRYPOINT  ["zinit", "init"]
+RUN ./init.sh
+
+ENTRYPOINT [ "/sbin/zinit", "init" ]

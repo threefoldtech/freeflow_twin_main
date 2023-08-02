@@ -79,7 +79,7 @@ root:freeflow/docker/dev$ sudo vim /etc/hosts
 ```vim
 127.0.0.1 digitaltwin.jimbertesting.be
 127.0.0.1 your-3bot-name.digitaltwin.jimbertesting.be
-127.0.0.1 documentserver.digitaltwin.jimbertesting.be,
+127.0.0.1 digitaltwin-test.jimbertesting.be,
 ```
 
 ### Windows and macOS
